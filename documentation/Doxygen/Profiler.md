@@ -27,7 +27,7 @@ class A {
     ~A;
     
     // Getter
-    void get_a(){return a_;}
+    int get_a(){return a_;}
 };
 ~~~~~~~~~~~~~~~~~~~~~~~
 
