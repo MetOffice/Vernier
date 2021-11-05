@@ -25,10 +25,6 @@ add_library(project_options INTERFACE)
 add_library(project_warnings INTERFACE)
 set_project_warnings(project_warnings)
 
-# Find required packages
-find_package(GTest REQUIRED)
-include(GoogleTest)
-
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)
 
