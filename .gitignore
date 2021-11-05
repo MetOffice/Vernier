@@ -13,43 +13,43 @@ tramp
 .org-id-locations
 *_archive
 
-# flymake-mode
+# Flymake-mode
 *_flymake.*
 
-# eshell files
+# Eshell files
 /eshell/history
 /eshell/lastdir
 
-# elpa packages
+# ELPA packages
 /elpa/
 
-# reftex files
+# Reftex files
 *.rel
 
 # AUCTeX auto folder
 /auto/
 
-# cask packages
+# Cask packages
 .cask/
 dist/
 
 # Flycheck
 flycheck_*.el
 
-# server auth directory
+# Server auth directory
 /server/
 
-# projectiles files
+# Projectiles files
 .projectile
 
-# directory configuration
+# Directory configuration
 .dir-locals.el
 
-# network security
+# Network security
 /network-security.data
 
 
-### VisualStudioCode template
+### Visual Studio Code template
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -132,13 +132,14 @@ flycheck_*.el
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
-# Gradle
+# Gradle Build Tool
 .idea/**/gradle.xml
 .idea/**/libraries
 
 # Gradle and Maven with auto-import
 # When using Gradle or Maven with auto-import, you should exclude module files,
-# since they will be recreated, and may cause churn.  Uncomment if using
+# since they will be recreated, and may cause churn.
+# Uncomment if using.
 # auto-import.
 # .idea/artifacts
 # .idea/compiler.xml
@@ -152,13 +153,13 @@ flycheck_*.el
 # CMake
 cmake-build-*/
 
-# Mongo Explorer plugin
+# MongoDB Explorer plugin
 .idea/**/mongoSettings.xml
 
 # File-based project format
 *.iws
 
-# IntelliJ
+# IntelliJ IDEA
 out/
 
 # mpeltonen/sbt-idea plugin
@@ -179,13 +180,13 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
-# Android studio 3.1+ serialized cache file
+# Android Studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
 ### Vim template
 # Swap
 [._]*.s[a-v][a-z]
-!*.svg  # comment out if you don't need vector files
+!*.svg  # Comment out if you don't need vector files
 [._]*.sw[a-p]
 [._]s[a-rt-v][a-z]
 [._]ss[a-gi-z]
