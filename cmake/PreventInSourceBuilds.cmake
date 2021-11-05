@@ -1,11 +1,12 @@
 #
 # This function will prevent in-source builds
 function(AssureOutOfSourceBuilds)
-    # make sure the user doesn't play dirty with symlinks
+    # Make sure the user doesn't perform in source builds by tricking
+    # the build system through the use of symlinks
     get_filename_component(srcdir "${CMAKE_SOURCE_DIR}" REALPATH)
     get_filename_component(bindir "${CMAKE_BINARY_DIR}" REALPATH)
 
-    # disallow in-source builds
+    # Disallow in-source builds
     if ("${srcdir}" STREQUAL "${bindir}")
         message("######################################################")
         message("Warning: in-source builds are disabled")
@@ -15,4 +16,4 @@ function(AssureOutOfSourceBuilds)
     endif ()
 endfunction()
 
-assureoutofsourcebuilds()
+AssureOutOfSourceBuilds()
