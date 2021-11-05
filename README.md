@@ -1,13 +1,27 @@
 # profiler
+
 Profiler for scientific code on HPC platforms.
 
-## Building
-Requires a c++17 compatible compiler, currently only tested with GCC-9.2.0.
+### Requirements
 
-The testing framework is GoogleTest (1.11.0) and source code documentation is created using Doxygen (1.8.5).
+- C++17 compatible compiler
+- CMake version 3.13 or newer.
+- GoogleTest version 1.11 or newer.
+
+### Supported Compilers
+
+The code has been tested with the following compilers:
+- GCC versions: 9.2.0, 10.2.0
+
+### Testing Framework and Documentation
+
+The testing framework is GoogleTest (1.11.0).  
+Source code documentation is generated using Doxygen (minimum 1.8.5).
+
+### Building profiler
 
 **To build:**  
-In project root directory.
+In project root directory:
 ~~~~~~~~~~~~~~~~shell
 mkdir build
 cd build
