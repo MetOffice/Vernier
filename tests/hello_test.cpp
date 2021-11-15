@@ -3,8 +3,8 @@
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 --------------------------------------------------------------------------------
- Description
- A basic unit test example using GTest
+ Description:
+ A basic unit test example using GoogleTest
 \*----------------------------------------------------------------------------*/
 
 #include <gtest/gtest.h>

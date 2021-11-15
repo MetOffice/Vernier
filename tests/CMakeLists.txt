@@ -10,5 +10,3 @@ function(add_unit_test test_name cpp_file)
 endfunction()
 
 add_unit_test(hello_test hello_test.cpp)
-
-
