@@ -36,4 +36,3 @@ class A {
 ## Communication Efficiency {#comme}
 
 TBD
- 
