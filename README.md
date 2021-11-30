@@ -4,14 +4,14 @@ Profiler for scientific code on HPC platforms.
 
 ### Requirements
 
-- C++17 compatible compiler
+- C++17 compatible compiler.
 - CMake version 3.13 or newer.
 - GoogleTest version 1.11 or newer.
 
 ### Supported Compilers
 
 The code has been tested with the following compilers:
-- GCC versions: 9.2.0, 10.2.0
+- GCC versions: 9.2.0, 10.2.0.
 
 ### Testing Framework and Documentation
 
