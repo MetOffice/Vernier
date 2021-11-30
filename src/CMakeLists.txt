@@ -1,16 +1,16 @@
 # File includes functionality to compile source into a shared library and set
 # up installation of the lib and header files upon build and install.
-# TODO - Generalise this for multiple libs
+# TODO - Issue #14 - Generalise build for multiple libs
 
 # Include helper functions for creating config files.
 include(CMakePackageConfigHelpers)
 
-# Add files source files to library
+# Add files source files to library.
 add_library(${CMAKE_PROJECT_NAME} SHARED
         profiler.h
         )
 
-# Link library to and external libs (also use project warnings and options)
+# Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         project_warnings
         project_options)
