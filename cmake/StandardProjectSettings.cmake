@@ -1,10 +1,10 @@
 # Some basic project settings for defaults such as build type and installation
-# prefix
+# prefix.
 
-# Set C++ standard compliance
+# Set C++ standard compliance.
 set(CMAKE_CXX_STANDARD 17)
 
-# Set a default build type if none was specified
+# Set a default build type if none was specified.
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
     set(CMAKE_BUILD_TYPE
@@ -15,7 +15,7 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
             CACHE CMAKE_BUILD_TYPE
             PROPERTY STRINGS
             # These build type options set the listed compiler options.
-            # These are CMake default flags for C++
+            # These are CMake default flags for C++.
             "Debug" # -g
             "Release" # -O3 -DNDEBUG
             "MinSizeRel" # -Os -DNDEBUG
@@ -23,7 +23,7 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     )
 endif ()
 
-# Generate compile_commands.json to make it easier to work with Clang-based tools
+# Generate compile_commands.json to make it easier to work with Clang-based tools.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Interprocedural optimisation is useful for improving program performance through
@@ -44,7 +44,7 @@ if (ENABLE_IPO)
     endif ()
 endif ()
 
-#Set default install location to be in build directory rather than /usr/bin etc.
-if(${CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT})
+# Set default install location to be in build directory rather than /usr/bin etc.
+if (${CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT})
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "..." FORCE)
-endif()
+endif ()
