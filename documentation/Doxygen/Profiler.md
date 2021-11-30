@@ -15,6 +15,7 @@ and Productivity (<a href="https://pop-coe.eu/node/69">POP</a>) Standard Metrics
 for Parallel Performance Analysis.
 
 ## Load Balance {#lb}
+
 ~~~~~~~~~~~~~~~~~~~~~~~cpp
 class A {
     private:
@@ -33,5 +34,6 @@ class A {
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Communication Efficiency {#comme}
+
 TBD
  
