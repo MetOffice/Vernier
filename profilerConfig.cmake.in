@@ -1,0 +1,6 @@
+# Package configuration file used by the configure_package_config_file command
+# in the root CMakeLists.txt file. This allows downstreams to use imported
+# targets (i.e. find_package()).
+
+@PACKAGE_INIT@
+include( "${CMAKE_CURRENT_LIST_DIR}/profilerTargets.cmake" )
