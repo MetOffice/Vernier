@@ -1,7 +1,7 @@
 # Contains a function for setting up the appropriate warnings for
 # different compilers and build settings.
 function(set_project_warnings project_name)
-    # Create option for forcing errors for all warnings
+    # Create option for forcing errors for all warnings.
     option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 
     # Create option to turn on sanitizers.
@@ -10,7 +10,7 @@ function(set_project_warnings project_name)
     set(CLANG_WARNINGS
             # All warnings (actually not all warnings obviously)
             -Wall
-            # More warnings (should be used on none legacy code)
+            # More warnings (should be used on non-legacy code)
             -Wextra
             # Warn the user if a variable declaration shadows one from a parent context
             -Wshadow
@@ -35,11 +35,11 @@ function(set_project_warnings project_name)
             -Wnull-dereference
             # Warn if float is implicit promoted to double
             -Wdouble-promotion
-            # Warn on security issues around functions that format output (ie printf)
+            # Warn on security issues around functions that format output (i.e. 'printf')
             -Wformat=2
             )
 
-    # Set warnings as errors if requested (Recommended during development/debug)
+    # Set warnings as errors if requested (recommended during development/debug)
     if (WARNINGS_AS_ERRORS)
         set(CLANG_WARNINGS ${CLANG_WARNINGS} -Werror)
     endif ()
