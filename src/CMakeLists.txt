@@ -1,6 +1,6 @@
 # File includes functionality to compile source into a shared library and set
 # up installation of the lib and header files upon build and install.
-# TODO - Issue #14 - Generalise build for multiple libs
+# TODO - Issue #14 - Generalise build for multiple libs.
 
 # Include helper functions for creating config files.
 include(CMakePackageConfigHelpers)
