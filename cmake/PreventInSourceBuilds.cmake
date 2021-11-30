@@ -1,7 +1,6 @@
-#
 # This function will prevent in-source builds
 function(AssureOutOfSourceBuilds)
-    # Make sure the user doesn't perform in source builds by tricking
+    # Make sure the user doesn't perform in-source builds by tricking
     # the build system through the use of symlinks
     get_filename_component(srcdir "${CMAKE_SOURCE_DIR}" REALPATH)
     get_filename_component(bindir "${CMAKE_BINARY_DIR}" REALPATH)
