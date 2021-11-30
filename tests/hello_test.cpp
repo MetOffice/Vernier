@@ -4,7 +4,7 @@
  under which the code may be used.
 --------------------------------------------------------------------------------
  Description:
- A basic unit test example using GoogleTest
+ A basic unit test example using GoogleTest.
 \*----------------------------------------------------------------------------*/
 
 #include <gtest/gtest.h>
