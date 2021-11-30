@@ -1,5 +1,5 @@
-# This file sets up the options for the Doxygen generation of API documentation
-# available options for CMake Doxygen integration can be found here:
+# This file sets up the options for the Doxygen generation of API documentation.
+# Available options for CMake Doxygen integration can be found here:
 # https://cmake.org/cmake/help/latest/module/FindDoxygen.html
 function(enable_doxygen)
     option(ENABLE_DOXYGEN "Enable doxygen doc builds of source" ON)
@@ -24,13 +24,13 @@ function(enable_doxygen)
         set(DOXYGEN_HTML_HEADER ${PROJECT_SOURCE_DIR}/documentation/Doxygen/html/header.html)
         set(DOXYGEN_HTML_FOOTER ${PROJECT_SOURCE_DIR}/documentation/Doxygen/html/footer.html)
 
-        # Find the Doxygen application install (requires dot)
+        # Find the Doxygen application install (requires "dot" tool).
         find_package(Doxygen REQUIRED dot)
 
         # Set up Doxygen build with source directory and additional pages.
         doxygen_add_docs(doxygen-docs ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/documentation/Doxygen ALL)
 
-        # Set up installation destination
+        # Set up installation destination.
         install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share/docs)
     endif ()
 endfunction()
