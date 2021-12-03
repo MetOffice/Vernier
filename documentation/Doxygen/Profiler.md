@@ -1,4 +1,4 @@
-Documentation {#mainpage}
+# Documentation {#mainpage}
 =============
 [TOC]
 
@@ -7,6 +7,16 @@ Documentation {#mainpage}
 This is a profiling tool written in C++ and designed for use with the Unified
 Model and LFRic.
 The current implementation is a work in progress.
+
+# Build Options {#Options}
+
+There are a number of options which can be passed to CMake on the command line
+or set using ccmake.
+
+Argument | Options (Default **Bold**)| Description
+:---------:|:---------:|:------------
+ `-DINCLUDE_GTEST` |  ON / **OFF** | Fetches and populates googletest within the project build.
+
 
 # Metrics  {#metrics}
 
