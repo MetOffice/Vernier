@@ -1,6 +1,7 @@
 # This sets up the testing framework inclusion for the project, optionally
 # googletest can be downloaded from the git repository and built in the main
-# build directory for use by ctest.
+# build directory for use by ctest. By default cmake will use find_package to
+# locate the installed library.
 
 # Add optional argument to fetch googletest
 option(INCLUDE_GTEST "Fetch GoogleTest framework during build" OFF)
@@ -26,17 +27,11 @@ if (INCLUDE_GTEST)
         FetchContent_Populate(googletest)
         add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
     endif()
-
-    # Set name of test lib for use with target_link_libraries.
-    set(GTEST_MAIN_NAME gtest_main)
 else()
     message(STATUS "Using local GoogleTest installation")
 
     # Find installed googletest library.
-    find_package(GTest REQUIRED)
-
-    # Set name of test lib for use with target_link_libraries.
-    set(GTEST_MAIN_NAME GTest::Main)
+    find_package(GTest CONFIG REQUIRED)
 endif ()
 
 # Include googletest testing library in project.
