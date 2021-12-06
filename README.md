@@ -1,4 +1,4 @@
-# profiler [![Actions Status: build](https://github.com/MetOffice/profiler/actions/workflows/build.yml/badge.svg)](https://github.com/MetOffice/profiler/actions/workflows/build.yml)
+# profiler [![Build Actions Status](https://github.com/MetOffice/profiler/actions/workflows/build.yml/badge.svg)](https://github.com/MetOffice/profiler/actions)
 
 Profiler for scientific code on HPC platforms.
 
