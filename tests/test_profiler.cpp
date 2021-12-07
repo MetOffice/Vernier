@@ -6,51 +6,43 @@
  */
 
 #include <unistd.h>
+#include <gtest/gtest.h>
+
+#include "omp.h"
 
 #include "profiler.h"
 
-int main()
+TEST(SystemTests, TimingTest)
 {
 
   // Start timing: noddy way, and using Profiler.
-
   double t1 = omp_get_wtime();
   auto prof_main = prof.start("MAIN");
 
-  // Time a subroutine
+  // Time a region
   {
     auto prof_sub = prof.start("MAIN_SUB");
-
-    //  #pragma omp parallel
-    //  {
-    //    size_t parallel_hash;
-    //    for (int it=0; it<10000; ++it){
-    //      prof.start("SUB_OMP", parallel_hash);
-    //      prof.stop ("SUB_OMP", parallel_hash);
-    //    }
-    //  }
-
-    sleep(10);
-
+    sleep(1);
     prof.stop(prof_sub);
   }
 
-  // Time nested subroutines on many threads.
+  // Time nested regions on many threads.
 #pragma omp parallel
   {
     auto prof_sub = prof.start("MAIN_SUB");
-    sleep(10);
+    sleep(1);
 
-    // Time nested routine
+    // Time nested region
     auto prof_sub2 = prof.start("MAIN_SUB2");
-    sleep(10);
-
+    sleep(1);
     prof.stop(prof_sub2);
+
+    // Outer region end.
     prof.stop(prof_sub);
   }
 
-  // Give the main routine some substantial execution time.
-  sleep(20);
+  // Give the main regions some substantial execution time.
+  sleep(2);
 
   prof.stop(prof_main);
   prof.write();
@@ -59,6 +51,4 @@ int main()
   double t2 = omp_get_wtime();
   std::cout << "\n" << "Timing: " << t2 - t1 << "\n\n";
 
-  return 0;
 }
-

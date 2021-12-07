@@ -29,6 +29,10 @@ class Profiler
     std::vector<HashTable>                               thread_hashtables_;
     std::vector<std::vector<std::pair<size_t,double>>>   thread_traceback_;
 
+    // Type definitions for vector array indexing.
+    typedef std::vector<HashTable>::size_type                        hashtable_iterator_t_;
+    typedef std::vector<std::vector<std::pair<size_t,double>>>::size_type pair_iterator_t_;
+
   public:
 
     // Constructors

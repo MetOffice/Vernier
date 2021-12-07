@@ -20,6 +20,9 @@ include(cmake/CompilerWarnings.cmake)
 include(cmake/Doxygen.cmake)
 enable_doxygen()
 
+# OpenMP required
+find_package(OpenMP REQUIRED) 
+
 # Trick to make it easier to add warnings and options to libs/executables.
 add_library(project_options INTERFACE)
 add_library(project_warnings INTERFACE)

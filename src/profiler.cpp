@@ -44,9 +44,10 @@ Profiler::Profiler(){
 size_t Profiler::start(std::string_view region_name)
 {
 
-  int tid = 0;
+  // Determine the thread number
+  auto tid = static_cast<hashtable_iterator_t_>(0);
 #ifdef _OPENMP
-  tid = omp_get_thread_num();
+  tid = static_cast<hashtable_iterator_t_>(omp_get_thread_num());
 #endif
 
   assert (tid <= thread_hashtables_.size());
@@ -73,10 +74,10 @@ void Profiler::stop(size_t const hash)
   // First job: log the stop time.
   double stop_time  = omp_get_wtime();
 
-  // Determine thread number
-  int tid = 0;
+  // Determine the thread number
+  auto tid = static_cast<hashtable_iterator_t_>(0);
 #ifdef _OPENMP
-  tid = omp_get_thread_num();
+  tid = static_cast<hashtable_iterator_t_>(omp_get_thread_num());
 #endif
 
   // Checks - which hash is last on the traceback list?
