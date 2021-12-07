@@ -5,8 +5,8 @@
  * -----------------------------------------------------------------------------
  */
 
-#ifndef PROFILER_H
-#define PROFILER_H
+#ifndef __PROFILER_H__
+#define __PROFILER_H__
 
 #include <string>
 #include <string_view>

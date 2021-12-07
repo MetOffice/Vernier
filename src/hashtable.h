@@ -5,8 +5,8 @@
  * -----------------------------------------------------------------------------
  */
 
-#ifndef HASHTABLE_H 
-#define HASHTABLE_H
+#ifndef __HASHTABLE_H__
+#define __HASHTABLE_H__
 
 #include <iostream>
 #include <map>
