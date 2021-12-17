@@ -5,7 +5,7 @@ function(add_unit_test test_name cpp_file)
             project_warnings
             project_options
             OpenMP::OpenMP_CXX
-            GTest::gtest_main)
+            GTest::gtest_main
             ${CMAKE_PROJECT_NAME})
     target_include_directories(${test_name} PRIVATE
             ${PROJECT_SOURCE_DIR}/src)
