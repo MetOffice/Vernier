@@ -4,7 +4,7 @@ function(add_unit_test test_name cpp_file)
     target_link_libraries(${test_name}
             project_warnings
             project_options
-            GTest::Main)
+            GTest::gtest_main)
     target_include_directories(${test_name} PRIVATE
             ${PROJECT_SOURCE_DIR}/src)
     gtest_discover_tests(${test_name})
