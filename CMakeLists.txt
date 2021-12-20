@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 include(cmake/PreventInSourceBuilds.cmake)
 
 # Set project name and the languages required to build the project and a
-# project description.
+# project description. Also set the version of the library being built.
 project(profiler LANGUAGES CXX
         DESCRIPTION "Met Office profiler"
         VERSION 0.1.0)
