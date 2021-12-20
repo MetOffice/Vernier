@@ -14,8 +14,9 @@ There are a number of options which can be passed to CMake on the command line
 or set using ccmake.
 
 Argument | Options (Default **Bold**)| Description
-:---------:|:---------:|:------------
- `-DINCLUDE_GTEST` |  ON / **OFF** | Fetches and populates googletest within the project build.
+:---:|:---:|:---
+ `-DBUILD_TESTS`   |  **ON** / OFF | Build all tests.
+ `-DINCLUDE_GTEST` |  ON / **OFF** | Fetches and populates googletest within the project build (Requires BUILD_TESTS=ON).
 
 
 # Metrics  {#metrics}

@@ -20,7 +20,10 @@ Source code documentation is generated using Doxygen (minimum 1.8.5).
 
 ### Building profiler
 
-**To build:**  
+CMake build options available: [here](https://metoffice.github.io/profiler/#Options)
+
+**To build:**
+
 In project root directory:
 ~~~~~~~~~~~~~~~~shell
 mkdir build
