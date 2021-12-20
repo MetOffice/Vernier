@@ -5,14 +5,10 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 include(cmake/PreventInSourceBuilds.cmake)
 
 # Set project name and the languages required to build the project and a
-# project description.
+# project description. Also set the version of the library being built.
 project(profiler LANGUAGES CXX
-        DESCRIPTION "Met Office profiler")
-
-# Set project versioning.
-# TODO - Issue #12 Move versioning to the project settings above.
-set(SOVERSION 0)
-set(VERSION 0.1.0)
+        DESCRIPTION "Met Office profiler"
+        VERSION 0.1.0)
 
 # Include general project setting files.
 include(cmake/StandardProjectSettings.cmake)
@@ -54,7 +50,7 @@ configure_package_config_file(
     
 write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake"
-        VERSION ${VERSION}
+        VERSION ${PROJECT_VERSION}
         COMPATIBILITY SameMajorVersion
 )
     
