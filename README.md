@@ -1,5 +1,7 @@
 # profiler
 
+[![Docs](https://github.com/MetOffice/profiler/actions/workflows/documentation.yml/badge.svg)](https://github.com/MetOffice/profiler/actions/workflows/documentation.yml)
+
 Profiler for scientific code on HPC platforms.
 
 ### Requirements
