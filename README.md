@@ -35,3 +35,8 @@ cmake ..
 make
 make test
 ~~~~~~~~~~~~~~~~
+
+The HTML Doxygen documentation is built by default when building the project. To
+build only the Doxygen docs use `make doxygen-docs`, the generated files can be 
+found in `<build>/html`. On installation the HTML pages are copied to 
+`<installation_root>/share/docs`.

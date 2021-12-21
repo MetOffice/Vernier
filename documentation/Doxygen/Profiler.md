@@ -17,6 +17,7 @@ Argument | Options (Default **Bold**)| Description
 :---:|:---:|:---
  `-DBUILD_TESTS`   |  **ON** / OFF | Build all tests.
  `-DINCLUDE_GTEST` |  ON / **OFF** | Fetches and populates GoogleTest within the project build (requires `BUILD_TESTS=ON`).
+ `-DENABLE_DOXYGEN`|  **ON** / OFF | Build the Doxygen documentation.
 
 
 # Metrics  {#metrics}
