@@ -30,5 +30,5 @@ add_subdirectory(src)
 # Include the testing setup.
 include(cmake/TestingSetup.cmake)
 
-# Include the installation options
+# Include the installation options.
 include(cmake/Installation.cmake)
