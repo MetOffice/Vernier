@@ -5,6 +5,8 @@
 
 Profiler for scientific code on HPC platforms.
 
+Documentation for the project can be found [here](https://metoffice.github.io/profiler)
+
 ### Requirements
 
 - C++17 compatible compiler.
