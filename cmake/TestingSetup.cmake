@@ -7,8 +7,7 @@
 option(BUILD_TESTS "Build the tests against GoogleTest" ON)
 
 if(BUILD_TESTS)
-
-    # Add optional argument to fetch googletest
+    # Add optional argument to fetch GoogleTest
     option(INCLUDE_GTEST "Fetch GoogleTest framework during build" OFF)
 
     if (INCLUDE_GTEST)
@@ -17,11 +16,11 @@ if(BUILD_TESTS)
         # Include FetchContent module to enable populating content at configure time.
         include(FetchContent)
 
-        # Set up googletest options to populate lib.
+        # Set up GoogleTest options to populate lib.
         FetchContent_Declare(
                 googletest
                 GIT_REPOSITORY https://github.com/google/googletest.git
-                GIT_TAG	e2239ee6043f73722e7aa812a459f54a28552929 # hash of release-1.11.0.
+                GIT_TAG	e2239ee6043f73722e7aa812a459f54a28552929 # Hash of release-1.11.0.
         )
 
         # Get the properties of the content being populated (e.g. googletest_BINARY_DIR).
@@ -35,7 +34,7 @@ if(BUILD_TESTS)
     else()
         message(STATUS "Using local GoogleTest installation")
 
-        # Find installed googletest library.
+        # Find installed GoogleTest library.
         find_package(GTest CONFIG REQUIRED)
     endif ()
 
