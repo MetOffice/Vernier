@@ -3,11 +3,11 @@
 # build directory for use by ctest. By default cmake will use find_package to
 # locate the installed library.
 
-# Optional argument to build the tests
+# Optional argument to build the tests.
 option(BUILD_TESTS "Build the tests against GoogleTest" ON)
 
 if(BUILD_TESTS)
-    # Add optional argument to fetch GoogleTest
+    # Add optional argument to fetch GoogleTest.
     option(INCLUDE_GTEST "Fetch GoogleTest framework during build" OFF)
 
     if (INCLUDE_GTEST)
@@ -41,7 +41,7 @@ if(BUILD_TESTS)
     # Include googletest testing library in project.
     include(GoogleTest)
 
-    # Enable testing with CTest
+    # Enable testing with CTest.
     enable_testing()
     add_subdirectory(tests)
 endif()
