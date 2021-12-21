@@ -5,7 +5,7 @@
 
 Profiler for scientific code on HPC platforms.
 
-Documentation for the project can be found [here](https://metoffice.github.io/profiler)
+Documentation for the project can be found [here](https://metoffice.github.io/profiler).
 
 ### Requirements
 
@@ -39,7 +39,10 @@ make
 make test
 ~~~~~~~~~~~~~~~~
 
-The HTML Doxygen documentation is built by default when building the project. To
-build only the Doxygen docs use `make doxygen-docs`, the generated files can be 
-found in `<build>/html`. On installation the HTML pages are copied to 
-`<installation_root>/share/docs`.
+#### Documentation
+
+The HTML Doxygen documentation is built by default when building the project and 
+the generated files can be found in `<build>/html`.
+
+To build only the Doxygen docs use `make doxygen-docs`. On installation the
+HTML pages are copied to `<installation_root>/share/docs`.
