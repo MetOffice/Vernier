@@ -14,8 +14,10 @@ There are a number of options which can be passed to CMake on the command line
 or set using ccmake.
 
 Argument | Options (Default **Bold**)| Description
-:---------:|:---------:|:------------
- `-DINCLUDE_GTEST` |  ON / **OFF** | Fetches and populates googletest within the project build.
+:---:|:---:|:---
+ `-DBUILD_TESTS`   |  **ON** / OFF | Build all tests.
+ `-DINCLUDE_GTEST` |  ON / **OFF** | Fetches and populates GoogleTest within the project build (requires `BUILD_TESTS=ON`).
+ `-DENABLE_DOXYGEN`|  **ON** / OFF | Build the Doxygen documentation.
 
 
 # Metrics  {#metrics}
