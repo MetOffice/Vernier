@@ -7,6 +7,7 @@ on:
       - 'src/**.h'
       - 'src/**.cpp'
       - 'documentation/**.md'
+      - '.github/workflows/documentation.yml'
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
