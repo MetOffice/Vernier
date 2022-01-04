@@ -5,22 +5,18 @@
  * -----------------------------------------------------------------------------
  */
 
-#ifndef __HASHTABLE_H__
-#define __HASHTABLE_H__
+#ifndef PROFILER_HASHTABLE_H
+#define PROFILER_HASHTABLE_H
 
-#include <iostream>
 #include <map>
-#include <list>
-#include <utility>
 #include <string>
-#include <functional>
-#include <cassert>
 #include <vector>
 #include <string_view>
 
 /**
  * @brief  Structure to hold information for a particular routine.
- * */
+ *
+ */
 
 struct HashEntry{
   public:

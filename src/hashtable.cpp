@@ -6,8 +6,9 @@
  */
 
 #include "hashtable.h"
-#include <utility>
 #include <iomanip>
+#include <cassert>
+#include <iostream>
 
 /**
  * @brief  Constructs a new entry in the hash table. 

@@ -5,15 +5,11 @@
  * -----------------------------------------------------------------------------
  */
 
-#ifndef __PROFILER_H__
-#define __PROFILER_H__
+#ifndef PROFILER_H
+#define PROFILER_H
 
-#include <string>
 #include <string_view>
-#include <cassert>
-#include <list>
 #include <iterator>
-#include <utility>
 #include <vector>
 
 #include "omp.h"

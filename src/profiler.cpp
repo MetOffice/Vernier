@@ -7,6 +7,9 @@
 
 #include "profiler.h"
 
+#include <iostream>
+#include <cassert>
+
 /**
  * @brief Constructor
  *
