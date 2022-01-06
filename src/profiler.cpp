@@ -34,8 +34,8 @@ Profiler::Profiler(){
   }
 
   // Assertions 
-  assert (thread_hashtables_.size() == max_threads_);
-  assert (thread_traceback_.size()  == max_threads_);
+  assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
+  assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
 
 }
 
