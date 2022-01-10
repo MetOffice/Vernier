@@ -44,11 +44,24 @@ TEST(SystemTests, TimingTest)
   // Give the main regions some substantial execution time.
   sleep(2);
 
+  // End of profiling; record t2 immediately afterwards.
   prof.stop(prof_main);
+  double t2 = omp_get_wtime();
+
+  // Write the profile
   prof.write();
 
-  // Compute t1-t2 timing and output that.
-  double t2 = omp_get_wtime();
-  std::cout << "\n" << "Timing: " << t2 - t1 << "\n\n";
+  // Check that the total time measured by the profiler is within some tolerance
+  // of the actual time measured by simple t2-t1.  This only tests the top-level
+  // timing, not individual subroutine timings.
+  double const time_tolerance = 0.0001;
+
+  double actual_time = t2 - t1;
+  double prof_time   = prof.get_total_wallclock_time();
+  EXPECT_NEAR(prof_time, actual_time, time_tolerance);
+
+  std::cout << "\n" << "Actual timing: "   << actual_time << "\n";
+  std::cout << "\n" << "Profiler timing: " << prof_time  << "\n\n";
 
 }
+

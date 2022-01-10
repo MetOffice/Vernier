@@ -123,4 +123,14 @@ void Profiler::write()
   }
 }
 
+/**
+ * @brief  Get the top-level elapsed time.
+ *
+ */
+
+double Profiler::get_total_wallclock_time()
+{
+  auto tid = static_cast<hashtable_iterator_t_>(0);
+  return thread_hashtables_[tid].get_total_wallclock_time();
+}
 

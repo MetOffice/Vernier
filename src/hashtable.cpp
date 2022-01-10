@@ -144,3 +144,16 @@ std::vector<size_t> HashTable::list_keys()
   return keys;
 }
 
+/**
+ * @brief  Get the total wallclock time, which is the total walltime of the
+ *         first entry in the table corresponding to the top-level timing
+ *         callipers.
+ *
+ */
+
+double HashTable::get_total_wallclock_time()
+{
+    return table_.begin()->second.total_walltime_;
+}
+
+

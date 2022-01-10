@@ -68,6 +68,7 @@ class HashTable{
 
     void add_child_time(size_t, double);
     void compute_self_times();
+    double get_total_wallclock_time();
 
 };
 #endif
