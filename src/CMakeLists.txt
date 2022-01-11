@@ -21,8 +21,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
 # set which header files are to be public and installed, this can be useful
 # when limiting access to the internal workings of the library with the install.
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-        SOVERSION ${SOVERSION}
-        VERSION ${VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+        VERSION ${PROJECT_VERSION}
         LINKER_LANGUAGE CXX
         PUBLIC_HEADER "profiler.h")
 
