@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <cassert>
 #include <iostream>
+#include <string>
 
 /**
  * @brief  Constructs a new entry in the hash table. 
