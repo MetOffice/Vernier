@@ -15,8 +15,8 @@ Documentation for the project can be found [here](https://metoffice.github.io/pr
 
 ### Supported Compilers
 
-The code has been tested with the following compilers:
-- GCC versions: 9.3.0, 10.2.0
+The code is tested with the following compilers:
+- GCC versions: 10.2.0
 - Clang versions: 12.0 
 
 ### Testing Framework and Documentation
