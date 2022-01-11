@@ -5,6 +5,15 @@
  * -----------------------------------------------------------------------------
  */
 
+/**
+ * @file   profiler.h
+ * @brief  Top-level profiler class.
+ *
+ * Contains the top-level class, whose methods are called from client code. Also
+ * declares a top-level, global, profiler object.
+ * 
+ */
+
 #ifndef PROFILER_H
 #define PROFILER_H
 
@@ -15,6 +24,14 @@
 #include "omp.h"
 
 #include "hashtable.h"
+
+/**
+ * @brief  Top-level profiler class.
+ *
+ * Maintains separate hashtables for each thread, and keeps a breadcrumb trail
+ * of profiled regions.
+ *
+ */
 
 class Profiler
 {

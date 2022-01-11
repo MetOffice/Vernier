@@ -5,16 +5,34 @@
  * -----------------------------------------------------------------------------
  */
 
+/**
+ *  @file   hashtable.h
+ *  @brief  Handles entries for each timed region.
+ *
+ *  In order to store region timings, one struct and one class are defined. The
+ *  struct (HashEntry) collects together information pertinent to a single
+ *  profiled region, such as its name, total time and self time.
+ *
+ *  The HashTable class contains a hashtable to hold the hash entries (see
+ *  above). The hashing algorithm is bundled with it, so that it remains an
+ *  internal implementation detail only.
+ *
+ *  An assortment of methods handle admin. tasks, such as adding new entries.
+ *
+ */
+
 #ifndef PROFILER_HASHTABLE_H
 #define PROFILER_HASHTABLE_H
 
 #include <map>
-#include <string>
 #include <vector>
+#include <string>
 #include <string_view>
 
 /**
  * @brief  Structure to hold information for a particular routine.
+ *
+ * Bundles together any information pertinent to a specific profiled region.
  *
  */
 
@@ -34,10 +52,10 @@ struct HashEntry{
 };
 
 /**
- * @brief
+ * @brief  Wraps STL hashtables with additional functionality.
  *
- * @description Interfaces with a C++ list to add entries to a linked list
- *              with some calculated hash.
+ * Bundles together an STL hashtable with the hashing algorithm, and adds
+ * e.g. time-handling methods.
  *
  */
 
