@@ -26,7 +26,9 @@ jobs:
 
       - name: Install Doxygen
         # Install doxygen from apt
-        run: sudo apt-get -y install doxygen graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install doxygen graphviz
 
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
