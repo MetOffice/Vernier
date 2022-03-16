@@ -2,6 +2,8 @@ set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/modules)
 
 # Testing for building a fortran lib and executable.
 add_library(profiler_f SHARED "profiler_mod.F90")
+target_link_libraries(profiler_f PRIVATE profiler_c)
+
 add_executable(fortran_test "main.F90")
 target_link_libraries(fortran_test profiler_f)
 

@@ -4,11 +4,14 @@
 ! under which the code may be used.
 !-----------------------------------------------------------------------------
 program main
-use profiler_mod, only : test
+use profiler_mod
 
 implicit none
+    integer :: hash
 
-    call test
 
+    hash = profiler_start("test")
+    call profiler_stop(hash)
+    call profiler_write
 
 end program main

@@ -19,11 +19,6 @@ enable_doxygen()
 # OpenMP required
 find_package(OpenMP 2.5 REQUIRED) 
 
-# Trick to make it easier to add warnings and options to libs/executables.
-add_library(project_options INTERFACE)
-add_library(project_warnings INTERFACE)
-set_project_warnings(project_warnings)
-
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)
 

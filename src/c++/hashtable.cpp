@@ -39,8 +39,8 @@ HashTable::HashTable(int const tid)
 
 size_t HashTable::query_insert(std::string_view region_name) noexcept
 {
-
-  size_t hash = hash_function_(region_name);
+//TODO - Needs a different hashing algorithm that is compatible with Fortran. this used to return size_t
+  int hash = hash_function_(region_name);
 
   if (table_.count(hash) == 0){
     table_.emplace(hash,HashEntry(region_name));

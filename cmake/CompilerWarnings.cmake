@@ -84,7 +84,7 @@ function(set_project_warnings project_name)
     endif ()
 
     # Add compiler and linker flags to project_warnings
-    target_compile_options(project_warnings INTERFACE ${PROJECT_WARNINGS})
-    target_link_options(project_warnings INTERFACE ${LINKER_FLAGS})
+    target_compile_options(${project_name} PRIVATE ${PROJECT_WARNINGS})
+    target_link_options(${project_name} PRIVATE ${LINKER_FLAGS})
 
 endfunction()
