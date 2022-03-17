@@ -1,28 +1,25 @@
 module profiler_mod
 
-    implicit none
+    interface
 
-    public :: profiler_start, profiler_stop
+        integer(c_int) function profiler_start(name) &
+          bind(C, name='c_profiler_start')
+            use, intrinsic :: iso_c_binding
+            implicit none
+            character(c_char) :: name
+        end function profiler_start
 
-contains
+        subroutine profiler_stop(hash) &
+          bind(C, name='c_profiler_stop')
+            use, intrinsic :: iso_c_binding
+            integer(c_int), value :: hash
+        end subroutine profiler_stop
 
-    integer function profiler_start(name) result(hash)
-        character(*), intent(in) :: name
-        integer c_profiler_start
-        external c_profiler_start
-        write(*,*) "Start profiling"
-        hash = c_profiler_start(name)
-        write(*,*) hash
-    end function profiler_start
+        subroutine profiler_write() &
+          bind(C, name='c_profiler_write')
+            use, intrinsic :: iso_c_binding
+        end subroutine profiler_write
 
-    subroutine profiler_stop(hash)
-        integer, intent(in) :: hash
-        write(*,*) hash
-        call c_profiler_stop(%VAL(hash))
-    end subroutine profiler_stop
-
-    subroutine profiler_write()
-        call c_profiler_write()
-    end subroutine profiler_write
+    end interface
 
 end module profiler_mod

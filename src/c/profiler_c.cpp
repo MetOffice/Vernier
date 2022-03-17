@@ -14,17 +14,17 @@
 
 extern "C" {
 
-size_t c_profiler_start_( const char *name )
+int c_profiler_start( const char *name )
 {
     return prof.start( name );
 }
 
-void c_profiler_stop_( const size_t hash )
+void c_profiler_stop( const size_t hash )
 {
     prof.stop( static_cast<size_t>( hash ) );
 }
 
-void c_profiler_write_()
+void c_profiler_write()
 {
     prof.write();
 }
