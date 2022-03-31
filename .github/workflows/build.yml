@@ -20,8 +20,8 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [
-          {c: gcc-10, cpp: g++-10},
-          {c: clang-12, cpp: clang++-12}
+          {c: gcc-10, cpp: g++-10, fortran: gfortran-10},
+          {c: clang-12, cpp: clang++-12, fortran: flang-12}
         ]
 
     steps:
