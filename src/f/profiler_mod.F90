@@ -1,25 +1,36 @@
 module profiler_mod
+  use, intrinsic :: iso_c_binding, only: c_char, c_long
+  implicit none
 
-    interface
+  !------------------------------------------------------------------------------
+  ! Public parameters
+  !------------------------------------------------------------------------------
 
-        integer(c_int) function profiler_start(name) &
-          bind(C, name='c_profiler_start')
-            use, intrinsic :: iso_c_binding
-            implicit none
-            character(c_char) :: name
-        end function profiler_start
+  integer, parameter :: pik = c_long
+  
+  !------------------------------------------------------------------------------
+  ! Public interfaces
+  !------------------------------------------------------------------------------
 
-        subroutine profiler_stop(hash) &
-          bind(C, name='c_profiler_stop')
-            use, intrinsic :: iso_c_binding
-            integer(c_int), value :: hash
-        end subroutine profiler_stop
+  interface
 
-        subroutine profiler_write() &
-          bind(C, name='c_profiler_write')
-            use, intrinsic :: iso_c_binding
-        end subroutine profiler_write
+    subroutine profiler_start(hash_out, name)             &
+        bind(C, name='c_profiler_start')
+          import :: c_char, c_long
+          character(kind=c_char, len=1), intent(in)  :: name
+          integer(kind=c_long),          intent(out) :: hash_out
+    end subroutine profiler_start
 
-    end interface
+    subroutine profiler_stop(hash_in)                   &
+      bind(C, name='c_profiler_stop')
+        import :: c_long
+        integer(kind=c_long), intent(in) :: hash_in
+    end subroutine profiler_stop
+
+    subroutine profiler_write()                         &
+      bind(C, name='c_profiler_write')
+    end subroutine profiler_write
+
+  end interface
 
 end module profiler_mod

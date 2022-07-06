@@ -62,7 +62,7 @@ size_t Profiler::start(std::string_view region_name)
   // Add routine to the traceback.
   double start_time = omp_get_wtime();
   thread_traceback_[tid].push_back(std::make_pair(hash, start_time));
-  std::cout << hash << std::endl;
+
   return hash;
 }
 
@@ -73,7 +73,7 @@ size_t Profiler::start(std::string_view region_name)
 
 void Profiler::stop(size_t const hash)
 {
-    std::cout << hash << std::endl;
+
   // First job: log the stop time.
   double stop_time  = omp_get_wtime();
 
