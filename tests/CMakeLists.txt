@@ -13,5 +13,12 @@ endfunction()
 
 # List of unit-tests added to CTest. Add a line calling the 'add_unit_test'
 # function to add an additional file of tests.
-add_unit_test(test_profiler test_profiler.cpp)
+add_unit_test(test_profiler c++/test_profiler.cpp)
+
+add_pfunit_ctest( test_profiler_f
+        TEST_SOURCES f/test_profiler_mod.pf
+        LINK_LIBRARIES ${CMAKE_PROJECT_NAME}_f)
+
+target_include_directories(test_profiler_f PUBLIC ${CMAKE_BINARY_DIR}/src/f/modules)
+
 
