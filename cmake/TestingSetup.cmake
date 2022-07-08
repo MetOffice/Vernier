@@ -6,6 +6,7 @@
 # Optional argument to build the tests.
 option(BUILD_TESTS "Build the tests against GoogleTest" ON)
 
+
 if(BUILD_TESTS)
     # Add optional argument to fetch GoogleTest.
     option(INCLUDE_GTEST "Fetch GoogleTest framework during build" OFF)
@@ -32,16 +33,28 @@ if(BUILD_TESTS)
             add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
         endif()
     else()
-        message(STATUS "Using local GoogleTest installation")
 
         # Find installed GoogleTest library.
         find_package(GTest CONFIG REQUIRED)
+
+        message(STATUS "Found GoogleTest testing framework")
     endif ()
 
     # Include googletest testing library in project.
     include(GoogleTest)
 
+    # Turn on testing of Fortran interface
+    option(BUILD_FORTRAN_TESTS "Build Fortran tests against pFUnit" ON)
+
+    # Find pFUnit
+    if(BUILD_FORTRAN_TESTS)
+        find_package(PFUNIT REQUIRED)
+        message(STATUS "Found pFUnit testing framework")
+    endif()
+
     # Enable testing with CTest.
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+
