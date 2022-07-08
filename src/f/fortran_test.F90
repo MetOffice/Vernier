@@ -60,11 +60,6 @@ t2 = omp_get_wtime();
 !Write the profile
 call profiler_write()
 
-!Check that the total time measured by the profiler is within some tolerance
-!of the actual time measured by simple t2-t1.  This only tests the top-level
-!timing, not individual subroutine timings.
-!double const time_tolerance = 0.0001;
-
 actual_time = t2 - t1
 
 print *, "Actual timing: ",   actual_time
