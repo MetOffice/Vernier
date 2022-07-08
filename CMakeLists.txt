@@ -6,7 +6,7 @@ include(cmake/PreventInSourceBuilds.cmake)
 
 # Set project name and the languages required to build the project and a
 # project description. Also set the version of the library being built.
-project(profiler LANGUAGES CXX
+project(profiler LANGUAGES CXX C Fortran
         DESCRIPTION "Met Office profiler"
         VERSION 0.1.0)
 
@@ -18,11 +18,6 @@ enable_doxygen()
 
 # OpenMP required
 find_package(OpenMP 2.5 REQUIRED) 
-
-# Trick to make it easier to add warnings and options to libs/executables.
-add_library(project_options INTERFACE)
-add_library(project_warnings INTERFACE)
-set_project_warnings(project_warnings)
 
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)

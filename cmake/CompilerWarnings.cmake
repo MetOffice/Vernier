@@ -61,10 +61,12 @@ function(set_project_warnings project_name)
 
     # Set compiler and linker flags depending on compiler
     if (CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+        # TODO Clang sanitizers need attention.
         if(USE_SANITIZERS)
             # Set Clang sanitizers for memory errors/leaks and undefined behaviour
-            set(CLANG_WARNINGS -fsanitize=address,undefined ${CLANG_WARNINGS})
-            set(CLANG_LINKER_FLAGS -fsanitize=address,undefined)
+            # set(CLANG_WARNINGS -fsanitize=address,undefined ${CLANG_WARNINGS})
+            # set(CLANG_LINKER_FLAGS -fsanitize=address,undefined)
+            set(CLANG_WARNINGS ${CLANG_WARNINGS})
         endif()
         set(PROJECT_WARNINGS ${CLANG_WARNINGS})
         set(LINKER_FLAGS ${CLANG_LINKER_FLAGS})
@@ -84,7 +86,7 @@ function(set_project_warnings project_name)
     endif ()
 
     # Add compiler and linker flags to project_warnings
-    target_compile_options(project_warnings INTERFACE ${PROJECT_WARNINGS})
-    target_link_options(project_warnings INTERFACE ${LINKER_FLAGS})
+    target_compile_options(${project_name} PRIVATE ${PROJECT_WARNINGS})
+    target_link_options(${project_name} PRIVATE ${LINKER_FLAGS})
 
 endfunction()

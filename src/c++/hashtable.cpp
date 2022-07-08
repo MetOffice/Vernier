@@ -39,7 +39,6 @@ HashTable::HashTable(int const tid)
 
 size_t HashTable::query_insert(std::string_view region_name) noexcept
 {
-
   size_t hash = hash_function_(region_name);
 
   if (table_.count(hash) == 0){
