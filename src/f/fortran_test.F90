@@ -54,8 +54,8 @@ end block
 call sleep(2);
 
 ! End of profiling; record t2 immediately afterwards.
-call profiler_stop(prof_main)
 t2 = omp_get_wtime();
+call profiler_stop(prof_main)
 
 !Write the profile
 call profiler_write()

@@ -16,8 +16,8 @@ TEST(SystemTests, TimingTest)
 {
 
   // Start timing: noddy way, and using Profiler.
-  double t1 = omp_get_wtime();
   auto prof_main = prof.start("MAIN");
+  double t1 = omp_get_wtime();
 
   // Time a region
   {
@@ -45,8 +45,8 @@ TEST(SystemTests, TimingTest)
   sleep(2);
 
   // End of profiling; record t2 immediately afterwards.
-  prof.stop(prof_main);
   double t2 = omp_get_wtime();
+  prof.stop(prof_main);
 
   // Write the profile
   prof.write();
