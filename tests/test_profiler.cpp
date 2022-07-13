@@ -44,7 +44,7 @@ TEST(SystemTests, TimingTest)
   // Give the main regions some substantial execution time.
   sleep(2);
 
-  // End of profiling; record t2 immediately afterwards.
+  // End of profiling; record t2 immediately before.
   double t2 = omp_get_wtime();
   prof.stop(prof_main);
 

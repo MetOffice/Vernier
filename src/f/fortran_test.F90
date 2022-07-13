@@ -53,7 +53,7 @@ end block
 !Give the main regions some substantial execution time.
 call sleep(2);
 
-! End of profiling; record t2 immediately afterwards.
+! End of profiling; record t2 immediately before.
 t2 = omp_get_wtime();
 call profiler_stop(prof_main)
 
