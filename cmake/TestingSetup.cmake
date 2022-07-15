@@ -35,7 +35,7 @@ if(BUILD_TESTS)
     else()
 
         # Find installed GoogleTest library.
-        find_package(GTest CONFIG REQUIRED)
+        find_package(GTest 1.11.0 CONFIG REQUIRED)
 
         message(STATUS "Found GoogleTest testing framework")
     endif ()
@@ -48,13 +48,12 @@ if(BUILD_TESTS)
 
     # Find pFUnit
     if(BUILD_FORTRAN_TESTS)
-        find_package(PFUNIT REQUIRED)
+        find_package(PFUNIT 4.4.1 REQUIRED)
         message(STATUS "Found pFUnit testing framework")
     endif()
 
     # Enable testing with CTest.
     enable_testing()
     add_subdirectory(tests)
+
 endif()
-
-

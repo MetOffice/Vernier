@@ -30,7 +30,7 @@ contains
     integer(kind=pik) :: prof_main
 
     !Start timing: noddy way, and using Profiler.
-    call profiler_start(prof_main, 'AMAIN')
+    call profiler_start(prof_main, 'FULL')
     t1 = omp_get_wtime()
 
     ! Time a region
