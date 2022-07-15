@@ -1,2 +1,2 @@
-add_subdirectory(c++)
-add_subdirectory(f)
+add_subdirectory(unit_tests)
+
