@@ -21,7 +21,7 @@ jobs:
       matrix:
         compiler: [
           {c: gcc-10, cpp: g++-10, fortran: gfortran-10},
-          {c: clang-12, cpp: clang++-12, fortran: flang-12}
+          {c: clang-12, cpp: clang++-12, fortran: f18}
         ]
 
     steps:
