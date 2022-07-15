@@ -6,7 +6,7 @@
 !-------------------------------------------------------------------------------
 
 module profiler_mod
-  use, intrinsic :: iso_c_binding, only: c_char, c_long
+  use, intrinsic :: iso_c_binding, only: c_char, c_long, c_double
   implicit none
   private
 
@@ -15,6 +15,7 @@ module profiler_mod
   !------------------------------------------------------------------------------
 
   integer, public, parameter :: pik = c_long
+  integer, public, parameter :: prk = c_double
   
   !------------------------------------------------------------------------------
   ! Public interfaces
@@ -23,6 +24,7 @@ module profiler_mod
   public :: profiler_start
   public :: profiler_stop
   public :: profiler_write
+  public :: profiler_get_total_wallclock_time
 
   interface
 
@@ -40,6 +42,11 @@ module profiler_mod
     subroutine profiler_write() bind(C, name='c_profiler_write')
         !No arguments to handle
     end subroutine profiler_write
+
+    real(kind=c_double) function profiler_get_total_wallclock_time() &
+        bind(C, name='c_get_total_wallclock_time')
+        import :: c_double
+    end function profiler_get_total_wallclock_time
 
   end interface
 
