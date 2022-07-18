@@ -25,6 +25,7 @@ extern "C" {
 	void c_profiler_start(long int&, char const*);
 	void c_profiler_stop (long int const&);
 	void c_profiler_write();
+    double c_get_total_wallclock_time();
 }
 
 /**
@@ -63,4 +64,12 @@ void c_profiler_write()
 {
     prof.write();
 }
+
+/**
+ * Get the total wallclock time
+ */
+ double c_get_total_wallclock_time()
+ {
+     return prof.get_total_wallclock_time();
+ }
 
