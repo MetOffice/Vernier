@@ -24,29 +24,31 @@ module profiler_mod
   public :: profiler_start
   public :: profiler_stop
   public :: profiler_write
-  public :: profiler_get_total_wallclock_time
+  public :: profiler_get_thread0_walltime
 
   interface
 
     subroutine profiler_start(hash_out, name)  bind(C, name='c_profiler_start')
-          import :: c_char, c_long
-          character(kind=c_char, len=1), intent(in)  :: name
-          integer(kind=c_long),          intent(out) :: hash_out
+      import :: c_char, c_long
+      character(kind=c_char, len=1), intent(in)  :: name
+      integer(kind=c_long),          intent(out) :: hash_out
     end subroutine profiler_start
 
     subroutine profiler_stop(hash_in) bind(C, name='c_profiler_stop')
-        import :: c_long
-        integer(kind=c_long), intent(in) :: hash_in
+      import :: c_long
+      integer(kind=c_long), intent(in) :: hash_in
     end subroutine profiler_stop
 
     subroutine profiler_write() bind(C, name='c_profiler_write')
         !No arguments to handle
     end subroutine profiler_write
 
-    real(kind=c_double) function profiler_get_total_wallclock_time() &
-        bind(C, name='c_get_total_wallclock_time')
-        import :: c_double
-    end function profiler_get_total_wallclock_time
+    function profiler_get_thread0_walltime(hash_in) result(walltime)   &
+             bind(C, name='c_get_thread0_walltime')
+      import :: c_double, c_long
+      integer(kind=c_long), intent(in) :: hash_in
+      real(kind=c_double)              :: walltime
+    end function profiler_get_thread0_walltime
 
   end interface
 
