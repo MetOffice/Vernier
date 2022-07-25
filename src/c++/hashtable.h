@@ -47,7 +47,7 @@ struct HashEntry{
     std::string region_name_;
     double      total_walltime_;
     double      self_walltime_;
-    double      child_walltime_;
+    double      child_walltime_; 
 
 };
 
@@ -87,6 +87,9 @@ class HashTable{
     void add_child_time(size_t, double);
     void compute_self_times();
     double get_total_wallclock_time();
-
+    double get_self_wallclock_time();
+    double get_child_wallclock_time();
+    // double get_wallclock_time(std::string_view input); 
+    
 };
 #endif

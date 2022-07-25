@@ -38,8 +38,8 @@ class Profiler
   private: 
 
     // Data members
-    int max_threads_;
-    std::vector<HashTable>                               thread_hashtables_;
+    
+    
     std::vector<std::vector<std::pair<size_t,double>>>   thread_traceback_;
 
     // Type definitions for vector array indexing.
@@ -47,6 +47,8 @@ class Profiler
     typedef std::vector<std::vector<std::pair<size_t,double>>>::size_type pair_iterator_t_;
 
   public:
+    int max_threads_;
+    std::vector<HashTable>                               thread_hashtables_;
 
     // Constructors
     Profiler();
@@ -56,6 +58,9 @@ class Profiler
     void   stop (size_t const);
     void   write();
     double get_total_wallclock_time();
+    double get_self_wallclock_time();
+    double get_child_wallclock_time();
+    // double get_wallclock_time(std::string_view input);
 };
 
 // Declare global profiler
