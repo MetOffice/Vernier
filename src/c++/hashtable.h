@@ -65,7 +65,7 @@ class HashTable{
 
     // Members
     int tid_;
-    std::map<size_t,HashEntry> table_;
+    std::map<size_t,HashEntry>  table_;
     std::hash<std::string_view> hash_function_;
 
   public:
@@ -88,8 +88,8 @@ class HashTable{
     void compute_self_times();
     double get_total_wallclock_time();
     double get_self_wallclock_time();
-    double get_child_wallclock_time();
-    // double get_wallclock_time(std::string_view input); 
+    double get_child_wallclock_time(); 
+    std::string get_region_name();
     
 };
 #endif

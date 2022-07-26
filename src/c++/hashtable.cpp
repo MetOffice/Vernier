@@ -167,21 +167,8 @@ double HashTable::get_child_wallclock_time()
     return table_.begin()->second.child_walltime_;
 }
 
-/*
-double HashTable::get_wallclock_time(std::string_view input)
-{ 
-
- this->compute_self_times();
-
- if (input == "total") {
-  return table_.begin()->second.total_walltime_;
- } else if (input == "child") {
-  return table_.begin()->second.child_walltime_;
- } else if (input == "self") {
-  return table_.begin()->second.self_walltime_;
- } else {
-  exit (100);
- }  
-} 
-*/
+std::string HashTable::get_region_name() 
+{
+    return table_.begin()->second.region_name_; 
+}
 

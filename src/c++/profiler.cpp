@@ -146,8 +146,8 @@ double Profiler::get_child_wallclock_time()
   return thread_hashtables_[tid].get_child_wallclock_time();
 }
 
-/*double Profiler::get_wallclock_time(std::string_view input)
+std::string Profiler::get_region_name()
 {
   auto tid = static_cast<hashtable_iterator_t_>(0); 
-  return thread_hashtables_[tid].get_wallclock_time(input); 
-}*/
+  return thread_hashtables_[tid].get_region_name();
+}
