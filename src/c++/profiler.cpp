@@ -124,14 +124,16 @@ void Profiler::write()
 }
 
 /**
- * @brief  Get the top-level elapsed time.
+ * @brief  Get the total (inclusive) time of everything below the specified hash.
+ *         Note: for thread 0 only.  This function provides an accessor to the
+ *         total wallclock time as measured by the profiler.
  *
  */
 
-double Profiler::get_total_wallclock_time()
+double Profiler::get_thread0_walltime(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
-  return thread_hashtables_[tid].get_total_wallclock_time();
+  return thread_hashtables_[tid].get_total_walltime(hash);
 }
 
 double Profiler::get_self_wallclock_time()

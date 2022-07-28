@@ -24,7 +24,7 @@
 #ifndef PROFILER_HASHTABLE_H
 #define PROFILER_HASHTABLE_H
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <string>
 #include <string_view>
@@ -65,7 +65,7 @@ class HashTable{
 
     // Members
     int tid_;
-    std::map<size_t,HashEntry>  table_;
+    std::unordered_map<size_t,HashEntry> table_;
     std::hash<std::string_view> hash_function_;
 
   public:
@@ -80,16 +80,13 @@ class HashTable{
     void write();
 
     // Member functions
-    double get_walltime(size_t const hash) const {return table_.at(hash).total_walltime_;}
-
     std::vector<size_t> list_keys();
-
     void add_child_time(size_t, double);
     void compute_self_times();
-    double get_total_wallclock_time();
-    double get_self_wallclock_time();
-    double get_child_wallclock_time(); 
-    std::string get_region_name();
-    
+    // double get_self_wallclock_time();
+    // double get_child_wallclock_time(); 
+    // std::string get_region_name();
+
+    double get_total_walltime(size_t const);
 };
 #endif
