@@ -66,7 +66,8 @@ class HashTable{
     // Members
     int tid_;
     std::unordered_map<size_t,HashEntry> table_;
-    std::hash<std::string_view> hash_function_;
+    std::hash<std::string_view>          hash_function_;
+    std::vector<std::pair<size_t, HashEntry>> hashvec;
 
   public:
 
@@ -83,10 +84,16 @@ class HashTable{
     std::vector<size_t> list_keys();
     void add_child_time(size_t, double);
     void compute_self_times();
-    // double get_self_wallclock_time();
-    // double get_child_wallclock_time(); 
-    // std::string get_region_name();
 
+    // Getter initialisers 
     double get_total_walltime(size_t const);
+    double get_self_walltime(size_t const);
+    double get_child_walltime(size_t const); 
+    std::string get_region_name(size_t const);
+
+    // Test 
+    size_t get_hashtable_count(size_t const);
+    bool is_table_empty();
+    std::vector<std::pair<size_t, HashEntry>> get_hashvec();
 };
 #endif

@@ -37,16 +37,16 @@ class Profiler
 {
   private: 
 
+    // Data members
+    int max_threads_;
+    std::vector<HashTable>                             thread_hashtables_;
+    std::vector<std::vector<std::pair<size_t,double>>>  thread_traceback_;
+
     // Type definitions for vector array indexing.
     typedef std::vector<HashTable>::size_type                        hashtable_iterator_t_;
     typedef std::vector<std::vector<std::pair<size_t,double>>>::size_type pair_iterator_t_;
 
   public:
-
-    // Data members
-    int max_threads_;
-    std::vector<HashTable>                             thread_hashtables_;
-    std::vector<std::vector<std::pair<size_t,double>>>  thread_traceback_;
 
     // Constructors
     Profiler();
@@ -55,10 +55,23 @@ class Profiler
     size_t start(std::string_view);
     void   stop (size_t const);
     void   write();
-    // double get_self_wallclock_time();
-    // double get_child_wallclock_time();
-    // std::string get_region_name();
-    double get_thread0_walltime(size_t const);
+    
+    // Getters
+    double      get_thread0_walltime(size_t const);
+    double      get_thread0_self_walltime(size_t const);
+    double      get_thread0_child_walltime(size_t const); 
+    std::string get_thread0_region_name(size_t const);
+
+    size_t get_thread_hashtables_size(); 
+    size_t get_thread_traceback_size();
+    int get_max_threads();
+
+    // Test 
+    size_t get_hashtable_count(size_t const);
+    size_t hashtable_query_insert(std::string_view);
+
+    bool is_table_empty();  
+    std::vector<std::pair<size_t, HashEntry>> get_hashvec();
 };
 
 // Declare global profiler

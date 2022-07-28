@@ -89,7 +89,7 @@ void Profiler::stop(size_t const hash)
   // Check that the hash is the one we expect. If it isn't, there is an error in
   // the instrumentation.
   if (hash != last_hash_on_list){
-    std::cout << "EMERGENCY STOP: hashes don't match." << "\n";
+    std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
     exit (100);
   }
 
@@ -136,20 +136,61 @@ double Profiler::get_thread0_walltime(size_t const hash)
   return thread_hashtables_[tid].get_total_walltime(hash);
 }
 
-double Profiler::get_self_wallclock_time()
+double Profiler::get_thread0_self_walltime(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
-  return thread_hashtables_[tid].get_self_wallclock_time();
+  return thread_hashtables_[tid].get_self_walltime(hash);
 }
 
-double Profiler::get_child_wallclock_time()
+double Profiler::get_thread0_child_walltime(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
-  return thread_hashtables_[tid].get_child_wallclock_time();
+  return thread_hashtables_[tid].get_child_walltime(hash);
 }
 
-std::string Profiler::get_region_name()
+std::string Profiler::get_thread0_region_name(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0); 
-  return thread_hashtables_[tid].get_region_name();
+  return thread_hashtables_[tid].get_region_name(hash);
+}
+
+size_t Profiler::get_thread_hashtables_size()
+{
+  return thread_hashtables_.size();
+}
+
+size_t Profiler::get_thread_traceback_size()
+{
+  return thread_traceback_.size();
+}
+
+int Profiler::get_max_threads()
+{
+  return max_threads_;
+}
+
+// In testing
+
+size_t Profiler::get_hashtable_count(size_t const hash)
+{
+  auto tid = static_cast<hashtable_iterator_t_>(0); 
+  return thread_hashtables_[tid].get_hashtable_count(hash);
+}
+
+size_t Profiler::hashtable_query_insert(std::string_view region_name) 
+{
+  auto tid = static_cast<hashtable_iterator_t_>(0);
+  return thread_hashtables_[tid].query_insert(region_name);
+}
+
+bool Profiler::is_table_empty()
+{
+  auto tid = static_cast<hashtable_iterator_t_>(0); 
+  return thread_hashtables_[tid].is_table_empty();
+}
+
+std::vector<std::pair<size_t, HashEntry>> Profiler::get_hashvec()
+{
+  auto tid = static_cast<hashtable_iterator_t_>(0);
+  return thread_hashtables_[tid].get_hashvec();
 }
