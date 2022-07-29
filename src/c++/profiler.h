@@ -66,12 +66,13 @@ class Profiler
     size_t get_thread_traceback_size();
     int get_max_threads();
 
-    // Test 
     size_t get_hashtable_count(size_t const);
     size_t hashtable_query_insert(std::string_view);
-
     bool is_table_empty();  
+
     std::vector<std::pair<size_t, HashEntry>> get_hashvec();
+
+    std::pair<size_t,double> get_final_traceback_pair();
 };
 
 // Declare global profiler

@@ -93,7 +93,7 @@ void Profiler::stop(size_t const hash)
     exit (100);
   }
 
-  // Increment the time for this
+  // Increment the total walltime for this
   double start_time = thread_traceback_[tid].back().second;
   double deltatime = stop_time - start_time;
   thread_hashtables_[tid].update(hash, deltatime);
@@ -169,8 +169,6 @@ int Profiler::get_max_threads()
   return max_threads_;
 }
 
-// In testing
-
 size_t Profiler::get_hashtable_count(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0); 
@@ -194,3 +192,10 @@ std::vector<std::pair<size_t, HashEntry>> Profiler::get_hashvec()
   auto tid = static_cast<hashtable_iterator_t_>(0);
   return thread_hashtables_[tid].get_hashvec();
 }
+
+std::pair<size_t,double> Profiler::get_final_traceback_pair()
+{
+  auto tid = static_cast<pair_iterator_t_>(0);
+  return thread_traceback_[tid].back();
+}
+
