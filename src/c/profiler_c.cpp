@@ -22,10 +22,10 @@
 #include <cstring>
 
 extern "C" {
-	void   c_profiler_start(long int&, char const*);
-	void   c_profiler_stop (long int const&);
-	void   c_profiler_write();
-        double c_get_thread0_walltime(long int const&);
+  void   c_profiler_start(long int&, char const*);
+  void   c_profiler_stop (long int const&);
+  void   c_profiler_write();
+  double c_get_thread0_walltime(long int const&);
 }
 
 /**
@@ -47,13 +47,13 @@ void c_profiler_start(long int& hash_out, char const* name)
 
 void c_profiler_stop(long int const& hash_in)
 {
-    size_t hash;
+  size_t hash;
 
-    // Ensure that the source and destination have the same size.
-    static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
-    std::memcpy(&hash, &hash_in, sizeof(hash));
+  // Ensure that the source and destination have the same size.
+  static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
+  std::memcpy(&hash, &hash_in, sizeof(hash));
 
-    prof.stop( hash );
+  prof.stop( hash );
 }
 
 /**
@@ -62,7 +62,7 @@ void c_profiler_stop(long int const& hash_in)
 
 void c_profiler_write()
 {
-    prof.write();
+  prof.write();
 }
 
 /**
@@ -70,13 +70,13 @@ void c_profiler_write()
  */
 
  double c_get_thread0_walltime(long int const& hash_in)
- {
-   size_t hash;
+{
+  size_t hash;
 
-   // Ensure that the source and destination have the same size.
-   static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
-   std::memcpy(&hash, &hash_in, sizeof(hash));
+  // Ensure that the source and destination have the same size.
+  static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
+  std::memcpy(&hash, &hash_in, sizeof(hash));
 
-   return prof.get_thread0_walltime( hash );
- }
+  return prof.get_thread0_walltime( hash );
+}
 
