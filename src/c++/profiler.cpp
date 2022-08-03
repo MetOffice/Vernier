@@ -136,11 +136,21 @@ double Profiler::get_thread0_walltime(size_t const hash)
   return thread_hashtables_[tid].get_total_walltime(hash);
 }
 
+/**
+ * @brief  Get the self walltime for the specified hash.
+ *
+ */
+
 double Profiler::get_thread0_self_walltime(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
   return thread_hashtables_[tid].get_self_walltime(hash);
 }
+
+/**
+ * @brief  Get the child walltime for the specified hash.
+ *
+ */
 
 double Profiler::get_thread0_child_walltime(size_t const hash)
 {
@@ -148,26 +158,53 @@ double Profiler::get_thread0_child_walltime(size_t const hash)
   return thread_hashtables_[tid].get_child_walltime(hash);
 }
 
+/**
+ * @brief  Get the region name corresponding to the input hash.
+ *
+ */
+
 std::string Profiler::get_thread0_region_name(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0); 
   return thread_hashtables_[tid].get_region_name(hash);
 }
 
+/**
+ * @brief  Returns the size of thread_hashtables_.
+ *
+ */
+
 size_t Profiler::get_thread_hashtables_size()
 {
   return thread_hashtables_.size();
 }
+
+/**
+ * @brief  Returns the size of thread_traceback_.
+ *
+ */
 
 size_t Profiler::get_thread_traceback_size()
 {
   return thread_traceback_.size();
 }
 
+/**
+ * @brief  Returns the value of max_threads_ i.e. the number of threads the profiler is specified to run on.
+ *
+ */
+
 int Profiler::get_max_threads()
 {
   return max_threads_;
 }
+
+/**
+ * @brief  Gets the output of .count() for the specified hash in the current threads hashtable.
+ *         This should be equal to 1 if an entry corresponding to the specified hash already
+ *         exists, and 0 if not.
+ *
+ */
 
 size_t Profiler::get_hashtable_count(size_t const hash)
 {
@@ -175,11 +212,23 @@ size_t Profiler::get_hashtable_count(size_t const hash)
   return thread_hashtables_[tid].get_hashtable_count(hash);
 }
 
+/**
+ * @brief  Does a query_insert into the current threads hashtable for the specified region name.
+ *         So if no entry for the specified region name currently exists, one will be made.
+ *         Like HashTable.query_insert, the corresponding hash is also returned.
+ *
+ */
+
 size_t Profiler::hashtable_query_insert(std::string_view region_name) 
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
   return thread_hashtables_[tid].query_insert(region_name);
 }
+
+/**
+ * @brief  Returns TRUE if the hashtable is empty and FALSE if not.
+ *
+ */
 
 bool Profiler::is_table_empty()
 {
@@ -187,15 +236,25 @@ bool Profiler::is_table_empty()
   return thread_hashtables_[tid].is_table_empty();
 }
 
+/**
+ * @brief  Gets the vector of (hash,HashEntry) pairs in Profiler.write() known as hashvec, the desired 
+ *         behaviour of which is to sort the entries from high to low self walltime.
+ *
+ */
+
 std::vector<std::pair<size_t, HashEntry>> Profiler::get_hashvec()
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
   return thread_hashtables_[tid].get_hashvec();
 }
 
-std::pair<size_t,double> Profiler::get_final_traceback_pair()
+/**
+ * @brief  Gets the inner layer vector in thread_traceback_ 
+ *
+ */
+
+std::vector<std::pair<size_t,double>> Profiler::get_traceback_vector()
 {
   auto tid = static_cast<pair_iterator_t_>(0);
-  return thread_traceback_[tid].back();
+  return thread_traceback_[tid];
 }
-

@@ -85,13 +85,12 @@ class HashTable{
     void add_child_time(size_t, double);
     void compute_self_times();
 
-    // Getter initialisers 
+    // Getters
     double get_total_walltime(size_t const);
     double get_self_walltime(size_t const);
     double get_child_walltime(size_t const); 
     std::string get_region_name(size_t const);
 
-    // Test 
     size_t get_hashtable_count(size_t const);
     bool is_table_empty();
     std::vector<std::pair<size_t, HashEntry>> get_hashvec();

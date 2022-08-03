@@ -166,36 +166,64 @@ double HashTable::get_total_walltime(size_t const hash)
     return table_.at(hash).total_walltime_;
 }
 
+/**
+ * @brief  Get the profiler self time corresponding to the input hash.
+ * 
+ */
+
 double HashTable::get_self_walltime(size_t const hash)
 {
     this->compute_self_times();
     return table_.at(hash).self_walltime_;
 }
 
+/**
+ * @brief  Get the child time corresponding to the input hash.
+ * 
+ */
+
 double HashTable::get_child_walltime(size_t const hash)
 {
     return table_.at(hash).child_walltime_;
 }
+
+/**
+ * @brief  Get the region name corresponding to the input hash.
+ * 
+ */
 
 std::string HashTable::get_region_name(size_t const hash) 
 {
     return table_.at(hash).region_name_; 
 }
 
+/**
+ * @brief  Get the hashtable .count() corresponding to the input hash.
+ * 
+ */
+
 size_t HashTable::get_hashtable_count(size_t const hash) 
 {
    return table_.count(hash);
 }
+
+/**
+ * @brief  Returns TRUE if the hashtable is empty and false otherwise.
+ * 
+ */
 
 bool HashTable::is_table_empty() 
 {
    return table_.empty();
 }
 
+/**
+ * @brief  Get the vector of pairs in profiler.write() used to sort entries from the underordered_map from high to low self walltime.
+ * 
+ */
+
 std::vector<std::pair<size_t, HashEntry>> HashTable::get_hashvec() 
 {
    this->write();
    return hashvec;
 }
-
-
