@@ -1,6 +1,7 @@
 #include <iostream>
 #include <profiler.h>
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <chrono>
 
 using ::testing::AllOf;
