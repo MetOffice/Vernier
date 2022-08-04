@@ -8,7 +8,7 @@ module test_profiler_mod
   @suite(name='test_profiler_mod_suite')
 
   use profiler_mod
-  use OMP_LIB
+  use omp_lib
 
 contains
 
@@ -21,15 +21,15 @@ contains
 
     integer, parameter :: dp = 8
 
-    !Timer declarations
+    ! Timer declarations
     real(kind=dp) :: t1, t2, actual_time
 
     real(kind=prk) :: profiler_wallclock_time
 
-    !Handle declarations
+    ! Handle declarations
     integer(kind=pik) :: prof_main
 
-    !Start timing: noddy way, and using Profiler.
+    ! Start timing: noddy way, and using Profiler.
     call profiler_start(prof_main, 'FULL')
     t1 = omp_get_wtime()
 
@@ -59,20 +59,20 @@ contains
     end block
     !$OMP END PARALLEL
 
-    !Give the main regions some substantial execution time.
+    ! Give the main regions some substantial execution time.
     call sleep(2);
 
-    ! End of profiling; record t2 immediately afterwards.
-    call profiler_stop(prof_main)
+    ! End of profiling; record t2 immediately before.
     t2 = omp_get_wtime();
+    call profiler_stop(prof_main)
 
-    !Write the profile
+    ! Write the profile
     call profiler_write()
 
     actual_time = t2 - t1
-    profiler_wallclock_time = profiler_get_total_wallclock_time()
+    profiler_wallclock_time = profiler_get_thread0_walltime(prof_main)
 
-    @assertEqual(actual_time, profiler_wallclock_time, tolerance=1e-4)
+    @assertEqual(actual_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
 
   end subroutine test_profiler
 

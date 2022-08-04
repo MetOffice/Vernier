@@ -55,7 +55,7 @@ class Profiler
     size_t start(std::string_view);
     void   stop (size_t const);
     void   write();
-    double get_total_wallclock_time();
+    double get_thread0_walltime(size_t const);
 };
 
 // Declare global profiler

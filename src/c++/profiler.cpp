@@ -124,13 +124,21 @@ void Profiler::write()
 }
 
 /**
- * @brief  Get the top-level elapsed time.
+ * @brief  Get the total (inclusive) time of everything below the specified hash.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest. 
+ *
+ * @note   This function is normally expected to be used to return the total
+ *         wallclock time for whole run. Since this value is required only from
+ *         thread 0, the function does not take a thread ID argument and returns
+ *         the value for thread 0 only. Taking the hash argument avoids the need
+ *         to store the top-level hash inside the profiler itself.
  *
  */
 
-double Profiler::get_total_wallclock_time()
+double Profiler::get_thread0_walltime(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
-  return thread_hashtables_[tid].get_total_wallclock_time();
+  return thread_hashtables_[tid].get_total_walltime(hash);
 }
 

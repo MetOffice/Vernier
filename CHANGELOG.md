@@ -14,8 +14,8 @@
 20/12/2021 PR #19 for #12: Use standard CMake project version variables for versioning. \
 21/12/2021 PR #18: Add GitHub runner for building and deploying Doxygen documentation. \
 21/12/2021 PR #22 for #13: Move install functionality in main CMakeLists.txt to cmake/Installation.cmake \
-21/01/2022 PR #23: Fix version number passed to Doxygen \
-15/03/2022 PR #5: Initial code import \
-08/07/2022 PR #27: Working Fortran (and C) interfaces \
-15/07/2022 PR #29: Unit testing for fortran interface
- 
+21/01/2022 PR #23: Fix version number passed to Doxygen. \
+15/03/2022 PR #5 towards #2: Initial code import. \
+08/07/2022 PR #27: Working Fortran (and C) interfaces. \
+15/07/2022 PR #30 for #29: Unit testing for Fortran interface. \
+04/08/2022 PR #32 for #31: Functionality improvements (walltime, swap to unordered_map, sort entries in output.

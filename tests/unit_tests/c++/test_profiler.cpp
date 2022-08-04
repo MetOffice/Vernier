@@ -16,8 +16,8 @@ TEST(SystemTests, TimingTest)
 {
 
   // Start timing: noddy way, and using Profiler.
-  double t1 = omp_get_wtime();
   auto prof_main = prof.start("MAIN");
+  double t1 = omp_get_wtime();
 
   // Time a region
   {
@@ -44,9 +44,9 @@ TEST(SystemTests, TimingTest)
   // Give the main regions some substantial execution time.
   sleep(2);
 
-  // End of profiling; record t2 immediately afterwards.
-  prof.stop(prof_main);
+  // End of profiling; record t2 immediately before.
   double t2 = omp_get_wtime();
+  prof.stop(prof_main);
 
   // Write the profile
   prof.write();
@@ -57,7 +57,7 @@ TEST(SystemTests, TimingTest)
   double const time_tolerance = 0.0001;
 
   double actual_time = t2 - t1;
-  double prof_time   = prof.get_total_wallclock_time();
+  double prof_time  = prof.get_thread0_walltime(prof_main);
   EXPECT_NEAR(prof_time, actual_time, time_tolerance);
 
   std::cout << "\n" << "Actual timing: "   << actual_time << "\n";
