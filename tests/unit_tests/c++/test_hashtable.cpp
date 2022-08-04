@@ -1,6 +1,5 @@
 #include <iostream>
 #include <profiler.h>
-#include <gtest/gtest.h> 
 #include <gmock/gmock.h>
 #include <chrono>
 
@@ -248,12 +247,12 @@ TEST(ProfilerTest,WriteTest) {
   const auto& prof_main = prof.start("Shortbread");
   const auto& prof_sub  = prof.start("Brownie"); 
   const auto& prof_sub2 = prof.start("RockyRoad"); 
-
-  sleep(1);
-
+  
   // Stop them 1 by 1
   prof.stop(prof_sub2); 
+  sleep(1);
   prof.stop(prof_sub);
+  sleep(2);
   prof.stop(prof_main);
 
   {
