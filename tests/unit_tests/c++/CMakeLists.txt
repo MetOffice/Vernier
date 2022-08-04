@@ -3,7 +3,8 @@ function(add_unit_test test_name cpp_file)
     add_executable(${test_name} ${cpp_file})
     target_link_libraries(${test_name}
             OpenMP::OpenMP_CXX
-            GTest::gtest_main
+            GTest::gtest_main 
+            GTest::gmock_main
             ${CMAKE_PROJECT_NAME})
     set_project_warnings(${test_name})
     target_include_directories(${test_name} PRIVATE
