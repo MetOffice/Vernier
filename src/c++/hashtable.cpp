@@ -42,10 +42,11 @@ size_t HashTable::query_insert(std::string_view region_name) noexcept
 {
   size_t hash = hash_function_(region_name);
 
-  table_.try_emplace(hash,HashEntry(region_name));
+  if (table_.count(hash) == 0){
+    table_.emplace(hash,HashEntry(region_name));
+    assert (table_.count(hash) > 0);
+  }
 
-  assert (table_.count(hash) == 1);
- 
   return hash;
 }
 
@@ -89,7 +90,7 @@ void HashTable::add_child_time(size_t hash, double time_delta)
 
 void HashTable::write()
 {
- 
+
   this->compute_self_times();
 
   std::string routine_at_thread = "Thread: " + std::to_string(tid_);
@@ -111,14 +112,10 @@ void HashTable::write()
   // Create a vector from the hashtable and sort the entries according to self
   // walltime.  If optimisation of this is needed, it ought to be possible to
   // acquire a vector of hash-selftime pairs in the correct order, then use the
-  // hashes to lookup other information directly from the hashtable.
-  hashvec = std::vector<std::pair<size_t, HashEntry>>(begin(table_), end(table_));
-
-  std::sort(begin(hashvec), end(hashvec), [](auto a, auto b) { 
-
-    return a.second.self_walltime_ > b.second.self_walltime_;
-  
-  });
+  // hashes to look up other information directly from the hashtable.
+  auto hashvec = std::vector<std::pair<size_t, HashEntry>>(begin(table_), end(table_));
+  std::sort(begin(hashvec), end(hashvec), 
+      [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_;});
     
   // Data entries
   for (auto& [hash, entry] : hashvec) {
@@ -163,7 +160,7 @@ std::vector<size_t> HashTable::list_keys()
 
 double HashTable::get_total_walltime(size_t const hash)
 {
-    return table_.at(hash).total_walltime_;
+  return table_.at(hash).total_walltime_;
 }
 
 /**
@@ -173,8 +170,8 @@ double HashTable::get_total_walltime(size_t const hash)
 
 double HashTable::get_self_walltime(size_t const hash)
 {
-    this->compute_self_times();
-    return table_.at(hash).self_walltime_;
+  this->compute_self_times();
+  return table_.at(hash).self_walltime_;
 }
 
 /**
@@ -184,7 +181,7 @@ double HashTable::get_self_walltime(size_t const hash)
 
 double HashTable::get_child_walltime(size_t const hash)
 {
-    return table_.at(hash).child_walltime_;
+  return table_.at(hash).child_walltime_;
 }
 
 /**
@@ -194,7 +191,7 @@ double HashTable::get_child_walltime(size_t const hash)
 
 std::string HashTable::get_region_name(size_t const hash) 
 {
-    return table_.at(hash).region_name_; 
+  return table_.at(hash).region_name_; 
 }
 
 /**
@@ -204,7 +201,7 @@ std::string HashTable::get_region_name(size_t const hash)
 
 size_t HashTable::get_hashtable_count(size_t const hash) 
 {
-   return table_.count(hash);
+  return table_.count(hash);
 }
 
 /**
@@ -214,7 +211,7 @@ size_t HashTable::get_hashtable_count(size_t const hash)
 
 bool HashTable::is_table_empty() 
 {
-   return table_.empty();
+  return table_.empty();
 }
 
 /**
@@ -224,6 +221,6 @@ bool HashTable::is_table_empty()
 
 std::vector<std::pair<size_t, HashEntry>> HashTable::get_hashvec() 
 {
-   this->write();
-   return hashvec;
+  this->write();
+  return hashvec;
 }

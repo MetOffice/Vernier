@@ -40,7 +40,7 @@ class Profiler
     // Data members
     int max_threads_;
     std::vector<HashTable>                             thread_hashtables_;
-    std::vector<std::vector<std::pair<size_t,double>>>  thread_traceback_;
+    std::vector<std::vector<std::pair<size_t,double>>> thread_traceback_;
 
     // Type definitions for vector array indexing.
     typedef std::vector<HashTable>::size_type                        hashtable_iterator_t_;
@@ -55,6 +55,7 @@ class Profiler
     size_t start(std::string_view);
     void   stop (size_t const);
     void   write();
+    bool   is_table_empty();
     
     // Getters
     double      get_thread0_walltime(size_t const);
@@ -67,7 +68,7 @@ class Profiler
     int get_max_threads();
     size_t get_hashtable_count(size_t const);
     size_t hashtable_query_insert(std::string_view);
-    bool is_table_empty();  
+      
 
     std::vector<std::pair<size_t, HashEntry>> get_hashvec();
     std::vector<std::pair<size_t,double>> get_traceback_vector();

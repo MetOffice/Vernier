@@ -93,7 +93,7 @@ void Profiler::stop(size_t const hash)
     exit (100);
   }
 
-  // Increment the total walltime for this
+  // Increment the time for this
   double start_time = thread_traceback_[tid].back().second;
   double deltatime = stop_time - start_time;
   thread_hashtables_[tid].update(hash, deltatime);
@@ -125,8 +125,14 @@ void Profiler::write()
 
 /**
  * @brief  Get the total (inclusive) time of everything below the specified hash.
- *         Note: for thread 0 only.  This function provides an accessor to the
- *         total wallclock time as measured by the profiler.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest. 
+ *
+ * @note   This function is normally expected to be used to return the total
+ *         wallclock time for whole run. Since this value is required only from
+ *         thread 0, the function does not take a thread ID argument and returns
+ *         the value for thread 0 only. Taking the hash argument avoids the need
+ *         to store the top-level hash inside the profiler itself.
  *
  */
 

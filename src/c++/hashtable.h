@@ -47,7 +47,7 @@ struct HashEntry{
     std::string region_name_;
     double      total_walltime_;
     double      self_walltime_;
-    double      child_walltime_; 
+    double      child_walltime_;
 
 };
 
@@ -66,7 +66,7 @@ class HashTable{
     // Members
     int tid_;
     std::unordered_map<size_t,HashEntry> table_;
-    std::hash<std::string_view>          hash_function_;
+    std::hash<std::string_view> hash_function_;
     std::vector<std::pair<size_t, HashEntry>> hashvec;
 
   public:
@@ -84,15 +84,14 @@ class HashTable{
     std::vector<size_t> list_keys();
     void add_child_time(size_t, double);
     void compute_self_times();
+    bool is_table_empty();
 
     // Getters
     double get_total_walltime(size_t const);
     double get_self_walltime(size_t const);
     double get_child_walltime(size_t const); 
     std::string get_region_name(size_t const);
-
     size_t get_hashtable_count(size_t const);
-    bool is_table_empty();
     std::vector<std::pair<size_t, HashEntry>> get_hashvec();
 };
 #endif
