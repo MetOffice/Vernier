@@ -1,7 +1,15 @@
 #include <iostream>
 #include <profiler.h>
-#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <chrono>
+
+using ::testing::AllOf;
+using ::testing::An;
+using ::testing::Gt;
+using ::testing::WhenSortedBy;
+using ::testing::ElementsAre;
+using ::testing::ExitedWithCode;
+using ::testing::KilledBySignal;
 
 // Using global profiler declared at the bottom of "profiler.h" :
 //
@@ -73,7 +81,7 @@ TEST(HashEntryTest,RegionNameTest) {
     const auto& prof_sub = prof.start("Latte");
 
     // Get subregion name out from profiler and test
-    std::string_view subregionName = prof.get_thread0_region_name(prof_sub);
+    std::string subregionName = prof.get_thread0_region_name(prof_sub);
     EXPECT_EQ("Latte", subregionName);
 
     prof.stop(prof_sub);
@@ -83,7 +91,7 @@ TEST(HashEntryTest,RegionNameTest) {
     SCOPED_TRACE("Problem with main region name");
 
     // Get main region name out from profiler and test
-    std::string_view regionName = prof.get_thread0_region_name(prof_main);
+    std::string regionName = prof.get_thread0_region_name(prof_main);
     EXPECT_EQ("Cappucino", regionName);
   }
 
@@ -220,7 +228,7 @@ TEST(HashTableTest,TracebackTest) {
     //  - The second entry is some time, here a check done to make sure it is some double greater than zero
     EXPECT_EQ( prof.get_traceback_vector().size(), 1);
     EXPECT_EQ( prof.get_traceback_vector().back().first, prof_main );
-    EXPECT_THAT( prof.get_traceback_vector().back().second, testing::AllOf(testing::An<double>(),testing::Gt(0.0)) );
+    EXPECT_THAT( prof.get_traceback_vector().back().second, AllOf(An<double>(),Gt(0.0)) );
   } 
 
   // Stop profiler
@@ -267,9 +275,9 @@ TEST(ProfilerTest,WriteTest) {
     SCOPED_TRACE("Entries in hashvec incorrectly sorted");
 
     // hashvec is ordered from high to low so... [lastEntry] < [firstEntry] 
-    const double& val1 = prof.get_hashvec()[0].second.self_walltime_;
-    const double& val2 = prof.get_hashvec()[1].second.self_walltime_;
-    const double& val3 = prof.get_hashvec()[2].second.self_walltime_;
+    const double val1 = prof.get_hashvec()[0].second.self_walltime_;
+    const double val2 = prof.get_hashvec()[1].second.self_walltime_;
+    const double val3 = prof.get_hashvec()[2].second.self_walltime_;
     EXPECT_LT(val3, val2);
     EXPECT_LT(val2, val1);
                                                                                                                                                                                             
@@ -277,7 +285,7 @@ TEST(ProfilerTest,WriteTest) {
     const double container1[3] = { prof.get_thread0_self_walltime(prof_main) ,
                                    prof.get_thread0_self_walltime(prof_sub)  ,
                                    prof.get_thread0_self_walltime(prof_sub2) };
-    EXPECT_THAT(container1, testing::WhenSortedBy(std::greater(),testing::ElementsAre(val1, val2, val3)));
+    EXPECT_THAT(container1, WhenSortedBy(std::greater(),ElementsAre(val1, val2, val3)));
   }
 }
 
@@ -298,7 +306,7 @@ TEST(ProfilerDeathTest,WrongHashTest) {
     // Eventually stop prof_main to avoid Wunused telling me off...
     prof.stop(prof_main);
 
-  }, testing::ExitedWithCode(100), "EMERGENCY STOP: hashes don't match."); 
+  }, ExitedWithCode(100), "EMERGENCY STOP: hashes don't match."); 
 
 }
 
@@ -310,7 +318,7 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
     prof.stop(prof_main);
 
-  }, testing::KilledBySignal(SIGSEGV), "" );
+  }, KilledBySignal(SIGSEGV), "" );
 
   EXPECT_EXIT({
 
@@ -318,7 +326,7 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
     prof.stop(prof_main);
 
-  }, testing::KilledBySignal(SIGSEGV), "" );
+  }, KilledBySignal(SIGSEGV), "" );
 
 }
 
