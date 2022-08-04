@@ -74,7 +74,8 @@ TEST(HashEntryTest,RegionNameTest) {
     const auto& prof_sub = prof.start("Latte");
 
     // Get subregion name out from profiler and test
-    EXPECT_EQ("Latte", prof.get_thread0_region_name(prof_sub));
+    std::string_view subregionName = prof.get_thread0_region_name(prof_sub);
+    EXPECT_EQ("Latte", subregionName);
 
     prof.stop(prof_sub);
   }
@@ -83,7 +84,8 @@ TEST(HashEntryTest,RegionNameTest) {
     SCOPED_TRACE("Problem with main region name");
 
     // Get main region name out from profiler and test
-    EXPECT_EQ("Cappucino", prof.get_thread0_region_name(prof_main));
+    std::string_view regionName = prof.get_thread0_region_name(prof_main);
+    EXPECT_EQ("Cappucino", regionName);
   }
 
   prof.stop(prof_main);
@@ -142,7 +144,7 @@ TEST(HashTableTest,ThreadsEqualsEntries) {
   
 }
 
-TEST(HashTableTest,UpdateTest) { 
+TEST(HashTableTest,UpdateAndMdiTest) { 
 
   // Create new hash 
   auto prof_main = prof.hashtable_query_insert("Pie");
@@ -179,6 +181,12 @@ TEST(HashTableTest,UpdateTest) {
     SCOPED_TRACE("MDI missing from time points expected to return it");  
     EXPECT_EQ(t1, MDI);
     EXPECT_EQ(t2, MDI);
+
+    // Introduce a subregion hash but never time it.
+    // The time for this region should also return an MDI.
+    const auto& prof_sub = prof.hashtable_query_insert("Sub");
+    const double& subregionTime = prof.get_thread0_walltime(prof_sub);
+    EXPECT_EQ(subregionTime, MDI);
   }
 
   { 
@@ -274,7 +282,7 @@ TEST(ProfilerTest,WriteTest) {
   }
 }
 
-TEST(ProfilerTest,WrongHashTest) {
+TEST(ProfilerDeathTest,WrongHashTest) {
 
   EXPECT_EXIT({
 
@@ -295,7 +303,7 @@ TEST(ProfilerTest,WrongHashTest) {
 
 }
 
-TEST(ProfilerTest,StopBeforeStartTest) { 
+TEST(ProfilerDeathTest,StopBeforeStartTest) { 
 
   EXPECT_EXIT({ 
 
@@ -305,4 +313,21 @@ TEST(ProfilerTest,StopBeforeStartTest) {
 
   }, testing::KilledBySignal(SIGSEGV), "" );
 
+  EXPECT_EXIT({
+
+    size_t prof_main = std::hash<std::string_view>{}("Main");
+
+    prof.stop(prof_main);
+
+  }, testing::KilledBySignal(SIGSEGV), "" );
+
 }
+
+
+
+
+
+
+
+
+
