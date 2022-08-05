@@ -21,6 +21,8 @@ function(enable_doxygen)
         set(DOXYGEN_JAVADOC_BLOCK NO)
         set(DOXYGEN_FULL_PATH_NAMES NO)
         set(DOXYGEN_STRIP_CODE_COMMENTS NO)
+        set(DOXYGEN_FILE_PATTERNS  *.c *.cpp *.h *.f90 *.F90 )
+        set(DOXYGEN_EXTENSION_MAPPING "F90=Fortran")
         set(DOXYGEN_HTML_HEADER ${PROJECT_SOURCE_DIR}/documentation/Doxygen/html/header.html)
         set(DOXYGEN_HTML_FOOTER ${PROJECT_SOURCE_DIR}/documentation/Doxygen/html/footer.html)
 
