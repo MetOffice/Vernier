@@ -99,7 +99,7 @@ module profiler_mod
 
       !Local variables
       character(len=len_trim(region_name)+1) :: local_region_name
-     
+
       local_region_name = trim(region_name) // c_null_char
       call interface_profiler_start(hash_out, local_region_name)
 
