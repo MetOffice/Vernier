@@ -57,12 +57,12 @@ jobs:
       env:
         OMP_NUM_THREADS: 1
       working-directory: ${{github.workspace}}/build
-      run: ctest -C ${{env.BUILD_TYPE}}
+      run: ctest -C -VV ${{env.BUILD_TYPE}}
 
     # Run tests on 4 threads
     - name: "Test (4 threads)"
       env:
         OMP_NUM_THREADS: 4
       working-directory: ${{github.workspace}}/build
-      run: ctest -C ${{env.BUILD_TYPE}}
+      run: ctest -C -VV ${{env.BUILD_TYPE}}
 
