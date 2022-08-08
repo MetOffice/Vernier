@@ -5,6 +5,7 @@
 ! under which the code may be used.
 !-------------------------------------------------------------------------------
 
+!> @file    profiler_mod.F90
 !> @brief   Provides Fortran profiler bindings.
 
 module profiler_mod
@@ -36,6 +37,7 @@ module profiler_mod
   !-----------------------------------------------------------------------------
 
   interface
+
     subroutine intf_profiler_start(hash_out, region)                   &
                bind(C, name='c_profiler_start')
       import :: c_char, pik
