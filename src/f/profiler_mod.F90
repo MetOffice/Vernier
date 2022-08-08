@@ -38,12 +38,12 @@ module profiler_mod
 
   interface
 
-    subroutine intf_profiler_start(hash_out, region)                   &
+    subroutine interface_profiler_start(hash_out, region)                   &
                bind(C, name='c_profiler_start')
       import :: c_char, pik
       character(kind=c_char, len=1), intent(in)  :: region
       integer(kind=pik),             intent(out) :: hash_out
-    end subroutine intf_profiler_start
+    end subroutine interface_profiler_start
 
     subroutine profiler_stop(hash_in) bind(C, name='c_profiler_stop')
       import :: pik
@@ -83,7 +83,7 @@ module profiler_mod
       character(len=len_trim(region)+1) :: local_region
      
       local_region = trim(region) // c_null_char
-      call intf_profiler_start(hash_out, local_region)
+      call interface_profiler_start(hash_out, local_region)
 
     end subroutine profiler_start
 
