@@ -27,7 +27,7 @@ module profiler_mod
   !-----------------------------------------------------------------------------
 
   !> @defgroup FortranAPI Fortran
-  !> @brief A simple Fortran API for the profiler
+  !> @brief Fortran API for the profiler
   public :: profiler_start
   public :: profiler_stop
   public :: profiler_write
@@ -38,7 +38,6 @@ module profiler_mod
   !-----------------------------------------------------------------------------
 
   interface
-
 	!> @ingroup FortranAPI
 	!> @fn profiler_mod::profiler_stop::profiler_stop(hash_in)
 	!> @brief Stop profiler
@@ -59,7 +58,7 @@ module profiler_mod
 	!> @fn profiler_mod::profiler_get_thread0_walltime::profiler_get_thread0_walltime(hash_in)
 	!> @brief Write profiling data out
 	!> @param [in] hash_in The hash of the region to return the time.
-	!> @result The Walltime within the region.
+	!> @returns The Walltime within the region.
     function profiler_get_thread0_walltime(hash_in) result(walltime)   &
              bind(C, name='c_get_thread0_walltime')
       import :: pik, prk
@@ -84,7 +83,7 @@ module profiler_mod
   !-----------------------------------------------------------------------------
   contains
 
-  	!> @ingroup FortranAPI
+	  !> @ingroup FortranAPI
     !> @brief  Start profiling a code region.
     !> @param [out] hash_out      The unique hash for this region.
     !> @param [in]  region_name   The region name.
