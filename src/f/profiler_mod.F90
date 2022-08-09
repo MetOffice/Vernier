@@ -11,7 +11,6 @@
 module profiler_mod
   use, intrinsic :: iso_c_binding, only: c_char, c_long, c_double, c_null_char
   implicit none
-  private
 
   !-----------------------------------------------------------------------------
   ! Public parameters
@@ -27,6 +26,8 @@ module profiler_mod
   ! Public interfaces / subroutines
   !-----------------------------------------------------------------------------
 
+  !> @defgroup FortranAPI
+  !> @brief Fortran API
   public :: profiler_start
   public :: profiler_stop
   public :: profiler_write
@@ -37,37 +38,53 @@ module profiler_mod
   !-----------------------------------------------------------------------------
 
   interface
-
-    subroutine interface_profiler_start(hash_out, region_name)                   &
-               bind(C, name='c_profiler_start')
-      import :: c_char, pik
-      character(kind=c_char, len=1), intent(in)  :: region_name
-      integer(kind=pik),             intent(out) :: hash_out
-    end subroutine interface_profiler_start
-
+	!> @ingroup FortranAPI
+	!> @fn profiler_mod::profiler_stop::profiler_stop(hash_in)
+	!> @brief Stop profiler
+	!> @param [in] hash_in The hash of the region to be stopped.
     subroutine profiler_stop(hash_in) bind(C, name='c_profiler_stop')
       import :: pik
       integer(kind=pik), intent(in) :: hash_in
     end subroutine profiler_stop
 
+    !> @ingroup FortranAPI
+	!> @fn profiler_mod::profiler_write::profiler_write()
+	!> @brief Write profiling data out
     subroutine profiler_write() bind(C, name='c_profiler_write')
         !No arguments to handle
     end subroutine profiler_write
 
+    !> @ingroup FortranAPI
+	!> @fn profiler_mod::profiler_get_thread0_walltime::profiler_get_thread0_walltime(hash_in)
+	!> @brief Write profiling data out
+	!> @param [in] hash_in The hash of the region to return the time.
+	!> @returns The Walltime within the region.
     function profiler_get_thread0_walltime(hash_in) result(walltime)   &
              bind(C, name='c_get_thread0_walltime')
       import :: pik, prk
       integer(kind=pik), intent(in) :: hash_in
       real(kind=prk)                :: walltime
     end function profiler_get_thread0_walltime
-
+    
+	!> @}
   end interface
+  
+  private 
+  interface
+    subroutine interface_profiler_start(hash_out, region_name)                   &
+               bind(C, name='c_profiler_start')
+      import :: c_char, pik
+      character(kind=c_char, len=1), intent(in)  :: region_name
+      integer(kind=pik),             intent(out) :: hash_out
+    end subroutine interface_profiler_start
+  end interface  
 
   !-----------------------------------------------------------------------------
   ! Contained functions / subroutines
   !-----------------------------------------------------------------------------
   contains
 
+	!> @ingroup FortranAPI
     !> @brief  Start a profiled region, taking care to add a C null character to
     !>         the end of the region name.
     !> @param [out] hash_out      The unique hash for this region.
