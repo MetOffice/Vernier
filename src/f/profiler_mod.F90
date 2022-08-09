@@ -38,10 +38,10 @@ module profiler_mod
 
   interface
 
-    subroutine interface_profiler_start(hash_out, region_name)                   &
+    subroutine interface_profiler_start(hash_out, region_name)         &
                bind(C, name='c_profiler_start')
       import :: c_char, pik
-      character(kind=c_char, len=1), intent(in)  :: region_name
+      character(kind=c_char, len=1), intent(in)  :: region_name(*)
       integer(kind=pik),             intent(out) :: hash_out
     end subroutine interface_profiler_start
 
