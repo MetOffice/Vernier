@@ -7,7 +7,7 @@
 //
 //  Tests focused on the "region name" of a particular section.
 //  All main and sub-regions should give the expected string. Various
-//  other funky region names are tested to see what happens.
+//  other funky region names will potentially be tested in the future.
 //
 
 TEST(RegionNameTest,NamesMatchTest) {
@@ -41,9 +41,9 @@ TEST(RegionNameTest,NamesMatchTest) {
 
 }
 
-/* Placeholder for testing weird region names, which there are no tests for within the code yet
+/* Placeholder for testing different region names, which there are no checks for within the code yet...
 
-TEST(RegionName,InvalidsTest) {
+TEST(RegionNameTest,InvalidsTest) {
 
   // Long name
   const auto& A = prof.hashtable_query_insert("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz");
@@ -51,14 +51,9 @@ TEST(RegionName,InvalidsTest) {
   // Nothing / blank space
 
   // Non-null-terminated string
-  char testString[7] = { 'L', 'a', 's', 'a', 'g', 'n', 'a'};
-  const auto& D = prof.hashtable_query_insert(testString);
 
   // Special characters
-  const auto& E = prof.hashtable_query_insert("m@1n_region*");
 
   // Initalise inside brackets
-  // const auto& G = prof.hashtable_query_insert(std::string Main = "MAIN");
-  // ... wont compile
 
 }*/
