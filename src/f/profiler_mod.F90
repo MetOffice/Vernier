@@ -26,8 +26,8 @@ module profiler_mod
   ! Public interfaces / subroutines
   !-----------------------------------------------------------------------------
 
-  !> @defgroup FortranAPI
-  !> @brief Fortran API
+  !> @defgroup FortranAPI Fortran
+  !> @brief A simple Fortran API for the profiler
   public :: profiler_start
   public :: profiler_stop
   public :: profiler_write
@@ -49,7 +49,7 @@ module profiler_mod
 
     !> @ingroup FortranAPI
 	!> @fn profiler_mod::profiler_write::profiler_write()
-	!> @brief Write profiling data out
+	!> @brief Write timings out for all profiling regions.
     subroutine profiler_write() bind(C, name='c_profiler_write')
         !No arguments to handle
     end subroutine profiler_write

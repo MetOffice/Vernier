@@ -13,7 +13,7 @@
  * C-language interfaces are needed to call the profiler from C and Fortran.
  *
  * Since Fortran is pass by reference, arguments are received as references (&).
- *
+ * 
  */
 
 #include "profiler.h"
@@ -21,6 +21,11 @@
 #include <iostream>
 #include <cstring>
 
+
+/**
+ * @defgroup CAPI C
+ * @brief A simple C API for the profiler
+ */ 
 extern "C" {
   void   c_profiler_start(long int&, char const*);
   void   c_profiler_stop (long int const&);
@@ -29,6 +34,7 @@ extern "C" {
 }
 
 /**
+ * @ingroup CAPI
  * @brief  Start timing a named region and return a unique handle.
  */
 
@@ -42,6 +48,7 @@ void c_profiler_start(long int& hash_out, char const* name)
 }
 
 /**
+ * @ingroup CAPI
  * @brief  Stop timing the region with the specified handle.
  */
 
@@ -57,6 +64,7 @@ void c_profiler_stop(long int const& hash_in)
 }
 
 /**
+ * @ingroup CAPI
  * @brief Write the profile itself.
  */
 
@@ -66,7 +74,8 @@ void c_profiler_write()
 }
 
 /**
- * Get the total wallclock time for the specified region on thread 0.
+ * @ingroup CAPI
+ * @brief Get the total wallclock time for the specified region on thread 0.
  */
 
  double c_get_thread0_walltime(long int const& hash_in)

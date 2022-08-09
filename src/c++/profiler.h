@@ -26,6 +26,11 @@
 #include "hashtable.h"
 
 /**
+ * @defgroup CPPAPI C++
+ * @brief C++ API for the profiler
+ */
+
+/**
  * @brief  Top-level profiler class.
  *
  * Maintains separate hashtables for each thread, and keeps a breadcrumb trail
@@ -49,6 +54,10 @@ class Profiler
   public:
 
     // Constructors
+    /**
+     * @ingroup CPPAPI
+     * @brief Constructor for profiler class
+     */
     Profiler();
 
     // Member functions
