@@ -68,10 +68,11 @@ module profiler_mod
   !-----------------------------------------------------------------------------
   contains
 
-    !> @brief  Start a profiled region, taking care to add a C null character to
-    !>         the end of the region name.
+    !> @brief  Start profiling a code region.
     !> @param [out] hash_out      The unique hash for this region.
     !> @param [in]  region_name   The region name.
+    !> @note   Routine names need not be null terminated:
+    !>         this routine will add a null termination character.
     subroutine profiler_start(hash_out, region_name)
       implicit none
 
