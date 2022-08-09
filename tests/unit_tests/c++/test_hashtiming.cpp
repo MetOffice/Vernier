@@ -14,24 +14,24 @@
 TEST(HashEntryTest, TimingsTest) {
 
   // Start main profiler region and chrono timing
-  const auto chrono_main_start = std::chrono::high_resolution_clock::now();
   const auto& prof_main = prof.start("QuicheLorraine");
+  const auto chrono_main_start = std::chrono::high_resolution_clock::now();
 
   sleep(1);
 
   // Start a sub-region and chrono timing
-  const auto chrono_sub_start = std::chrono::high_resolution_clock::now();
   const auto& prof_sub = prof.start("SalmonQuiche");
+  const auto chrono_sub_start = std::chrono::high_resolution_clock::now();
 
   sleep(1);
 
   // Stop profiler sub-region and respective chrono time
-  prof.stop(prof_sub);
   const auto chrono_sub_end = std::chrono::high_resolution_clock::now();
+  prof.stop(prof_sub);
 
   // Stop profiler main region and respective chrono time
-  prof.stop(prof_main);
   const auto chrono_main_end = std::chrono::high_resolution_clock::now();
+  prof.stop(prof_main);
 
   {
     SCOPED_TRACE("Self walltime calculation failed");
