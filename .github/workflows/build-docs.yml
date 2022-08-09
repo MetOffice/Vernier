@@ -1,0 +1,45 @@
+name: Build Docs
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+    # Only build if there has been a change in the following files
+      - 'src/**.h'
+      - 'src/**.cpp'
+      - 'documentation/**.md'
+      - '.github/workflows/build-docs.yml'
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      CXX: /usr/bin/g++-10
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Doxygen
+        # Install doxygen from apt
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install doxygen graphviz
+
+      - name: Configure CMake
+        # Configure CMake in a 'build' subdirectory.
+        run: >
+          cmake -B ${{github.workspace}}/build 
+          -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} 
+          -DCMAKE_CXX_COMPILER=${{ env.CXX }} 
+          -DBUILD_TESTS=OFF
+          -DBUILD_DOXYGEN=ON
+
+      - name: Build
+        # Build your program with the given configuration
+        run: >
+          cmake --build ${{github.workspace}}/build 
+          --config ${{env.BUILD_TYPE}} 
+          --target doxygen-docs
