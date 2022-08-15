@@ -16,7 +16,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         OpenMP::OpenMP_CXX)
 
 set_project_warnings(${CMAKE_PROJECT_NAME})
-set_code_coverage(${CMAKE_PROJECT_NAME})
 
 set(PUBLIC_HEADER_FILES profiler.h hashtable.h)
 
