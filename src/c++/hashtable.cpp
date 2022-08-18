@@ -13,7 +13,7 @@
 #include <algorithm>
 
 /**
- * @brief  Constructs a new entry in the hash table. 
+ * @brief  Constructs a new entry in the hash table.
  *
  */
 
@@ -22,11 +22,12 @@ HashEntry::HashEntry(std::string_view region_name)
       , total_walltime_(0.0)
       , self_walltime_(0.0)
       , child_walltime_(0.0)
+      , call_count_(0)
       {}
 
 /**
  * @brief Hashtable constructor
- * 
+ *
  */
 
 HashTable::HashTable(int const tid)
@@ -65,6 +66,9 @@ void HashTable::update(size_t hash, double time_delta)
   auto& entry = table_.at(hash);
   entry.total_walltime_ += time_delta;
 
+  // Update the number of times this region has been called
+  entry.call_count_ += 1;
+
 }
 
 /**
@@ -100,13 +104,15 @@ void HashTable::write()
   std::cout
     << std::setw(40) << std::left  << routine_at_thread  << " "
     << std::setw(15) << std::right << "Self (s)"         << " "
-    << std::setw(15) << std::right << "Total (s)"        << "\n";
- 
+    << std::setw(15) << std::right << "Total (s)"        << " "
+    << std::setw(10) << std::right << "Calls"            << "\n";
+
   std::cout << std::setfill('-');
   std::cout
     << std::setw(40) << "-" << " "
     << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << "\n";
+    << std::setw(15) << "-" << " "
+    << std::setw(10) << "-" << "\n";
   std::cout << std::setfill(' ');
 
   // Create a vector from the hashtable and sort the entries according to self
@@ -114,15 +120,16 @@ void HashTable::write()
   // acquire a vector of hash-selftime pairs in the correct order, then use the
   // hashes to look up other information directly from the hashtable.
   auto hashvec = std::vector<std::pair<size_t, HashEntry>>(begin(table_), end(table_));
-  std::sort(begin(hashvec), end(hashvec), 
+  std::sort(begin(hashvec), end(hashvec),
       [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_;});
-    
+
   // Data entries
   for (auto& [hash, entry] : hashvec) {
-    std::cout 
+    std::cout
       << std::setw(40) << std::left  << entry.region_name_    << " "
       << std::setw(15) << std::right << entry.self_walltime_  << " "
-      << std::setw(15) << std::right << entry.total_walltime_ << "\n";
+      << std::setw(15) << std::right << entry.total_walltime_ << " "
+      << std::setw(10) << std::right << entry.call_count_     << "\n";
   }
 }
 
@@ -155,7 +162,7 @@ std::vector<size_t> HashTable::list_keys()
 
 /**
  * @brief  Get the total (inclusive) time corresponding to the input hash.
- * 
+ *
  */
 
 double HashTable::get_total_walltime(size_t const hash)
@@ -163,4 +170,12 @@ double HashTable::get_total_walltime(size_t const hash)
     return table_.at(hash).total_walltime_;
 }
 
+/**
+ * @brief  Get the number of times the input hash region has been called.
+ *
+ */
 
+int HashTable::get_region_call_count(size_t const hash)
+{
+    return table_.at(hash).call_count_;
+}

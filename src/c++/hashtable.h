@@ -48,6 +48,7 @@ struct HashEntry{
     double      total_walltime_;
     double      self_walltime_;
     double      child_walltime_;
+    int         call_count_;
 
 };
 
@@ -60,7 +61,7 @@ struct HashEntry{
  */
 
 class HashTable{
-  
+
   private:
 
     // Members
@@ -84,6 +85,7 @@ class HashTable{
     void add_child_time(size_t, double);
     void compute_self_times();
     double get_total_walltime(size_t const);
+    int get_region_call_count(size_t const);
 
 };
 #endif
