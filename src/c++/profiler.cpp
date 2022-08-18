@@ -23,10 +23,14 @@ Profiler::Profiler(){
   max_threads_ = omp_get_max_threads();
 #endif
 
-  // Create vector of hash tables: one hashtable for each thread.
+  // Create vector of hash tables: one hashtable for each thread. Ensure that
+  // each new table has an entry for the profiler itself. The value of
+  // profiler_hash_ is the same for all threads, and is updated serially, so it
+  // is OK to carry forward the value returned for the last thread.
   for (int tid=0; tid<max_threads_; ++tid)
   {
     HashTable new_table(tid);
+    profiler_hash_ = new_table.insert_special("__profiler__");
     thread_hashtables_.push_back(new_table);
 
     std::vector<std::pair<size_t,double>> new_list;
@@ -40,12 +44,17 @@ Profiler::Profiler(){
 }
 
 /**
- * @brief  Start timing.
- *
+ * @brief  Start timing a profiled code region.
+ * @param [in]  region_name   The code region name.
+ * @returns     Unique hash for the code region being started.
+ * @todo    Revisit profiling overhead measurement.  
  */
 
 size_t Profiler::start(std::string_view region_name)
 {
+
+  // Note the time on entry to the profiler call.
+  double calliper_entry_time = omp_get_wtime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -63,19 +72,27 @@ size_t Profiler::start(std::string_view region_name)
   double start_time = omp_get_wtime();
   thread_traceback_[tid].push_back(std::make_pair(hash, start_time));
 
+  // Account for the time spent in the profiler itself. 
+  double calliper_exit_time = omp_get_wtime();
+  double calliper_deltatime = calliper_exit_time - calliper_entry_time;
+  thread_hashtables_[tid].update(profiler_hash_, calliper_deltatime);
+
   return hash;
 }
 
 /**
- * @brief  Stop timing.
- *
+ * @brief  Stop timing a profiled code region.
+ * @param [in]   Hash of the profiled code region being stopped.
+ * @todo    Revisit profiling overhead measurement.  
  */
 
 void Profiler::stop(size_t const hash)
 {
 
-  // First job: log the stop time.
-  double stop_time  = omp_get_wtime();
+  // Note the time on entry to the profiler call, which matches the time at
+  // which the profiled code region has stopped. 
+  double calliper_entry_time = omp_get_wtime();
+  double stop_time = calliper_entry_time;
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -106,6 +123,11 @@ void Profiler::stop(size_t const hash)
     size_t parent_hash = thread_traceback_[tid].back().first;
     thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
   }
+ 
+  // Account for time spent in the profiler itself.
+  double calliper_exit_time = omp_get_wtime();
+  double calliper_deltatime = calliper_exit_time - calliper_entry_time;
+  thread_hashtables_[tid].update(profiler_hash_, calliper_deltatime);
 
 }
 

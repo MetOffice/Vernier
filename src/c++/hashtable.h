@@ -45,9 +45,10 @@ struct HashEntry{
 
     // Data members
     std::string region_name_;
-    double      total_walltime_;
-    double      self_walltime_;
-    double      child_walltime_;
+    unsigned int num_calls_;
+    double       total_walltime_;
+    double       self_walltime_;
+    double       child_walltime_;
 
 };
 
@@ -76,6 +77,7 @@ class HashTable{
 
     // Prototypes
     size_t query_insert(std::string_view) noexcept;
+    size_t insert_special(std::string_view);
     void update(size_t, double);
     void write();
 
@@ -87,3 +89,4 @@ class HashTable{
 
 };
 #endif
+

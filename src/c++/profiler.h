@@ -30,7 +30,6 @@
  *
  * Maintains separate hashtables for each thread, and keeps a breadcrumb trail
  * of profiled regions.
- *
  */
 
 class Profiler
@@ -38,6 +37,7 @@ class Profiler
   private: 
 
     // Data members
+    size_t profiler_hash_;
     int max_threads_;
     std::vector<HashTable>                               thread_hashtables_;
     std::vector<std::vector<std::pair<size_t,double>>>   thread_traceback_;
