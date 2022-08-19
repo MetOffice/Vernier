@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <chrono>
 
 /**
  * @brief Constructor
@@ -29,7 +30,7 @@ Profiler::Profiler(){
     HashTable new_table(tid);
     thread_hashtables_.push_back(new_table);
 
-    std::vector<std::pair<size_t,double>> new_list;
+    std::vector<std::pair<size_t,std::chrono::time_point<std::chrono::steady_clock>>> new_list;
     thread_traceback_.push_back(new_list);
   }
 
@@ -60,7 +61,7 @@ size_t Profiler::start(std::string_view region_name)
   size_t const hash = thread_hashtables_[tid].query_insert(region_name);
 
   // Add routine to the traceback.
-  double start_time = omp_get_wtime();
+  auto start_time = std::chrono::steady_clock::now();
   thread_traceback_[tid].push_back(std::make_pair(hash, start_time));
 
   return hash;
@@ -75,7 +76,7 @@ void Profiler::stop(size_t const hash)
 {
 
   // First job: log the stop time.
-  double stop_time  = omp_get_wtime();
+  auto stop_time = std::chrono::steady_clock::now();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -94,9 +95,9 @@ void Profiler::stop(size_t const hash)
   }
 
   // Increment the time for this
-  double start_time = thread_traceback_[tid].back().second;
-  double deltatime = stop_time - start_time;
-  thread_hashtables_[tid].update(hash, deltatime);
+  auto start_time = thread_traceback_[tid].back().second;
+  std::chrono::duration<double> deltatime = stop_time - start_time;
+  thread_hashtables_[tid].update(hash, deltatime.count());
 
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
@@ -104,7 +105,7 @@ void Profiler::stop(size_t const hash)
   // Add child time to parent
   if (! thread_traceback_[tid].empty()) {
     size_t parent_hash = thread_traceback_[tid].back().first;
-    thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
+    thread_hashtables_[tid].add_child_time(parent_hash, deltatime.count());
   }
 
 }

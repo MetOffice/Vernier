@@ -20,6 +20,7 @@
 #include <string_view>
 #include <iterator>
 #include <vector>
+#include <chrono>
 
 #include "omp.h"
 
@@ -39,12 +40,12 @@ class Profiler
 
     // Data members
     int max_threads_;
-    std::vector<HashTable>                               thread_hashtables_;
-    std::vector<std::vector<std::pair<size_t,double>>>   thread_traceback_;
+    std::vector<HashTable> thread_hashtables_;
+    std::vector<std::vector<std::pair<size_t,std::chrono::time_point<std::chrono::steady_clock>>>> thread_traceback_;
 
     // Type definitions for vector array indexing.
-    typedef std::vector<HashTable>::size_type                        hashtable_iterator_t_;
-    typedef std::vector<std::vector<std::pair<size_t,double>>>::size_type pair_iterator_t_;
+    typedef std::vector<HashTable>::size_type hashtable_iterator_t_;
+    typedef std::vector<std::vector<std::pair<size_t,std::chrono::time_point<std::chrono::steady_clock>>>>::size_type pair_iterator_t_;
 
   public:
 
