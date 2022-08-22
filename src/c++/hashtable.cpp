@@ -120,8 +120,6 @@ void HashTable::add_child_time(size_t hash, double time_delta,
 void HashTable::write()
 {
 
-  this->compute_self_times();
-
   std::string routine_at_thread = "Thread: " + std::to_string(tid_);
 
   // Write headings
@@ -163,15 +161,27 @@ void HashTable::write()
  *
  */
 
- void HashTable::compute_self_times()
+ void HashTable::prepare_computed_times(size_t const profiler_hash)
  {
+
+   double total_overhead_time = 0.0;
+
+   // Loop over entries in the hashtable. Although the hashtable does already
+   // contain an entry for the profiler itself, the constructor will have
+   // ensured that all numerical data members are zero.
    for (auto& [hash, entry] : table_) {
      entry.self_walltime_ = entry.total_walltime_   
                           - entry.child_walltime_ 
                           - entry.overhead_time_;
      entry.total_raw_walltime_ = entry.total_walltime_
                                - entry.overhead_time_;
+     total_overhead_time += entry.overhead_time_;
    }
+
+   // Set values for the profiler entry in the hashtable.
+   table_.at(profiler_hash).total_walltime_     = total_overhead_time;
+   table_.at(profiler_hash).total_raw_walltime_ = total_overhead_time;
+
  }
 
 /**

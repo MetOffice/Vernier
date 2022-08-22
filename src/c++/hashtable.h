@@ -85,7 +85,7 @@ class HashTable{
     // Member functions
     std::vector<size_t> list_keys();
     void add_child_time(size_t, double, double);
-    void compute_self_times();
+    void prepare_computed_times(size_t const);
     double get_total_walltime(size_t const);
 
 };
