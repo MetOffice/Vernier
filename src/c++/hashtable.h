@@ -45,10 +45,11 @@ struct HashEntry{
 
     // Data members
     std::string region_name_;
-    unsigned int num_calls_;
-    double       total_walltime_;
-    double       self_walltime_;
-    double       child_walltime_;
+    double      total_walltime_;
+    double      total_raw_walltime_;
+    double      self_walltime_;
+    double      child_walltime_;
+    double      overhead_time_;
 
 };
 
@@ -83,7 +84,7 @@ class HashTable{
 
     // Member functions
     std::vector<size_t> list_keys();
-    void add_child_time(size_t, double);
+    void add_child_time(size_t, double, double);
     void compute_self_times();
     double get_total_walltime(size_t const);
 

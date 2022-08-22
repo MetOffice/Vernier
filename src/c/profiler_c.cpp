@@ -25,7 +25,8 @@ extern "C" {
   void   c_profiler_start(long int&, char const*);
   void   c_profiler_stop (long int const&);
   void   c_profiler_write();
-  double c_get_thread0_walltime(long int const&);
+  double c_get_total_walltime(long int const&, int const&);
+  double c_get_overhead_time (int const&);
 }
 
 /**
@@ -66,10 +67,13 @@ void c_profiler_write()
 }
 
 /**
- * Get the total wallclock time for the specified region on thread 0.
+ * @brief  Get the total wallclock time for the specified region on the
+ *         specified thread.
+ * @param[in] hash_in     The hash of the region of interest. 
+ * @param[in] thread_id   Return the time for this thread ID.
  */
 
- double c_get_thread0_walltime(long int const& hash_in)
+double c_get_total_walltime(long int const& hash_in, int const& thread_id)
 {
   size_t hash;
 
@@ -77,6 +81,16 @@ void c_profiler_write()
   static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
   std::memcpy(&hash, &hash_in, sizeof(hash));
 
-  return prof.get_thread0_walltime( hash );
+  return prof.get_total_walltime(hash, thread_id);
+}
+
+/**
+ * @brief  Get the profiler overhead time on the specified thread.
+ * @param[in] thread_id   Return the time for this thread ID.
+ */
+
+double c_get_overhead_time(int const& thread_id)
+{
+  return prof.get_overhead_time(thread_id);
 }
 

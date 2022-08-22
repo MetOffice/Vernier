@@ -57,7 +57,7 @@ TEST(SystemTests, TimingTest)
   double const time_tolerance = 0.0001;
 
   double actual_time = t2 - t1;
-  double prof_time  = prof.get_thread0_walltime(prof_main);
+  double prof_time  = prof.get_total_walltime(prof_main, 0);
   EXPECT_NEAR(prof_time, actual_time, time_tolerance);
 
   std::cout << "\n" << "Actual timing: "   << actual_time << "\n";

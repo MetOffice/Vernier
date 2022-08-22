@@ -11,6 +11,17 @@
 #include <cassert>
 
 /**
+ * @brief Constructor for StartCalliperValues struct.
+ *
+ */
+
+StartCalliperValues::StartCalliperValues(double start_time, 
+                                         double start_calliper_deltatime)
+  : start_time_(start_time)
+  , start_calliper_deltatime_(start_calliper_deltatime)
+  {}
+
+/**
  * @brief Constructor
  *
  */
@@ -33,7 +44,7 @@ Profiler::Profiler(){
     profiler_hash_ = new_table.insert_special("__profiler__");
     thread_hashtables_.push_back(new_table);
 
-    std::vector<std::pair<size_t,double>> new_list;
+    std::vector<std::pair<size_t,StartCalliperValues>> new_list;
     thread_traceback_.push_back(new_list);
   }
 
@@ -69,13 +80,10 @@ size_t Profiler::start(std::string_view region_name)
   size_t const hash = thread_hashtables_[tid].query_insert(region_name);
 
   // Add routine to the traceback.
-  double start_time = omp_get_wtime();
-  thread_traceback_[tid].push_back(std::make_pair(hash, start_time));
-
-  // Account for the time spent in the profiler itself. 
-  double calliper_exit_time = omp_get_wtime();
-  double calliper_deltatime = calliper_exit_time - calliper_entry_time;
-  thread_hashtables_[tid].update(profiler_hash_, calliper_deltatime);
+  double exit_time = omp_get_wtime();
+  double calliper_deltatime = exit_time - calliper_entry_time;
+  StartCalliperValues new_times = StartCalliperValues(exit_time, calliper_deltatime);
+  thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
 
   return hash;
 }
@@ -110,24 +118,28 @@ void Profiler::stop(size_t const hash)
     exit (100);
   }
 
-  // Increment the time for this
-  double start_time = thread_traceback_[tid].back().second;
-  double deltatime = stop_time - start_time;
+  // Get start calliper values needed for subsequent computation.
+  StartCalliperValues& start_calliper_times = 
+    thread_traceback_[tid].back().second;
+
+  // Compute time spent in profiled subroutine.
+  double deltatime = stop_time - start_calliper_times.start_time_;
+
+  // Do the hashtable update for the child region.
   thread_hashtables_[tid].update(hash, deltatime);
 
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
 
-  // Add child time to parent
-  if (! thread_traceback_[tid].empty()) {
-    size_t parent_hash = thread_traceback_[tid].back().first;
-    thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
-  }
- 
-  // Account for time spent in the profiler itself.
+  // Account for time spent in the profiler itself. 
   double calliper_exit_time = omp_get_wtime();
   double calliper_deltatime = calliper_exit_time - calliper_entry_time;
-  thread_hashtables_[tid].update(profiler_hash_, calliper_deltatime);
+
+  // Add child time and profiling overheads to parent
+  if (! thread_traceback_[tid].empty()) {
+    size_t parent_hash = thread_traceback_[tid].back().first;
+    thread_hashtables_[tid].add_child_time(parent_hash, deltatime, calliper_deltatime);
+  }
 
 }
 
@@ -146,21 +158,31 @@ void Profiler::write()
 }
 
 /**
- * @brief  Get the total (inclusive) time of everything below the specified hash.
+ * @brief  Get the total (inclusive) time of everything below the routine
+ *         corresponding to the specified hash, on the specified thread.
  *
  * @param[in] hash  The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
  *
- * @note   This function is normally expected to be used to return the total
- *         wallclock time for whole run. Since this value is required only from
- *         thread 0, the function does not take a thread ID argument and returns
- *         the value for thread 0 only. Taking the hash argument avoids the need
- *         to store the top-level hash inside the profiler itself.
- *
+ * @note  Taking the hash argument avoids the need to store the top-level hash
+ *        inside the profiler itself.
  */
 
-double Profiler::get_thread0_walltime(size_t const hash)
+double Profiler::get_total_walltime(size_t const hash, int const thread_id)
 {
-  auto tid = static_cast<hashtable_iterator_t_>(0);
+  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_total_walltime(hash);
+}
+
+/**
+ * @brief  Get the the spent in the profiler itself, on the specified thread.
+ *
+ * @param[in] thread_id  The thread ID for which to return the overhead.
+ */
+
+double Profiler::get_overhead_time(int const thread_id)
+{
+  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
+  return thread_hashtables_[tid].get_total_walltime(profiler_hash_);
 }
 

@@ -19,10 +19,11 @@
 
 HashEntry::HashEntry(std::string_view region_name)
       : region_name_(region_name)
-      , num_calls_(0)
       , total_walltime_(0.0)
+      , total_raw_walltime_(0.0)
       , self_walltime_(0.0)
       , child_walltime_(0.0)
+      , overhead_time_(0.0)
       {}
 
 /**
@@ -72,9 +73,10 @@ size_t HashTable::insert_special(std::string_view region_name)
 }
 
 /**
- * @brief  Updates the total walltime and call count for the specified region. 
+ * @brief  Updates the total walltime for the specified region. 
  * @param [in] hash  The hash corresponding to the profiled region.
  * @param [in] time_delta  The time increment to add.
+ * @param [in] overhead_time_delta  The overhead time increment to add.
  */
 
 void HashTable::update(size_t hash, double time_delta)
@@ -85,16 +87,20 @@ void HashTable::update(size_t hash, double time_delta)
 
   // Increment the number of calls and the walltime for this hash entry.
   auto& entry = table_.at(hash);
-  entry.num_calls_++;
   entry.total_walltime_ += time_delta;
 }
 
 /**
- * @brief  Add child time to parent, and recompute the self time.
- *
+ * @brief  Add child region time to parent, and also any profiling overhead time
+ *         that must be subtracted from the parent's total time later.
+ * @param [in] hash        The hash of the child region to update.
+ * @param [in] time_delta  The time spent in the child region.
+ * @param [in] overhead_time_delta  The time spent in profiler callipers when monitoring
+ *                                  the child region.
  */
 
-void HashTable::add_child_time(size_t hash, double time_delta)
+void HashTable::add_child_time(size_t hash, double time_delta,
+                               double overhead_time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
@@ -103,6 +109,7 @@ void HashTable::add_child_time(size_t hash, double time_delta)
   // Increment the walltime for this hash entry
   auto& entry = table_.at(hash);
   entry.child_walltime_ += time_delta;
+  entry.overhead_time_  += overhead_time_delta;
 }
 
 /**
@@ -121,8 +128,8 @@ void HashTable::write()
   std::cout << "\n";
   std::cout
     << std::setw(40) << std::left  << routine_at_thread  << " "
-    << std::setw(15) << std::right << "# Calls"          << " "
     << std::setw(15) << std::right << "Self (s)"         << " "
+    << std::setw(15) << std::right << "Total (raw) (s)"  << " "
     << std::setw(15) << std::right << "Total (s)"        << "\n";
  
   std::cout << std::setfill('-');
@@ -144,22 +151,26 @@ void HashTable::write()
   // Data entries
   for (auto& [hash, entry] : hashvec) {
     std::cout 
-      << std::setw(40) << std::left  << entry.region_name_    << " "
-      << std::setw(15) << std::right << entry.num_calls_      << " "
-      << std::setw(15) << std::right << entry.self_walltime_  << " "
-      << std::setw(15) << std::right << entry.total_walltime_ << "\n";
+      << std::setw(40) << std::left  << entry.region_name_         << " "
+      << std::setw(15) << std::right << entry.self_walltime_       << " "
+      << std::setw(15) << std::right << entry.total_raw_walltime_  << " "
+      << std::setw(15) << std::right << entry.total_walltime_      << "\n";
   }
 }
 
 /**
- * @brief  Computes self times from total times.
+ * @brief  Computes self times from total times and profiling overheads.
  *
  */
 
  void HashTable::compute_self_times()
  {
    for (auto& [hash, entry] : table_) {
-     entry.self_walltime_ = entry.total_walltime_ - entry.child_walltime_;
+     entry.self_walltime_ = entry.total_walltime_   
+                          - entry.child_walltime_ 
+                          - entry.overhead_time_;
+     entry.total_raw_walltime_ = entry.total_walltime_
+                               - entry.overhead_time_;
    }
  }
 

@@ -30,7 +30,8 @@ module profiler_mod
   public :: profiler_start
   public :: profiler_stop
   public :: profiler_write
-  public :: profiler_get_thread0_walltime
+  public :: profiler_get_total_walltime
+  public :: profiler_get_overhead_time
 
   !-----------------------------------------------------------------------------
   ! Interfaces
@@ -54,12 +55,20 @@ module profiler_mod
         !No arguments to handle
     end subroutine profiler_write
 
-    function profiler_get_thread0_walltime(hash_in) result(walltime)   &
-             bind(C, name='c_get_thread0_walltime')
+    function profiler_get_total_walltime(hash_in, thread_id) result(walltime) &
+             bind(C, name='c_get_total_walltime')
       import :: pik, prk
       integer(kind=pik), intent(in) :: hash_in
+      integer(kind=pik), intent(in) :: thread_id
       real(kind=prk)                :: walltime
-    end function profiler_get_thread0_walltime
+    end function profiler_get_total_walltime
+
+    function profiler_get_overhead_time(thread_id) result(overhead_time)      &
+             bind(C, name='c_get_overhead_time')
+      import :: pik, prk
+      integer(kind=pik), intent(in) :: thread_id
+      real(kind=prk)                :: overhead_time
+    end function profiler_get_overhead_time
 
   end interface
 

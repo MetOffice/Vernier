@@ -26,6 +26,23 @@
 #include "hashtable.h"
 
 /**
+ * @brief  Struct to store values set during the start calliper, and needed in
+ *         the stop calliper.
+ */
+
+struct StartCalliperValues
+{
+  public:
+
+    // Constructors
+    StartCalliperValues(double, double);
+
+    // Data members
+    double start_time_;
+    double start_calliper_deltatime_;
+};
+
+/**
  * @brief  Top-level profiler class.
  *
  * Maintains separate hashtables for each thread, and keeps a breadcrumb trail
@@ -39,12 +56,12 @@ class Profiler
     // Data members
     size_t profiler_hash_;
     int max_threads_;
-    std::vector<HashTable>                               thread_hashtables_;
-    std::vector<std::vector<std::pair<size_t,double>>>   thread_traceback_;
+    std::vector<HashTable>                                           thread_hashtables_;
+    std::vector<std::vector<std::pair<size_t,StartCalliperValues>>>   thread_traceback_;
 
     // Type definitions for vector array indexing.
-    typedef std::vector<HashTable>::size_type                        hashtable_iterator_t_;
-    typedef std::vector<std::vector<std::pair<size_t,double>>>::size_type pair_iterator_t_;
+    typedef std::vector<HashTable>::size_type                                     hashtable_iterator_t_;
+    typedef std::vector<std::vector<std::pair<size_t,StartCalliperValues>>>::size_type pair_iterator_t_;
 
   public:
 
@@ -55,7 +72,8 @@ class Profiler
     size_t start(std::string_view);
     void   stop (size_t const);
     void   write();
-    double get_thread0_walltime(size_t const);
+    double get_total_walltime (size_t const, int const);
+    double get_overhead_time(int const);
 };
 
 // Declare global profiler
