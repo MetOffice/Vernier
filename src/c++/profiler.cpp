@@ -116,11 +116,14 @@ void Profiler::stop(size_t const hash)
 
 void Profiler::write()
 {
-  // Write each one
+  // Write each one to file
+  output_stream.open("profiler-output.txt");
   for (auto& it : thread_hashtables_)
   {
-    it.write();
+    it.write(output_stream);
   }
+  output_stream.flush();
+  output_stream.close();
 }
 
 /**

@@ -91,7 +91,7 @@ void HashTable::add_child_time(size_t hash, double time_delta)
  *
  */
 
-void HashTable::write()
+void HashTable::write(std::ofstream& outstream)
 {
 
   this->compute_self_times();
@@ -99,20 +99,18 @@ void HashTable::write()
   std::string routine_at_thread = "Thread: " + std::to_string(tid_);
 
   // Write headings
-  std::cout << "\n";
-  std::cout
+  outstream << "\n";
+  outstream
     << std::setw(40) << std::left  << routine_at_thread  << " "
     << std::setw(15) << std::right << "Self (s)"         << " "
-    << std::setw(15) << std::right << "Total (s)"        << " "
-    << std::setw(10) << std::right << "Calls"            << "\n";
+    << std::setw(15) << std::right << "Total (s)"        << "\n";
 
-  std::cout << std::setfill('-');
-  std::cout
+  outstream << std::setfill('-');
+  outstream
     << std::setw(40) << "-" << " "
     << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(10) << "-" << "\n";
-  std::cout << std::setfill(' ');
+    << std::setw(15) << "-" << "\n";
+  outstream << std::setfill(' ');
 
   // Create a vector from the hashtable and sort the entries according to self
   // walltime.  If optimisation of this is needed, it ought to be possible to
@@ -124,7 +122,7 @@ void HashTable::write()
 
   // Data entries
   for (auto& [hash, entry] : hashvec) {
-    std::cout
+    outstream
       << std::setw(40) << std::left  << entry.region_name_    << " "
       << std::setw(15) << std::right << entry.self_walltime_  << " "
       << std::setw(15) << std::right << entry.total_walltime_ << " "

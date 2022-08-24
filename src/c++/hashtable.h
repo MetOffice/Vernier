@@ -28,6 +28,7 @@
 #include <vector>
 #include <string>
 #include <string_view>
+#include <fstream>
 
 /**
  * @brief  Structure to hold information for a particular routine.
@@ -78,7 +79,7 @@ class HashTable{
     // Prototypes
     size_t query_insert(std::string_view) noexcept;
     void update(size_t, double);
-    void write();
+    void write(std::ofstream&);
 
     // Member functions
     std::vector<size_t> list_keys();
