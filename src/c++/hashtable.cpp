@@ -116,7 +116,7 @@ void HashTable::write(std::ofstream& outstream)
   // walltime.  If optimisation of this is needed, it ought to be possible to
   // acquire a vector of hash-selftime pairs in the correct order, then use the
   // hashes to look up other information directly from the hashtable.
-  hashvec = std::vector<std::pair<size_t, HashEntry>>(table_.cbegin(), table_.cend());
+  auto hashvec = std::vector<std::pair<size_t, HashEntry>>(table_.cbegin(), table_.cend());
   std::sort(begin(hashvec), end(hashvec),
       [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_;});
 
