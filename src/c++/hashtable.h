@@ -28,12 +28,16 @@
 #include <vector>
 #include <string>
 #include <string_view>
+<<<<<<< HEAD
 #include <chrono>
 
 // Type definitions for chrono steady clock time points and durations
 using time_duration_t = std::chrono::duration<double>;
 using time_point_t    = std::chrono::time_point<std::chrono::steady_clock, time_duration_t>;
 
+=======
+#include <fstream>
+>>>>>>> Farting the current output into a hard-coded file (#52)
 
 /**
  * @brief  Structure to hold information for a particular routine.
@@ -85,7 +89,7 @@ class HashTable{
     // Prototypes
     size_t query_insert(std::string_view) noexcept;
     void update(size_t, time_duration_t);
-    void write();
+    void write(std::ofstream&);
 
     // Member functions
     std::vector<size_t> list_keys();
