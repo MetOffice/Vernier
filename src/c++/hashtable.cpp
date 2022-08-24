@@ -13,7 +13,7 @@
 #include <algorithm>
 
 /**
- * @brief  Constructs a new entry in the hash table. 
+ * @brief  Constructs a new entry in the hash table.
  *
  */
 
@@ -26,7 +26,7 @@ HashEntry::HashEntry(std::string_view region_name)
 
 /**
  * @brief Hashtable constructor
- * 
+ *
  */
 
 HashTable::HashTable(int const tid)
@@ -88,7 +88,7 @@ void HashTable::add_child_time(size_t hash, double time_delta)
  *
  */
 
-void HashTable::write()
+void HashTable::write(std::ofstream& outstream)
 {
 
   this->compute_self_times();
@@ -96,30 +96,30 @@ void HashTable::write()
   std::string routine_at_thread = "Thread: " + std::to_string(tid_);
 
   // Write headings
-  std::cout << "\n";
-  std::cout
+  outstream << "\n";
+  outstream
     << std::setw(40) << std::left  << routine_at_thread  << " "
     << std::setw(15) << std::right << "Self (s)"         << " "
     << std::setw(15) << std::right << "Total (s)"        << "\n";
- 
-  std::cout << std::setfill('-');
-  std::cout
+
+  outstream << std::setfill('-');
+  outstream
     << std::setw(40) << "-" << " "
     << std::setw(15) << "-" << " "
     << std::setw(15) << "-" << "\n";
-  std::cout << std::setfill(' ');
+  outstream << std::setfill(' ');
 
   // Create a vector from the hashtable and sort the entries according to self
   // walltime.  If optimisation of this is needed, it ought to be possible to
   // acquire a vector of hash-selftime pairs in the correct order, then use the
   // hashes to look up other information directly from the hashtable.
   auto hashvec = std::vector<std::pair<size_t, HashEntry>>(begin(table_), end(table_));
-  std::sort(begin(hashvec), end(hashvec), 
+  std::sort(begin(hashvec), end(hashvec),
       [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_;});
-    
+
   // Data entries
   for (auto& [hash, entry] : hashvec) {
-    std::cout 
+    outstream
       << std::setw(40) << std::left  << entry.region_name_    << " "
       << std::setw(15) << std::right << entry.self_walltime_  << " "
       << std::setw(15) << std::right << entry.total_walltime_ << "\n";
@@ -155,12 +155,10 @@ std::vector<size_t> HashTable::list_keys()
 
 /**
  * @brief  Get the total (inclusive) time corresponding to the input hash.
- * 
+ *
  */
 
 double HashTable::get_total_walltime(size_t const hash)
 {
     return table_.at(hash).total_walltime_;
 }
-
-

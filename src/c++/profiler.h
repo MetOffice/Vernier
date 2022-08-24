@@ -11,7 +11,7 @@
  *
  * Contains the top-level class, whose methods are called from client code. Also
  * declares a top-level, global, profiler object.
- * 
+ *
  */
 
 #ifndef PROFILER_H
@@ -35,12 +35,13 @@
 
 class Profiler
 {
-  private: 
+  private:
 
     // Data members
     int max_threads_;
     std::vector<HashTable>                               thread_hashtables_;
     std::vector<std::vector<std::pair<size_t,double>>>   thread_traceback_;
+    std::ofstream output_stream;
 
     // Type definitions for vector array indexing.
     typedef std::vector<HashTable>::size_type                        hashtable_iterator_t_;

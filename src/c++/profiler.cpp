@@ -33,7 +33,7 @@ Profiler::Profiler(){
     thread_traceback_.push_back(new_list);
   }
 
-  // Assertions 
+  // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
   assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
 
@@ -116,17 +116,20 @@ void Profiler::stop(size_t const hash)
 
 void Profiler::write()
 {
-  // Write each one
+  // Write each one to file
+  output_stream.open("profiler-output.txt");
   for (auto& it : thread_hashtables_)
   {
-    it.write();
+    it.write(output_stream);
   }
+  output_stream.flush();
+  output_stream.close();
 }
 
 /**
  * @brief  Get the total (inclusive) time of everything below the specified hash.
  *
- * @param[in] hash  The hash corresponding to the region of interest. 
+ * @param[in] hash  The hash corresponding to the region of interest.
  *
  * @note   This function is normally expected to be used to return the total
  *         wallclock time for whole run. Since this value is required only from
@@ -141,4 +144,3 @@ double Profiler::get_thread0_walltime(size_t const hash)
   auto tid = static_cast<hashtable_iterator_t_>(0);
   return thread_hashtables_[tid].get_total_walltime(hash);
 }
-
