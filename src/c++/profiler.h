@@ -26,7 +26,7 @@
 #include "hashtable.h"
 
 /**
- * @defgroup CPPAPI C++
+ * @defgroup API C++
  * @brief C++ API for the profiler
  */
 
@@ -54,10 +54,10 @@ class Profiler
   public:
 
     // Constructors
-    /**
-     * @ingroup CPPAPI
-     * @brief Constructor for profiler class
-     */
+/**
+ * @ingroup API
+ * @brief Constructor for profiler class
+ */
     Profiler();
 
     // Member functions

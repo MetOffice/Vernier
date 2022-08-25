@@ -38,6 +38,7 @@ module profiler_mod
   !-----------------------------------------------------------------------------
 
   interface
+
 	!> @ingroup FortranAPI
 	!> @fn profiler_mod::profiler_stop::profiler_stop(hash_in)
 	!> @brief Stop profiler
@@ -83,7 +84,7 @@ module profiler_mod
   !-----------------------------------------------------------------------------
   contains
 
-	  !> @ingroup FortranAPI
+  	!> @ingroup FortranAPI
     !> @brief  Start profiling a code region.
     !> @param [out] hash_out      The unique hash for this region.
     !> @param [in]  region_name   The region name.
