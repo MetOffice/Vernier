@@ -67,8 +67,7 @@ void HashTable::update(size_t hash, double time_delta)
   entry.total_walltime_ += time_delta;
 
   // Update the number of times this region has been called
-  entry.call_count_ += 1;
-
+  entry.call_count_ ++;
 }
 
 /**
@@ -170,10 +169,15 @@ double HashTable::get_total_walltime(size_t const hash)
     return table_.at(hash).total_walltime_;
 }
 
-/**
- * @brief  Get the number of times the input hash region has been called.
- *
- */
+ /**
+  * @brief  Get the number of times the input hash region has been called.
+  *
+  * @param[in] hash  The hash corresponding to the region of interest.
+  *
+  * @returns  Returns an integer corresponding to the number of the times the
+  *           region of interest has been called within the code being profiled.
+  *
+  */
 
 int HashTable::get_region_call_count(size_t const hash)
 {

@@ -143,12 +143,19 @@ double Profiler::get_thread0_walltime(size_t const hash)
 }
 
 /**
- * @brief  Get the number of times the input hash region has been called.
+ * @brief  Get the number of times the input hash region has been called on the
+*          input thread ID.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest.
+ * @param[in] tid   The ID corresponding to the thread of interest.
+ *
+ * @returns  Returns an integer corresponding to the number of times the
+ *           region of interest has been called on the specified thread.
  *
  */
 
-int Profiler::get_region_call_count(size_t const hash)
+int Profiler::get_region_call_count(size_t const hash, int const tid)
 {
-  auto tid = static_cast<hashtable_iterator_t_>(0);
+  static_cast<hashtable_iterator_t_>(tid);
   return thread_hashtables_[tid].get_region_call_count(hash);
 }
