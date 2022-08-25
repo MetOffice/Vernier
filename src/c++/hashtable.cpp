@@ -67,7 +67,7 @@ void HashTable::update(size_t hash, double time_delta)
   entry.total_walltime_ += time_delta;
 
   // Update the number of times this region has been called
-  entry.call_count_ ++;
+  entry.call_count_++;
 }
 
 /**
