@@ -26,7 +26,7 @@
 #include "hashtable.h"
 
 /**
- * @defgroup CPPAPI C++
+ * @defgroup API C++
  * @brief C++ API for the profiler
  */
 
@@ -54,17 +54,53 @@ class Profiler
   public:
 
     // Constructors
-    /**
-     * @ingroup CPPAPI
-     * @brief Constructor for profiler class
-     */
+/**
+ * @ingroup API
+ * @brief Constructor for profiler class
+ */
     Profiler();
 
     // Member functions
-    size_t start(std::string_view);
-    void   stop (size_t const);
+
+/**
+ * @ingroup API
+ * @brief  Start timing.
+ *
+ * @param[in] region_name A unique name for the region being timed.
+ *
+ */
+    size_t start(std::string_view region_name);
+
+/**
+ * @ingroup API
+ * @brief  Stop timing.
+ *
+ * @param[in] hash  The hash corresponding to the region to be stopped.
+ */
+    void   stop (size_t hash);
+
+/**
+ * @ingroup API
+ * @brief  Write profile information.
+ *
+ */
     void   write();
-    double get_thread0_walltime(size_t const);
+
+
+/**
+ * @ingroup API
+ * @brief  Get the total (inclusive) time of everything below the specified hash.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest.
+ *
+ * @note   This function is normally expected to be used to return the total
+ *         wallclock time for whole run. Since this value is required only from
+ *         thread 0, the function does not take a thread ID argument and returns
+ *         the value for thread 0 only. Taking the hash argument avoids the need
+ *         to store the top-level hash inside the profiler itself.
+ *
+ */
+    double get_thread0_walltime(size_t hash);
 };
 
 // Declare global profiler

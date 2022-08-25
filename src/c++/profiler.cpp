@@ -39,11 +39,6 @@ Profiler::Profiler(){
 
 }
 
-/**
- * @brief  Start timing.
- *
- */
-
 size_t Profiler::start(std::string_view region_name)
 {
 
@@ -65,11 +60,6 @@ size_t Profiler::start(std::string_view region_name)
 
   return hash;
 }
-
-/**
- * @brief  Stop timing.
- *
- */
 
 void Profiler::stop(size_t const hash)
 {
@@ -109,11 +99,6 @@ void Profiler::stop(size_t const hash)
 
 }
 
-/**
- * @brief  Write profile information.
- *
- */
-
 void Profiler::write()
 {
   // Write each one
@@ -122,19 +107,6 @@ void Profiler::write()
     it.write();
   }
 }
-
-/**
- * @brief  Get the total (inclusive) time of everything below the specified hash.
- *
- * @param[in] hash  The hash corresponding to the region of interest. 
- *
- * @note   This function is normally expected to be used to return the total
- *         wallclock time for whole run. Since this value is required only from
- *         thread 0, the function does not take a thread ID argument and returns
- *         the value for thread 0 only. Taking the hash argument avoids the need
- *         to store the top-level hash inside the profiler itself.
- *
- */
 
 double Profiler::get_thread0_walltime(size_t const hash)
 {

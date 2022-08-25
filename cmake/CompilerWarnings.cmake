@@ -2,7 +2,7 @@
 # different compilers and build settings.
 function(set_project_warnings project_name)
     # Create option for forcing errors for all warnings.
-    option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
+    option(WARNINGS_AS_ERRORS "Treat compiler warnings as errors" ON)
 
     # Create option to turn on sanitizers.
     option(USE_SANITIZERS "Turn on sanitizers to help reporting of runtime errors" OFF)
