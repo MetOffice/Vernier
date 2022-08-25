@@ -38,6 +38,15 @@ module profiler_mod
   !-----------------------------------------------------------------------------
 
   interface
+
+    subroutine interface_profiler_start(hash_out, region_name)         &
+               bind(C, name='c_profiler_start')
+      import :: c_char, pik
+      character(kind=c_char, len=1), intent(in)  :: region_name(*)
+      integer(kind=pik),             intent(out) :: hash_out
+    end subroutine interface_profiler_start
+
+  interface
 	!> @ingroup FortranAPI
 	!> @fn profiler_mod::profiler_stop::profiler_stop(hash_in)
 	!> @brief Stop profiler
@@ -89,6 +98,31 @@ module profiler_mod
     !>         the end of the region name.
     !> @param [out] hash_out      The unique hash for this region.
     !> @param [in]  region_name   The region name.
+    subroutine profiler_start(hash_out, region_name)
+      implicit none
+
+      !Arguments
+      character(len=*),  intent(in)  :: region_name
+      integer(kind=pik), intent(out) :: hash_out
+
+      !Local variables
+      character(len=len_trim(region_name)+1) :: local_region_name
+     
+      local_region_name = trim(region_name) // c_null_char
+      call interface_profiler_start(hash_out, local_region_name)
+
+    end subroutine profiler_start
+
+  !-----------------------------------------------------------------------------
+  ! Contained functions / subroutines
+  !-----------------------------------------------------------------------------
+  contains
+
+    !> @brief  Start profiling a code region.
+    !> @param [out] hash_out      The unique hash for this region.
+    !> @param [in]  region_name   The region name.
+    !> @note   Region names need not be null terminated:
+    !>         this routine will add a null termination character.
     subroutine profiler_start(hash_out, region_name)
       implicit none
 
