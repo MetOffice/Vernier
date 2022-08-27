@@ -38,8 +38,8 @@ struct StartCalliperValues
     StartCalliperValues(double, double);
 
     // Data members
-    double start_time_;
-    double start_calliper_deltatime_;
+    double region_start_time_;
+    double calliper_start_time_;
 };
 
 /**

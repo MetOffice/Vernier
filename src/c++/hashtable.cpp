@@ -99,8 +99,7 @@ void HashTable::update(size_t hash, double time_delta)
  *                                  the child region.
  */
 
-void HashTable::add_child_time(size_t hash, double time_delta,
-                               double overhead_time_delta)
+double* HashTable::add_child_time(size_t hash, double time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
@@ -109,7 +108,7 @@ void HashTable::add_child_time(size_t hash, double time_delta,
   // Increment the walltime for this hash entry
   auto& entry = table_.at(hash);
   entry.child_walltime_ += time_delta;
-  entry.overhead_time_  += overhead_time_delta;
+  return &entry.overhead_time_; 
 }
 
 /**

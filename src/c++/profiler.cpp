@@ -15,10 +15,10 @@
  *
  */
 
-StartCalliperValues::StartCalliperValues(double start_time, 
-                                         double start_calliper_deltatime)
-  : start_time_(start_time)
-  , start_calliper_deltatime_(start_calliper_deltatime)
+StartCalliperValues::StartCalliperValues(double region_start_time, 
+                                         double calliper_start_time)
+  : region_start_time_(region_start_time)
+  , calliper_start_time_(calliper_start_time)
   {}
 
 /**
@@ -65,7 +65,7 @@ size_t Profiler::start(std::string_view region_name)
 {
 
   // Note the time on entry to the profiler call.
-  double calliper_entry_time = omp_get_wtime();
+  double calliper_start_time = omp_get_wtime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -79,10 +79,9 @@ size_t Profiler::start(std::string_view region_name)
   // Insert this region into the thread's hash table.
   size_t const hash = thread_hashtables_[tid].query_insert(region_name);
 
-  // Add routine to the traceback.
-  double exit_time = omp_get_wtime();
-  double calliper_deltatime = exit_time - calliper_entry_time;
-  StartCalliperValues new_times = StartCalliperValues(exit_time, calliper_deltatime);
+  // Store the calliper and region start times.
+  double region_start_time = omp_get_wtime();
+  StartCalliperValues new_times = StartCalliperValues(region_start_time, calliper_start_time);
   thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
 
   return hash;
@@ -97,10 +96,8 @@ size_t Profiler::start(std::string_view region_name)
 void Profiler::stop(size_t const hash)
 {
 
-  // Note the time on entry to the profiler call, which matches the time at
-  // which the profiled code region has stopped. 
-  double calliper_entry_time = omp_get_wtime();
-  double stop_time = calliper_entry_time;
+  // Log the region stop time.
+  double region_stop_time = omp_get_wtime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -122,25 +119,30 @@ void Profiler::stop(size_t const hash)
   StartCalliperValues& start_calliper_times = 
     thread_traceback_[tid].back().second;
 
-  // Compute time spent in profiled subroutine.
-  double deltatime = stop_time - start_calliper_times.start_time_;
+  // Compute the region time
+  double deltatime = region_stop_time - start_calliper_times.region_start_time_;
 
   // Do the hashtable update for the child region.
   thread_hashtables_[tid].update(hash, deltatime);
 
+  // Precompute times as far as possible - just need the calliper stop time
+  // later.
+  double temp_sum = start_calliper_times.calliper_start_time_ + deltatime;
+
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
 
-  // Account for time spent in the profiler itself. 
-  double calliper_exit_time = omp_get_wtime();
-  double calliper_deltatime = calliper_exit_time - calliper_entry_time;
+  double* calliper_deltatime = nullptr;
 
-  // Add child time and profiling overheads to parent
+  // Prepare to add timings to parent
   if (! thread_traceback_[tid].empty()) {
     size_t parent_hash = thread_traceback_[tid].back().first;
-    thread_hashtables_[tid].add_child_time(parent_hash, deltatime, calliper_deltatime);
+    calliper_deltatime = thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
+    // Account for time spent in the profiler itself. 
+    // double calliper_stop_time = omp_get_wtime();
+    double calliper_stop_time = 0.0;
+    *calliper_deltatime += calliper_stop_time - temp_sum;
   }
-
 }
 
 /**
