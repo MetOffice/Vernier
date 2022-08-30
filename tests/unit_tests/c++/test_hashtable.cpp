@@ -63,6 +63,7 @@ TEST(HashTableTest,ThreadsEqualsEntries) {
   // throw an exception as it won't exist assuming
   // max_threads_ == thread_hashtables_.size(). This is just a different way of
   // testing the assertion that already exists in the code.
+
   EXPECT_ANY_THROW(prof.get_hashtable(prof.get_max_threads()+1));
 
 }
