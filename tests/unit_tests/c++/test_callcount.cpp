@@ -1,3 +1,10 @@
+/* -----------------------------------------------------------------------------
+ *  (c) Crown copyright 2022 Met Office. All rights reserved.
+ *  The file LICENCE, distributed with this code, contains details of the terms
+ *  under which the code may be used.
+ * -----------------------------------------------------------------------------
+ */
+
 #include <gtest/gtest.h>
 
 #include "omp.h"
@@ -28,13 +35,14 @@ TEST(HashEntryTest,CallCountTest)
     // Current thread ID
     int thread_id  = omp_get_thread_num();
 
-    // Also initialise prof_sub_private (even though it will be overwritten in
-    // the following 'for' loop) so that the compiler doesn't think it remains
-    // uninitialised when assigning it to prob_sub_store.
+    // Also initialise prof_sub_private. The compiler doesn't know how many
+    // iterations of the subsequent 'for' loop there will be, and may flag
+    // warnings about it being potentially uninitialised when assigning to
+    // prof_sub_shared.
     size_t prof_sub_private = 0;
 
-    // Call a subregion a differing number of times depending on the thread ID,
-    // starting with 4 calls for thread 0 and going down to 1 call for thread 3.
+    // Call a subregion a differing number of times depending on the thread ID.
+    // The highest thread ID will have the fewest calls: just 1.
     for (int i = 0; i < num_threads-thread_id; ++i)
     {
       prof_sub_private = prof.start("SubRegion");

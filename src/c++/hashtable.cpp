@@ -179,7 +179,7 @@ double HashTable::get_total_walltime(size_t const hash)
   *
   */
 
-int HashTable::get_region_call_count(size_t const hash)
+unsigned long long int HashTable::get_region_call_count(size_t const hash)
 {
     return table_.at(hash).call_count_;
 }

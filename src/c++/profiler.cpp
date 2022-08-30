@@ -154,7 +154,7 @@ double Profiler::get_thread0_walltime(size_t const hash)
  *
  */
 
-int Profiler::get_region_call_count(size_t const hash, int const input_tid)
+unsigned long long int Profiler::get_region_call_count(size_t const hash, int const input_tid)
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_region_call_count(hash);

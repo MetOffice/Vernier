@@ -56,7 +56,7 @@ class Profiler
     void   stop (size_t const);
     void   write();
     double get_thread0_walltime(size_t const);
-    int get_region_call_count(size_t const, int const);
+    unsigned long long int get_region_call_count(size_t const, int const);
 };
 
 // Declare global profiler
