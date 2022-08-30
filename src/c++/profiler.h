@@ -58,14 +58,14 @@ class Profiler
 
     // HashEntry getters
     double      get_thread0_walltime(size_t const);
-    double      get_self_walltime(size_t const, int const input_tid = 0);
-    double      get_child_walltime(size_t const, int const input_tid = 0);
-    std::string get_region_name(size_t const, int const input_tid = 0);
+    double      get_self_walltime(size_t const, int const);
+    double      get_child_walltime(size_t const, int const);
+    std::string get_region_name(size_t const, int const);
 
     // Getters that return a constant, referenced instance of a private data member
-    const std::unordered_map<size_t,HashEntry>&      get_hashtable(int const input_tid = 0);
-    const std::vector<std::pair<size_t,double>>&     get_inner_traceback_vector(int const input_tid = 0);
-    const std::vector<std::pair<size_t, HashEntry>>& get_hashvec(int const input_tid = 0);
+    const std::unordered_map<size_t,HashEntry>&      get_hashtable(int const);
+    const std::vector<std::pair<size_t,double>>&     get_inner_traceback_vector(int const);
+    const std::vector<std::pair<size_t, HashEntry>>& get_hashvec(int const);
     const int& get_max_threads();
 
 };

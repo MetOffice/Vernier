@@ -23,7 +23,7 @@ TEST(RegionNameTest,NamesMatchTest) {
     const auto& prof_latte = prof.start(myString);
 
     // Get subregion name out from profiler and check it is what we expect
-    std::string subregionName = prof.get_region_name(prof_latte);
+    std::string subregionName = prof.get_region_name(prof_latte,0);
     EXPECT_EQ("Latte", subregionName);
 
     prof.stop(prof_latte);
@@ -33,7 +33,7 @@ TEST(RegionNameTest,NamesMatchTest) {
     SCOPED_TRACE("Problem with main region name");
 
     // Get main region name out from profiler and test
-    std::string regionName = prof.get_region_name(prof_cappucino);
+    std::string regionName = prof.get_region_name(prof_cappucino,0);
     EXPECT_EQ("Cappucino", regionName);
   }
 

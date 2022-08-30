@@ -18,7 +18,7 @@ using ::testing::Gt;
 TEST(HashTableTest,QueryInsertTest) {
 
   // Hashtable instance to poke and prod without changing any private data
-  const auto& htable = prof.get_hashtable();
+  const auto& htable = prof.get_hashtable(0);
 
   // Nothing has been done yet, hashtable should be empty
   EXPECT_TRUE(htable.empty());
@@ -30,7 +30,7 @@ TEST(HashTableTest,QueryInsertTest) {
   prof.stop(prof_rigatoni);
 
   {
-    SCOPED_TRACE("HashTable still empty, .count() returning 0 after Profiler::start()");
+    SCOPED_TRACE("HashTable still empty after start is called");
 
     // Table no longer empty
     EXPECT_FALSE(htable.empty());
@@ -62,7 +62,7 @@ TEST(HashTableTest,ThreadsEqualsEntries) {
   // Trying to access an entry one higher than the value of max_threads_ should
   // throw an exception as it won't exist assuming
   // max_threads_ == thread_hashtables_.size(). This is just a different way of
-  // testing the assertion that already exists in the code. 
+  // testing the assertion that already exists in the code.
   EXPECT_ANY_THROW(prof.get_hashtable(prof.get_max_threads()+1));
 
 }
@@ -120,7 +120,7 @@ TEST(HashTableTest,UpdateAndMdiTest) {
 
 TEST(HashTableTest,TracebackTest) {
 
-  const auto& traceback_vec = prof.get_inner_traceback_vector();
+  const auto& traceback_vec = prof.get_inner_traceback_vector(0);
 
   {
     SCOPED_TRACE("traceback.at() not throwing exception before profiler.start()");

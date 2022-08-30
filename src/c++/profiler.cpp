@@ -139,7 +139,7 @@ void Profiler::write()
 double Profiler::get_thread0_walltime(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
-  return thread_hashtables_.at(tid).get_total_walltime(hash);
+  return thread_hashtables_[tid].get_total_walltime(hash);
 }
 
 /**
@@ -150,7 +150,7 @@ double Profiler::get_thread0_walltime(size_t const hash)
 double Profiler::get_self_walltime(size_t const hash, int const input_tid)
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
-  return thread_hashtables_.at(tid).get_self_walltime(hash);
+  return thread_hashtables_[tid].get_self_walltime(hash);
 }
 
 /**
@@ -161,7 +161,7 @@ double Profiler::get_self_walltime(size_t const hash, int const input_tid)
 double Profiler::get_child_walltime(size_t const hash, int const input_tid)
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
-  return thread_hashtables_.at(tid).get_child_walltime(hash);
+  return thread_hashtables_[tid].get_child_walltime(hash);
 }
 
 /**
@@ -172,7 +172,7 @@ double Profiler::get_child_walltime(size_t const hash, int const input_tid)
 std::string Profiler::get_region_name(size_t const hash, int const input_tid)
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
-  return thread_hashtables_.at(tid).get_region_name(hash);
+  return thread_hashtables_[tid].get_region_name(hash);
 }
 
 /**

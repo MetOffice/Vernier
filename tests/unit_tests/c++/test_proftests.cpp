@@ -29,21 +29,24 @@ TEST(ProfilerTest,WriteTest) {
   // Call write to ensure hashvec is filled & sorted
   prof.write();
 
+  // Get the Hashvec
+  const auto& local_hashvec = prof.get_hashvec(0);
+
   {
     SCOPED_TRACE("Hashvec has incorrect size!");
 
     // Since hashvec is a vector of (hash,HashEntry) pairs
     // it should be equal in size to the number of regions
-    ASSERT_EQ(prof.get_hashvec().size(), 3);
+    ASSERT_EQ(local_hashvec.size(), 3);
   }
 
   {
     SCOPED_TRACE("Entries in hashvec incorrectly sorted");
 
     // hashvec is ordered from high to low so... [lastEntry] < [firstEntry]
-    const double& val1 = prof.get_hashvec()[0].second.self_walltime_;
-    const double& val2 = prof.get_hashvec()[1].second.self_walltime_;
-    const double& val3 = prof.get_hashvec()[2].second.self_walltime_;
+    const double& val1 = local_hashvec[0].second.self_walltime_;
+    const double& val2 = local_hashvec[1].second.self_walltime_;
+    const double& val3 = local_hashvec[2].second.self_walltime_;
     EXPECT_LT(val3, val2);
     EXPECT_LT(val2, val1);
   }

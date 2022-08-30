@@ -38,8 +38,8 @@ TEST(HashEntryTest, TimingsTest) {
 
     // Grab the total, child and self wallclock times
     const double& total = prof.get_thread0_walltime(prof_main);
-    const double& child = prof.get_child_walltime(prof_main);
-    const double& self  = prof.get_self_walltime(prof_main);
+    const double& child = prof.get_child_walltime(prof_main,0);
+    const double& self  = prof.get_self_walltime(prof_main,0);
 
     // Test that self_walltime = total_walltime - child_walltime
     EXPECT_EQ(self,total-child);
