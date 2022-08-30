@@ -2,6 +2,7 @@
 #include <profiler.h>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <omp.h>
 
 using ::testing::AllOf;
 using ::testing::An;
@@ -16,26 +17,27 @@ using ::testing::Gt;
 
 TEST(HashTableTest,QueryInsertTest) {
 
+  // Hashtable instance to poke and prod without changing any private data
+  const auto& htable = prof.get_hashtable();
+
+  // Nothing has been done yet, hashtable should be empty
+  EXPECT_TRUE(htable.empty());
+
+  // Create new hashes via HashTable::query_insert, which is used in Profiler::start
+  const auto& prof_rigatoni = prof.start("Rigatoni");
+  const auto& prof_penne    = prof.start("Penne");
+  prof.stop(prof_penne);
+  prof.stop(prof_rigatoni);
+
   {
-    SCOPED_TRACE("Table not empty beforehand");
-
-    // Nothing has been done yet, table should be empty
-    EXPECT_TRUE(prof.is_table_empty());
-  }
-
-  // Create new hashes via query insert
-  const auto& prof_main = prof.hashtable_query_insert("Rigatoni");
-  const auto& prof_sub  = prof.hashtable_query_insert("Penne");
-
-  {
-    SCOPED_TRACE("Table still empty or .count() returning 0 after query_insert");
+    SCOPED_TRACE("HashTable still empty, .count() returning 0 after Profiler::start()");
 
     // Table no longer empty
-    EXPECT_FALSE(prof.is_table_empty());
+    EXPECT_FALSE(htable.empty());
 
     // .count() returns 1 if map already has an entry associated with input hash
-    EXPECT_EQ(prof.get_hashtable_count(prof_main), 1);
-    EXPECT_EQ(prof.get_hashtable_count(prof_sub),  1);
+    EXPECT_EQ(htable.count(prof_rigatoni), 1);
+    EXPECT_EQ(htable.count(prof_penne),    1);
   }
 
   {
@@ -45,34 +47,39 @@ TEST(HashTableTest,QueryInsertTest) {
     //  - query_insert'ing Penne or Rigatoni just returns the hash
     //  - the regions have different hashes
     //  - the regions have the hashes returned by hash_function_ which uses std::hash
-    EXPECT_EQ(prof.hashtable_query_insert("Rigatoni"), std::hash<std::string_view>{}("Rigatoni"));
-    EXPECT_EQ(prof.hashtable_query_insert("Penne"),    std::hash<std::string_view>{}("Penne"));
+    EXPECT_EQ(prof.start("Rigatoni"), std::hash<std::string_view>{}("Rigatoni"));
+    EXPECT_EQ(prof.start("Penne"),    std::hash<std::string_view>{}("Penne"));
   }
+  prof.stop(prof_penne);
 
   // HashTable.query_insert() includes "noexcept" specifier
-  EXPECT_NO_THROW( prof.hashtable_query_insert("Penne") );
+  EXPECT_NO_THROW( prof.start("Penne") );
 
 }
 
 TEST(HashTableTest,ThreadsEqualsEntries) {
 
-  // Start and stop profiler timing
-  const auto& prof_main = prof.start("MAIN");
-  prof.stop(prof_main);
-
-  // Compare number of threads and number of hashtable entries
-  EXPECT_EQ( prof.get_max_threads() , prof.get_thread_hashtables_size() );
-  EXPECT_EQ( prof.get_max_threads() , prof.get_thread_traceback_size()  );
+  // Trying to access an entry one higher than the value of max_threads_ should
+  // throw an exception as it won't exist assuming
+  // max_threads_ == thread_hashtables_.size(). This is just a different way of
+  // testing the assertion that already exists in the code. 
+  EXPECT_ANY_THROW(prof.get_hashtable(prof.get_max_threads()+1));
 
 }
+
+/**
+ * @TODO  Decide how to handle the MDI stuff and update the following test
+ *        accordingly. See Issue #53.
+ *
+ */
 
 TEST(HashTableTest,UpdateAndMdiTest) {
 
   // Create new hash
-  auto prof_main = prof.hashtable_query_insert("Pie");
+  size_t prof_pie = std::hash<std::string_view>{}("Pie");
 
-  // Time t1 declared before profiler.start()
-  const double& t1 = prof.get_thread0_walltime(prof_main);
+  // Trying to find a time before .start() will throw an exception
+  EXPECT_ANY_THROW(prof.get_thread0_walltime(prof_pie));
 
   // Start timing
   prof.start("Pie");
@@ -80,58 +87,50 @@ TEST(HashTableTest,UpdateAndMdiTest) {
   sleep(1);
 
   // Time t2 declared inbetween .start() and first .stop()
-  const double& t2 = prof.get_thread0_walltime(prof_main);
+  const double& t1 = prof.get_thread0_walltime(prof_pie);
 
   // Stop timing
-  prof.stop(prof_main);
+  prof.stop(prof_pie);
 
   // Time t3 declared after first profiler.stop()
-  const double& t3 = prof.get_thread0_walltime(prof_main);
+  const double& t2 = prof.get_thread0_walltime(prof_pie);
 
   // Start and stop same region again
   prof.start("Pie");
   sleep(1);
-  prof.stop(prof_main);
+  prof.stop(prof_pie);
 
   // Time t4 declared after second profiler.stop()
-  const double& t4 = prof.get_thread0_walltime(prof_main);
+  const double& t3 = prof.get_thread0_walltime(prof_pie);
 
-  // Expected behaviour: t1 & t2 return the MDI and t4 > t3 > 0
+  // Expected behaviour: t1 return the MDI and t3 > t2 > 0
   constexpr double MDI = 0.0;     // Missing Data Indicator (MDI)
 
   {
     SCOPED_TRACE("MDI missing from time points expected to return it");
     EXPECT_EQ(t1, MDI);
-    EXPECT_EQ(t2, MDI);
-
-    // Introduce a subregion hash but never time it.
-    // The time for this region should also return an MDI.
-    const auto& prof_sub = prof.hashtable_query_insert("Sub");
-    const double& subregionTime = prof.get_thread0_walltime(prof_sub);
-    EXPECT_EQ(subregionTime, MDI);
   }
 
   {
     SCOPED_TRACE("Update potentially not incrementing times correctly");
-    EXPECT_GT(t3, 0.0);
-    EXPECT_GT(t4, t3 );
+    EXPECT_GT(t2, 0.0);
+    EXPECT_GT(t3, t2 );
   }
 }
 
 TEST(HashTableTest,TracebackTest) {
 
-  // Instantiate hashtable
-  const auto& prof_main = prof.hashtable_query_insert("Main");
+  const auto& traceback_vec = prof.get_inner_traceback_vector();
 
   {
     SCOPED_TRACE("traceback.at() not throwing exception before profiler.start()");
 
     // .at() throws exception when trying to access entry which isn't there
-    EXPECT_ANY_THROW(prof.get_traceback_vector().at(0) );
+    EXPECT_ANY_THROW( traceback_vec.at(0) );
   }
 
   // Start profiler
-  prof.start("Main");
+  const auto& prof_main = prof.start("Main");
 
   {
     SCOPED_TRACE("Traceback vector setup incorrectly");
@@ -141,9 +140,9 @@ TEST(HashTableTest,TracebackTest) {
     //  - It should have a size of 1 in this example
     //  - The first entry in the pair should be prof_main
     //  - The second entry is some time, here a check done to make sure it is some double greater than zero
-    EXPECT_EQ( prof.get_traceback_vector().size(), 1);
-    EXPECT_EQ( prof.get_traceback_vector().back().first, prof_main );
-    EXPECT_THAT( prof.get_traceback_vector().back().second, AllOf(An<double>(),Gt(0.0)) );
+    EXPECT_EQ( traceback_vec.size(), 1);
+    EXPECT_EQ( traceback_vec.back().first, prof_main );
+    EXPECT_THAT( traceback_vec.back().second, AllOf(An<double>(),Gt(0.0)) );
   }
 
   // Stop profiler
@@ -153,13 +152,13 @@ TEST(HashTableTest,TracebackTest) {
     SCOPED_TRACE("Traceback vector not empty, pop_back() failed or still an unexpected entry left?");
 
     // Shouldn't be any elements left
-    EXPECT_TRUE(prof.get_traceback_vector().empty() );
+    EXPECT_TRUE( traceback_vec.empty() );
   }
 
   {
     SCOPED_TRACE("traceback.at() not throwing exception after element is deleted by pop_back()");
 
     // .at() should throw exception again, only existing element was deleted by .pop_back() inside profiler.stop()
-    EXPECT_ANY_THROW(prof.get_traceback_vector().at(0) );
+    EXPECT_ANY_THROW( traceback_vec.at(0) );
   }
 }

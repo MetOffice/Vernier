@@ -11,7 +11,7 @@
  *
  * Contains the top-level class, whose methods are called from client code. Also
  * declares a top-level, global, profiler object.
- * 
+ *
  */
 
 #ifndef PROFILER_H
@@ -35,7 +35,7 @@
 
 class Profiler
 {
-  private: 
+  private:
 
     // Data members
     int max_threads_;
@@ -55,23 +55,19 @@ class Profiler
     size_t start(std::string_view);
     void   stop (size_t const);
     void   write();
-    bool   is_table_empty();
-    
-    // Getters
+
+    // HashEntry getters
     double      get_thread0_walltime(size_t const);
-    double      get_thread0_self_walltime(size_t const);
-    double      get_thread0_child_walltime(size_t const); 
-    std::string get_thread0_region_name(size_t const);
+    double      get_self_walltime(size_t const, int const input_tid = 0);
+    double      get_child_walltime(size_t const, int const input_tid = 0);
+    std::string get_region_name(size_t const, int const input_tid = 0);
 
-    size_t get_thread_hashtables_size(); 
-    size_t get_thread_traceback_size();
-    int get_max_threads();
-    size_t get_hashtable_count(size_t const);
-    size_t hashtable_query_insert(std::string_view);
-      
+    // Getters that return a constant, referenced instance of a private data member
+    const std::unordered_map<size_t,HashEntry>&      get_hashtable(int const input_tid = 0);
+    const std::vector<std::pair<size_t,double>>&     get_inner_traceback_vector(int const input_tid = 0);
+    const std::vector<std::pair<size_t, HashEntry>>& get_hashvec(int const input_tid = 0);
+    const int& get_max_threads();
 
-    std::vector<std::pair<size_t, HashEntry>> get_hashvec();
-    std::vector<std::pair<size_t,double>> get_traceback_vector();
 };
 
 // Declare global profiler

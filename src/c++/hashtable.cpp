@@ -13,7 +13,7 @@
 #include <algorithm>
 
 /**
- * @brief  Constructs a new entry in the hash table. 
+ * @brief  Constructs a new entry in the hash table.
  *
  */
 
@@ -26,7 +26,7 @@ HashEntry::HashEntry(std::string_view region_name)
 
 /**
  * @brief Hashtable constructor
- * 
+ *
  */
 
 HashTable::HashTable(int const tid)
@@ -101,7 +101,7 @@ void HashTable::write()
     << std::setw(40) << std::left  << routine_at_thread  << " "
     << std::setw(15) << std::right << "Self (s)"         << " "
     << std::setw(15) << std::right << "Total (s)"        << "\n";
- 
+
   std::cout << std::setfill('-');
   std::cout
     << std::setw(40) << "-" << " "
@@ -113,13 +113,13 @@ void HashTable::write()
   // walltime.  If optimisation of this is needed, it ought to be possible to
   // acquire a vector of hash-selftime pairs in the correct order, then use the
   // hashes to look up other information directly from the hashtable.
-  hashvec = std::vector<std::pair<size_t, HashEntry>>(begin(table_), end(table_));
-  std::sort(begin(hashvec), end(hashvec), 
+  hashvec = std::vector<std::pair<size_t, HashEntry>>(table_.cbegin(), table_.cend());
+  std::sort(begin(hashvec), end(hashvec),
       [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_;});
-    
+
   // Data entries
   for (auto& [hash, entry] : hashvec) {
-    std::cout 
+    std::cout
       << std::setw(40) << std::left  << entry.region_name_    << " "
       << std::setw(15) << std::right << entry.self_walltime_  << " "
       << std::setw(15) << std::right << entry.total_walltime_ << "\n";
@@ -155,7 +155,7 @@ std::vector<size_t> HashTable::list_keys()
 
 /**
  * @brief  Get the total (inclusive) time corresponding to the input hash.
- * 
+ *
  */
 
 double HashTable::get_total_walltime(size_t const hash)
@@ -165,7 +165,7 @@ double HashTable::get_total_walltime(size_t const hash)
 
 /**
  * @brief  Get the profiler self time corresponding to the input hash.
- * 
+ *
  */
 
 double HashTable::get_self_walltime(size_t const hash)
@@ -176,7 +176,7 @@ double HashTable::get_self_walltime(size_t const hash)
 
 /**
  * @brief  Get the child time corresponding to the input hash.
- * 
+ *
  */
 
 double HashTable::get_child_walltime(size_t const hash)
@@ -186,41 +186,26 @@ double HashTable::get_child_walltime(size_t const hash)
 
 /**
  * @brief  Get the region name corresponding to the input hash.
- * 
+ *
  */
 
-std::string HashTable::get_region_name(size_t const hash) 
+std::string HashTable::get_region_name(size_t const hash)
 {
-  return table_.at(hash).region_name_; 
+  return table_.at(hash).region_name_;
 }
 
 /**
- * @brief  Get the hashtable .count() corresponding to the input hash.
- * 
+ * @brief  Get the vector in profiler.write() which is used to sort entries in
+ *         the hashtable from high to low self walltime.
+ *
  */
 
-size_t HashTable::get_hashtable_count(size_t const hash) 
+std::vector<std::pair<size_t, HashEntry>>& HashTable::get_hashvec()
 {
-  return table_.count(hash);
-}
-
-/**
- * @brief  Returns TRUE if the hashtable is empty and false otherwise.
- * 
- */
-
-bool HashTable::is_table_empty() 
-{
-  return table_.empty();
-}
-
-/**
- * @brief  Get the vector of pairs in profiler.write() used to sort entries from the underordered_map from high to low self walltime.
- * 
- */
-
-std::vector<std::pair<size_t, HashEntry>> HashTable::get_hashvec() 
-{
-  this->write();
   return hashvec;
+}
+
+std::unordered_map<size_t,HashEntry>& HashTable::get_hashtable()
+{
+  return table_;
 }

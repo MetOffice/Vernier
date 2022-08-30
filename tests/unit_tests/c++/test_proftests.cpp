@@ -17,16 +17,17 @@ using ::testing::KilledBySignal;
 TEST(ProfilerTest,WriteTest) {
 
   // Start 3 nested regions
-  const auto& prof_main = prof.start("Shortbread");
-  const auto& prof_sub  = prof.start("Brownie");
-  const auto& prof_sub2 = prof.start("RockyRoad");
+  const auto& prof_shortbread = prof.start("Shortbread");
+  const auto& prof_brownie    = prof.start("Brownie");
+  const auto& prof_rockyroad  = prof.start("RockyRoad");
 
   // Stop them 1 by 1
-  prof.stop(prof_sub2);
+  prof.stop(prof_rockyroad);
+  prof.stop(prof_brownie);
+  prof.stop(prof_shortbread);
 
-  prof.stop(prof_sub);
-
-  prof.stop(prof_main);
+  // Call write to ensure hashvec is filled & sorted
+  prof.write();
 
   {
     SCOPED_TRACE("Hashvec has incorrect size!");
@@ -40,9 +41,9 @@ TEST(ProfilerTest,WriteTest) {
     SCOPED_TRACE("Entries in hashvec incorrectly sorted");
 
     // hashvec is ordered from high to low so... [lastEntry] < [firstEntry]
-    const double val1 = prof.get_hashvec()[0].second.self_walltime_;
-    const double val2 = prof.get_hashvec()[1].second.self_walltime_;
-    const double val3 = prof.get_hashvec()[2].second.self_walltime_;
+    const double& val1 = prof.get_hashvec()[0].second.self_walltime_;
+    const double& val2 = prof.get_hashvec()[1].second.self_walltime_;
+    const double& val3 = prof.get_hashvec()[2].second.self_walltime_;
     EXPECT_LT(val3, val2);
     EXPECT_LT(val2, val1);
   }
@@ -73,7 +74,7 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
   EXPECT_DEATH({
 
-    const auto& prof_main = prof.hashtable_query_insert("Main");
+    const auto prof_main = std::hash<std::string_view>{}("Main");
 
     // Stop the profiler before anything is done
     prof.stop(prof_main);
