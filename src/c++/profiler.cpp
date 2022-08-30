@@ -6,6 +6,7 @@
  */
 
 #include "profiler.h"
+#include "prof_gettime.h"
 
 #include <iostream>
 #include <cassert>
@@ -42,9 +43,14 @@ Profiler::Profiler(){
   {
     HashTable new_table(tid);
     profiler_hash_ = new_table.insert_special("__profiler__");
-    thread_hashtables_.push_back(new_table);
 
+    // Ensure there is at least one entry in the traceback.
+    //StartCalliperValues new_times(0.0, 0.0);
     std::vector<std::pair<size_t,StartCalliperValues>> new_list;
+    //new_list.push_back(std::make_pair(profiler_hash_, new_times));
+
+    // Add to main hashtable and main traceback
+    thread_hashtables_.push_back(new_table);
     thread_traceback_.push_back(new_list);
   }
 
@@ -65,7 +71,7 @@ size_t Profiler::start(std::string_view region_name)
 {
 
   // Note the time on entry to the profiler call.
-  double calliper_start_time = omp_get_wtime();
+  double calliper_start_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -80,7 +86,7 @@ size_t Profiler::start(std::string_view region_name)
   size_t const hash = thread_hashtables_[tid].query_insert(region_name);
 
   // Store the calliper and region start times.
-  double region_start_time = omp_get_wtime();
+  double region_start_time = prof_gettime();
   StartCalliperValues new_times = StartCalliperValues(region_start_time, calliper_start_time);
   thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
 
@@ -97,7 +103,7 @@ void Profiler::stop(size_t const hash)
 {
 
   // Log the region stop time.
-  double region_stop_time = omp_get_wtime();
+  double region_stop_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -136,13 +142,18 @@ void Profiler::stop(size_t const hash)
 
   // Prepare to add timings to parent
   if (! thread_traceback_[tid].empty()) {
-    size_t parent_hash = thread_traceback_[tid].back().first;
-    calliper_deltatime = thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
-    // Account for time spent in the profiler itself. 
-    // double calliper_stop_time = omp_get_wtime();
-    double calliper_stop_time = 0.0;
-    *calliper_deltatime += calliper_stop_time - temp_sum;
+   size_t parent_hash = thread_traceback_[tid].back().first;
+   calliper_deltatime = thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
+
+   // Cache the previous value on this side of the final time measurement.
+   double previous_calliper_deltatime =  *calliper_deltatime;
+
+   // Account for time spent in the profiler itself. 
+   double calliper_stop_time = prof_gettime();
+   double interim_time = calliper_stop_time - temp_sum;
+   *calliper_deltatime = previous_calliper_deltatime + interim_time;
   }
+
 }
 
 /**

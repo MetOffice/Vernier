@@ -178,6 +178,7 @@ void HashTable::write()
    }
 
    // Set values for the profiler entry in the hashtable.
+   table_.at(profiler_hash).self_walltime_      = total_overhead_time;
    table_.at(profiler_hash).total_walltime_     = total_overhead_time;
    table_.at(profiler_hash).total_raw_walltime_ = total_overhead_time;
 

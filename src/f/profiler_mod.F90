@@ -91,11 +91,24 @@ module profiler_mod
 
       !Local variables
       character(len=len_trim(region_name)+1) :: local_region_name
-     
-      local_region_name = trim(region_name) // c_null_char
+
+      call append_null_char(region_name, local_region_name, len_trim(region_name))
+
       call interface_profiler_start(hash_out, local_region_name)
 
     end subroutine profiler_start
+
+    subroutine append_null_char(string_in, string_out, strlen)
+      implicit none
+
+      integer, intent(in)                  :: strlen
+      character(len=strlen),   intent(in)  :: string_in
+      character(len=strlen+1), intent(out) :: string_out
+
+      string_out(1:strlen)          = string_in(1:strlen)
+      string_out(strlen+1:strlen+1) = c_null_char
+
+    end subroutine append_null_char
 
 end module profiler_mod
 
