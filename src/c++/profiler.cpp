@@ -139,7 +139,7 @@ void Profiler::write()
 double Profiler::get_thread0_walltime(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
-  return thread_hashtables_.at(tid).get_total_walltime(hash);
+  return thread_hashtables_[tid].get_total_walltime(hash);
 }
 
 /**
