@@ -20,4 +20,6 @@
 15/07/2022 PR #30 for #29: Unit testing for Fortran interface. \
 04/08/2022 PR #32 for #31: Functionality improvements (walltime, swap to unordered_map, sort entries in output. \
 10/08/2022 PR #41 for #37 Add null terminated strings in Fortran interface. \
-16/08/2022 PR #48 Add hashtable.h to installed header files.
+16/08/2022 PR #48 Add hashtable.h to installed header files. \
+30/08/2022 PR #51 for #34: Including the number of times a region is called.
+

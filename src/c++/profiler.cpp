@@ -33,7 +33,7 @@ Profiler::Profiler(){
     thread_traceback_.push_back(new_list);
   }
 
-  // Assertions 
+  // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
   assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
 
@@ -126,7 +126,7 @@ void Profiler::write()
 /**
  * @brief  Get the total (inclusive) time of everything below the specified hash.
  *
- * @param[in] hash  The hash corresponding to the region of interest. 
+ * @param[in] hash  The hash corresponding to the region of interest.
  *
  * @note   This function is normally expected to be used to return the total
  *         wallclock time for whole run. Since this value is required only from
@@ -142,3 +142,20 @@ double Profiler::get_thread0_walltime(size_t const hash)
   return thread_hashtables_[tid].get_total_walltime(hash);
 }
 
+/**
+ * @brief  Get the number of times the input hash region has been called on the
+*          input thread ID.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest.
+ * @param[in] tid   The ID corresponding to the thread of interest.
+ *
+ * @returns  Returns an integer corresponding to the number of times the
+ *           region of interest has been called on the specified thread.
+ *
+ */
+
+unsigned long long int Profiler::get_region_call_count(size_t const hash, int const input_tid)
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_region_call_count(hash);
+}

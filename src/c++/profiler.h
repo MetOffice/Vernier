@@ -11,7 +11,7 @@
  *
  * Contains the top-level class, whose methods are called from client code. Also
  * declares a top-level, global, profiler object.
- * 
+ *
  */
 
 #ifndef PROFILER_H
@@ -35,7 +35,7 @@
 
 class Profiler
 {
-  private: 
+  private:
 
     // Data members
     int max_threads_;
@@ -56,6 +56,7 @@ class Profiler
     void   stop (size_t const);
     void   write();
     double get_thread0_walltime(size_t const);
+    unsigned long long int get_region_call_count(size_t const, int const);
 };
 
 // Declare global profiler
