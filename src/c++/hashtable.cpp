@@ -22,6 +22,7 @@ HashEntry::HashEntry(std::string_view region_name)
       , total_walltime_(0.0)
       , self_walltime_(0.0)
       , child_walltime_(0.0)
+      , call_count_(0)
       {}
 
 /**
@@ -65,6 +66,8 @@ void HashTable::update(size_t hash, double time_delta)
   auto& entry = table_.at(hash);
   entry.total_walltime_ += time_delta;
 
+  // Update the number of times this region has been called
+  entry.call_count_++;
 }
 
 /**
@@ -100,13 +103,15 @@ void HashTable::write()
   std::cout
     << std::setw(40) << std::left  << routine_at_thread  << " "
     << std::setw(15) << std::right << "Self (s)"         << " "
-    << std::setw(15) << std::right << "Total (s)"        << "\n";
+    << std::setw(15) << std::right << "Total (s)"        << " "
+    << std::setw(10) << std::right << "Calls"            << "\n";
 
   std::cout << std::setfill('-');
   std::cout
     << std::setw(40) << "-" << " "
     << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << "\n";
+    << std::setw(15) << "-" << " "
+    << std::setw(10) << "-" << "\n";
   std::cout << std::setfill(' ');
 
   // Create a vector from the hashtable and sort the entries according to self
@@ -122,7 +127,8 @@ void HashTable::write()
     std::cout
       << std::setw(40) << std::left  << entry.region_name_    << " "
       << std::setw(15) << std::right << entry.self_walltime_  << " "
-      << std::setw(15) << std::right << entry.total_walltime_ << "\n";
+      << std::setw(15) << std::right << entry.total_walltime_ << " "
+      << std::setw(10) << std::right << entry.call_count_     << "\n";
   }
 }
 
@@ -194,18 +200,40 @@ std::string HashTable::get_region_name(size_t const hash)
   return table_.at(hash).region_name_;
 }
 
+ /**
+  * @brief  Get the number of times the input hash region has been called.
+  *
+  * @param[in] hash  The hash corresponding to the region of interest.
+  *
+  * @returns  Returns an integer corresponding to the number of the times the
+  *           region of interest has been called within the code being profiled.
+  *
+  */
+
+unsigned long long int HashTable::get_region_call_count(size_t const hash)
+{
+    return table_.at(hash).call_count_;
+}
+
 /**
  * @brief  Get the vector in profiler.write() which is used to sort entries in
  *         the hashtable from high to low self walltime.
  *
  */
-
+ 
 std::vector<std::pair<size_t, HashEntry>>& HashTable::get_hashvec()
 {
   return hashvec;
 }
 
+/**
+ * @brief  Get the actual std::unordered_map hashtable, "table_" wherein hashes
+ *         and hash entries are stored.
+ *
+ */
+
 std::unordered_map<size_t,HashEntry>& HashTable::get_hashtable()
 {
   return table_;
 }
+

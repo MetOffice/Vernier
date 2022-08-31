@@ -176,6 +176,24 @@ std::string Profiler::get_region_name(size_t const hash, int const input_tid)
 }
 
 /**
+ * @brief  Get the number of times the input hash region has been called on the
+ *         input thread ID.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest.
+ * @param[in] tid   The ID corresponding to the thread of interest.
+ *
+ * @returns  Returns an integer corresponding to the number of times the
+ *           region of interest has been called on the specified thread.
+ *
+ */
+
+unsigned long long int Profiler::get_region_call_count(size_t const hash, int const input_tid)
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_region_call_count(hash);
+}
+
+/**
  * @brief  Gets the std::unordered_map "table_" hashtable.
  *
  */
@@ -218,3 +236,5 @@ const int& Profiler::get_max_threads()
 {
   return max_threads_;
 }
+
+

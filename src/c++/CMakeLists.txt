@@ -17,6 +17,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
 
 set_project_warnings(${CMAKE_PROJECT_NAME})
 
+set(PUBLIC_HEADER_FILES profiler.h hashtable.h)
+
 # Set the properties of the library including, the version and language. Also
 # set which header files are to be public and installed, this can be useful
 # when limiting access to the internal workings of the library with the install.
@@ -24,7 +26,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
         SOVERSION ${PROJECT_VERSION_MAJOR}
         VERSION ${PROJECT_VERSION}
         LINKER_LANGUAGE CXX
-        PUBLIC_HEADER "profiler.h")
+        PUBLIC_HEADER "${PUBLIC_HEADER_FILES}")
 
 # Set up installation rules for the library.
 install(TARGETS ${CMAKE_PROJECT_NAME} EXPORT "${CMAKE_PROJECT_NAME}Targets"
