@@ -96,8 +96,8 @@ void Profiler::stop(size_t const hash)
 
   // Increment the time for this
   auto start_time = thread_traceback_[tid].back().second;
-  std::chrono::duration<double, std::ratio<1>> deltatime = stop_time - start_time;
-  thread_hashtables_[tid].update(hash, deltatime.count());
+  time_duration_t deltatime = stop_time - start_time;
+  thread_hashtables_[tid].update(hash, deltatime);
 
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
@@ -105,7 +105,7 @@ void Profiler::stop(size_t const hash)
   // Add child time to parent
   if (! thread_traceback_[tid].empty()) {
     size_t parent_hash = thread_traceback_[tid].back().first;
-    thread_hashtables_[tid].add_child_time(parent_hash, deltatime.count());
+    thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
   }
 
 }
