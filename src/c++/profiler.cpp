@@ -30,7 +30,7 @@ Profiler::Profiler(){
     HashTable new_table(tid);
     thread_hashtables_.push_back(new_table);
 
-    std::vector<std::pair<size_t,std::chrono::time_point<std::chrono::steady_clock>>> new_list;
+    std::vector<std::pair<size_t,time_point_t>> new_list;
     thread_traceback_.push_back(new_list);
   }
 
