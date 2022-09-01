@@ -110,18 +110,35 @@ void Profiler::stop(size_t const hash)
 }
 
 /**
- * @brief  Write profile information.
+ * @brief  Write profile information to file.
+ *
+ * @note   The default file that the profiler will spit information into is
+ *         called "profiler-output.txt". There also exists the option to set a
+ *         custom name via the environment variable "ProfOut".
  *
  */
 
 void Profiler::write()
 {
-  // Write each one to file
-  output_stream.open("profiler-output.txt");
+  // Pickup environment variable filename if it exists, if not use the default
+  // name of "profiler-output.txt"
+  const char* filename = getenv("ProfOut");
+  if (filename != NULL)
+  {
+    output_stream.open(filename);
+  }
+  else
+  {
+    output_stream.open("profiler-output.txt");
+    delete filename;
+  }
+
+  // Write to file
   for (auto& it : thread_hashtables_)
   {
     it.write(output_stream);
   }
+
   output_stream.flush();
   output_stream.close();
 }
