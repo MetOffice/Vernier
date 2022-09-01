@@ -103,13 +103,15 @@ void HashTable::write(std::ofstream& outstream)
   outstream
     << std::setw(40) << std::left  << routine_at_thread  << " "
     << std::setw(15) << std::right << "Self (s)"         << " "
-    << std::setw(15) << std::right << "Total (s)"        << "\n";
+    << std::setw(15) << std::right << "Total (s)"        << " "
+    << std::setw(10) << std::right << "Calls"            << "\n";
 
   outstream << std::setfill('-');
   outstream
     << std::setw(40) << "-" << " "
     << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << "\n";
+    << std::setw(15) << "-" << " "
+    << std::setw(10) << "-" << "\n";
   outstream << std::setfill(' ');
 
   // Create a vector from the hashtable and sort the entries according to self
