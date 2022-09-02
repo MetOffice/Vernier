@@ -1,4 +1,4 @@
-#include <iostream>
+//#include <iostream>
 #include <profiler.h>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -9,7 +9,7 @@ using ::testing::An;
 using ::testing::Gt;
 
 //
-//  Tesing some hashtable member variables and functions, such as query_insert()
+//  Testing some hashtable member variables and functions, such as query_insert()
 //  and the std::vector thread_traceback_. The desired behaviour of calling
 //  get_thread0_walltime before profiler.stop() is a bit fuzzy at the time of
 //  writing, but currently a test is done to make sure it returns the MDI of 0.0
@@ -50,10 +50,6 @@ TEST(HashTableTest,QueryInsertTest) {
     EXPECT_EQ(prof.start("Rigatoni"), std::hash<std::string_view>{}("Rigatoni"));
     EXPECT_EQ(prof.start("Penne"),    std::hash<std::string_view>{}("Penne"));
   }
-  prof.stop(prof_penne);
-
-  // HashTable.query_insert() includes "noexcept" specifier
-  EXPECT_NO_THROW( prof.start("Penne") );
 
 }
 
@@ -64,7 +60,7 @@ TEST(HashTableTest,ThreadsEqualsEntries) {
   // max_threads_ == thread_hashtables_.size(). This is just a different way of
   // testing the assertion that already exists in the code.
 
-  EXPECT_ANY_THROW(prof.get_hashtable(prof.get_max_threads()+1));
+  EXPECT_THROW(prof.get_hashtable(prof.get_max_threads()+1), std::out_of_range);
 
 }
 
@@ -80,29 +76,30 @@ TEST(HashTableTest,UpdateAndMdiTest) {
   size_t prof_pie = std::hash<std::string_view>{}("Pie");
 
   // Trying to find a time before .start() will throw an exception
-  EXPECT_ANY_THROW(prof.get_thread0_walltime(prof_pie));
+  EXPECT_THROW(prof.get_thread0_walltime(prof_pie), std::out_of_range);
 
   // Start timing
-  prof.start("Pie");
+  auto const& expected_hash = prof.start("Pie");
+  EXPECT_EQ(expected_hash,prof_pie); // Make sure prof_pie has the hash we expect
 
   sleep(1);
 
-  // Time t2 declared inbetween .start() and first .stop()
-  const double& t1 = prof.get_thread0_walltime(prof_pie);
+  // Time t1 declared inbetween .start() and first .stop()
+  double const t1 = prof.get_thread0_walltime(prof_pie);
 
-  // Stop timing
+  //Stop timing
   prof.stop(prof_pie);
 
-  // Time t3 declared after first profiler.stop()
-  const double& t2 = prof.get_thread0_walltime(prof_pie);
+  // Time t2 declared after first profiler.stop()
+  double const t2 = prof.get_thread0_walltime(prof_pie);
 
   // Start and stop same region again
   prof.start("Pie");
   sleep(1);
   prof.stop(prof_pie);
 
-  // Time t4 declared after second profiler.stop()
-  const double& t3 = prof.get_thread0_walltime(prof_pie);
+  // Time t3 declared after second profiler.stop()
+  double const t3 = prof.get_thread0_walltime(prof_pie);
 
   // Expected behaviour: t1 return the MDI and t3 > t2 > 0
   constexpr double MDI = 0.0;     // Missing Data Indicator (MDI)
@@ -127,7 +124,7 @@ TEST(HashTableTest,TracebackTest) {
     SCOPED_TRACE("traceback.at() not throwing exception before profiler.start()");
 
     // .at() throws exception when trying to access entry which isn't there
-    EXPECT_ANY_THROW( traceback_vec.at(0) );
+    EXPECT_THROW( traceback_vec.at(0), std::out_of_range );
   }
 
   // Start profiler

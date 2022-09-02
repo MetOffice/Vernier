@@ -45,17 +45,12 @@ TEST(HashEntryTest, TimingsTest) {
     EXPECT_EQ(self,total-child);
   }
 
-  // Work out chrono durations in seconds and milliseconds
-  //typedef std::chrono::milliseconds ms;
-  //typedef std::chrono::seconds s;
+  // Work out chrono durations in seconds
+  std::chrono::duration<double> main_region_duration = chrono_main_end - chrono_main_start;
+  double main_in_s = main_region_duration.count();
 
-  std::chrono::duration<double, std::milli> main_region_duration = chrono_main_end - chrono_main_start;
-  double main_in_ms      = main_region_duration.count();
-  double main_in_seconds = main_in_ms/1000.0;
-
-  std::chrono::duration<double, std::milli> sub_region_duration = chrono_sub_end - chrono_sub_start;
-  double sub_in_ms      = sub_region_duration.count();
-  double sub_in_seconds = sub_in_ms/1000.0;
+  std::chrono::duration<double> sub_region_duration = chrono_sub_end - chrono_sub_start;
+  double sub_in_s  = sub_region_duration.count();
 
   {
     SCOPED_TRACE("Chrono and profiler times not within tolerance");
@@ -64,10 +59,7 @@ TEST(HashEntryTest, TimingsTest) {
     const double time_tolerance = 0.0001;
 
     // Expect profiler & chrono times to be within tolerance
-    EXPECT_NEAR( prof.get_thread0_walltime(prof_main), main_in_seconds, time_tolerance );
-    EXPECT_NEAR( prof.get_thread0_walltime(prof_sub) , sub_in_seconds , time_tolerance );
-
-    EXPECT_NEAR( prof.get_thread0_walltime(prof_main), main_in_ms/1000.0, time_tolerance);
-    EXPECT_NEAR( prof.get_thread0_walltime(prof_sub),  sub_in_ms/1000.0 , time_tolerance);
+    EXPECT_NEAR( prof.get_thread0_walltime(prof_main), main_in_s, time_tolerance );
+    EXPECT_NEAR( prof.get_thread0_walltime(prof_sub) , sub_in_s , time_tolerance );
   }
 }

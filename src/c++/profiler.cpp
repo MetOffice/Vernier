@@ -136,7 +136,7 @@ void Profiler::write()
  *
  */
 
-double Profiler::get_thread0_walltime(size_t const hash)
+double Profiler::get_thread0_walltime(size_t const hash) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
   return thread_hashtables_[tid].get_total_walltime(hash);
@@ -158,7 +158,7 @@ double Profiler::get_self_walltime(size_t const hash, int const input_tid)
  *
  */
 
-double Profiler::get_child_walltime(size_t const hash, int const input_tid)
+double Profiler::get_child_walltime(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_child_walltime(hash);
@@ -169,7 +169,7 @@ double Profiler::get_child_walltime(size_t const hash, int const input_tid)
  *
  */
 
-std::string Profiler::get_region_name(size_t const hash, int const input_tid)
+std::string Profiler::get_region_name(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_region_name(hash);
@@ -187,7 +187,7 @@ std::string Profiler::get_region_name(size_t const hash, int const input_tid)
  *
  */
 
-unsigned long long int Profiler::get_region_call_count(size_t const hash, int const input_tid)
+unsigned long long int Profiler::get_region_call_count(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_region_call_count(hash);
@@ -198,7 +198,7 @@ unsigned long long int Profiler::get_region_call_count(size_t const hash, int co
  *
  */
 
-const std::unordered_map<size_t,HashEntry>& Profiler::get_hashtable(int const input_tid)
+std::unordered_map<size_t,HashEntry> const& Profiler::get_hashtable(int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_.at(tid).get_hashtable();
@@ -209,7 +209,7 @@ const std::unordered_map<size_t,HashEntry>& Profiler::get_hashtable(int const in
  *
  */
 
-const std::vector<std::pair<size_t,double>>& Profiler::get_inner_traceback_vector(int const input_tid)
+std::vector<std::pair<size_t,double>> const& Profiler::get_inner_traceback_vector(int const input_tid) const
 {
   auto tid = static_cast<pair_iterator_t_>(input_tid);
   return thread_traceback_.at(tid);
@@ -221,7 +221,7 @@ const std::vector<std::pair<size_t,double>>& Profiler::get_inner_traceback_vecto
  *
  */
 
-const std::vector<std::pair<size_t, HashEntry>>& Profiler::get_hashvec(int const input_tid)
+std::vector<std::pair<size_t, HashEntry>> const& Profiler::get_hashvec(int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_.at(tid).get_hashvec();
@@ -232,9 +232,7 @@ const std::vector<std::pair<size_t, HashEntry>>& Profiler::get_hashvec(int const
  *
  */
 
-const int& Profiler::get_max_threads()
+int const& Profiler::get_max_threads() const
 {
   return max_threads_;
 }
-
-

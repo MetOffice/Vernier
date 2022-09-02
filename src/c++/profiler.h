@@ -57,17 +57,17 @@ class Profiler
     void   write();
 
     // HashEntry getters
-    double      get_thread0_walltime(size_t const);
-    double      get_self_walltime(size_t const, int const);
-    double      get_child_walltime(size_t const, int const);
-    std::string get_region_name(size_t const, int const);
-    unsigned long long int get_region_call_count(size_t const, int const);
+    double       get_thread0_walltime(size_t const hash) const;
+    double       get_self_walltime(size_t const hash, int const input_tid);
+    double       get_child_walltime(size_t const hash, int const input_tid) const;
+    std::string  get_region_name(size_t const hash, int const input_tid) const;
+    unsigned long long int get_region_call_count(size_t const hash, int const input_tid) const;
 
     // Getters that return a constant, referenced instance of a private data member
-    const std::unordered_map<size_t,HashEntry>&      get_hashtable(int const);
-    const std::vector<std::pair<size_t,double>>&     get_inner_traceback_vector(int const);
-    const std::vector<std::pair<size_t, HashEntry>>& get_hashvec(int const);
-    const int& get_max_threads();
+    std::unordered_map<size_t,HashEntry> const&      get_hashtable(int const input_tid) const;
+    std::vector<std::pair<size_t,double>> const&     get_inner_traceback_vector(int const input_tid) const;
+    std::vector<std::pair<size_t, HashEntry>> const& get_hashvec(int const input_tid) const;
+    int const& get_max_threads() const;
 
 };
 

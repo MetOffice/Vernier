@@ -164,7 +164,7 @@ std::vector<size_t> HashTable::list_keys()
  *
  */
 
-double HashTable::get_total_walltime(size_t const hash)
+double const& HashTable::get_total_walltime(size_t const hash) const
 {
   return table_.at(hash).total_walltime_;
 }
@@ -174,7 +174,7 @@ double HashTable::get_total_walltime(size_t const hash)
  *
  */
 
-double HashTable::get_self_walltime(size_t const hash)
+double const& HashTable::get_self_walltime(size_t const hash)
 {
   this->compute_self_times();
   return table_.at(hash).self_walltime_;
@@ -185,7 +185,7 @@ double HashTable::get_self_walltime(size_t const hash)
  *
  */
 
-double HashTable::get_child_walltime(size_t const hash)
+double const& HashTable::get_child_walltime(size_t const hash) const
 {
   return table_.at(hash).child_walltime_;
 }
@@ -195,7 +195,7 @@ double HashTable::get_child_walltime(size_t const hash)
  *
  */
 
-std::string HashTable::get_region_name(size_t const hash)
+std::string const& HashTable::get_region_name(size_t const hash) const
 {
   return table_.at(hash).region_name_;
 }
@@ -210,7 +210,7 @@ std::string HashTable::get_region_name(size_t const hash)
   *
   */
 
-unsigned long long int HashTable::get_region_call_count(size_t const hash)
+unsigned long long int const& HashTable::get_region_call_count(size_t const hash) const
 {
     return table_.at(hash).call_count_;
 }
@@ -220,8 +220,8 @@ unsigned long long int HashTable::get_region_call_count(size_t const hash)
  *         the hashtable from high to low self walltime.
  *
  */
- 
-std::vector<std::pair<size_t, HashEntry>>& HashTable::get_hashvec()
+
+std::vector<std::pair<size_t, HashEntry>> const& HashTable::get_hashvec() const
 {
   return hashvec;
 }
@@ -232,8 +232,7 @@ std::vector<std::pair<size_t, HashEntry>>& HashTable::get_hashvec()
  *
  */
 
-std::unordered_map<size_t,HashEntry>& HashTable::get_hashtable()
+std::unordered_map<size_t,HashEntry> const& HashTable::get_hashtable() const
 {
   return table_;
 }
-
