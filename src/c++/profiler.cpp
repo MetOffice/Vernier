@@ -96,7 +96,7 @@ void Profiler::stop(size_t const hash)
 
   // Increment the time for this
   auto start_time = thread_traceback_[tid].back().second;
-  time_duration_t deltatime = stop_time - start_time;
+  auto deltatime  = stop_time - start_time;
   thread_hashtables_[tid].update(hash, deltatime);
 
   // Remove from the end of the list.
