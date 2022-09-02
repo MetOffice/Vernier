@@ -32,7 +32,7 @@
 
 // Type definitions for chrono steady clock time points and durations
 typedef std::chrono::time_point<std::chrono::steady_clock> time_point_t;
-typedef std::chrono::duration<double, std::ratio<1>>    time_duration_t;
+typedef std::chrono::duration<double>                   time_duration_t;
 
 /**
  * @brief  Structure to hold information for a particular routine.

@@ -19,9 +19,9 @@
 
 HashEntry::HashEntry(std::string_view region_name)
       : region_name_(region_name)
-      , total_walltime_(0)
-      , self_walltime_(0)
-      , child_walltime_(0)
+      , total_walltime_(std::chrono::duration<double>::zero())
+      , self_walltime_(std::chrono::duration<double>::zero())
+      , child_walltime_(std::chrono::duration<double>::zero())
       , call_count_(0)
       {}
 
