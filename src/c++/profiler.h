@@ -67,7 +67,7 @@ class Profiler
     std::unordered_map<size_t,HashEntry> const&      get_hashtable(int const input_tid) const;
     std::vector<std::pair<size_t,double>> const&     get_inner_traceback_vector(int const input_tid) const;
     std::vector<std::pair<size_t, HashEntry>> const& get_hashvec(int const input_tid) const;
-    int const& get_max_threads() const;
+    int get_max_threads() const;
 
 };
 

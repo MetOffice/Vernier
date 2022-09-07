@@ -232,7 +232,7 @@ std::vector<std::pair<size_t, HashEntry>> const& Profiler::get_hashvec(int const
  *
  */
 
-int const& Profiler::get_max_threads() const
+int Profiler::get_max_threads() const
 {
   return max_threads_;
 }
