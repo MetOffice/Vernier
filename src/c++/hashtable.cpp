@@ -164,7 +164,7 @@ std::vector<size_t> HashTable::list_keys()
  *
  */
 
-double const& HashTable::get_total_walltime(size_t const hash) const
+double HashTable::get_total_walltime(size_t const hash) const
 {
   return table_.at(hash).total_walltime_.count();
 }
@@ -174,7 +174,7 @@ double const& HashTable::get_total_walltime(size_t const hash) const
  *
  */
 
-double const& HashTable::get_self_walltime(size_t const hash)
+double HashTable::get_self_walltime(size_t const hash)
 {
   this->compute_self_times();
   return table_.at(hash).self_walltime_.count();
@@ -185,7 +185,7 @@ double const& HashTable::get_self_walltime(size_t const hash)
  *
  */
 
-double const& HashTable::get_child_walltime(size_t const hash) const
+double HashTable::get_child_walltime(size_t const hash) const
 {
   return table_.at(hash).child_walltime_.count();
 }

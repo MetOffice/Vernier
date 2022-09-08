@@ -210,7 +210,7 @@ std::unordered_map<size_t,HashEntry> const& Profiler::get_hashtable(int const in
  *
  */
 
-std::vector<std::pair<size_t,double>> const& Profiler::get_inner_traceback_vector(int const input_tid) const
+std::vector<std::pair<size_t,time_point_t>> const& Profiler::get_inner_traceback_vector(int const input_tid) const
 {
   auto tid = static_cast<pair_iterator_t_>(input_tid);
   return thread_traceback_.at(tid);

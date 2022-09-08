@@ -93,9 +93,9 @@ class HashTable{
     void compute_self_times();
 
     // Getters
-    double const&      get_total_walltime(size_t const hash) const;
-    double const&      get_self_walltime(size_t const hash);
-    double const&      get_child_walltime(size_t const hash) const;
+    double             get_total_walltime(size_t const hash) const;
+    double             get_self_walltime(size_t const hash);
+    double             get_child_walltime(size_t const hash) const;
     std::string const& get_region_name(size_t const hash) const;
     unsigned long long int const& get_region_call_count(size_t const hash) const;
 

@@ -136,10 +136,10 @@ TEST(HashTableTest,TracebackTest) {
     // Therefore...
     //  - It should have a size of 1 in this example
     //  - The first entry in the pair should be prof_main
-    //  - The second entry is some time, here a check done to make sure it is some double greater than zero
+    //  - The second entry is some time, here a check done to make sure it has the type "time_point_t"
     EXPECT_EQ( traceback_vec.size(), 1);
     EXPECT_EQ( traceback_vec.back().first, prof_main );
-    EXPECT_THAT( traceback_vec.back().second, AllOf(An<double>(),Gt(0.0)) );
+    EXPECT_THAT( traceback_vec.back().second, An<time_point_t>() );
   }
 
   // Stop profiler
