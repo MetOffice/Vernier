@@ -1,8 +1,15 @@
-#include <iostream>
-#include <chrono>
-#include <profiler.h>
+/* -----------------------------------------------------------------------------
+ *  (c) Crown copyright 2022 Met Office. All rights reserved.
+ *  The file LICENCE, distributed with this code, contains details of the terms
+ *  under which the code may be used.
+ * -----------------------------------------------------------------------------
+ */
+
 #include <gtest/gtest.h>
 
+#include "profiler.h"
+
+#include <chrono>
 
 //
 //  Tests focused on the "region name" of a particular section.

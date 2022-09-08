@@ -5,12 +5,12 @@
  * -----------------------------------------------------------------------------
  */
 
-#include <unistd.h>
 #include <gtest/gtest.h>
 
-#include "omp.h"
-
 #include "profiler.h"
+
+#include "omp.h"
+#include <unistd.h>
 
 TEST(SystemTests, TimingTest)
 {
@@ -64,4 +64,3 @@ TEST(SystemTests, TimingTest)
   std::cout << "\n" << "Profiler timing: " << prof_time  << "\n\n";
 
 }
-

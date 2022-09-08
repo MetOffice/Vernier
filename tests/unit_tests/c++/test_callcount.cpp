@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "omp.h"
-
 #include "profiler.h"
+
+#include "omp.h"
 
 TEST(HashEntryTest,CallCountTest)
 {
@@ -62,6 +62,6 @@ TEST(HashEntryTest,CallCountTest)
   // Check call_count_ is the number expected on all threads
   for (int j = 0; j < num_threads; ++j)
   {
-    EXPECT_EQ(prof.get_region_call_count(prof_sub_shared,j),num_threads-j);
+    EXPECT_EQ(prof.get_call_count(prof_sub_shared,j),num_threads-j);
   }
 }

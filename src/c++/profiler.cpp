@@ -188,52 +188,8 @@ std::string Profiler::get_region_name(size_t const hash, int const input_tid) co
  *
  */
 
-unsigned long long int Profiler::get_region_call_count(size_t const hash, int const input_tid) const
+unsigned long long int Profiler::get_call_count(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_region_call_count(hash);
-}
-
-/**
- * @brief  Gets the std::unordered_map "table_" hashtable.
- *
- */
-
-std::unordered_map<size_t,HashEntry> const& Profiler::get_hashtable(int const input_tid) const
-{
-  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
-  return thread_hashtables_.at(tid).get_hashtable();
-}
-
-/**
- * @brief  Gets the inner layer vector in thread_traceback_.
- *
- */
-
-std::vector<std::pair<size_t,time_point_t>> const& Profiler::get_inner_traceback_vector(int const input_tid) const
-{
-  auto tid = static_cast<pair_iterator_t_>(input_tid);
-  return thread_traceback_.at(tid);
-}
-
-/**
- * @brief  Gets the vector of (hash,HashEntry) pairs in Profiler.write() known as hashvec, the desired
- *         behaviour of which is to sort the entries from high to low self walltime.
- *
- */
-
-std::vector<std::pair<size_t, HashEntry>> const& Profiler::get_hashvec(int const input_tid) const
-{
-  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
-  return thread_hashtables_.at(tid).get_hashvec();
-}
-
-/**
- * @brief  Return the value of max_threads_
- *
- */
-
-int Profiler::get_max_threads() const
-{
-  return max_threads_;
 }
