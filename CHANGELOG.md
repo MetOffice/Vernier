@@ -22,4 +22,5 @@
 10/08/2022 PR #41 for #37 Add null terminated strings in Fortran interface. \
 16/08/2022 PR #48 Add hashtable.h to installed header files. \
 30/08/2022 PR #51 for #34: Including the number of times a region is called. \
-09/09/2022 PR #39 for #35: Initial profiler unit tests.
+09/09/2022 PR #39 for #35: Initial profiler unit tests. \
+08/09/2022 PR #55 for #33: Replace omp_get_wtime(). (Chrono)

@@ -44,9 +44,9 @@ TEST(ProfilerTest,WriteTest) {
     SCOPED_TRACE("Entries in hashvec incorrectly sorted");
 
     // hashvec is ordered from high to low so... [lastEntry] < [firstEntry]
-    const double& val1 = local_hashvec[0].second.self_walltime_;
-    const double& val2 = local_hashvec[1].second.self_walltime_;
-    const double& val3 = local_hashvec[2].second.self_walltime_;
+    const double& val1 = local_hashvec[0].second.self_walltime_.count();
+    const double& val2 = local_hashvec[1].second.self_walltime_.count();
+    const double& val3 = local_hashvec[2].second.self_walltime_.count();
 
     EXPECT_LT(val3, val2);
     EXPECT_LT(val2, val1);

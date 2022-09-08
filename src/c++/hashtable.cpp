@@ -19,9 +19,9 @@
 
 HashEntry::HashEntry(std::string_view region_name)
       : region_name_(region_name)
-      , total_walltime_(0.0)
-      , self_walltime_(0.0)
-      , child_walltime_(0.0)
+      , total_walltime_(time_duration_t::zero())
+      , self_walltime_(time_duration_t::zero())
+      , child_walltime_(time_duration_t::zero())
       , call_count_(0)
       {}
 
@@ -56,7 +56,7 @@ size_t HashTable::query_insert(std::string_view region_name) noexcept
  *
  */
 
-void HashTable::update(size_t hash, double time_delta)
+void HashTable::update(size_t hash, time_duration_t time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
@@ -75,7 +75,7 @@ void HashTable::update(size_t hash, double time_delta)
  *
  */
 
-void HashTable::add_child_time(size_t hash, double time_delta)
+void HashTable::add_child_time(size_t hash, time_duration_t time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
@@ -125,10 +125,10 @@ void HashTable::write()
   // Data entries
   for (auto& [hash, entry] : hashvec) {
     std::cout
-      << std::setw(40) << std::left  << entry.region_name_    << " "
-      << std::setw(15) << std::right << entry.self_walltime_  << " "
-      << std::setw(15) << std::right << entry.total_walltime_ << " "
-      << std::setw(10) << std::right << entry.call_count_     << "\n";
+      << std::setw(40) << std::left  << entry.region_name_            << " "
+      << std::setw(15) << std::right << entry.self_walltime_.count()  << " "
+      << std::setw(15) << std::right << entry.total_walltime_.count() << " "
+      << std::setw(10) << std::right << entry.call_count_             << "\n";
   }
 }
 
@@ -164,9 +164,9 @@ std::vector<size_t> HashTable::list_keys()
  *
  */
 
-double const& HashTable::get_total_walltime(size_t const hash) const
+double HashTable::get_total_walltime(size_t const hash) const
 {
-  return table_.at(hash).total_walltime_;
+  return table_.at(hash).total_walltime_.count();
 }
 
 /**
@@ -174,10 +174,10 @@ double const& HashTable::get_total_walltime(size_t const hash) const
  *
  */
 
-double const& HashTable::get_self_walltime(size_t const hash)
+double HashTable::get_self_walltime(size_t const hash)
 {
   this->compute_self_times();
-  return table_.at(hash).self_walltime_;
+  return table_.at(hash).self_walltime_.count();
 }
 
 /**
@@ -185,9 +185,9 @@ double const& HashTable::get_self_walltime(size_t const hash)
  *
  */
 
-double const& HashTable::get_child_walltime(size_t const hash) const
+double HashTable::get_child_walltime(size_t const hash) const
 {
-  return table_.at(hash).child_walltime_;
+  return table_.at(hash).child_walltime_.count();
 }
 
 /**

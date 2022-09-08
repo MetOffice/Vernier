@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <chrono>
 
 /**
  * @brief Constructor
@@ -29,7 +30,7 @@ Profiler::Profiler(){
     HashTable new_table(tid);
     thread_hashtables_.push_back(new_table);
 
-    std::vector<std::pair<size_t,double>> new_list;
+    std::vector<std::pair<size_t,time_point_t>> new_list;
     thread_traceback_.push_back(new_list);
   }
 
@@ -60,7 +61,7 @@ size_t Profiler::start(std::string_view region_name)
   size_t const hash = thread_hashtables_[tid].query_insert(region_name);
 
   // Add routine to the traceback.
-  double start_time = omp_get_wtime();
+  auto start_time = std::chrono::steady_clock::now();
   thread_traceback_[tid].push_back(std::make_pair(hash, start_time));
 
   return hash;
@@ -75,7 +76,7 @@ void Profiler::stop(size_t const hash)
 {
 
   // First job: log the stop time.
-  double stop_time  = omp_get_wtime();
+  auto stop_time = std::chrono::steady_clock::now();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -94,8 +95,8 @@ void Profiler::stop(size_t const hash)
   }
 
   // Increment the time for this
-  double start_time = thread_traceback_[tid].back().second;
-  double deltatime = stop_time - start_time;
+  auto start_time = thread_traceback_[tid].back().second;
+  auto deltatime  = stop_time - start_time;
   thread_hashtables_[tid].update(hash, deltatime);
 
   // Remove from the end of the list.
@@ -209,7 +210,7 @@ std::unordered_map<size_t,HashEntry> const& Profiler::get_hashtable(int const in
  *
  */
 
-std::vector<std::pair<size_t,double>> const& Profiler::get_inner_traceback_vector(int const input_tid) const
+std::vector<std::pair<size_t,time_point_t>> const& Profiler::get_inner_traceback_vector(int const input_tid) const
 {
   auto tid = static_cast<pair_iterator_t_>(input_tid);
   return thread_traceback_.at(tid);
