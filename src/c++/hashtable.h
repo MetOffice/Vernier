@@ -68,6 +68,7 @@ class HashTable{
     int tid_;
     std::unordered_map<size_t,HashEntry> table_;
     std::hash<std::string_view> hash_function_;
+    std::vector<std::pair<size_t, HashEntry>> hashvec;
 
   public:
 
@@ -84,8 +85,15 @@ class HashTable{
     std::vector<size_t> list_keys();
     void add_child_time(size_t, double);
     void compute_self_times();
-    double get_total_walltime(size_t const);
-    unsigned long long int get_region_call_count(size_t const);
 
+    // Getters
+    double const&      get_total_walltime(size_t const hash) const;
+    double const&      get_self_walltime(size_t const hash);
+    double const&      get_child_walltime(size_t const hash) const;
+    std::string const& get_region_name(size_t const hash) const;
+    unsigned long long int const& get_region_call_count(size_t const hash) const;
+
+    std::vector<std::pair<size_t, HashEntry>> const& get_hashvec() const;
+    std::unordered_map<size_t,HashEntry> const& get_hashtable() const;
 };
 #endif

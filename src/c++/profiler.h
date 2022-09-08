@@ -39,8 +39,8 @@ class Profiler
 
     // Data members
     int max_threads_;
-    std::vector<HashTable>                               thread_hashtables_;
-    std::vector<std::vector<std::pair<size_t,double>>>   thread_traceback_;
+    std::vector<HashTable>                             thread_hashtables_;
+    std::vector<std::vector<std::pair<size_t,double>>> thread_traceback_;
 
     // Type definitions for vector array indexing.
     typedef std::vector<HashTable>::size_type                        hashtable_iterator_t_;
@@ -55,8 +55,20 @@ class Profiler
     size_t start(std::string_view);
     void   stop (size_t const);
     void   write();
-    double get_thread0_walltime(size_t const);
-    unsigned long long int get_region_call_count(size_t const, int const);
+
+    // HashEntry getters
+    double       get_thread0_walltime(size_t const hash) const;
+    double       get_self_walltime(size_t const hash, int const input_tid);
+    double       get_child_walltime(size_t const hash, int const input_tid) const;
+    std::string  get_region_name(size_t const hash, int const input_tid) const;
+    unsigned long long int get_region_call_count(size_t const hash, int const input_tid) const;
+
+    // Getters that return a constant, referenced instance of a private data member
+    std::unordered_map<size_t,HashEntry> const&      get_hashtable(int const input_tid) const;
+    std::vector<std::pair<size_t,double>> const&     get_inner_traceback_vector(int const input_tid) const;
+    std::vector<std::pair<size_t, HashEntry>> const& get_hashvec(int const input_tid) const;
+    int get_max_threads() const;
+
 };
 
 // Declare global profiler
