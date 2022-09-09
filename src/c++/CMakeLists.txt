@@ -13,7 +13,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-        OpenMP::OpenMP_CXX)
+        OpenMP::OpenMP_CXX
+        MPI::MPI_CXX)
 
 set_project_warnings(${CMAKE_PROJECT_NAME})
 

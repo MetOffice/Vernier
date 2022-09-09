@@ -120,17 +120,25 @@ void Profiler::stop(size_t const hash)
 
 void Profiler::write()
 {
+  // Find current MPI rank
+  int current_rank;
+  MPI_Comm comm = MPI_COMM_WORLD;
+  MPI_Comm_rank(comm, &current_rank);
+
   // Pickup environment variable filename if it exists, if not use the default
-  // name of "profiler-output.txt"
-  const char* filename = getenv("ProfOut");
-  if (filename != NULL)
+  // name of "profiler-output.txt". In either case, include the MPI rank in the
+  // name of the file.
+  const char* env_variable = std::getenv("PROFILER_OUTFILE");
+  if (env_variable != NULL)
   {
-    output_stream.open(filename);
+    const char* user_filename = (env_variable + ("-" + std::to_string(current_rank))).c_str();
+    output_stream.open(user_filename);
   }
   else
   {
-    output_stream.open("profiler-output.txt");
-    delete filename;
+    delete env_variable;
+    std::string default_filename = "profiler-output-" + std::to_string(current_rank);
+    output_stream.open(default_filename);
   }
 
   // Write to file
