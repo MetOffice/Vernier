@@ -23,4 +23,5 @@
 16/08/2022 PR #48 Add hashtable.h to installed header files. \
 30/08/2022 PR #51 for #34: Including the number of times a region is called. \
 09/09/2022 PR #39 for #35: Initial profiler unit tests. \
-08/09/2022 PR #55 for #33: Replace omp_get_wtime(). (Chrono)
+08/09/2022 PR #55 for #33: Replace omp_get_wtime(). (Chrono) \
+13/09/2022 PR #60 for #59: Allow manual triggering of workflows.
