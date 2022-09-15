@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 # File includes functionality to compile source into a shared library and set
 # up installation of the lib and header files upon build and install.
 # TODO - Issue #14 - Generalise build for multiple libs.
