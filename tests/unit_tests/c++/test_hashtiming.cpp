@@ -1,7 +1,14 @@
-#include <iostream>
-#include <chrono>
-#include <profiler.h>
+/* -----------------------------------------------------------------------------
+ *  (c) Crown copyright 2022 Met Office. All rights reserved.
+ *  The file LICENCE, distributed with this code, contains details of the terms
+ *  under which the code may be used.
+ * -----------------------------------------------------------------------------
+ */
+
 #include <gtest/gtest.h>
+#include <chrono>
+
+#include "profiler.h"
 
 //
 //  A "timings" test that has expectations about the profiler walltime.
@@ -56,7 +63,7 @@ TEST(HashEntryTest, TimingsTest) {
     SCOPED_TRACE("Chrono and profiler times not within tolerance");
 
     // Specify a time tolerance
-    const double time_tolerance = 0.0001;
+    const double time_tolerance = 0.0005;
 
     // Expect profiler & chrono times to be within tolerance
     EXPECT_NEAR( prof.get_thread0_walltime(prof_main), main_in_s, time_tolerance );

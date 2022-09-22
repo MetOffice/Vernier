@@ -1,43 +1,34 @@
-#include <profiler.h>
-#include <gtest/gtest.h>
+/* -----------------------------------------------------------------------------
+ *  (c) Crown copyright 2022 Met Office. All rights reserved.
+ *  The file LICENCE, distributed with this code, contains details of the terms
+ *  under which the code may be used.
+ * -----------------------------------------------------------------------------
+ */
+
 #include <gmock/gmock.h>
 #include <omp.h>
+
+#include "profiler.h"
 
 using ::testing::AllOf;
 using ::testing::An;
 using ::testing::Gt;
 
 //
-//  Testing some hashtable member variables and functions, such as query_insert()
-//  and the std::vector thread_traceback_. The desired behaviour of calling
-//  get_thread0_walltime before profiler.stop() is a bit fuzzy at the time of
-//  writing, but currently a test is done to make sure it returns the MDI of 0.0
+//  Testing that the hashing function works as expected (we don't want
+//  collisions), and that walltimes are being updated by profiler.stop().
+//  The desired behaviour of calling get_thread0_walltime before profiler.stop()
+//  is a bit fuzzy at the time of writing, but currently a test is done to make
+//  sure it returns the MDI of 0.0
 //
 
-TEST(HashTableTest,QueryInsertTest) {
-
-  // Hashtable instance to poke and prod without changing any private data
-  const auto& htable = prof.get_hashtable(0);
-
-  // Nothing has been done yet, hashtable should be empty
-  EXPECT_TRUE(htable.empty());
+TEST(HashTableTest,HashFunctionTest) {
 
   // Create new hashes via HashTable::query_insert, which is used in Profiler::start
   const auto& prof_rigatoni = prof.start("Rigatoni");
   const auto& prof_penne    = prof.start("Penne");
   prof.stop(prof_penne);
   prof.stop(prof_rigatoni);
-
-  {
-    SCOPED_TRACE("HashTable still empty after start is called");
-
-    // Table no longer empty
-    EXPECT_FALSE(htable.empty());
-
-    // .count() returns 1 if map already has an entry associated with input hash
-    EXPECT_EQ(htable.count(prof_rigatoni), 1);
-    EXPECT_EQ(htable.count(prof_penne),    1);
-  }
 
   {
     SCOPED_TRACE("Hashing related fault");
@@ -52,24 +43,13 @@ TEST(HashTableTest,QueryInsertTest) {
 
 }
 
-TEST(HashTableTest,ThreadsEqualsEntries) {
-
-  // Trying to access an entry one higher than the value of max_threads_ should
-  // throw an exception as it won't exist assuming
-  // max_threads_ == thread_hashtables_.size(). This is just a different way of
-  // testing the assertion that already exists in the code.
-
-  EXPECT_THROW(prof.get_hashtable(prof.get_max_threads()+1), std::out_of_range);
-
-}
-
 /**
  * @TODO  Decide how to handle the MDI stuff and update the following test
  *        accordingly. See Issue #53.
  *
  */
 
-TEST(HashTableTest,UpdateAndMdiTest) {
+TEST(HashTableTest,UpdateTimesTest) {
 
   // Create new hash
   size_t prof_pie = std::hash<std::string_view>{}("Pie");
@@ -112,50 +92,5 @@ TEST(HashTableTest,UpdateAndMdiTest) {
     SCOPED_TRACE("Update potentially not incrementing times correctly");
     EXPECT_GT(t2, 0.0);
     EXPECT_GT(t3, t2 );
-  }
-}
-
-TEST(HashTableTest,TracebackTest) {
-
-  const auto& traceback_vec = prof.get_inner_traceback_vector(0);
-
-  {
-    SCOPED_TRACE("traceback.at() not throwing exception before profiler.start()");
-
-    // .at() throws exception when trying to access entry which isn't there
-    EXPECT_THROW( traceback_vec.at(0), std::out_of_range );
-  }
-
-  // Start profiler
-  const auto& prof_main = prof.start("Main");
-
-  {
-    SCOPED_TRACE("Traceback vector setup incorrectly");
-
-    // The traceback vector for this thread is a vector of pairs of (hash,StartTime)
-    // Therefore...
-    //  - It should have a size of 1 in this example
-    //  - The first entry in the pair should be prof_main
-    //  - The second entry is some time, here a check done to make sure it has the type "time_point_t"
-    EXPECT_EQ( traceback_vec.size(), 1);
-    EXPECT_EQ( traceback_vec.back().first, prof_main );
-    EXPECT_THAT( traceback_vec.back().second, An<time_point_t>() );
-  }
-
-  // Stop profiler
-  prof.stop(prof_main);
-
-  {
-    SCOPED_TRACE("Traceback vector not empty, pop_back() failed or still an unexpected entry left?");
-
-    // Shouldn't be any elements left
-    EXPECT_TRUE( traceback_vec.empty() );
-  }
-
-  {
-    SCOPED_TRACE("traceback.at() not throwing exception after element is deleted by pop_back()");
-
-    // .at() should throw exception again, only existing element was deleted by .pop_back() inside profiler.stop()
-    EXPECT_ANY_THROW( traceback_vec.at(0) );
   }
 }
