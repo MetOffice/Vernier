@@ -1,7 +1,6 @@
 name: Build and Test
 
 on:
-  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
@@ -58,12 +57,12 @@ jobs:
       env:
         OMP_NUM_THREADS: 1
       working-directory: ${{github.workspace}}/build
-      run: ctest -VV -C ${{env.BUILD_TYPE}}
+      run: ctest -C ${{env.BUILD_TYPE}}
 
     # Run tests on 4 threads
     - name: "Test (4 threads)"
       env:
         OMP_NUM_THREADS: 4
       working-directory: ${{github.workspace}}/build
-      run: ctest -VV -C ${{env.BUILD_TYPE}}
+      run: ctest -C ${{env.BUILD_TYPE}}
 

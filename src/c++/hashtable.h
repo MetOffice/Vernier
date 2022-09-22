@@ -28,12 +28,6 @@
 #include <vector>
 #include <string>
 #include <string_view>
-#include <chrono>
-
-// Type definitions for chrono steady clock time points and durations
-using time_duration_t = std::chrono::duration<double>;
-using time_point_t    = std::chrono::time_point<std::chrono::steady_clock, time_duration_t>;
-
 
 /**
  * @brief  Structure to hold information for a particular routine.
@@ -50,11 +44,10 @@ struct HashEntry{
     explicit HashEntry(std::string_view);
 
     // Data members
-    std::string            region_name_;
-    time_duration_t        total_walltime_;
-    time_duration_t        self_walltime_;
-    time_duration_t        child_walltime_;
-    unsigned long long int call_count_;
+    std::string region_name_;
+    double      total_walltime_;
+    double      self_walltime_;
+    double      child_walltime_;
 
 };
 
@@ -67,14 +60,13 @@ struct HashEntry{
  */
 
 class HashTable{
-
+  
   private:
 
     // Members
     int tid_;
     std::unordered_map<size_t,HashEntry> table_;
     std::hash<std::string_view> hash_function_;
-    std::vector<std::pair<size_t, HashEntry>> hashvec;
 
   public:
 
@@ -84,22 +76,14 @@ class HashTable{
 
     // Prototypes
     size_t query_insert(std::string_view) noexcept;
-    void update(size_t, time_duration_t);
+    void update(size_t, double);
     void write();
 
     // Member functions
     std::vector<size_t> list_keys();
-    void add_child_time(size_t, time_duration_t);
+    void add_child_time(size_t, double);
     void compute_self_times();
+    double get_total_walltime(size_t const);
 
-    // Getters
-    double             get_total_walltime(size_t const hash) const;
-    double             get_self_walltime(size_t const hash);
-    double             get_child_walltime(size_t const hash) const;
-    std::string const& get_region_name(size_t const hash) const;
-    unsigned long long int const& get_region_call_count(size_t const hash) const;
-
-    std::vector<std::pair<size_t, HashEntry>> const& get_hashvec() const;
-    std::unordered_map<size_t,HashEntry> const& get_hashtable() const;
 };
 #endif

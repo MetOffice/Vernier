@@ -11,7 +11,7 @@
  *
  * Contains the top-level class, whose methods are called from client code. Also
  * declares a top-level, global, profiler object.
- *
+ * 
  */
 
 #ifndef PROFILER_H
@@ -40,16 +40,16 @@
 
 class Profiler
 {
-  private:
+  private: 
 
     // Data members
     int max_threads_;
-    std::vector<HashTable> thread_hashtables_;
-    std::vector<std::vector<std::pair<size_t,time_point_t>>> thread_traceback_;
+    std::vector<HashTable>                               thread_hashtables_;
+    std::vector<std::vector<std::pair<size_t,double>>>   thread_traceback_;
 
     // Type definitions for vector array indexing.
-    typedef std::vector<HashTable>::size_type hashtable_iterator_t_;
-    typedef std::vector<std::vector<std::pair<size_t,time_point_t>>>::size_type pair_iterator_t_;
+    typedef std::vector<HashTable>::size_type                        hashtable_iterator_t_;
+    typedef std::vector<std::vector<std::pair<size_t,double>>>::size_type pair_iterator_t_;
 
   public:
 
@@ -85,6 +85,7 @@ class Profiler
  *
  */
     void   write();
+
 
 /**
  * @ingroup API
