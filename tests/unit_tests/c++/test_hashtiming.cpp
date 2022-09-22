@@ -63,7 +63,7 @@ TEST(HashEntryTest, TimingsTest) {
     SCOPED_TRACE("Chrono and profiler times not within tolerance");
 
     // Specify a time tolerance
-    const double time_tolerance = 0.0002;
+    const double time_tolerance = 0.0005;
 
     // Expect profiler & chrono times to be within tolerance
     EXPECT_NEAR( prof.get_thread0_walltime(prof_main), main_in_s, time_tolerance );
