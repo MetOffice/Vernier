@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <chrono>
 
 /**
  * @brief Constructor
@@ -29,11 +30,11 @@ Profiler::Profiler(){
     HashTable new_table(tid);
     thread_hashtables_.push_back(new_table);
 
-    std::vector<std::pair<size_t,double>> new_list;
+    std::vector<std::pair<size_t,time_point_t>> new_list;
     thread_traceback_.push_back(new_list);
   }
 
-  // Assertions 
+  // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
   assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
 
@@ -55,7 +56,7 @@ size_t Profiler::start(std::string_view region_name)
   size_t const hash = thread_hashtables_[tid].query_insert(region_name);
 
   // Add routine to the traceback.
-  double start_time = omp_get_wtime();
+  auto start_time = std::chrono::steady_clock::now();
   thread_traceback_[tid].push_back(std::make_pair(hash, start_time));
 
   return hash;
@@ -65,7 +66,7 @@ void Profiler::stop(size_t const hash)
 {
 
   // First job: log the stop time.
-  double stop_time  = omp_get_wtime();
+  auto stop_time = std::chrono::steady_clock::now();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -79,13 +80,13 @@ void Profiler::stop(size_t const hash)
   // Check that the hash is the one we expect. If it isn't, there is an error in
   // the instrumentation.
   if (hash != last_hash_on_list){
-    std::cout << "EMERGENCY STOP: hashes don't match." << "\n";
+    std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
     exit (100);
   }
 
   // Increment the time for this
-  double start_time = thread_traceback_[tid].back().second;
-  double deltatime = stop_time - start_time;
+  auto start_time = thread_traceback_[tid].back().second;
+  auto deltatime  = stop_time - start_time;
   thread_hashtables_[tid].update(hash, deltatime);
 
   // Remove from the end of the list.
@@ -121,3 +122,97 @@ double Profiler::get_thread0_walltime(size_t const hash)
   return thread_hashtables_[tid].get_total_walltime(hash);
 }
 
+/**
+ * @brief  Get the self walltime for the specified hash.
+ *
+ */
+
+double Profiler::get_self_walltime(size_t const hash, int const input_tid)
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_self_walltime(hash);
+}
+
+/**
+ * @brief  Get the child walltime for the specified hash.
+ *
+ */
+
+double Profiler::get_child_walltime(size_t const hash, int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_child_walltime(hash);
+}
+
+/**
+ * @brief  Get the region name corresponding to the input hash.
+ *
+ */
+
+std::string Profiler::get_region_name(size_t const hash, int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_region_name(hash);
+}
+
+/**
+ * @brief  Get the number of times the input hash region has been called on the
+ *         input thread ID.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest.
+ * @param[in] tid   The ID corresponding to the thread of interest.
+ *
+ * @returns  Returns an integer corresponding to the number of times the
+ *           region of interest has been called on the specified thread.
+ *
+ */
+
+unsigned long long int Profiler::get_region_call_count(size_t const hash, int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_region_call_count(hash);
+}
+
+/**
+ * @brief  Gets the std::unordered_map "table_" hashtable.
+ *
+ */
+
+std::unordered_map<size_t,HashEntry> const& Profiler::get_hashtable(int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_.at(tid).get_hashtable();
+}
+
+/**
+ * @brief  Gets the inner layer vector in thread_traceback_.
+ *
+ */
+
+std::vector<std::pair<size_t,time_point_t>> const& Profiler::get_inner_traceback_vector(int const input_tid) const
+{
+  auto tid = static_cast<pair_iterator_t_>(input_tid);
+  return thread_traceback_.at(tid);
+}
+
+/**
+ * @brief  Gets the vector of (hash,HashEntry) pairs in Profiler.write() known as hashvec, the desired
+ *         behaviour of which is to sort the entries from high to low self walltime.
+ *
+ */
+
+std::vector<std::pair<size_t, HashEntry>> const& Profiler::get_hashvec(int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_.at(tid).get_hashvec();
+}
+
+/**
+ * @brief  Return the value of max_threads_
+ *
+ */
+
+int Profiler::get_max_threads() const
+{
+  return max_threads_;
+}
