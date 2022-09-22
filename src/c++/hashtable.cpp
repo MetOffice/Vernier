@@ -210,7 +210,7 @@ std::string HashTable::get_region_name(size_t const hash) const
   *
   */
 
-unsigned long long int HashTable::get_region_call_count(size_t const hash) const
+unsigned long long int HashTable::get_call_count(size_t const hash) const
 {
     return table_.at(hash).call_count_;
 }

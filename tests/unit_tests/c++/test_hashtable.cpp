@@ -6,10 +6,9 @@
  */
 
 #include <gmock/gmock.h>
+#include <omp.h>
 
 #include "profiler.h"
-
-#include "omp.h"
 
 using ::testing::AllOf;
 using ::testing::An;

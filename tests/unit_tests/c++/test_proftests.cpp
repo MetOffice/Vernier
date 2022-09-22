@@ -6,10 +6,9 @@
  */
 
 #include <gmock/gmock.h>
+#include <chrono>
 
 #include "profiler.h"
-
-#include <chrono>
 
 using ::testing::ExitedWithCode;
 using ::testing::KilledBySignal;

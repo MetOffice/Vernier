@@ -6,10 +6,9 @@
  */
 
 #include <gtest/gtest.h>
+#include <omp.h>
 
 #include "profiler.h"
-
-#include "omp.h"
 
 TEST(HashEntryTest,CallCountTest)
 {

@@ -191,5 +191,5 @@ std::string Profiler::get_region_name(size_t const hash, int const input_tid) co
 unsigned long long int Profiler::get_call_count(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
-  return thread_hashtables_[tid].get_region_call_count(hash);
+  return thread_hashtables_[tid].get_call_count(hash);
 }
