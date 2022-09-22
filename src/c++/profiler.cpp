@@ -108,6 +108,13 @@ void Profiler::write()
   }
 }
 
+/**
+* @note   This function is normally expected to be used to return the total
+*         wallclock time for whole run. Since this value is required only from
+*         thread 0, the function does not take a thread ID argument and returns
+*         the value for thread 0 only. Taking the hash argument avoids the need
+*         to store the top-level hash inside the profiler itself.
+*/
 double Profiler::get_thread0_walltime(size_t const hash)
 {
   auto tid = static_cast<hashtable_iterator_t_>(0);
