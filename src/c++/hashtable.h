@@ -34,30 +34,6 @@
 using time_duration_t = std::chrono::duration<double>;
 using time_point_t    = std::chrono::time_point<std::chrono::steady_clock, time_duration_t>;
 
-
-/**
- * @brief  Structure to hold information for a particular routine.
- *
- * Bundles together any information pertinent to a specific profiled region.
- *
- */
-
-struct HashEntry{
-  public:
-
-    // Constructor
-    HashEntry() = delete;
-    explicit HashEntry(std::string_view);
-
-    // Data members
-    std::string            region_name_;
-    time_duration_t        total_walltime_;
-    time_duration_t        self_walltime_;
-    time_duration_t        child_walltime_;
-    unsigned long long int call_count_;
-
-};
-
 /**
  * @brief  Wraps STL hashtables with additional functionality.
  *
@@ -70,11 +46,32 @@ class HashTable{
 
   private:
 
+    /**
+     * @brief  Structure to hold information for a particular routine.
+     *
+     * Bundles together any information pertinent to a specific profiled region.
+     *
+     */
+    struct HashEntry{
+      public:
+
+        // Constructor
+        HashEntry() = delete;
+        explicit HashEntry(std::string_view);
+
+        // Data members
+        std::string            region_name_;
+        time_duration_t        total_walltime_;
+        time_duration_t        self_walltime_;
+        time_duration_t        child_walltime_;
+        unsigned long long int call_count_;
+
+    };
+
     // Members
     int tid_;
     std::unordered_map<size_t,HashEntry> table_;
     std::hash<std::string_view> hash_function_;
-    std::vector<std::pair<size_t, HashEntry>> hashvec;
 
   public:
 
