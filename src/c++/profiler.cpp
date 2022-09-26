@@ -10,14 +10,15 @@
 
 #include <iostream>
 #include <cassert>
+#include <chrono>
 
 /**
  * @brief Constructor for StartCalliperValues struct.
  *
  */
 
-StartCalliperValues::StartCalliperValues(double region_start_time, 
-                                         double calliper_start_time)
+StartCalliperValues::StartCalliperValues(time_point_t region_start_time, 
+                                         time_point_t calliper_start_time)
   : region_start_time_(region_start_time)
   , calliper_start_time_(calliper_start_time)
   {}
@@ -27,7 +28,8 @@ StartCalliperValues::StartCalliperValues(double region_start_time,
  *
  */
 
-Profiler::Profiler(){
+Profiler::Profiler()
+{
 
   // Set the maximum number of threads.
   max_threads_ = 1;
@@ -41,20 +43,18 @@ Profiler::Profiler(){
   // is OK to carry forward the value returned for the last thread.
   for (int tid=0; tid<max_threads_; ++tid)
   {
+
+    // Create a new table
     HashTable new_table(tid);
-    profiler_hash_ = new_table.insert_special("__profiler__");
-
-    // Ensure there is at least one entry in the traceback.
-    //StartCalliperValues new_times(0.0, 0.0);
-    std::vector<std::pair<size_t,StartCalliperValues>> new_list;
-    //new_list.push_back(std::make_pair(profiler_hash_, new_times));
-
-    // Add to main hashtable and main traceback
     thread_hashtables_.push_back(new_table);
+
+    // Create a new list
+    std::vector<std::pair<size_t,StartCalliperValues>> new_list;
     thread_traceback_.push_back(new_list);
+
   }
 
-  // Assertions 
+  // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
   assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
 
@@ -71,7 +71,7 @@ size_t Profiler::start(std::string_view region_name)
 {
 
   // Note the time on entry to the profiler call.
-  double calliper_start_time = prof_gettime();
+  time_point_t calliper_start_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -86,7 +86,7 @@ size_t Profiler::start(std::string_view region_name)
   size_t const hash = thread_hashtables_[tid].query_insert(region_name);
 
   // Store the calliper and region start times.
-  double region_start_time = prof_gettime();
+  auto region_start_time = prof_gettime();
   StartCalliperValues new_times = StartCalliperValues(region_start_time, calliper_start_time);
   thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
 
@@ -103,7 +103,7 @@ void Profiler::stop(size_t const hash)
 {
 
   // Log the region stop time.
-  double region_stop_time = prof_gettime();
+  auto region_stop_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -117,7 +117,7 @@ void Profiler::stop(size_t const hash)
   // Check that the hash is the one we expect. If it isn't, there is an error in
   // the instrumentation.
   if (hash != last_hash_on_list){
-    std::cout << "EMERGENCY STOP: hashes don't match." << "\n";
+    std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
     exit (100);
   }
 
@@ -126,19 +126,19 @@ void Profiler::stop(size_t const hash)
     thread_traceback_[tid].back().second;
 
   // Compute the region time
-  double deltatime = region_stop_time - start_calliper_times.region_start_time_;
+  auto deltatime = region_stop_time - start_calliper_times.region_start_time_;
 
   // Do the hashtable update for the child region.
   thread_hashtables_[tid].update(hash, deltatime);
 
-  // Precompute times as far as possible - just need the calliper stop time
+  // Precompute times as far as possible. We just need the calliper stop time
   // later.
-  double temp_sum = start_calliper_times.calliper_start_time_ + deltatime;
+  auto temp_sum = start_calliper_times.calliper_start_time_ + deltatime;
 
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
 
-  double* calliper_deltatime = nullptr;
+  time_duration_t* calliper_deltatime = nullptr;
 
   // Prepare to add timings to parent
   if (! thread_traceback_[tid].empty()) {
@@ -146,11 +146,11 @@ void Profiler::stop(size_t const hash)
    calliper_deltatime = thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
 
    // Cache the previous value on this side of the final time measurement.
-   double previous_calliper_deltatime =  *calliper_deltatime;
+   auto previous_calliper_deltatime =  *calliper_deltatime;
 
    // Account for time spent in the profiler itself. 
-   double calliper_stop_time = prof_gettime();
-   double interim_time = calliper_stop_time - temp_sum;
+   auto calliper_stop_time = prof_gettime();
+   auto interim_time = calliper_stop_time - temp_sum;
    *calliper_deltatime = previous_calliper_deltatime + interim_time;
   }
 
@@ -166,7 +166,7 @@ void Profiler::write()
   // Write each one
   for (auto& it : thread_hashtables_)
   {
-    it.prepare_computed_times(profiler_hash_);
+    it.prepare_computed_times();
     it.write();
   }
 }
@@ -189,14 +189,53 @@ double Profiler::get_total_walltime(size_t const hash, int const thread_id)
 }
 
 /**
- * @brief  Get the the spent in the profiler itself, on the specified thread.
+ * @brief  Get the self walltime for the specified hash.
  *
- * @param[in] thread_id  The thread ID for which to return the overhead.
  */
 
-double Profiler::get_overhead_time(int const thread_id)
+double Profiler::get_self_walltime(size_t const hash, int const input_tid)
 {
-  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
-  return thread_hashtables_[tid].get_total_walltime(profiler_hash_);
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_self_walltime(hash);
+}
+
+/**
+ * @brief  Get the child walltime for the specified hash.
+ *
+ */
+
+double Profiler::get_child_walltime(size_t const hash, int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_child_walltime(hash);
+}
+
+/**
+ * @brief  Get the region name corresponding to the input hash.
+ *
+ */
+
+std::string Profiler::get_region_name(size_t const hash, int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_region_name(hash);
+}
+
+/**
+ * @brief  Get the number of times the input hash region has been called on the
+ *         input thread ID.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest.
+ * @param[in] tid   The ID corresponding to the thread of interest.
+ *
+ * @returns  Returns an integer corresponding to the number of times the
+ *           region of interest has been called on the specified thread.
+ *
+ */
+
+unsigned long long int Profiler::get_call_count(size_t const hash, int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_call_count(hash);
 }
 

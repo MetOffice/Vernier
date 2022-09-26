@@ -11,7 +11,7 @@
  *
  * Contains the top-level class, whose methods are called from client code. Also
  * declares a top-level, global, profiler object.
- * 
+ *
  */
 
 #ifndef PROFILER_H
@@ -20,8 +20,7 @@
 #include <string_view>
 #include <iterator>
 #include <vector>
-
-#include "omp.h"
+#include <omp.h>
 
 #include "hashtable.h"
 
@@ -35,11 +34,11 @@ struct StartCalliperValues
   public:
 
     // Constructors
-    StartCalliperValues(double, double);
+    StartCalliperValues(time_point_t, time_point_t);
 
     // Data members
-    double region_start_time_;
-    double calliper_start_time_;
+    time_point_t region_start_time_;
+    time_point_t calliper_start_time_;
 };
 
 /**
@@ -51,11 +50,12 @@ struct StartCalliperValues
 
 class Profiler
 {
-  private: 
+  private:
 
     // Data members
     size_t profiler_hash_;
     int max_threads_;
+
     std::vector<HashTable>                                           thread_hashtables_;
     std::vector<std::vector<std::pair<size_t,StartCalliperValues>>>   thread_traceback_;
 
@@ -72,8 +72,14 @@ class Profiler
     size_t start(std::string_view);
     void   stop (size_t const);
     void   write();
-    double get_total_walltime (size_t const, int const);
-    double get_overhead_time(int const);
+
+    // Getters
+    double                 get_total_walltime (size_t const, int const);
+    double                 get_self_walltime(size_t const hash, int const input_tid);
+    double                 get_child_walltime(size_t const hash, int const input_tid) const;
+    std::string            get_region_name(size_t const hash, int const input_tid) const;
+    unsigned long long int get_call_count(size_t const hash, int const input_tid) const;
+
 };
 
 // Declare global profiler

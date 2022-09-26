@@ -1,16 +1,10 @@
 
-#include <time.h>
+#include <chrono>
 
-#define BILLION  1'000'000'000L
+#include "prof_gettime.h"
 
-double prof_gettime()
+time_point_t prof_gettime()
 {
-  struct timespec monotime;
-  clock_gettime(CLOCK_MONOTONIC, &monotime);
-
-  double time = static_cast<double>(monotime.tv_sec) 
-              + static_cast<double>(monotime.tv_nsec) / static_cast<double>(BILLION);
-
-  return time;
+  return std::chrono::steady_clock::now();
 }
 

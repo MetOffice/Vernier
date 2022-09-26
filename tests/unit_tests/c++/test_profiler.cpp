@@ -5,10 +5,9 @@
  * -----------------------------------------------------------------------------
  */
 
-#include <unistd.h>
 #include <gtest/gtest.h>
-
-#include "omp.h"
+#include <omp.h>
+#include <unistd.h>
 
 #include "profiler.h"
 
@@ -54,14 +53,13 @@ TEST(SystemTests, TimingTest)
   // Check that the total time measured by the profiler is within some tolerance
   // of the actual time measured by simple t2-t1.  This only tests the top-level
   // timing, not individual subroutine timings.
-  double const time_tolerance = 0.0001;
+  double const time_tolerance = 0.0005;
 
   double actual_time = t2 - t1;
   double prof_time  = prof.get_total_walltime(prof_main, 0);
-  EXPECT_NEAR(prof_time, actual_time, time_tolerance);
-
   std::cout << "\n" << "Actual timing: "   << actual_time << "\n";
   std::cout << "\n" << "Profiler timing: " << prof_time  << "\n\n";
+  EXPECT_NEAR(prof_time, actual_time, time_tolerance);
+
 
 }
-
