@@ -19,10 +19,11 @@
 
 HashEntry::HashEntry(std::string_view region_name)
       : region_name_(region_name)
-      , total_walltime_     (time_duration_t::zero())
-      , total_raw_walltime_ (time_duration_t::zero())
-      , self_walltime_      (time_duration_t::zero())
-      , child_walltime_     (time_duration_t::zero())
+      , total_walltime_      (time_duration_t::zero())
+      , total_raw_walltime_  (time_duration_t::zero())
+      , self_walltime_       (time_duration_t::zero())
+      , child_walltime_      (time_duration_t::zero())
+      , overhead_walltime_   (time_duration_t::zero())
       , call_count_(0)
       {}
 
@@ -90,7 +91,7 @@ void HashTable::update(size_t hash, time_duration_t time_delta)
  * @param [in] time_delta  The time spent in the child region.
  */
 
-time_duration_t* HashTable::add_child_time(size_t hash, time_duration_t time_delta)
+void HashTable::add_child_time(size_t hash, time_duration_t time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
@@ -99,7 +100,12 @@ time_duration_t* HashTable::add_child_time(size_t hash, time_duration_t time_del
   // Increment the walltime for this hash entry
   auto& entry = table_.at(hash);
   entry.child_walltime_ += time_delta;
-  return &entry.overhead_walltime_; 
+}
+
+void HashTable::add_overhead_time(size_t hash, time_duration_t calliper_time) 
+{
+  auto& entry = table_.at(hash);
+  entry.overhead_walltime_ += calliper_time;
 }
 
 /**
@@ -166,7 +172,7 @@ void HashTable::write()
      entry.self_walltime_ = entry.total_walltime_
                           - entry.child_walltime_
                           - entry.overhead_walltime_;
-     entry.total_raw_walltime_ = entry.total_walltime_;
+     entry.total_raw_walltime_ = entry.total_walltime_
                                - entry.overhead_walltime_;
      total_overhead_time += entry.overhead_walltime_;
    }
@@ -175,7 +181,8 @@ void HashTable::write()
    table_.at(profiler_hash_).self_walltime_      = total_overhead_time;
    table_.at(profiler_hash_).child_walltime_     = time_duration_t::zero();
    table_.at(profiler_hash_).total_walltime_     = total_overhead_time;
-   table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time;
+   //table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time;
+   table_.at(profiler_hash_).total_raw_walltime_ = static_cast<time_duration_t>(-997.0);
 
 }
 
@@ -202,6 +209,17 @@ std::vector<size_t> HashTable::list_keys()
 double HashTable::get_total_walltime(size_t const hash) const
 {
   return table_.at(hash).total_walltime_.count();
+}
+
+double HashTable::get_total_raw_walltime(size_t const hash) 
+{
+   prepare_computed_times();
+   return table_.at(hash).total_raw_walltime_.count();
+}
+
+double HashTable::get_overhead_walltime(size_t const hash) const
+{
+  return table_.at(hash).overhead_walltime_.count();
 }
 
 /**

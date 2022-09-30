@@ -37,10 +37,7 @@ Profiler::Profiler()
   max_threads_ = omp_get_max_threads();
 #endif
 
-  // Create vector of hash tables: one hashtable for each thread. Ensure that
-  // each new table has an entry for the profiler itself. The value of
-  // profiler_hash_ is the same for all threads, and is updated serially, so it
-  // is OK to carry forward the value returned for the last thread.
+  // Create vector of hash tables: one hashtable for each thread.
   for (int tid=0; tid<max_threads_; ++tid)
   {
 
@@ -138,22 +135,16 @@ void Profiler::stop(size_t const hash)
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
 
-  time_duration_t* calliper_deltatime = nullptr;
-
   // Prepare to add timings to parent
   if (! thread_traceback_[tid].empty()) {
    size_t parent_hash = thread_traceback_[tid].back().first;
-   calliper_deltatime = thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
-
-   // Cache the previous value on this side of the final time measurement.
-   auto previous_calliper_deltatime =  *calliper_deltatime;
+   thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
 
    // Account for time spent in the profiler itself. 
    auto calliper_stop_time = prof_gettime();
    auto interim_time = calliper_stop_time - temp_sum;
-   *calliper_deltatime = previous_calliper_deltatime + interim_time;
+   thread_hashtables_[tid].add_overhead_time(parent_hash, interim_time);
   }
-
 }
 
 /**
@@ -186,6 +177,18 @@ double Profiler::get_total_walltime(size_t const hash, int const thread_id)
 {
   auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_total_walltime(hash);
+}
+
+double Profiler::get_total_raw_walltime(size_t const hash, int const thread_id)
+{
+  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
+  return thread_hashtables_[tid].get_total_raw_walltime(hash);
+}
+
+double Profiler::get_overhead_walltime(size_t const hash, int const thread_id)
+{
+  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
+  return thread_hashtables_[tid].get_overhead_walltime(hash);
 }
 
 /**

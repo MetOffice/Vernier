@@ -90,11 +90,14 @@ class HashTable{
 
     // Member functions
     std::vector<size_t> list_keys();
-    time_duration_t* add_child_time(size_t, time_duration_t);
+    void add_child_time   (size_t, time_duration_t);
+    void add_overhead_time(size_t, time_duration_t);
     void prepare_computed_times();
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;
+    double                 get_total_raw_walltime(size_t const hash);
+    double                 get_overhead_walltime(size_t const hash) const;
     double                 get_self_walltime(size_t const hash);
     double                 get_child_walltime(size_t const hash) const;
     std::string            get_region_name(size_t const hash) const;
