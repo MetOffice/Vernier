@@ -194,7 +194,7 @@ double HashTable::get_child_walltime(size_t const hash) const
  *
  */
 
-std::string const& HashTable::get_region_name(size_t const hash) const
+std::string HashTable::get_region_name(size_t const hash) const
 {
   return table_.at(hash).region_name_;
 }
@@ -209,29 +209,7 @@ std::string const& HashTable::get_region_name(size_t const hash) const
   *
   */
 
-unsigned long long int const& HashTable::get_region_call_count(size_t const hash) const
+unsigned long long int HashTable::get_call_count(size_t const hash) const
 {
     return table_.at(hash).call_count_;
-}
-
-/**
- * @brief  Get the vector in profiler.write() which is used to sort entries in
- *         the hashtable from high to low self walltime.
- *
- */
-
-std::vector<std::pair<size_t, HashEntry>> const& HashTable::get_hashvec() const
-{
-  return hashvec;
-}
-
-/**
- * @brief  Get the actual std::unordered_map hashtable, "table_" wherein hashes
- *         and hash entries are stored.
- *
- */
-
-std::unordered_map<size_t,HashEntry> const& HashTable::get_hashtable() const
-{
-  return table_;
 }
