@@ -1,9 +1,8 @@
-/* -----------------------------------------------------------------------------
- *  (c) Crown copyright 2021 Met Office. All rights reserved.
- *  The file LICENCE, distributed with this code, contains details of the terms
- *  under which the code may be used.
- * -----------------------------------------------------------------------------
- */
+/*----------------------------------------------------------------------------*\
+ (c) Crown copyright 2022 Met Office. All rights reserved.
+ The file LICENCE, distributed with this code, contains details of the terms
+ under which the code may be used.
+\*----------------------------------------------------------------------------*/
 
 /**
  *  @file   hashtable.h
