@@ -8,7 +8,9 @@
 #include <chrono>
 #include <profiler.h>
 #include <gtest/gtest.h>
+#include <chrono>
 
+#include "profiler.h"
 
 //
 //  Tests focused on the "region name" of a particular section.
