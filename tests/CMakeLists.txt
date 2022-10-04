@@ -4,4 +4,3 @@
 #  under which the code may be used.
 # ------------------------------------------------------------------------------
 add_subdirectory(unit_tests)
-
