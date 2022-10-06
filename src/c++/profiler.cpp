@@ -157,7 +157,6 @@ void Profiler::write()
   // Write each one
   for (auto& it : thread_hashtables_)
   {
-    it.prepare_computed_times();
     it.write();
   }
 }

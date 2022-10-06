@@ -77,6 +77,10 @@ class HashTable{
     std::hash<std::string_view> hash_function_;
     std::vector<std::pair<size_t, HashEntry>> hashvec;
 
+    // Private member functions
+    void prepare_computed_times(size_t const);
+    void prepare_computed_times_all();
+
   public:
 
     // Constructors
@@ -92,7 +96,6 @@ class HashTable{
     std::vector<size_t> list_keys();
     void add_child_time   (size_t const, time_duration_t);
     void add_overhead_time(size_t const, time_duration_t);
-    void prepare_computed_times();
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;

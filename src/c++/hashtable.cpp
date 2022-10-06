@@ -116,6 +116,8 @@ void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_ti
 void HashTable::write()
 {
 
+  prepare_computed_times_all();
+
   std::string routine_at_thread = "Thread: " + std::to_string(tid_);
 
   // Write headings
@@ -155,27 +157,44 @@ void HashTable::write()
   }
 }
 
+void HashTable::prepare_computed_times(size_t hash)
+{
+  auto& entry = table_.at(hash);
+
+  // Self time
+  entry.self_walltime_ = entry.total_walltime_
+                       - entry.child_walltime_
+                       - entry.overhead_walltime_;
+
+  // Total walltime with overheads attributed to the parent removed.
+  entry.total_raw_walltime_ = entry.total_walltime_
+                            - entry.overhead_walltime_;
+}
+
 /**
  * @brief  Computes self times from total times and profiling overheads.
  *
  */
 
- void HashTable::prepare_computed_times()
+ void HashTable::prepare_computed_times_all()
  {
 
    auto total_overhead_time = time_duration_t::zero();
 
-   // Loop over entries in the hashtable. Although the hashtable does already
-   // contain an entry for the profiler itself, the constructor will have
-   // ensured that all numerical data members are zero.
+   // Loop over entries in the hashtable. This would include the special
+   // profiler entry, but the HashEntry constructor will have ensured that all
+   // corresponding values are zero thus far.
    for (auto& [hash, entry] : table_) {
-     entry.self_walltime_ = entry.total_walltime_
-                          - entry.child_walltime_
-                          - entry.overhead_walltime_;
-     entry.total_raw_walltime_ = entry.total_walltime_
-                               - entry.overhead_walltime_;
+     prepare_computed_times(hash);
      total_overhead_time += entry.overhead_walltime_;
    }
+
+   // Check that the special profiler hash entries are all zero, even after the
+   // above loop.
+   assert(table_.at(profiler_hash_).self_walltime__     == 0.0);
+   assert(table_.at(profiler_hash_).child_walltime_     == 0.0);
+   assert(table_.at(profiler_hash_).total_walltime_     == 0.0);
+   assert(table_.at(profiler_hash_).total_raw_walltime_ == 0.0);
 
    // Set values for the profiler entry specifically in the hashtable.
    table_.at(profiler_hash_).self_walltime_      = total_overhead_time;
@@ -212,7 +231,7 @@ double HashTable::get_total_walltime(size_t const hash) const
 
 double HashTable::get_total_raw_walltime(size_t const hash) 
 {
-   prepare_computed_times();
+   prepare_computed_times(hash);
    return table_.at(hash).total_raw_walltime_.count();
 }
 
@@ -228,7 +247,7 @@ double HashTable::get_overhead_walltime(size_t const hash) const
 
 double HashTable::get_self_walltime(size_t const hash)
 {
-  prepare_computed_times();
+  prepare_computed_times(hash);
   return table_.at(hash).self_walltime_.count();
 }
 
