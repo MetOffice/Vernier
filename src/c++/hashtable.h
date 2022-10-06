@@ -90,8 +90,8 @@ class HashTable{
 
     // Member functions
     std::vector<size_t> list_keys();
-    void add_child_time   (size_t, time_duration_t);
-    void add_overhead_time(size_t, time_duration_t);
+    void add_child_time   (size_t const, time_duration_t);
+    void add_overhead_time(size_t const, time_duration_t);
     void prepare_computed_times();
 
     // Getters

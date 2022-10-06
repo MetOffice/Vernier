@@ -123,14 +123,14 @@ void Profiler::stop(size_t const hash)
     thread_traceback_[tid].back().second;
 
   // Compute the region time
-  auto deltatime = region_stop_time - start_calliper_times.region_start_time_;
+  auto region_time = region_stop_time - start_calliper_times.region_start_time_;
 
   // Do the hashtable update for the child region.
-  thread_hashtables_[tid].update(hash, deltatime);
+  thread_hashtables_[tid].update(hash, region_time);
 
   // Precompute times as far as possible. We just need the calliper stop time
   // later.
-  auto temp_sum = start_calliper_times.calliper_start_time_ + deltatime;
+  auto temp_sum = start_calliper_times.calliper_start_time_ + region_time;
 
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
@@ -138,12 +138,12 @@ void Profiler::stop(size_t const hash)
   // Prepare to add timings to parent
   if (! thread_traceback_[tid].empty()) {
    size_t parent_hash = thread_traceback_[tid].back().first;
-   thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
+   thread_hashtables_[tid].add_child_time(parent_hash, region_time);
 
    // Account for time spent in the profiler itself. 
    auto calliper_stop_time = prof_gettime();
-   auto interim_time = calliper_stop_time - temp_sum;
-   thread_hashtables_[tid].add_overhead_time(parent_hash, interim_time);
+   auto calliper_time = calliper_stop_time - temp_sum;
+   thread_hashtables_[tid].add_overhead_time(parent_hash, calliper_time);
   }
 }
 

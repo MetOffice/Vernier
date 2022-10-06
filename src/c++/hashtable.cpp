@@ -91,7 +91,7 @@ void HashTable::update(size_t hash, time_duration_t time_delta)
  * @param [in] time_delta  The time spent in the child region.
  */
 
-void HashTable::add_child_time(size_t hash, time_duration_t time_delta)
+void HashTable::add_child_time(size_t const hash, time_duration_t time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
@@ -102,7 +102,7 @@ void HashTable::add_child_time(size_t hash, time_duration_t time_delta)
   entry.child_walltime_ += time_delta;
 }
 
-void HashTable::add_overhead_time(size_t hash, time_duration_t calliper_time) 
+void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_time) 
 {
   auto& entry = table_.at(hash);
   entry.overhead_walltime_ += calliper_time;
@@ -181,8 +181,7 @@ void HashTable::write()
    table_.at(profiler_hash_).self_walltime_      = total_overhead_time;
    table_.at(profiler_hash_).child_walltime_     = time_duration_t::zero();
    table_.at(profiler_hash_).total_walltime_     = total_overhead_time;
-   //table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time;
-   table_.at(profiler_hash_).total_raw_walltime_ = static_cast<time_duration_t>(-997.0);
+   table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time;
 
 }
 
