@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 # This file sets up the options for the Doxygen generation of API documentation.
 # Available options for CMake Doxygen integration can be found here:
 # https://cmake.org/cmake/help/latest/module/FindDoxygen.html
