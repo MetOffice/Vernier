@@ -53,6 +53,7 @@ class HashTable{
      *
      */
     struct HashEntry{
+      
       public:
 
         // Constructor
