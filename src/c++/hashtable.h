@@ -105,6 +105,7 @@ class HashTable{
     double                 get_child_walltime(size_t const hash) const;
     std::string            get_region_name(size_t const hash) const;
     unsigned long long int get_call_count(size_t const hash) const;
+    unsigned long long int get_prof_call_count() const;
 };
 #endif
 

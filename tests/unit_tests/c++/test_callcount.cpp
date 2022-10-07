@@ -58,9 +58,15 @@ TEST(HashEntryTest,CallCountTest)
   // Stop main region
   prof.stop(prof_main);
 
-  // Check call_count_ is the number expected on all threads
+  // Check call_count_ is the number expected on all threads. On most threads,
+  // the profiler calliper call count should match this number, except on thread
+  // zero which includes the main region callipers.
   for (int j = 0; j < num_threads; ++j)
   {
     EXPECT_EQ(prof.get_call_count(prof_sub_shared,j),num_threads-j);
+
+    int incr = (j==0) ? 1 : 0;
+    EXPECT_EQ(prof.get_prof_call_count(j),num_threads-j+incr);
   }
+
 }

@@ -309,17 +309,31 @@ std::string HashTable::get_region_name(size_t const hash) const
   return table_.at(hash).region_name_;
 }
 
- /**
-  * @brief  Get the number of times the input hash region has been called.
-  *
-  * @param[in] hash  The hash corresponding to the region of interest.
-  *
-  * @returns  Returns an integer corresponding to the number of the times the
-  *           region of interest has been called within the code being profiled.
-  *
-  */
+/**
+ * @brief  Get the number of times the input hash region has been called.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest.
+ *
+ * @returns  Returns an integer corresponding to the number of the times the
+ *           region of interest has been called within the code being profiled.
+ *
+ */
 
 unsigned long long int HashTable::get_call_count(size_t const hash) const
 {
     return table_.at(hash).call_count_;
 }
+
+/**
+ * @brief  Get the number of calliper pairs called.
+ *
+ * @returns  Returns an integer corresponding to the number of the times pairs
+ *           of callipers have been called. 
+ *           
+ */
+
+unsigned long long int HashTable::get_prof_call_count() const
+{
+    return table_.at(profiler_hash_).call_count_;
+}
+

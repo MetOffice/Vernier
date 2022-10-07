@@ -283,3 +283,20 @@ unsigned long long int Profiler::get_call_count(size_t const hash, int const inp
   return thread_hashtables_[tid].get_call_count(hash);
 }
 
+/**
+ * @brief  Get the number of calliper pairs called on the specified thread.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest.
+ * @param[in] tid   The ID corresponding to the thread of interest.
+ *
+ * @returns  Returns an integer corresponding to the number of times the
+ *           region of interest has been called on the specified thread.
+ *
+ */
+
+unsigned long long int Profiler::get_prof_call_count(int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_prof_call_count();
+}
+
