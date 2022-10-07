@@ -17,8 +17,9 @@
  *
  */
 
-StartCalliperValues::StartCalliperValues(time_point_t region_start_time, 
-                                         time_point_t calliper_start_time)
+Profiler::StartCalliperValues::StartCalliperValues(
+                                   time_point_t region_start_time, 
+                                   time_point_t calliper_start_time)
   : region_start_time_(region_start_time)
   , calliper_start_time_(calliper_start_time)
   {}

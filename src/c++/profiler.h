@@ -24,22 +24,6 @@
 
 #include "hashtable.h"
 
-/**
- * @brief  Struct to store values set during the start calliper, and needed in
- *         the stop calliper.
- */
-
-struct StartCalliperValues
-{
-  public:
-
-    // Constructors
-    StartCalliperValues(time_point_t, time_point_t);
-
-    // Data members
-    time_point_t region_start_time_;
-    time_point_t calliper_start_time_;
-};
 
 /**
  * @brief  Top-level profiler class.
@@ -51,6 +35,23 @@ struct StartCalliperValues
 class Profiler
 {
   private:
+
+    /**
+     * @brief  Struct to store values set during the start calliper, and needed in
+     *         the stop calliper.
+     */
+
+    struct StartCalliperValues
+    {
+      public:
+
+        // Constructors
+        StartCalliperValues(time_point_t, time_point_t);
+
+        // Data members
+        time_point_t region_start_time_;
+        time_point_t calliper_start_time_;
+    };
 
     // Data members
     int max_threads_;
