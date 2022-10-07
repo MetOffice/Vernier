@@ -82,6 +82,10 @@ void HashTable::update(size_t hash, time_duration_t time_delta)
 
   // Update the number of times this region has been called
   entry.call_count_++;
+
+  // Also increment the number of calliper-pairs called.
+  auto& profiler_entry = table_.at(profiler_hash_);
+  profiler_entry.call_count_++;
 }
 
 /**
