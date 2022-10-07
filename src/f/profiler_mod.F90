@@ -71,8 +71,8 @@ module profiler_mod
     !> @brief  Start profiling a code region.
     !> @param [out] hash_out      The unique hash for this region.
     !> @param [in]  region_name   The region name.
-    !> @note   Region names need not be null terminated:
-    !>         this routine will add a null termination character.
+    !> @note   Region names need not be null terminated on entry to this
+    !>         routine.
     subroutine profiler_start(hash_out, region_name)
       implicit none
 
@@ -89,6 +89,12 @@ module profiler_mod
 
     end subroutine profiler_start
 
+    !> @brief  Adds a null character to the end of a string.
+    !> @param [in]  strlen      Length of the unterminated string.
+    !> @param [in]  string_in   Unterminated string.
+    !> @param [out] string_out  Null-terminated string. 
+    !> @note  Tests suggested that adding the null character in this manner, as
+    !>     opposed to the concatenation operator (//) has performance benefits.
     subroutine append_null_char(string_in, string_out, strlen)
       implicit none
 
