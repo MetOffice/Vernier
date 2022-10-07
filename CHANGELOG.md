@@ -25,4 +25,5 @@
 09/09/2022 PR #39 for #35: Initial profiler unit tests. \
 08/09/2022 PR #55 for #33: Replace omp_get_wtime(). (Chrono) \
 13/09/2022 PR #60 for #59: Allow manual triggering of workflows. \
-22/09/2022 PR #57 for #56: Remove unwanted getters and their associated tests.
+22/09/2022 PR #57 for #56: Remove unwanted getters and their associated tests. \
+04/10/2022 PR #63 for #62: Add copyright statements to all files.

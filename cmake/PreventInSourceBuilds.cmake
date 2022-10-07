@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 # This function will prevent in-source builds
 function(AssureOutOfSourceBuilds)
     # Make sure the user doesn't perform in-source builds by tricking

@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 if(BUILD_FORTRAN_TESTS)
     # If build Fortran tests is on add tests
     add_pfunit_ctest( test_profiler_f

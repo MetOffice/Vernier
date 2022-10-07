@@ -1,10 +1,12 @@
-/* -----------------------------------------------------------------------------
- *  (c) Crown copyright 2022 Met Office. All rights reserved.
- *  The file LICENCE, distributed with this code, contains details of the terms
- *  under which the code may be used.
- * -----------------------------------------------------------------------------
- */
+/*----------------------------------------------------------------------------*\
+ (c) Crown copyright 2022 Met Office. All rights reserved.
+ The file LICENCE, distributed with this code, contains details of the terms
+ under which the code may be used.
+\*----------------------------------------------------------------------------*/
 
+#include <iostream>
+#include <chrono>
+#include <profiler.h>
 #include <gtest/gtest.h>
 #include <chrono>
 
