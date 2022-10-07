@@ -41,9 +41,9 @@ HashTable::HashTable(int const tid)
   profiler_hash_ = hash_function_(profiler_name);
 
   // Insert special entry for the profiler overhead time.
-  assert (table_.count(hash) == 0);
+  assert (table_.count(profiler_hash_) == 0);
   table_.emplace(profiler_hash_, HashEntry(profiler_name));
-  assert (table_.count(hash) > 0);
+  assert (table_.count(profiler_hash_) > 0);
 }
 
 /**
@@ -210,10 +210,10 @@ void HashTable::prepare_computed_times(size_t const hash)
 
    // Check that the special profiler hash entries are all zero, even after the
    // above loop.
-   assert(table_.at(profiler_hash_).self_walltime__     == 0.0);
-   assert(table_.at(profiler_hash_).child_walltime_     == 0.0);
-   assert(table_.at(profiler_hash_).total_walltime_     == 0.0);
-   assert(table_.at(profiler_hash_).total_raw_walltime_ == 0.0);
+   assert(table_.at(profiler_hash_).self_walltime_      == time_duration_t::zero());
+   assert(table_.at(profiler_hash_).child_walltime_     == time_duration_t::zero());
+   assert(table_.at(profiler_hash_).total_walltime_     == time_duration_t::zero());
+   assert(table_.at(profiler_hash_).total_raw_walltime_ == time_duration_t::zero());
 
    // Set values for the profiler entry specifically in the hashtable.
    table_.at(profiler_hash_).self_walltime_      = total_overhead_time;
