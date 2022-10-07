@@ -1,3 +1,16 @@
+/* -----------------------------------------------------------------------------
+ *  (c) Crown copyright 2022 Met Office. All rights reserved.
+ *  The file LICENCE, distributed with this code, contains details of the terms
+ *  under which the code may be used.
+ * -----------------------------------------------------------------------------
+ */
+
+/**
+ * @file   prof_gettime.h
+ * @brief  Declares time-measurement functionality.
+ *
+ * Contains abstractions for time points, time durations and the clock itself.
+ */
 
 #ifndef PROF_GETTIME_H
 #define PROF_GETTIME_H

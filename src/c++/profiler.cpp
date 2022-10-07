@@ -61,7 +61,7 @@ Profiler::Profiler()
  * @brief  Start timing a profiled code region.
  * @param [in]  region_name   The code region name.
  * @returns     Unique hash for the code region being started.
- * @todo    Revisit profiling overhead measurement.  
+ * @todo        Revisit profiling overhead measurement.  (#64)
  */
 
 size_t Profiler::start(std::string_view region_name)
@@ -93,7 +93,12 @@ size_t Profiler::start(std::string_view region_name)
 /**
  * @brief  Stop timing a profiled code region.
  * @param [in]   Hash of the profiled code region being stopped.
- * @todo    Revisit profiling overhead measurement.  
+ * @note  The calliper time (spent in the profiler) is measured by
+ *        differencing the beginning of the start calliper from the end of the stop
+ *        calliper, and subtracting the measured region time. Hence larger
+ *        absolute times are being measured, which are less likely to suffer
+ *        fractional error from precision limitations of the clock.   
+ * @todo  Revisit profiling overhead measurement. (#64)
  */
 
 void Profiler::stop(size_t const hash)
@@ -130,6 +135,9 @@ void Profiler::stop(size_t const hash)
 
   // Precompute times as far as possible. We just need the calliper stop time
   // later.
+  //   (t4-t1) = calliper time + region time 
+  //   (t3-t2) = region_time
+  //   calliper_time = (t4-t1) - (t3-t2)  = t4 - ( t3-t2 + t1)
   auto temp_sum = start_calliper_times.calliper_start_time_ + region_time;
 
   // Remove from the end of the list.
@@ -162,14 +170,11 @@ void Profiler::write()
 }
 
 /**
- * @brief  Get the total (inclusive) time of everything below the routine
- *         corresponding to the specified hash, on the specified thread.
+ * @brief  Get the total (inclusive) time taken by a region and everything below it.
  *
- * @param[in] hash  The hash corresponding to the region of interest. 
+ * @param[in] hash       The hash corresponding to the region of interest. 
  * @param[in] thread_id  The thread ID for which to return the walltime.
  *
- * @note  Taking the hash argument avoids the need to store the top-level hash
- *        inside the profiler itself.
  */
 
 double Profiler::get_total_walltime(size_t const hash, int const thread_id)
@@ -178,11 +183,29 @@ double Profiler::get_total_walltime(size_t const hash, int const thread_id)
   return thread_hashtables_[tid].get_total_walltime(hash);
 }
 
+/**
+ * @brief  Get the total (inclusive) time taken by a region, and everything below it,
+ *         minus the profiling overheads for calls to direct child regions.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
+ *
+ */
+
 double Profiler::get_total_raw_walltime(size_t const hash, int const thread_id)
 {
   auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_total_raw_walltime(hash);
 }
+
+/**
+ * @brief  Get the profiling overhead time experienced by a region, 
+ *         as incurred by calling child regions.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
+ *
+ */
 
 double Profiler::get_overhead_walltime(size_t const hash, int const thread_id)
 {
@@ -191,7 +214,11 @@ double Profiler::get_overhead_walltime(size_t const hash, int const thread_id)
 }
 
 /**
- * @brief  Get the self walltime for the specified hash.
+ * @brief  Get the self (exclusive) time spent executing a region, minus the
+ *         cost of child regions.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
  *
  */
 
@@ -202,7 +229,14 @@ double Profiler::get_self_walltime(size_t const hash, int const input_tid)
 }
 
 /**
- * @brief  Get the child walltime for the specified hash.
+ * @brief  Get the time spent executing children of a region, including 
+ *         the time taken by their descendents.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
+ *
+ * @note  This time does not include profiling overhead costs incurred directly
+ *        by the region.
  *
  */
 
@@ -213,7 +247,14 @@ double Profiler::get_child_walltime(size_t const hash, int const input_tid) cons
 }
 
 /**
- * @brief  Get the region name corresponding to the input hash.
+ * @brief  Get the name of a region corresponding to a given hash.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
+ *
+ * @note  The thread ID is included to future-proof against the possibility of
+ *        including the thread ID in hashed strings. Hence the hash may not be
+ *        the same on each thread.
  *
  */
 

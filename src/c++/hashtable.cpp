@@ -41,7 +41,7 @@ HashTable::HashTable(int const tid)
   std::string const profiler_name = "__profiler__";
   profiler_hash_ = hash_function_(profiler_name);
 
-  // Insert the special entry.
+  // Insert special entry for the profiler overhead time.
   assert (table_.count(hash) == 0);
   table_.emplace(profiler_hash_, HashEntry(profiler_name));
   assert (table_.count(hash) > 0);
@@ -65,7 +65,7 @@ size_t HashTable::query_insert(std::string_view region_name) noexcept
 }
 
 /**
- * @brief  Updates the total walltime for the specified region. 
+ * @brief  Updates the total walltime and call count for the specified region. 
  * @param [in] hash  The hash corresponding to the profiled region.
  * @param [in] time_delta  The time increment to add.
  */
@@ -85,8 +85,7 @@ void HashTable::update(size_t hash, time_duration_t time_delta)
 }
 
 /**
- * @brief  Add child region time to parent, and also any profiling overhead time
- *         that must be subtracted from the parent's total time later.
+ * @brief  Add child region time to parent.
  * @param [in] hash        The hash of the child region to update.
  * @param [in] time_delta  The time spent in the child region.
  */
@@ -102,6 +101,13 @@ void HashTable::add_child_time(size_t const hash, time_duration_t time_delta)
   entry.child_walltime_ += time_delta;
 }
 
+/**
+ * @brief  Add profiling overhead time, incurred when calling a child, to the
+ *         parent region.
+ * @param [in] hash           The hash of the child region to update.
+ * @param [in] calliper_time  The profiling overhead time.
+ */
+
 void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_time) 
 {
   auto& entry = table_.at(hash);
@@ -116,6 +122,7 @@ void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_ti
 void HashTable::write()
 {
 
+  // Ensure all computed times are up-to-date.
   prepare_computed_times_all();
 
   std::string routine_at_thread = "Thread: " + std::to_string(tid_);
@@ -157,7 +164,16 @@ void HashTable::write()
   }
 }
 
-void HashTable::prepare_computed_times(size_t hash)
+/**
+ * @brief  Evaluates times derived from other times measured, for a particular
+ *         code region.
+ * @detail Times computed are: the region self time and the total time minus
+ *         directly incurred profiling overhead costs.
+ *
+ * @param [in] hash   The hash of the region to compute.
+ */
+
+void HashTable::prepare_computed_times(size_t const hash)
 {
   auto& entry = table_.at(hash);
 
@@ -172,8 +188,8 @@ void HashTable::prepare_computed_times(size_t hash)
 }
 
 /**
- * @brief  Computes self times from total times and profiling overheads.
- *
+ * @brief  Evaluates times derived from other times measured, looping over all
+ *         code regions; includes updating the special profiling overhead entry.
  */
 
  void HashTable::prepare_computed_times_all()
@@ -220,8 +236,8 @@ std::vector<size_t> HashTable::list_keys()
 }
 
 /**
- * @brief  Get the total (inclusive) time corresponding to the input hash.
- *
+ * @brief  Get the total (inclusive) time of the specified region.
+ * @param [in]  The hash corresponding to the region.
  */
 
 double HashTable::get_total_walltime(size_t const hash) const
@@ -229,11 +245,25 @@ double HashTable::get_total_walltime(size_t const hash) const
   return table_.at(hash).total_walltime_.count();
 }
 
-double HashTable::get_total_raw_walltime(size_t const hash) 
+/**
+ * @brief  Get the total time of the specified region, minus profiling overheads
+ *         incurred by calling direct children.
+ * @param [in]  The hash corresponding to the region.
+ * @note   This time is derived from other measured times, therefore a to
+ *         `prepare_computed_times` is need to update its value. 
+ */
+
+double HashTable::get_total_raw_walltime(size_t const hash)
 {
    prepare_computed_times(hash);
    return table_.at(hash).total_raw_walltime_.count();
 }
+
+/**
+ * @brief  Get the profiling overhead time for a specified region, as incurred
+ *         by calling direct children. 
+ * @param [in]  The hash corresponding to the region.
+ */
 
 double HashTable::get_overhead_walltime(size_t const hash) const
 {
@@ -241,8 +271,10 @@ double HashTable::get_overhead_walltime(size_t const hash) const
 }
 
 /**
- * @brief  Get the profiler self time corresponding to the input hash.
- *
+ * @brief  Get the profiler self (exclusive) time corresponding to the input hash.
+ * @param [in]  The hash corresponding to the region.
+ * @note   This time is derived from other measured times, therefore a to
+ *         `prepare_computed_times` is need to update its value. 
  */
 
 double HashTable::get_self_walltime(size_t const hash)
@@ -253,7 +285,9 @@ double HashTable::get_self_walltime(size_t const hash)
 
 /**
  * @brief  Get the child time corresponding to the input hash.
- *
+ * @param [in]  The hash corresponding to the region.
+ * @note   This time is derived from other measured times, therefore a to
+ *         `prepare_computed_times` is need to update its value. 
  */
 
 double HashTable::get_child_walltime(size_t const hash) const
@@ -263,7 +297,7 @@ double HashTable::get_child_walltime(size_t const hash) const
 
 /**
  * @brief  Get the region name corresponding to the input hash.
- *
+ * @param [in]  The hash corresponding to the region.
  */
 
 std::string HashTable::get_region_name(size_t const hash) const
