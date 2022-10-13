@@ -126,21 +126,26 @@ void Profiler::write()
   MPI_Comm comm = MPI_COMM_WORLD;
   MPI_Comm_rank(comm, &current_rank);
 
+  // Filename "tail" - will be different for each rank and appended onto the
+  // end of the output file name 
+  std::string mpi_filename_tail = "-" + std::to_string(current_rank);
+
   // Pickup environment variable filename if it exists, if not use the default
   // name of "profiler-output.txt". In either case, include the MPI rank in the
   // name of the file.
+  std::ofstream output_stream;
   const char* env_variable = std::getenv("PROFILER_OUTFILE");
+  std::string out_filename;
   if (env_variable != NULL)
   {
-    const char* user_filename = (env_variable + ("-" + std::to_string(current_rank))).c_str();
-    output_stream.open(user_filename);
+    out_filename = env_variable + mpi_filename_tail;
   }
   else
   {
     delete env_variable;
-    std::string default_filename = "profiler-output-" + std::to_string(current_rank);
-    output_stream.open(default_filename);
+    out_filename = "profiler-output" + mpi_filename_tail;
   }
+  output_stream.open(out_filename);
 
   // Write to file
   for (auto& it : thread_hashtables_)
