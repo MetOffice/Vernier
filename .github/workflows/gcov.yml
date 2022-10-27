@@ -75,6 +75,7 @@ jobs:
            
     - name: Generate html
       working-directory: ${{github.workspace}}/build
+      shell: bash -l {0}
       run: genhtml coverage.info --output-directory out
 
   
