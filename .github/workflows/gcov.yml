@@ -8,6 +8,37 @@ on:
     branches: [ main ] 
 
 jobs:
+  conda:
+    runs-on: ubunutu-latest 
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Create environment
+      uses: conda-incubator/setup-miniconda@v2
+      with: 
+        auto-activate-base: false
+        environment-file: myenv.yml
+        python-version: 3.9 
+        activate-environment: myenv
+
+    - name: Package list
+      shell: bash -l {0} 
+      run: | 
+        conda info
+        conda list 
+
+    - name: Gcov
+      shell: bash -l {0}
+      run: | 
+        conda install gcov
+
+    - name: Lcov
+      shell: bash -l {0}
+      run: | 
+        conda install lcov
+
   build:
     runs-on: ubuntu-latest 
     strategy:
@@ -45,6 +76,11 @@ jobs:
     - name: Run tests 
       working-directory: ${{github.workspace}}/build  
       run: ctest 
+
+  run:
+    runs-on: ubuntu-latest 
+
+    steps:
 
     - name: Run Gcov 
       working-directory: ${{github.workspace}}/build
