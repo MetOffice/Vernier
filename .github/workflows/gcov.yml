@@ -10,6 +10,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest 
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [
+          {c: gcc-10, cpp: g++-10, fortran: gfortran-10},
+          {c: clang-12, cpp: clang++-12, fortran: gfortran-10}
+        ]
     
     steps:
 
@@ -19,8 +26,12 @@ jobs:
     - name: Configure CMake 
       run: > 
         cmake -B ${{github.workspace}}/build 
+        -DCMAKE_C_COMPILER=${{ matrix.compiler.c }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} 
+        -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }}
         -DCMAKE_CXX_FLAGS="--coverage" 
         -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=ON 
+        -DENABLE_DOXYGEN=OFF 
 
     - name: Build 
       run: cmake --build ${{github.workspace}}/build
