@@ -48,7 +48,7 @@ jobs:
 
     - name: Run Gcov 
       working-directory: ${{github.workspace}}/build
-      run: gcov -H -m ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
+      run: gcov -j -m ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
 
     - name: Run Lcov
       working-directory: ${{github.workspace}}/build 
