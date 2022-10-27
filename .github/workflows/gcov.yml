@@ -25,7 +25,6 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with: 
         auto-activate-base: false
-        environment-file: myenv.yml
         python-version: 3.9 
         activate-environment: myenv
 
