@@ -17,13 +17,9 @@ jobs:
           {c: gcc-10, cpp: g++-10, fortran: gfortran-10}
         ]
 
-    defaults: 
-      run:
-        shell: bash
-        working-directory: ${{github.workspace}}/build
-
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Create conda environment
       uses: conda-incubator/setup-miniconda@v2
@@ -34,7 +30,7 @@ jobs:
         activate-environment: myenv
 
     - name: Install Lcov
-      shell: -l {0}
+      shell: bash -l {0}
       run: conda install lcov
 
     - name: Configure CMake 
@@ -54,20 +50,22 @@ jobs:
       run: cmake --build ${{github.workspace}}/build
 
     - name: Make 
+      working-directory: ${{github.workspace}}/build
       run: make 
 
     - name: Run tests 
+      working-directory: ${{github.workspace}}/build
       run: ctest 
 
     - name: Run Gcov 
       run: gcov -j -m ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
 
     - name: Run Lcov
-      shell: -l {0}
+      shell: bash -l {0}
       run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file coverage.info
            
     - name: Generate html
-      shell: -l {0}
+      shell: bash -l {0}
       run: genhtml coverage.info --output-directory out
 
   
