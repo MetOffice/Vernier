@@ -26,6 +26,7 @@ jobs:
       with: 
         auto-activate-base: false
         python-version: 3.9 
+        channels: conda-forge, defaults
         activate-environment: myenv
 
     - name: Package list
