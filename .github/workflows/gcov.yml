@@ -70,6 +70,7 @@ jobs:
 
     - name: Run Lcov
       working-directory: ${{github.workspace}}/build 
+      shell: bash -l {0}
       run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file coverage.info
            
     - name: Generate html
