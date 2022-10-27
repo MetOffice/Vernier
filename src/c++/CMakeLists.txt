@@ -12,8 +12,9 @@ include(CMakePackageConfigHelpers)
 
 # Add files source files to library.
 add_library(${CMAKE_PROJECT_NAME} SHARED
-        profiler.h    profiler.cpp
-        hashtable.h   hashtable.cpp
+        profiler.h      profiler.cpp
+        hashtable.h     hashtable.cpp
+        prof_gettime.h  prof_gettime.cpp
         )
 
 # Link library to and external libs (also use project warnings and options).
@@ -22,7 +23,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
 
 set_project_warnings(${CMAKE_PROJECT_NAME})
 
-set(PUBLIC_HEADER_FILES profiler.h hashtable.h)
+set(PUBLIC_HEADER_FILES profiler.h hashtable.h prof_gettime.h)
 
 # Set the properties of the library including, the version and language. Also
 # set which header files are to be public and installed, this can be useful

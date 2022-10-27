@@ -18,7 +18,7 @@ using ::testing::Gt;
 //
 //  Testing that the hashing function works as expected (we don't want
 //  collisions), and that walltimes are being updated by profiler.stop().
-//  The desired behaviour of calling get_thread0_walltime before profiler.stop()
+//  The desired behaviour of calling get_total_walltime before profiler.stop()
 //  is a bit fuzzy at the time of writing, but currently a test is done to make
 //  sure it returns the MDI of 0.0
 //
@@ -56,7 +56,7 @@ TEST(HashTableTest,UpdateTimesTest) {
   size_t prof_pie = std::hash<std::string_view>{}("Pie");
 
   // Trying to find a time before .start() will throw an exception
-  EXPECT_THROW(prof.get_thread0_walltime(prof_pie), std::out_of_range);
+  EXPECT_THROW(prof.get_total_walltime(prof_pie, 0), std::out_of_range);
 
   // Start timing
   auto const& expected_hash = prof.start("Pie");
@@ -65,13 +65,13 @@ TEST(HashTableTest,UpdateTimesTest) {
   sleep(1);
 
   // Time t1 declared inbetween .start() and first .stop()
-  double const t1 = prof.get_thread0_walltime(prof_pie);
+  double const t1 = prof.get_total_walltime(prof_pie, 0);
 
   //Stop timing
   prof.stop(prof_pie);
 
   // Time t2 declared after first profiler.stop()
-  double const t2 = prof.get_thread0_walltime(prof_pie);
+  double const t2 = prof.get_total_walltime(prof_pie, 0);
 
   // Start and stop same region again
   prof.start("Pie");
@@ -79,7 +79,7 @@ TEST(HashTableTest,UpdateTimesTest) {
   prof.stop(prof_pie);
 
   // Time t3 declared after second profiler.stop()
-  double const t3 = prof.get_thread0_walltime(prof_pie);
+  double const t3 = prof.get_total_walltime(prof_pie, 0);
 
   // Expected behaviour: t1 return the MDI and t3 > t2 > 0
   constexpr double MDI = 0.0;     // Missing Data Indicator (MDI)
