@@ -14,8 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler: [
-          {c: gcc-10, cpp: g++-10, fortran: gfortran-10},
-          {c: clang-12, cpp: clang++-12, fortran: gfortran-10}
+          {c: gcc-10, cpp: g++-10, fortran: gfortran-10}
         ]
     
     steps:
@@ -30,6 +29,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} 
         -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }}
         -DBUILD_TESTS=ON
+        -DBUILD_FORTRAN_TESTS=OFF
         -DINCLUDE_GTEST=ON
         -DCMAKE_CXX_FLAGS="--coverage" 
         -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=ON 
