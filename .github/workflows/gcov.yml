@@ -8,8 +8,14 @@ on:
     branches: [ main ] 
 
 jobs:
-  conda:
+  build:
     runs-on: ubunutu-latest 
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [
+          {c: gcc-10, cpp: g++-10, fortran: gfortran-10}
+        ]
 
     steps:
     - name: Checkout
@@ -39,20 +45,6 @@ jobs:
       run: | 
         conda install lcov
 
-  build:
-    runs-on: ubuntu-latest 
-    strategy:
-      fail-fast: false
-      matrix:
-        compiler: [
-          {c: gcc-10, cpp: g++-10, fortran: gfortran-10}
-        ]
-    
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v2
-
     - name: Configure CMake 
       run: > 
         cmake -B ${{github.workspace}}/build 
@@ -76,11 +68,6 @@ jobs:
     - name: Run tests 
       working-directory: ${{github.workspace}}/build  
       run: ctest 
-
-  run:
-    runs-on: ubuntu-latest 
-
-    steps:
 
     - name: Run Gcov 
       working-directory: ${{github.workspace}}/build
