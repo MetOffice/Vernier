@@ -42,7 +42,7 @@ jobs:
       run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file coverage.info
            
     - name: Generate html
-      working-directory: ${{githutb.workspace}}/build
+      working-directory: ${{github.workspace}}/build
       run: genhtml coverage.info --output-directory out
 
   
