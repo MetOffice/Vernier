@@ -1,0 +1,48 @@
+name: Check unit test coverage 
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ] 
+  pull_request:
+    branches: [ main ] 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest 
+    
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure CMake 
+      run: > 
+        cmake -B ${{github.workspace}}/build 
+        -DCMAKE_CXX_FLAGS="--coverage" 
+        -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=ON 
+
+    - name: Build 
+      run: cmake --build ${{github.workspace}}/build
+
+    - name: Make 
+      working-directory: ${{github.workspace}}/build 
+      run: make 
+
+    - name: Run tests 
+      working-directory: ${{github.workspace}}/build  
+      run: ctest 
+
+    - name: Run Gcov 
+      working-directory: ${{github.workspace}}/build
+      run: gcov -H -m ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
+
+    - name: Run Lcov
+      working-directory: ${{github.workspace}}/build 
+      run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file coverage.info
+           
+    - name: Generate html
+      working-directory: ${{githutb.workspace}}/build
+      run: genhtml coverage.info --output-directory out
+
+  
