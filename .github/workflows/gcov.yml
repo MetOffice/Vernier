@@ -34,11 +34,6 @@ jobs:
         conda info
         conda list 
 
-    - name: Gcov
-      shell: bash -l {0}
-      run: | 
-        conda install gcov
-
     - name: Lcov
       shell: bash -l {0}
       run: | 
