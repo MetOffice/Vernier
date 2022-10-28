@@ -40,7 +40,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} 
         -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }}
         -DBUILD_TESTS=ON
-        -DBUILD_FORTRAN_TESTS=OFF
+        -DBUILD_FORTRAN_TESTS=ON
         -DINCLUDE_GTEST=ON
         -DCMAKE_CXX_FLAGS="-g --coverage" 
         -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=ON 
@@ -58,7 +58,9 @@ jobs:
       run: ctest 
 
     - name: Run Gcov 
-      run: gcov -j -m ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
+      run: | 
+        gcov --help
+        gcov -m -j ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
 
     - name: Inital Lcov Run
       shell: bash -l {0}
