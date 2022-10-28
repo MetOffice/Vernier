@@ -49,10 +49,9 @@ jobs:
           git add --force docs/documentation
           git stash
           git remote update
-          git checkout gh-pages
-          rm -rf ${{github.workspace}}/docs/documentation
+          git checkout -b gh-pages
           git stash pop
           git reset
           git add --force docs/documentation
           git commit --allow-empty -m "Update Doxygen documentation"
-          git push
+          git push origin gh-pages

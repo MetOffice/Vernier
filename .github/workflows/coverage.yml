@@ -10,6 +10,10 @@ on:
       - 'tests/**'
       - '.github/workflows/coverage.yml'
 
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
 jobs:
   build:
     runs-on: ubuntu-latest 
@@ -44,6 +48,7 @@ jobs:
       #   .gcno files for gcov. 
       run: > 
         cmake -B ${{github.workspace}}/build 
+        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         -DCMAKE_C_COMPILER=${{ matrix.compiler.c }}
         -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} 
         -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }}
@@ -56,7 +61,7 @@ jobs:
 
     - name: Build 
       # Build with the given configuration
-      run: cmake --build ${{github.workspace}}/build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Make  
       working-directory: ${{github.workspace}}/build
@@ -74,7 +79,7 @@ jobs:
       shell: bash -l {0}
       run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file basecoverage.info
 
-    - name: Extract relevant info 
+    - name: Extract Relevant Paths
       # Ignore all the STL header files from the initial lcov .info file
       shell: bash -l {0}
       run: lcov --extract basecoverage.info '${{github.workspace}}/src/*' --output-file coverage.info
@@ -83,7 +88,7 @@ jobs:
       shell: bash -l {0}
       run: genhtml coverage.info --output-directory out
 
-    - name: Update github pages 
+    - name: Update Coverage Pages 
       run: | 
         mkdir -p ${{github.workspace}}/docs/coverage
         cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage/.
@@ -91,12 +96,12 @@ jobs:
         git config user.email 'github-actions[bot]' 
         git add --force docs/coverage
         git stash
+        git remote update
         git checkout -b gh-pages
-        rm -rf ${{github.workspace}}/docs/coverage
         git stash pop 
         git reset 
         git add --force docs/coverage
         git commit --allow-empty -m "Update coverage documentation"
-        git push -f origin gh-pages
+        git push origin gh-pages
 
   
