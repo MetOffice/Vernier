@@ -77,7 +77,7 @@ jobs:
         git add --force docs 
         git stash
         git checkout -b gh-pages
-        git rm -rf docs/coverage
+        git rm -rf ${{github.workspace}}/docs/coverage
         git stash pop 
         git reset 
         git add --force docs
