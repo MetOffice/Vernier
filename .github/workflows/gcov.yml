@@ -70,14 +70,14 @@ jobs:
 
     - name: Update github pages 
       run: | 
-        mkdir -p ${{github.workspace}}/docs/coverage
-        cp -rf ${{github.workspace}}/out ${{github.workspace}}/docs/coverage 
+        mkdir -p ${{github.workspace}}/docs
+        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/. 
         git config user.name 'github-actions[bot]'
         git config user.email 'github-actions[bot]' 
         git add --force docs 
         git stash
         git checkout -b gh-pages
-        rm -rf ${{github.workspace}}/docs/coverage
+        rm -rf ${{github.workspace}}/docs
         git stash pop 
         git reset 
         git add --force docs
