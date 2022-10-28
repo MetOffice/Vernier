@@ -4,8 +4,11 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ] 
-  pull_request:
-    branches: [ main ] 
+    paths:
+      - 'src/**.h'
+      - 'src/**.cpp'
+      - 'tests/**'
+      - '.github/workflows/coverage.yml'
 
 jobs:
   build:
@@ -82,17 +85,17 @@ jobs:
 
     - name: Update github pages 
       run: | 
-        mkdir -p ${{github.workspace}}/docs
-        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/.
+        mkdir -p ${{github.workspace}}//coverage
+        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage.
         git config user.name 'github-actions[bot]'
         git config user.email 'github-actions[bot]' 
-        git add --force docs
+        git add --force docs/coverage
         git stash
         git checkout -b gh-pages
-        rm -rf ${{github.workspace}}/docs
+        rm -rf ${{github.workspace}}/docs/coverage
         git stash pop 
         git reset 
-        git add --force docs
+        git add --force docs/coverage
         git commit --allow-empty -m "Update coverage documentation"
         git push -f origin gh-pages
 
