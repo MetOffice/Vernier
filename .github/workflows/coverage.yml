@@ -86,7 +86,7 @@ jobs:
     - name: Update github pages 
       run: | 
         mkdir -p ${{github.workspace}}//coverage
-        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage.
+        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage/.
         git config user.name 'github-actions[bot]'
         git config user.email 'github-actions[bot]' 
         git add --force docs/coverage
