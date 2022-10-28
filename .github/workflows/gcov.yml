@@ -42,7 +42,7 @@ jobs:
         -DBUILD_TESTS=ON
         -DBUILD_FORTRAN_TESTS=OFF
         -DINCLUDE_GTEST=ON
-        -DCMAKE_CXX_FLAGS="--coverage" 
+        -DCMAKE_CXX_FLAGS="-g --coverage" 
         -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=ON 
         -DENABLE_DOXYGEN=OFF 
 
@@ -65,7 +65,7 @@ jobs:
       run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file basecoverage.info
 
     - name: Extract relevant info 
-      shell: bash -l {0]}
+      shell: bash -l {0}
       run: lcov --extract basecoverage.info '${{github.workspace}}/src/*' --output-file coverage.info
 
     - name: Generate html
