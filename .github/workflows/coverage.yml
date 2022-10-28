@@ -1,4 +1,4 @@
-name: Check unit test coverage 
+name: Unit test coverage
 
 on:
   workflow_dispatch:
@@ -22,6 +22,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Create conda environment
+      # Setup a virtual conda environment
       uses: conda-incubator/setup-miniconda@v2
       with: 
         auto-activate-base: false
@@ -30,10 +31,14 @@ jobs:
         activate-environment: myenv
 
     - name: Install Lcov
+      # Install lcov from conda (graphical front-end for gcov reports)
       shell: bash -l {0}
       run: conda install lcov
 
     - name: Configure CMake 
+      # Configure CMake in a 'build' subdirectory
+      #   Key thing here is the "--coverage" CXX flag which generates
+      #   .gcno files for gcov. 
       run: > 
         cmake -B ${{github.workspace}}/build 
         -DCMAKE_C_COMPILER=${{ matrix.compiler.c }}
@@ -47,25 +52,27 @@ jobs:
         -DENABLE_DOXYGEN=OFF 
 
     - name: Build 
+      # Build with the given configuration
       run: cmake --build ${{github.workspace}}/build
 
-    - name: Make 
+    - name: Make  
       working-directory: ${{github.workspace}}/build
       run: make 
 
     - name: Run tests 
+      # Run all the unit test executables
       working-directory: ${{github.workspace}}/build
       run: ctest 
 
     - name: Run Gcov 
-      run: | 
-        gcov -m ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
+      run: gcov --demangled-names --human-readable ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
 
     - name: Inital Lcov Run
       shell: bash -l {0}
       run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file basecoverage.info
 
     - name: Extract relevant info 
+      # Ignore all the STL header files from the initial lcov .info file
       shell: bash -l {0}
       run: lcov --extract basecoverage.info '${{github.workspace}}/src/*' --output-file coverage.info
 
@@ -75,18 +82,18 @@ jobs:
 
     - name: Update github pages 
       run: | 
-        mkdir -p ${{github.workspace}}/docs
-        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/. 
+        mkdir -p ${{github.workspace}}/docs/coverage
+        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage/.
         git config user.name 'github-actions[bot]'
         git config user.email 'github-actions[bot]' 
-        git add --force docs 
+        git add --force docs/coverage 
         git stash
         git checkout -b gh-pages
-        rm -rf ${{github.workspace}}/docs
+        rm -rf ${{github.workspace}}/docs/coverage
         git stash pop 
         git reset 
-        git add --force docs
-        git commit -m "Update coverage documentation"
+        git add --force docs/coverage
+        git commit --allow-empty -m "Update coverage documentation"
         git push -f origin gh-pages
 
   
