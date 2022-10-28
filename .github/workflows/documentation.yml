@@ -50,7 +50,7 @@ jobs:
           git stash
           git remote update
           git checkout gh-pages
-          git rm -rf docs/documentation
+          rm -rf ${{github.workspace}}/docs/documentation
           git stash pop
           git reset
           git add --force docs/documentation
