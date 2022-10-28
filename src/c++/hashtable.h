@@ -29,9 +29,7 @@
 #include <string_view>
 #include <chrono>
 
-// Type definitions for chrono steady clock time points and durations
-using time_duration_t = std::chrono::duration<double>;
-using time_point_t    = std::chrono::time_point<std::chrono::steady_clock, time_duration_t>;
+#include "prof_gettime.h"
 
 
 /**
@@ -49,10 +47,12 @@ struct HashEntry{
     explicit HashEntry(std::string_view);
 
     // Data members
-    std::string            region_name_;
-    time_duration_t        total_walltime_;
-    time_duration_t        self_walltime_;
-    time_duration_t        child_walltime_;
+    std::string      region_name_;
+    time_duration_t  total_walltime_;
+    time_duration_t  total_raw_walltime_;
+    time_duration_t  self_walltime_;
+    time_duration_t  child_walltime_;
+    time_duration_t  overhead_walltime_;
     unsigned long long int call_count_;
 
 };
@@ -71,9 +71,14 @@ class HashTable{
 
     // Members
     int tid_;
+    size_t profiler_hash_;
     std::unordered_map<size_t,HashEntry> table_;
     std::hash<std::string_view> hash_function_;
     std::vector<std::pair<size_t, HashEntry>> hashvec;
+
+    // Private member functions
+    void prepare_computed_times(size_t const);
+    void prepare_computed_times_all();
 
   public:
 
@@ -88,14 +93,18 @@ class HashTable{
 
     // Member functions
     std::vector<size_t> list_keys();
-    void add_child_time(size_t, time_duration_t);
-    void compute_self_times();
+    void add_child_time   (size_t const, time_duration_t);
+    void add_overhead_time(size_t const, time_duration_t);
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;
+    double                 get_total_raw_walltime(size_t const hash);
+    double                 get_overhead_walltime(size_t const hash) const;
     double                 get_self_walltime(size_t const hash);
     double                 get_child_walltime(size_t const hash) const;
     std::string            get_region_name(size_t const hash) const;
     unsigned long long int get_call_count(size_t const hash) const;
+    unsigned long long int get_prof_call_count() const;
 };
 #endif
+

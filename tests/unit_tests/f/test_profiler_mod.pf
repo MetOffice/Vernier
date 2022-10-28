@@ -23,8 +23,6 @@ contains
     ! Timer declarations
     real(kind=dp) :: t1, t2, actual_time
 
-    real(kind=prk) :: profiler_wallclock_time
-
     ! Handle declarations
     integer(kind=pik) :: prof_main
 
@@ -68,10 +66,14 @@ contains
     ! Write the profile
     call profiler_write()
 
-    actual_time = t2 - t1
-    profiler_wallclock_time = profiler_get_thread0_walltime(prof_main)
+    assertions: block
+      real(kind=prk) :: profiler_wallclock_time
 
-    @assertEqual(actual_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
+      actual_time = t2 - t1
+      profiler_wallclock_time = profiler_get_total_walltime(prof_main, 0_pik)
+
+      @assertEqual(actual_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
+    end block assertions
 
   end subroutine test_profiler
 

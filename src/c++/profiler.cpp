@@ -5,17 +5,31 @@
 \*----------------------------------------------------------------------------*/
 
 #include "profiler.h"
+#include "prof_gettime.h"
 
 #include <iostream>
 #include <cassert>
 #include <chrono>
 
 /**
+ * @brief Constructor for StartCalliperValues struct.
+ *
+ */
+
+Profiler::StartCalliperValues::StartCalliperValues(
+                                   time_point_t region_start_time, 
+                                   time_point_t calliper_start_time)
+  : region_start_time_(region_start_time)
+  , calliper_start_time_(calliper_start_time)
+  {}
+
+/**
  * @brief Constructor
  *
  */
 
-Profiler::Profiler(){
+Profiler::Profiler()
+{
 
   // Set the maximum number of threads.
   max_threads_ = 1;
@@ -26,11 +40,15 @@ Profiler::Profiler(){
   // Create vector of hash tables: one hashtable for each thread.
   for (int tid=0; tid<max_threads_; ++tid)
   {
+
+    // Create a new table
     HashTable new_table(tid);
     thread_hashtables_.push_back(new_table);
 
-    std::vector<std::pair<size_t,time_point_t>> new_list;
+    // Create a new list
+    std::vector<std::pair<size_t,StartCalliperValues>> new_list;
     thread_traceback_.push_back(new_list);
+
   }
 
   // Assertions
@@ -40,12 +58,17 @@ Profiler::Profiler(){
 }
 
 /**
- * @brief  Start timing.
- *
+ * @brief  Start timing a profiled code region.
+ * @param [in]  region_name   The code region name.
+ * @returns     Unique hash for the code region being started.
+ * @todo        Revisit profiling overhead measurement.  (#64)
  */
 
 size_t Profiler::start(std::string_view region_name)
 {
+
+  // Note the time on entry to the profiler call.
+  time_point_t calliper_start_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -59,23 +82,30 @@ size_t Profiler::start(std::string_view region_name)
   // Insert this region into the thread's hash table.
   size_t const hash = thread_hashtables_[tid].query_insert(region_name);
 
-  // Add routine to the traceback.
-  auto start_time = std::chrono::steady_clock::now();
-  thread_traceback_[tid].push_back(std::make_pair(hash, start_time));
+  // Store the calliper and region start times.
+  auto region_start_time = prof_gettime();
+  StartCalliperValues new_times = StartCalliperValues(region_start_time, calliper_start_time);
+  thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
 
   return hash;
 }
 
 /**
- * @brief  Stop timing.
- *
+ * @brief  Stop timing a profiled code region.
+ * @param [in]   Hash of the profiled code region being stopped.
+ * @note  The calliper time (spent in the profiler) is measured by
+ *        differencing the beginning of the start calliper from the end of the stop
+ *        calliper, and subtracting the measured region time. Hence larger
+ *        absolute times are being measured, which are less likely to suffer
+ *        fractional error from precision limitations of the clock.   
+ * @todo  Revisit profiling overhead measurement. (#64)
  */
 
 void Profiler::stop(size_t const hash)
 {
 
-  // First job: log the stop time.
-  auto stop_time = std::chrono::steady_clock::now();
+  // Log the region stop time.
+  auto region_stop_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -93,20 +123,36 @@ void Profiler::stop(size_t const hash)
     exit (100);
   }
 
-  // Increment the time for this
-  auto start_time = thread_traceback_[tid].back().second;
-  auto deltatime  = stop_time - start_time;
-  thread_hashtables_[tid].update(hash, deltatime);
+  // Get start calliper values needed for subsequent computation.
+  StartCalliperValues& start_calliper_times = 
+    thread_traceback_[tid].back().second;
+
+  // Compute the region time
+  auto region_duration = region_stop_time - start_calliper_times.region_start_time_;
+
+  // Do the hashtable update for the child region.
+  thread_hashtables_[tid].update(hash, region_duration);
+
+  // Precompute times as far as possible. We just need the calliper stop time
+  // later.
+  //   (t4-t1) = calliper time + region time 
+  //   (t3-t2) = region_duration
+  //   calliper_time = (t4-t1) - (t3-t2)  = t4 - ( t3-t2 + t1)
+  auto temp_sum = start_calliper_times.calliper_start_time_ + region_duration;
 
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
 
-  // Add child time to parent
+  // Prepare to add timings to parent
   if (! thread_traceback_[tid].empty()) {
-    size_t parent_hash = thread_traceback_[tid].back().first;
-    thread_hashtables_[tid].add_child_time(parent_hash, deltatime);
-  }
+   size_t parent_hash = thread_traceback_[tid].back().first;
+   thread_hashtables_[tid].add_child_time(parent_hash, region_duration);
 
+   // Account for time spent in the profiler itself. 
+   auto calliper_stop_time = prof_gettime();
+   auto calliper_time = calliper_stop_time - temp_sum;
+   thread_hashtables_[tid].add_overhead_time(parent_hash, calliper_time);
+  }
 }
 
 /**
@@ -124,26 +170,55 @@ void Profiler::write()
 }
 
 /**
- * @brief  Get the total (inclusive) time of everything below the specified hash.
+ * @brief  Get the total (inclusive) time taken by a region and everything below it.
  *
- * @param[in] hash  The hash corresponding to the region of interest.
- *
- * @note   This function is normally expected to be used to return the total
- *         wallclock time for whole run. Since this value is required only from
- *         thread 0, the function does not take a thread ID argument and returns
- *         the value for thread 0 only. Taking the hash argument avoids the need
- *         to store the top-level hash inside the profiler itself.
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
  *
  */
 
-double Profiler::get_thread0_walltime(size_t const hash) const
+double Profiler::get_total_walltime(size_t const hash, int const thread_id)
 {
-  auto tid = static_cast<hashtable_iterator_t_>(0);
+  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_total_walltime(hash);
 }
 
 /**
- * @brief  Get the self walltime for the specified hash.
+ * @brief  Get the total (inclusive) time taken by a region, and everything below it,
+ *         minus the profiling overheads for calls to direct child regions.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
+ *
+ */
+
+double Profiler::get_total_raw_walltime(size_t const hash, int const thread_id)
+{
+  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
+  return thread_hashtables_[tid].get_total_raw_walltime(hash);
+}
+
+/**
+ * @brief  Get the profiling overhead time experienced by a region, 
+ *         as incurred by calling child regions.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
+ *
+ */
+
+double Profiler::get_overhead_walltime(size_t const hash, int const thread_id)
+{
+  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
+  return thread_hashtables_[tid].get_overhead_walltime(hash);
+}
+
+/**
+ * @brief  Get the self (exclusive) time spent executing a region, minus the
+ *         cost of child regions.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
  *
  */
 
@@ -154,7 +229,14 @@ double Profiler::get_self_walltime(size_t const hash, int const input_tid)
 }
 
 /**
- * @brief  Get the child walltime for the specified hash.
+ * @brief  Get the time spent executing children of a region, including 
+ *         the time taken by their descendents.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
+ *
+ * @note  This time does not include profiling overhead costs incurred directly
+ *        by the region.
  *
  */
 
@@ -165,7 +247,14 @@ double Profiler::get_child_walltime(size_t const hash, int const input_tid) cons
 }
 
 /**
- * @brief  Get the region name corresponding to the input hash.
+ * @brief  Get the name of a region corresponding to a given hash.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest. 
+ * @param[in] thread_id  The thread ID for which to return the walltime.
+ *
+ * @note  The thread ID is included to future-proof against the possibility of
+ *        including the thread ID in hashed strings. Hence the hash may not be
+ *        the same on each thread.
  *
  */
 
@@ -192,3 +281,21 @@ unsigned long long int Profiler::get_call_count(size_t const hash, int const inp
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_call_count(hash);
 }
+
+/**
+ * @brief  Get the number of calliper pairs called on the specified thread.
+ *
+ * @param[in] hash  The hash corresponding to the region of interest.
+ * @param[in] tid   The ID corresponding to the thread of interest.
+ *
+ * @returns  Returns an integer corresponding to the number of times the
+ *           region of interest has been called on the specified thread.
+ *
+ */
+
+unsigned long long int Profiler::get_prof_call_count(int const input_tid) const
+{
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_prof_call_count();
+}
+
