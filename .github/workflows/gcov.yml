@@ -60,10 +60,14 @@ jobs:
     - name: Run Gcov 
       run: gcov -j -m ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
 
-    - name: Run Lcov
+    - name: Inital Lcov Run
       shell: bash -l {0}
-      run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file coverage.info
-           
+      run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file basecoverage.info
+
+    - name: Extract relevant info 
+      shell: bash -l {0]}
+      run: lcov --extract basecoverage.info '${{github.workspace}}/src/*' --output-file coverage.info
+
     - name: Generate html
       shell: bash -l {0}
       run: genhtml coverage.info --output-directory out
