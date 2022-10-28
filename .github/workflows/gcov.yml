@@ -77,7 +77,8 @@ jobs:
         git add --force docs 
         git stash
         git remote update
-        git checkout gh-pages
+        git branch gh-pages
+        git checkout -b gh-pages
         git rm -rf docs/coverage
         git stash pop 
         git reset 
