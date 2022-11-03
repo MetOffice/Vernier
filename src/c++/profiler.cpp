@@ -135,7 +135,7 @@ void Profiler::stop(size_t const hash)
 
   // Precompute times as far as possible. We just need the calliper stop time
   // later.
-  //   (t4-t1) = calliper time + region time 
+  //   (t4-t1) = calliper time + region duration
   //   (t3-t2) = region_duration
   //   calliper_time = (t4-t1) - (t3-t2)  = t4 - ( t3-t2 + t1)
   auto temp_sum = start_calliper_times.calliper_start_time_ + region_duration;
@@ -143,16 +143,20 @@ void Profiler::stop(size_t const hash)
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
 
-  // Prepare to add timings to parent
+  // Account for time spent in the profiler itself. 
+  auto calliper_stop_time = prof_gettime();
+  auto calliper_time = calliper_stop_time - temp_sum;
+
+  // Add child and overhead times to parent.
   if (! thread_traceback_[tid].empty()) {
    size_t parent_hash = thread_traceback_[tid].back().first;
-   thread_hashtables_[tid].add_child_time(parent_hash, region_duration);
-
-   // Account for time spent in the profiler itself. 
-   auto calliper_stop_time = prof_gettime();
-   auto calliper_time = calliper_stop_time - temp_sum;
-   thread_hashtables_[tid].add_overhead_time(parent_hash, calliper_time);
+   //thread_hashtables_[tid].add_child_time   (parent_hash, region_duration);
+   //thread_hashtables_[tid].add_overhead_time(parent_hash, calliper_time);
+   thread_hashtables_[tid].add_subtimes(parent_hash, region_duration, calliper_time);
   }
+
+  // Add overhead time to the separate profiler entry.
+  thread_hashtables_[tid].add_total_overhead_time(calliper_time);
 }
 
 /**

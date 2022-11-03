@@ -93,8 +93,10 @@ class HashTable{
 
     // Member functions
     std::vector<size_t> list_keys();
-    void add_child_time   (size_t const, time_duration_t);
-    void add_overhead_time(size_t const, time_duration_t);
+    void add_subtimes   (size_t const, time_duration_t const, time_duration_t const);
+    void add_child_time (size_t const, time_duration_t const);
+    void add_overhead_time (size_t const, time_duration_t const);
+    void add_total_overhead_time(time_duration_t const);
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;

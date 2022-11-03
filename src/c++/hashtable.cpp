@@ -88,33 +88,70 @@ void HashTable::update(size_t hash, time_duration_t time_delta)
 }
 
 /**
- * @brief  Add child region time to parent.
+ * @brief  Add child region and overhead times to parent.
  * @param [in] hash        The hash of the child region to update.
  * @param [in] time_delta  The time spent in the child region.
  */
 
-void HashTable::add_child_time(size_t const hash, time_duration_t time_delta)
+void HashTable::add_child_time(size_t const hash,
+                               time_duration_t const time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
   assert (table_.count(hash) > 0);
 
-  // Increment the walltime for this hash entry
   auto& entry = table_.at(hash);
+
+  // Increment the child time for this entry
   entry.child_walltime_ += time_delta;
 }
 
 /**
- * @brief  Add profiling overhead time, incurred when calling a child, to the
- *         parent region.
- * @param [in] hash           The hash of the child region to update.
- * @param [in] calliper_time  The profiling overhead time.
+ * @brief  Add child region and overhead times to parent.
+ * @param [in] hash        The hash of the child region to update.
+ * @param [in] time_delta  The time spent in the child region.
  */
 
-void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_time) 
+void HashTable::add_overhead_time(size_t const hash,
+                             time_duration_t const calliper_time)
 {
+  // Assertions
+  assert (table_.size() > 0);
+  assert (table_.count(hash) > 0);
+
   auto& entry = table_.at(hash);
+
+  // Increment the overhead time for this entry
   entry.overhead_walltime_ += calliper_time;
+}
+
+/**
+ * @brief  Add child region and overhead times to parent.
+ * @param [in] hash        The hash of the child region to update.
+ * @param [in] time_delta  The time spent in the child region.
+ */
+
+void HashTable::add_subtimes(size_t const hash, 
+                             time_duration_t const time_delta,
+                             time_duration_t const calliper_time)
+{
+  // Assertions
+  assert (table_.size() > 0);
+  assert (table_.count(hash) > 0);
+
+  auto& entry = table_.at(hash);
+
+  // Increment the child time for this entry
+  entry.child_walltime_ += time_delta;
+
+  // Increment the overhead time for this entry
+  entry.overhead_walltime_ += calliper_time;
+}
+
+void HashTable::add_total_overhead_time(time_duration_t const calliper_time)
+{
+  auto& entry = table_.at(profiler_hash_);
+  entry.total_walltime_ += calliper_time;
 }
 
 /**
@@ -205,21 +242,23 @@ void HashTable::prepare_computed_times(size_t const hash)
    // corresponding values are zero thus far.
    for (auto& [hash, entry] : table_) {
      prepare_computed_times(hash);
-     total_overhead_time += entry.overhead_walltime_;
    }
 
-   // Check that the special profiler hash entries are all zero, even after the
-   // above loop.
-   assert(table_.at(profiler_hash_).self_walltime_      == time_duration_t::zero());
-   assert(table_.at(profiler_hash_).child_walltime_     == time_duration_t::zero());
-   assert(table_.at(profiler_hash_).total_walltime_     == time_duration_t::zero());
-   assert(table_.at(profiler_hash_).total_raw_walltime_ == time_duration_t::zero());
+   /// // Check that the special profiler hash entries are all zero, even after the
+   /// // above loop.
+   /// assert(table_.at(profiler_hash_).self_walltime_      == time_duration_t::zero());
+   /// assert(table_.at(profiler_hash_).child_walltime_     == time_duration_t::zero());
+   /// assert(table_.at(profiler_hash_).total_walltime_     == time_duration_t::zero());
+   /// assert(table_.at(profiler_hash_).total_raw_walltime_ == time_duration_t::zero());
 
    // Set values for the profiler entry specifically in the hashtable.
-   table_.at(profiler_hash_).self_walltime_      = total_overhead_time;
-   table_.at(profiler_hash_).child_walltime_     = time_duration_t::zero();
-   table_.at(profiler_hash_).total_walltime_     = total_overhead_time;
-   table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time;
+   // table_.at(profiler_hash_).self_walltime_      = total_overhead_time_;
+   // table_.at(profiler_hash_).child_walltime_     = time_duration_t::zero();
+   // table_.at(profiler_hash_).total_walltime_     = total_overhead_time_;
+   // table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time_;
+
+   // std::cout << "My    thread ID: " << omp_get_thread_num() << std::endl;
+   // std::cout << "Table thread ID: " << tid_                 << std::endl;
 
 }
 
