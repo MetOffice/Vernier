@@ -8,6 +8,7 @@ include(CMakePackageConfigHelpers)
 # Add files source files to library.
 add_library(${CMAKE_PROJECT_NAME} SHARED
         profiler.h    profiler.cpp
+        writer.h      writer.cpp
         hashtable.h   hashtable.cpp
         )
 

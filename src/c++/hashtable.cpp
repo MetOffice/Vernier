@@ -91,7 +91,7 @@ void HashTable::add_child_time(size_t hash, time_duration_t time_delta)
  *
  */
 
-void HashTable::write(std::ofstream& outstream)
+void HashTable::print(std::ostream& outstream)
 {
 
   this->compute_self_times();

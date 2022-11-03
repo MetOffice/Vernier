@@ -84,7 +84,7 @@ class HashTable{
     // Prototypes
     size_t query_insert(std::string_view) noexcept;
     void update(size_t, time_duration_t);
-    void write(std::ofstream&);
+    void print(std::ostream&);
 
     // Member functions
     std::vector<size_t> list_keys();

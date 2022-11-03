@@ -66,9 +66,6 @@ contains
     t2 = omp_get_wtime();
     call profiler_stop(prof_main)
 
-    ! Write the profile
-    call profiler_write()
-
     actual_time = t2 - t1
     profiler_wallclock_time = profiler_get_thread0_walltime(prof_main)
 

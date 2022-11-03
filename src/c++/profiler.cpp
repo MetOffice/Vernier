@@ -7,6 +7,8 @@
 
 #include "profiler.h"
 
+#include "writer.h"
+
 #include <iostream>
 #include <cassert>
 #include <chrono>
@@ -114,47 +116,15 @@ void Profiler::stop(size_t const hash)
  * @brief  Write profile information to file.
  *
  * @note   The default file that the profiler will spit information into is
- *         called "profiler-output.txt". There also exists the option to set a
- *         custom name via the environment variable "ProfOut".
+ *         called "profiler-output". There also exists the option to set a
+ *         custom name via an environment variable.
  *
  */
 
 void Profiler::write()
 {
-  // Find current MPI rank
-  int current_rank;
-  MPI_Comm comm = MPI_COMM_WORLD;
-  MPI_Comm_rank(comm, &current_rank);
-
-  // Filename "tail" - will be different for each rank and appended onto the
-  // end of the output file name 
-  std::string mpi_filename_tail = "-" + std::to_string(current_rank);
-
-  // Pickup environment variable filename if it exists, if not use the default
-  // name of "profiler-output.txt". In either case, include the MPI rank in the
-  // name of the file.
-  std::ofstream output_stream;
-  const char* env_variable = std::getenv("PROFILER_OUTFILE");
-  std::string out_filename;
-  if (env_variable != NULL)
-  {
-    out_filename = env_variable + mpi_filename_tail;
-  }
-  else
-  {
-    delete env_variable;
-    out_filename = "profiler-output" + mpi_filename_tail;
-  }
-  output_stream.open(out_filename);
-
-  // Write to file
-  for (auto& it : thread_hashtables_)
-  {
-    it.write(output_stream);
-  }
-
-  output_stream.flush();
-  output_stream.close();
+  Writer scribe;
+  scribe.write(thread_hashtables_);
 }
 
 /**
