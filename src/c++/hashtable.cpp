@@ -95,40 +95,93 @@ void HashTable::write()
 
   this->compute_self_times();
 
-  std::string routine_at_thread = "Thread: " + std::to_string(tid_);
+  // Headers
+  std::string column = "     ";
 
-  // Write headings
   std::cout << "\n";
   std::cout
-    << std::setw(40) << std::left  << routine_at_thread  << " "
-    << std::setw(15) << std::right << "Self (s)"         << " "
-    << std::setw(15) << std::right << "Total (s)"        << " "
-    << std::setw(10) << std::right << "Calls"            << "\n";
-
-  std::cout << std::setfill('-');
-  std::cout
-    << std::setw(40) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(10) << "-" << "\n";
-  std::cout << std::setfill(' ');
+    << std::setw(3) << std::left  << "#"     
+    << std::setw(8) << std::left  << "% Time"     << column
+    << std::setw(8) << std::right << "Cumul"      << column
+    << std::setw(8) << std::right << "Self"       << column
+    << std::setw(8) << std::right << "Total"      << column
+    << std::setw(5) << std::right << "calls"      << column
+    << std::setw(8) << std::right << "Self"       << column
+    << std::setw(8) << std::right << "Total"      << column
+    << std::setw(8) << std::right << "Routine@"   << "\n";
+  std::cout 
+    << std::setw(75) << " " 
+    << std::setw(45) << std::left << "(Size; Size/sec; Size/call; MinSize; MaxSize)" << "\n";
+  
+  // Subheaders
+  std::cout 
+    << std::setw(3) << std::left  << ""     
+    << std::setw(8) << std::left  << "(self)"     << column
+    << std::setw(8) << std::right << "(sec)"      << column
+    << std::setw(8) << std::right << "(sec)"      << column
+    << std::setw(8) << std::right << "(sec)"      << column
+    << std::setw(5) << std::right << ""           << column
+    << std::setw(8) << std::right << "ms/call"    << column
+    << std::setw(8) << std::right << "ms/call"    << column
+    << std::setw(8) << std::right << ""           << "\n\n";
 
   // Create a vector from the hashtable and sort the entries according to self
   // walltime.  If optimisation of this is needed, it ought to be possible to
   // acquire a vector of hash-selftime pairs in the correct order, then use the
   // hashes to look up other information directly from the hashtable.
-  hashvec = std::vector<std::pair<size_t, HashEntry>>(table_.cbegin(), table_.cend());
+  auto hashvec = std::vector<std::pair<size_t, HashEntry>>(table_.cbegin(), table_.cend());
   std::sort(begin(hashvec), end(hashvec),
-      [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_;});
+      [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_; });
 
-  // Data entries
+  // Create a string to append onto the end of the region names
+  std::string region_name_tail = "@" + std::to_string(tid_);
+
+  // Find the highest walltime in table_, which should be the total runtime of
+  // the program. This is used later when calculating '% Time'.
+  double top_walltime = std::max_element
+  ( 
+    std::begin(hashvec), std::end(hashvec),
+    [] (auto a, auto b) {
+      return a.second.total_walltime_ < b.second.total_walltime_; 
+    } 
+  )->second.total_walltime_.count(); 
+
+  // Declare any variables external to HashEntry
+  int             region_number = 0;
+  double          percent_time;
+  time_duration_t cumul_walltime = time_duration_t::zero();
+  double          self_per_call;
+  double          total_per_call;
+  
+  // 
+  // Write data to file
+  // 
+
+  std::cout << std::fixed << std::showpoint << std::setprecision(3);
+
   for (auto& [hash, entry] : hashvec) {
+
+    // Calculate non-HashEntry data
+    region_number++;
+    percent_time    = 100.0 * ( entry.self_walltime_.count() / top_walltime );
+    cumul_walltime += entry.self_walltime_;
+    self_per_call   = 1000.0 * ( entry.self_walltime_.count()  / static_cast<double>(entry.call_count_) );
+    total_per_call  = 1000.0 * ( entry.total_walltime_.count() / static_cast<double>(entry.call_count_) );
+
+    // Write everything out 
     std::cout
-      << std::setw(40) << std::left  << entry.region_name_            << " "
-      << std::setw(15) << std::right << entry.self_walltime_.count()  << " "
-      << std::setw(15) << std::right << entry.total_walltime_.count() << " "
-      << std::setw(10) << std::right << entry.call_count_             << "\n";
+      << std::setw(3) << std::left  << region_number    
+      << std::setw(8) << std::left  << percent_time                  << column
+      << std::setw(8) << std::right << cumul_walltime.count()        << column
+      << std::setw(8) << std::right << entry.self_walltime_.count()  << column
+      << std::setw(8) << std::right << entry.total_walltime_.count() << column
+      << std::setw(5) << std::right << entry.call_count_             << column
+      << std::setw(8) << std::right << self_per_call                 << column
+      << std::setw(8) << std::right << total_per_call                << column
+      << std::setw(8) << std::right << entry.region_name_ + region_name_tail << "\n";
+
   }
+
 }
 
 /**
