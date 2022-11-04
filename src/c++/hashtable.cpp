@@ -133,9 +133,6 @@ void HashTable::write()
   std::sort(begin(hashvec), end(hashvec),
       [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_; });
 
-  // Create a string to append onto the end of the region names
-  std::string region_name_tail = "@" + std::to_string(tid_);
-
   // Find the highest walltime in table_, which should be the total runtime of
   // the program. This is used later when calculating '% Time'.
   double top_walltime = std::max_element
@@ -178,10 +175,21 @@ void HashTable::write()
       << std::setw(5) << std::right << entry.call_count_             << column
       << std::setw(8) << std::right << self_per_call                 << column
       << std::setw(8) << std::right << total_per_call                << column
-      << std::setw(8) << std::right << entry.region_name_ + region_name_tail << "\n";
+      << std::setw(8) << std::right << entry.region_name_            << "\n";
 
   }
 
+}
+
+/**
+ * @brief  Combines the table_ of two HashTable's together.
+ * 
+ * @param[in] ht  The input HashTable
+ */
+
+void HashTable::combine(const HashTable& ht)
+{
+  table_.insert(ht.table_.begin(), ht.table_.end());
 }
 
 /**

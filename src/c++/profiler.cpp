@@ -57,7 +57,8 @@ size_t Profiler::start(std::string_view region_name)
   assert (tid <= thread_traceback_.size());
 
   // Insert this region into the thread's hash table.
-  size_t const hash = thread_hashtables_[tid].query_insert(region_name);
+  std::string new_region_name = std::string(region_name) + "@" + std::to_string(tid);
+  size_t const hash = thread_hashtables_[tid].query_insert(new_region_name);
 
   // Add routine to the traceback.
   auto start_time = std::chrono::steady_clock::now();
@@ -116,11 +117,21 @@ void Profiler::stop(size_t const hash)
 
 void Profiler::write()
 {
-  // Write each one
+  // Remove any empty entries
+  thread_hashtables_.shrink_to_fit();
+
+  // Create a new HashTable object that will become a combination of every 
+  // HashTable in thread_hashtables_
+  HashTable one_table_to_rule_them_all(999);
+
+  // Fuse together all hashtables
   for (auto& it : thread_hashtables_)
   {
-    it.write();
+    one_table_to_rule_them_all.combine(it);
   }
+
+  // Write out the big one
+  one_table_to_rule_them_all.write();
 }
 
 /**

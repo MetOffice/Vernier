@@ -73,7 +73,6 @@ class HashTable{
     int tid_;
     std::unordered_map<size_t,HashEntry> table_;
     std::hash<std::string_view> hash_function_;
-    std::vector<std::pair<size_t, HashEntry>> hashvec;
 
   public:
 
@@ -85,6 +84,7 @@ class HashTable{
     size_t query_insert(std::string_view) noexcept;
     void update(size_t, time_duration_t);
     void write();
+    void combine(const HashTable& ht);
 
     // Member functions
     std::vector<size_t> list_keys();
