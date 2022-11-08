@@ -7,7 +7,6 @@
 #include "profiler.h"
 #include "hashvec.h"
 
-#include <iostream>
 #include <cassert>
 #include <chrono>
 

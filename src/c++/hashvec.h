@@ -1,3 +1,9 @@
+/*----------------------------------------------------------------------------*\
+ (c) Crown copyright 2022 Met Office. All rights reserved.
+ The file LICENCE, distributed with this code, contains details of the terms
+ under which the code may be used.
+\*----------------------------------------------------------------------------*/
+
 #ifndef HASHVEC_H
 #define HASHVEC_H
 

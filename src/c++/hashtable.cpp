@@ -4,7 +4,7 @@
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
-#include "hashvec.h"
+#include "hashtable.h"
 #include <cassert>
 #include <string>
 
