@@ -20,7 +20,7 @@ class HashVec {
     public:
 
       // Member functions
-      std::vector<std::pair<size_t,HashEntry>>* return_mem_address();
+      std::vector<std::pair<size_t,HashEntry>>& get();
       void sort();
       void write() const;
 

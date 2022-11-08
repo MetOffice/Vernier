@@ -115,10 +115,10 @@ std::vector<size_t> HashTable::list_keys()
  * 
  */
 
-void HashTable::append_to(std::vector<std::pair<size_t,HashEntry>>* hashvec_ptr)
+void HashTable::append_to(std::vector<std::pair<size_t,HashEntry>>& hashvec)
 {
   compute_self_times();
-  hashvec_ptr->insert(hashvec_ptr->end(), table_.begin(), table_.end());
+  hashvec.insert(hashvec.end(), table_.begin(), table_.end());
 }
 
 /**

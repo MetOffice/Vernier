@@ -10,9 +10,9 @@
 
 #include "hashvec.h"
 
-std::vector<std::pair<size_t,HashEntry>>* HashVec::return_mem_address()
+std::vector<std::pair<size_t,HashEntry>>* HashVec::get()
 {
-  return &hashvec_;
+  return hashvec_;
 }
 
 void HashVec::sort()

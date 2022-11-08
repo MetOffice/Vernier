@@ -122,7 +122,7 @@ void Profiler::write()
 
   for (auto& it : thread_hashtables_)
   {
-    it.append_to(new_hashvec.return_mem_address());
+    it.append_to(new_hashvec.get());
   }
 
   new_hashvec.sort();

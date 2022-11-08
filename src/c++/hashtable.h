@@ -89,7 +89,7 @@ class HashTable{
     std::vector<size_t> list_keys();
     void add_child_time(size_t, time_duration_t);
     void compute_self_times();
-    void append_to(std::vector<std::pair<size_t,HashEntry>>* hashvec_ptr);
+    void append_to(std::vector<std::pair<size_t,HashEntry>>& hashvec);
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;
