@@ -9,6 +9,7 @@
 
 #include <cassert>
 #include <chrono>
+#include <iostream>
 
 /**
  * @brief Constructor

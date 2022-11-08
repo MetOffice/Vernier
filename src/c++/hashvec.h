@@ -9,6 +9,15 @@
 
 #include "hashtable.h"
 
+/**
+ * @brief  Class containing the "hashvec", a STL vector of key-value pairs.
+ *
+ * The hashvec is used to sort from high to low self walltimes, since this
+ * can't be done on a traditional C++ hashtable. It also serves as a singular
+ * container for each thread's hashtable to go into.
+ *
+ */
+
 class HashVec {
 
     private: 

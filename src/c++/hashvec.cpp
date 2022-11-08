@@ -10,14 +10,25 @@
 
 #include "hashvec.h"
 
-std::vector<std::pair<size_t,HashEntry>>* HashVec::get()
+/**
+ * @brief Getter that returns a reference to the private hashvec.
+ * 
+ * @param[out]  hashvec_  The hashvec itself, a vector of key-value pairs.
+ *
+ */
+
+std::vector<std::pair<size_t,HashEntry>>& HashVec::get()
 {
   return hashvec_;
 }
 
+/**
+ * @brief CFunction that sorts all entries from high to low self walltime.
+ *
+ */
+
 void HashVec::sort()
 {
-    // Sort from high to low self_walltime_
     std::sort
     (
         begin(hashvec_), end(hashvec_),
@@ -26,6 +37,11 @@ void HashVec::sort()
         }
     );
 }
+
+/**
+ * @brief Write all data to file.
+ *
+ */
 
 void HashVec::write() const
 {
