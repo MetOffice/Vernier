@@ -11,6 +11,11 @@
 #include <cassert>
 #include <chrono>
 
+// Work around a GNU compiler bug.
+extern time_point_t logged_calliper_start_time;
+#pragma omp threadprivate(logged_calliper_start_time)
+time_point_t logged_calliper_start_time;
+
 /**
  * @brief Constructor for StartCalliperValues struct.
  *
@@ -59,6 +64,7 @@ Profiler::Profiler()
 
 /**
  * @brief  Start timing a profiled code region.
+ * @detail Calls two other start routines.
  * @param [in]  region_name   The code region name.
  * @returns     Unique hash for the code region being started.
  * @todo        Revisit profiling overhead measurement.  (#64)
@@ -66,9 +72,33 @@ Profiler::Profiler()
 
 size_t Profiler::start(std::string_view region_name)
 {
+  start1();
+  auto hash = start2(region_name);
+  return hash;
+}
 
-  // Note the time on entry to the profiler call.
-  time_point_t calliper_start_time = prof_gettime();
+/**
+ * @brief  Start timing a profiled code region, part 1: make a 
+ *         threadprivate note of the time.
+ * @param [in]  region_name   The code region name.
+ * @returns     Unique hash for the code region being started.
+ * @todo        Revisit profiling overhead measurement.  (#64)
+ */
+
+void Profiler::start1()
+{
+  logged_calliper_start_time = prof_gettime();
+}
+
+/**
+ * @brief  Start timing a profiled code region, part 2.
+ * @param [in]  region_name   The code region name.
+ * @returns     Unique hash for the code region being started.
+ * @todo        Revisit profiling overhead measurement.  (#64)
+ */
+
+size_t Profiler::start2(std::string_view region_name)
+{
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -84,7 +114,8 @@ size_t Profiler::start(std::string_view region_name)
 
   // Store the calliper and region start times.
   auto region_start_time = prof_gettime();
-  StartCalliperValues new_times = StartCalliperValues(region_start_time, calliper_start_time);
+  StartCalliperValues new_times = StartCalliperValues(
+            region_start_time, logged_calliper_start_time);
   thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
 
   return hash;

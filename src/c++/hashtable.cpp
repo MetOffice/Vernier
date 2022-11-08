@@ -69,7 +69,7 @@ size_t HashTable::query_insert(std::string_view region_name) noexcept
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(size_t hash, time_duration_t time_delta)
+void HashTable::update(size_t const hash, time_duration_t time_delta)
 {
   // Assertions
   assert (table_.size() > 0);

@@ -21,7 +21,8 @@
 #include <cstring>
 
 extern "C" {
-  void   c_profiler_start(long int&, char const*);
+  void   c_profiler_start1();
+  void   c_profiler_start2(long int&, char const*);
   void   c_profiler_stop (long int const&);
   void   c_profiler_write();
   double c_get_total_walltime(long int const&, int const&);
@@ -31,9 +32,18 @@ extern "C" {
  * @brief  Start timing a named region and return a unique handle.
  */
 
-void c_profiler_start(long int& hash_out, char const* name)
+void c_profiler_start1()
 {
-  size_t hash = prof.start( name );
+  prof.start1();
+}
+
+/**
+ * @brief  Start timing a named region and return a unique handle.
+ */
+
+void c_profiler_start2(long int& hash_out, char const* name)
+{
+  size_t hash = prof.start2( name );
 
   // Ensure that the source and destination have the same size.
   static_assert(sizeof(hash) == sizeof(hash_out), "Hash/Out size mismatch.");
