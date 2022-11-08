@@ -5,6 +5,7 @@
 \*----------------------------------------------------------------------------*/
 
 #include "profiler.h"
+#include "hashvec.h"
 
 #include <iostream>
 #include <cassert>
@@ -117,22 +118,19 @@ void Profiler::stop(size_t const hash)
 
 void Profiler::write()
 {
-  // Remove any empty entries
-  thread_hashtables_.shrink_to_fit();
 
-  // Create a new HashTable object that will become a combination of every 
-  // HashTable in thread_hashtables_
-  HashTable one_table_to_rule_them_all(999);
+  HashVec new_hashvec;
 
-  // Fuse together all hashtables
   for (auto& it : thread_hashtables_)
   {
-    one_table_to_rule_them_all.combine(it);
+    it.append_to(new_hashvec.return_mem_address());
   }
 
-  // Write out the big one
-  one_table_to_rule_them_all.write();
+  new_hashvec.sort();
+  new_hashvec.write();
+
 }
+
 
 /**
  * @brief  Get the total (inclusive) time of everything below the specified hash.

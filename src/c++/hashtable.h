@@ -84,12 +84,12 @@ class HashTable{
     size_t query_insert(std::string_view) noexcept;
     void update(size_t, time_duration_t);
     void write();
-    void combine(const HashTable& ht);
 
     // Member functions
     std::vector<size_t> list_keys();
     void add_child_time(size_t, time_duration_t);
     void compute_self_times();
+    void append_to(std::vector<std::pair<size_t,HashEntry>>* hashvec_ptr);
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;
