@@ -7,96 +7,48 @@
 
 /**
  * @file   writer.h
- * @brief  Contains writer class and handles IO.
+ * @brief  Contains the writer class, which handles IO.
  *
- * Contains a strategy method made up of a base IO class + derived classes,
- * aswell as context and writer classes which handle tasks such as creation 
- * of pointers and calling the correct methods.
+ * Implements a strategy pattern that favours using functions over 
+ * single-method objects, hence reducing the number of classes required. 
  *
  */
 
+#ifndef WRITER_H
+#define WRITER_H
+
 #include <vector>
-#include <memory>
-#include <fstream>
+#include <functional>
 #include "hashtable.h"
 
 /**
- * @brief  IO interface class.
+ * @brief  Writer class, which sits above hashtable and is constructed 
+ *         within the profiler.
  *
- * An interface-style base class which contains a pure virtual write method,
- * which can then be overloaded by derived classes.
- *
- */
-
-class IO_Interface {
-
-    protected:
-
-      std::ofstream output_stream;
-
-    public:
-
-      // Virtual constructor
-      virtual ~IO_Interface() = default;
-
-      // Pure virtual "write" method
-      virtual void write(std::vector<HashTable>) = 0;
-
-};
-
-/**
- * @brief  Derived class for multiple-file output.
- * 
- * Overloads the pure virtual write method in IO_Interface.
+ * Any callable function can be passed into the writer class constructor and
+ * subsequently executed using the execute method. Different strategies can be
+ * included as static member functions, such as MultiFile.
  *
  */
 
-class MultipleFiles : public IO_Interface {
+class Writer {
 
-    public:
+  private:
 
-      void write(std::vector<HashTable> ht) override;
-      
+    // Strategy
+    std::function<void(std::vector<HashTable>)> strategy_;
+
+  public:
+
+    // Constructor
+    explicit Writer(std::function<void(std::vector<HashTable>)>);
+
+    // Execution method
+    void executeStrategy(std::vector<HashTable>);
+
+    // Strategies 
+    static void MultiFile(std::vector<HashTable>);
+
 };
 
-/**
- * @brief  Context class.
- * 
- * A key part of any strategy method which is responsible for maintaining
- * a reference to one of the interface's derived classes. It has an execution
- * method which calls the appropriate derived class write method.
- *
- */
-
-class IO_StrategyContext {
-
-    private:
-
-      std::unique_ptr<IO_Interface> io_strategy_;
-
-    public:
-
-      // Constructor 
-      explicit IO_StrategyContext(std::unique_ptr<IO_Interface> temp_ptr);
-
-      // Methods
-      void setStrategy(std::unique_ptr<IO_Interface> temp_ptr);
-      void executeStrategy(std::vector<HashTable> ht); 
-    
-};
-
-/**
- * @brief  Writer class.
- * 
- * A class that picks a strategy and creates a context class object. This 
- * class serves as something for the profiler to interface with. 
- *
- */
-
-class Writer { 
-
-    public:
-
-      void write(std::vector<HashTable> ht);
-      
-};
+#endif

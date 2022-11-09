@@ -7,16 +7,37 @@
 
 #include "writer.h"
 #include <mpi.h>
+#include <fstream>
 
 /**
- * @brief  Writes out all entires in the hashtable into a separate file for 
- *         each mpi rank.
- * 
- * @param[in] htvec  A vector of hashtables.
+ * @brief Writer constructor.
  *
  */
 
-void MultipleFiles::write(std::vector<HashTable> htvec) 
+Writer::Writer(std::function<void(std::vector<HashTable>)> in) 
+    : strategy_(std::move(in)) 
+    {} 
+
+/**
+ * @brief Method that executes whatever function is passed to strategy_ via the
+ *        constructor.
+ *
+ */
+
+void Writer::executeStrategy(std::vector<HashTable> htv)
+{
+    strategy_(htv);
+}
+
+/**
+ * @brief The multiple-output-files strategy.
+ * 
+ * Writes out data from the vector of HashTables given to it into one file per
+ * mpi rank.
+ *
+ */
+
+void Writer::MultiFile(std::vector<HashTable> htv)
 {
     // Find current MPI rank
     int current_rank;
@@ -41,70 +62,17 @@ void MultipleFiles::write(std::vector<HashTable> htvec)
         delete env_variable;
         out_filename = "profiler-output" + mpi_filename_tail;
     }
+    std::ofstream output_stream;
     output_stream.open(out_filename);
 
-    // Write to file then close it
-    for (auto& it : htvec)
+    //
+    // Write to file 
+    //
+    for (auto& it : htv)
     {
         it.print(output_stream);
     }
+
     output_stream.flush();
     output_stream.close();
-}
-
-/**
- * @brief  Context class constructor.
- * 
- * @param[in] temp_ptr  Pointer to IO Interface, which will be empty after 
- *                      ownership is transferred to io_strategy_
- *
- */
-
-IO_StrategyContext::IO_StrategyContext(std::unique_ptr<IO_Interface> temp_ptr) 
-    : io_strategy_(std::move(temp_ptr)) 
-    {}
-
-/**
- * @brief  Allows the strategy to be switched.
- * 
- * @param[in] temp_ptr  Pointer to IO Interface, which will be empty after 
- *                      ownership is transferred to io_strategy_
- *
- */
-
-void IO_StrategyContext::setStrategy(std::unique_ptr<IO_Interface> temp_ptr)
-{
-    io_strategy_ = std::move(temp_ptr);
-}
-
-/**
- * @brief  Calls the write method linked to whichever derived class the 
- *         strategy is referencing.
- * 
- * @param[in] htvec  A vector of hashtables.
- *
- */
-
-void IO_StrategyContext::executeStrategy(std::vector<HashTable> htvec)
-{
-    io_strategy_->write(htvec);
-}
-
-/**
- * @brief  Strategy decision is made and context class object created in order
- *         to execute the appropriate write method.
- * 
- * @param[in] htvec  A vector of hashtables.
- *
- */
-
-void Writer::write(std::vector<HashTable> htvec)
-{
-    const char* user_strat = std::getenv("PROF_IO_MODE");
-    if ( user_strat == NULL || static_cast<std::string>(user_strat) == "MultipleFiles")
-    {
-        IO_StrategyContext contextObj(std::move(std::make_unique<MultipleFiles>()));
-        contextObj.executeStrategy(htvec);
-    }
-    else throw std::runtime_error("Invalid PROF_IO_MODE value");
 }

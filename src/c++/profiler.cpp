@@ -123,8 +123,16 @@ void Profiler::stop(size_t const hash)
 
 void Profiler::write()
 {
-  Writer scribe;
-  scribe.write(thread_hashtables_);
+
+  const char* user_strat = std::getenv("PROF_IO_MODE");
+
+  if ( user_strat == NULL || static_cast<std::string>(user_strat) == "MultipleFiles" )
+  {
+    Writer scribe(Writer::MultiFile);
+    scribe.executeStrategy(thread_hashtables_);
+  }
+  else throw std::runtime_error("Invalid PROF_IO_MODE choice");
+
 }
 
 /**
