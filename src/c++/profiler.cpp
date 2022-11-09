@@ -174,20 +174,28 @@ void Profiler::stop(size_t const hash)
   // Remove from the end of the list.
   thread_traceback_[tid].pop_back();
 
+  // The sequence of code that follows is aimed at leaving only minimal and
+  // simple operations after the call to prof_gettime().
+  time_duration_t* parent_overhead_time_ptr = nullptr;
+
+  // Acquire parent pointers
+  if (! thread_traceback_[tid].empty()){
+    size_t parent_hash = thread_traceback_[tid].back().first;
+    parent_overhead_time_ptr = thread_hashtables_[tid].add_child_time(
+                                         parent_hash, region_duration);
+  }
+
+  // Increment profiler calls, and get a reference to the total overhead time.
+  auto& total_overhead_time = thread_hashtables_[tid].increment_profiler_calls();
+
   // Account for time spent in the profiler itself. 
   auto calliper_stop_time = prof_gettime();
   auto calliper_time = calliper_stop_time - temp_sum;
 
-  // Add child and overhead times to parent.
-  if (! thread_traceback_[tid].empty()) {
-   size_t parent_hash = thread_traceback_[tid].back().first;
-   //thread_hashtables_[tid].add_child_time   (parent_hash, region_duration);
-   //thread_hashtables_[tid].add_overhead_time(parent_hash, calliper_time);
-   thread_hashtables_[tid].add_subtimes(parent_hash, region_duration, calliper_time);
-  }
-
-  // Add overhead time to the separate profiler entry.
-  thread_hashtables_[tid].add_total_overhead_time(calliper_time);
+  // Increment the overhead time both the parent and total overhead times, using
+  // previously-obtained pointers or references, as appropriate.
+  if(parent_overhead_time_ptr){ *parent_overhead_time_ptr += calliper_time; }
+  total_overhead_time += calliper_time;
 }
 
 /**

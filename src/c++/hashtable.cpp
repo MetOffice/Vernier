@@ -80,79 +80,41 @@ void HashTable::update(size_t const hash, time_duration_t time_delta)
   entry.total_walltime_ += time_delta;
 
   // Update the number of times this region has been called
-  entry.call_count_++;
+  ++entry.call_count_;
 
-  // Also increment the number of calliper-pairs called.
-  auto& profiler_entry = table_.at(profiler_hash_);
-  profiler_entry.call_count_++;
 }
 
 /**
- * @brief  Add child region and overhead times to parent.
- * @param [in] hash        The hash of the child region to update.
- * @param [in] time_delta  The time spent in the child region.
+ * @brief
+ *
  */
 
-void HashTable::add_child_time(size_t const hash,
-                               time_duration_t const time_delta)
+time_duration_t* HashTable::add_child_time(
+                         size_t const hash,
+                         time_duration_t child_walltime)
 {
-  // Assertions
-  assert (table_.size() > 0);
-  assert (table_.count(hash) > 0);
-
   auto& entry = table_.at(hash);
-
-  // Increment the child time for this entry
-  entry.child_walltime_ += time_delta;
+  entry.child_walltime_ += child_walltime;
+  return &entry.overhead_walltime_;
 }
 
 /**
- * @brief  Add child region and overhead times to parent.
- * @param [in] hash        The hash of the child region to update.
- * @param [in] time_delta  The time spent in the child region.
+ * @brief
+ *
  */
 
-void HashTable::add_overhead_time(size_t const hash,
-                             time_duration_t const calliper_time)
-{
-  // Assertions
-  assert (table_.size() > 0);
-  assert (table_.count(hash) > 0);
-
-  auto& entry = table_.at(hash);
-
-  // Increment the overhead time for this entry
-  entry.overhead_walltime_ += calliper_time;
-}
-
-/**
- * @brief  Add child region and overhead times to parent.
- * @param [in] hash        The hash of the child region to update.
- * @param [in] time_delta  The time spent in the child region.
- */
-
-void HashTable::add_subtimes(size_t const hash, 
-                             time_duration_t const time_delta,
-                             time_duration_t const calliper_time)
-{
-  // Assertions
-  assert (table_.size() > 0);
-  assert (table_.count(hash) > 0);
-
-  auto& entry = table_.at(hash);
-
-  // Increment the child time for this entry
-  entry.child_walltime_ += time_delta;
-
-  // Increment the overhead time for this entry
-  entry.overhead_walltime_ += calliper_time;
-}
-
-void HashTable::add_total_overhead_time(time_duration_t const calliper_time)
+time_duration_t& HashTable::increment_profiler_calls()
 {
   auto& entry = table_.at(profiler_hash_);
-  entry.total_walltime_ += calliper_time;
+  ++entry.call_count_;
+  return entry.total_walltime_;
 }
+
+/**
+ * @brief  Add child region and overhead times to parent.
+ * @param [in] hash        The hash of the child region to update.
+ * @param [in] time_delta  The time spent in the child region.
+ */
 
 /**
  * @brief  Writes all entries in the hashtable, sorted according to self times.
