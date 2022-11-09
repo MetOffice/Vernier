@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 # Function to simplify adding unit-tests
 function(add_unit_test test_name cpp_file)
     add_executable(${test_name} ${cpp_file})

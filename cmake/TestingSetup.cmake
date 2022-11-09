@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 # This sets up the testing framework inclusion for the project, optionally
 # googletest can be downloaded from the git repository and built in the main
 # build directory for use by ctest. By default cmake will use find_package to

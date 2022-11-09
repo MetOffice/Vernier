@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 # Set up the installation and creation of *.cmake files for use with the
 # find_package cmake function.
 install(

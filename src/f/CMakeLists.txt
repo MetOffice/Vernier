@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/modules)
 
 # Testing for building a fortran lib and executable.
@@ -24,3 +29,8 @@ install(TARGETS ${CMAKE_PROJECT_NAME}_f EXPORT "${CMAKE_PROJECT_NAME}Targets"
         NAMELINK_COMPONENT  "${CMAKE_PROJECT_NAME}_Development"
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# On installation, copy .mod files to the `include` directory.
+install(DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/ DESTINATION include)
+
+
