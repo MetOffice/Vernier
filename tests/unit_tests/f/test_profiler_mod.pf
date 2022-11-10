@@ -63,9 +63,6 @@ contains
     t2 = omp_get_wtime();
     call profiler_stop(prof_main)
 
-    ! Write the profile
-    call profiler_write()
-
     assertions: block
       real(kind=prk) :: profiler_wallclock_time
 

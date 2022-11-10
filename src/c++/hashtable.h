@@ -28,9 +28,9 @@
 #include <string>
 #include <string_view>
 #include <chrono>
+#include <fstream>
 
 #include "prof_gettime.h"
-
 
 /**
  * @brief  Structure to hold information for a particular routine.
@@ -74,7 +74,6 @@ class HashTable{
     size_t profiler_hash_;
     std::unordered_map<size_t,HashEntry> table_;
     std::hash<std::string_view> hash_function_;
-    std::vector<std::pair<size_t, HashEntry>> hashvec;
 
     // Private member functions
     void prepare_computed_times(size_t const);
@@ -89,7 +88,7 @@ class HashTable{
     // Prototypes
     size_t query_insert(std::string_view) noexcept;
     void update(size_t, time_duration_t);
-    void write();
+    void print(std::ostream&);
 
     // Member functions
     std::vector<size_t> list_keys();

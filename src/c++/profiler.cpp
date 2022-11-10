@@ -7,6 +7,8 @@
 #include "profiler.h"
 #include "prof_gettime.h"
 
+#include "writer.h"
+
 #include <iostream>
 #include <cassert>
 #include <chrono>
@@ -156,17 +158,27 @@ void Profiler::stop(size_t const hash)
 }
 
 /**
- * @brief  Write profile information.
+ * @brief  Write profile information to file.
+ *
+ * @note   The default file that the profiler will spit information into is
+ *         called "profiler-output". There also exists the option to set a
+ *         custom name via an environment variable.
  *
  */
 
 void Profiler::write()
 {
-  // Write each one
-  for (auto& it : thread_hashtables_)
+
+  // Find user-defined IO method (will return NULL if empty)
+  const char* user_strat = std::getenv("PROF_IO_MODE");
+
+  if ( user_strat == NULL || static_cast<std::string>(user_strat) == "MultipleFiles" )
   {
-    it.write();
+    Writer scribe(Writer::MultiFile);
+    scribe.executeStrategy(thread_hashtables_);
   }
+  else throw std::runtime_error("Invalid PROF_IO_MODE choice");
+
 }
 
 /**
