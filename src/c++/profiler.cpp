@@ -169,6 +169,7 @@ void Profiler::stop(size_t const hash)
 void Profiler::write()
 {
 
+  // Find user-defined IO method (will return NULL if empty)
   const char* user_strat = std::getenv("PROF_IO_MODE");
 
   if ( user_strat == NULL || static_cast<std::string>(user_strat) == "MultipleFiles" )
