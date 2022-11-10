@@ -39,6 +39,7 @@ jobs:
       # Print the version number of installed libraries 
       run: | 
         gcc --version
+        $ echo |cpp -fopenmp -dM |grep -i open
         mpichversion
        
     - name: Configure CMake
