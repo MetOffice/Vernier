@@ -21,7 +21,7 @@ The code has been tested with the following compilers:
 
 ### Libraries 
 
-- OpenMP 5.0 (from GCC 9.4.0)
+- OpenMP 4.5 
 - MPICH 3.3.2
 
 ### Testing Framework and Documentation
