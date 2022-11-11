@@ -158,12 +158,17 @@ void Profiler::stop(size_t const hash)
   tid = static_cast<hashtable_iterator_t_>(omp_get_thread_num());
 #endif
 
-  // Checks - which hash is last on the traceback list?
   auto call_depth_it = static_cast<pair_iterator_t_>(call_depth);
-  size_t last_hash_on_list = thread_traceback_[tid].at(call_depth_it).first;
 
-  // Check that the hash is the one we expect. If it isn't, there is an error in
-  // the instrumentation.
+  // Check that we have called a start calliper before the stop calliper.
+  // If not, then the call depth would be -1.
+  if (call_depth < 0) {
+    std::cerr << "EMERGENCY STOP: stop called before start calliper." << "\n";
+    exit (101);
+  }
+
+  // Check: which hash is last on the traceback list?
+  size_t last_hash_on_list = thread_traceback_[tid].at(call_depth_it).first;
   if (hash != last_hash_on_list){
     std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
     exit (100);
