@@ -6,6 +6,7 @@
  */
 
 #include "writer.h"
+#include "formatter.h"
 #include <mpi.h>
 #include <fstream>
 
@@ -14,7 +15,7 @@
  *
  */
 
-Writer::Writer(std::function<void(std::vector<HashTable>)> in) 
+Writer::Writer(std::function<void(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>)> in) 
     : strategy_(std::move(in)) 
     {} 
 
@@ -24,9 +25,9 @@ Writer::Writer(std::function<void(std::vector<HashTable>)> in)
  *
  */
 
-void Writer::executeStrategy(std::vector<HashTable> htv)
+void Writer::executeStrategy(std::function<void(std::ofstream&, Formatter&)> f_in, std::vector<HashTable> htv)
 {
-    strategy_(htv);
+    strategy_(f_in, htv);
 }
 
 /**
@@ -37,7 +38,7 @@ void Writer::executeStrategy(std::vector<HashTable> htv)
  *
  */
 
-void Writer::MultiFile(std::vector<HashTable> htv)
+void Writer::MultiFile(std::function<void(std::ofstream&, Formatter&)> f_in, std::vector<HashTable> htv)
 {
     // Find current MPI rank
     int current_rank;
@@ -66,16 +67,16 @@ void Writer::MultiFile(std::vector<HashTable> htv)
     //
     // Write to file 
     //
-    HashVec new_hashvec;
+    Formatter formatter(f_in);
 
-    for (auto& it : thread_hashtables_)
+    for (auto& it : htv)
     {
-      it.append_to(new_hashvec.get());
+        it.append_to(formatter.get_hashvec());
     }
 
-    new_hashvec.sort();
-    new_hashvec.write();
-
+    formatter.sort_hashvec();
+    formatter.executeStrategy(output_stream, formatter);
+    
     output_stream.flush();
     output_stream.close();
 }

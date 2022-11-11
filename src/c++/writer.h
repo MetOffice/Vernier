@@ -20,6 +20,7 @@
 #include <vector>
 #include <functional>
 #include "hashtable.h"
+#include "formatter.h"
 
 /**
  * @brief  Writer class, which sits above hashtable and is constructed 
@@ -36,18 +37,18 @@ class Writer {
   private:
 
     // Strategy
-    std::function<void(std::vector<HashTable>)> strategy_;
+    std::function<void(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>)> strategy_;
 
   public:
 
     // Constructor
-    explicit Writer(std::function<void(std::vector<HashTable>)>);
+    explicit Writer(std::function<void(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>)>);
 
     // Execution method
-    void executeStrategy(std::vector<HashTable>);
+    void executeStrategy(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>);
 
     // Strategies 
-    static void MultiFile(std::vector<HashTable>);
+    static void MultiFile(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>);
 
 };
 

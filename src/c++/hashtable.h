@@ -27,8 +27,6 @@
 #include <vector>
 #include <string>
 #include <string_view>
-#include <chrono>
-#include <fstream>
 
 #include "prof_gettime.h"
 
@@ -88,13 +86,11 @@ class HashTable{
     // Prototypes
     size_t query_insert(std::string_view) noexcept;
     void update(size_t, time_duration_t);
-    void print(std::ostream&);
 
     // Member functions
     std::vector<size_t> list_keys();
-    void add_child_time   (size_t const, time_duration_t);
+    void add_child_time(size_t const, time_duration_t);
     void add_overhead_time(size_t const, time_duration_t);
-    void add_child_time(size_t, time_duration_t);
     void compute_self_times();
     void append_to(std::vector<std::pair<size_t,HashEntry>>& hashvec);
 

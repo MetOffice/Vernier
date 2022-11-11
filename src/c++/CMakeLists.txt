@@ -12,11 +12,11 @@ include(CMakePackageConfigHelpers)
 
 # Add files source files to library.
 add_library(${CMAKE_PROJECT_NAME} SHARED
-        profiler.h    profiler.cpp
+        profiler.h      profiler.cpp
         prof_gettime.h  prof_gettime.cpp
-        writer.h      writer.cpp
-        hashvec.h     hashvec.cpp
-        hashtable.h   hashtable.cpp
+        writer.h        writer.cpp
+        formatter.h     formatter.cpp
+        hashtable.h     hashtable.cpp
         )
 
 # Link library to and external libs (also use project warnings and options).

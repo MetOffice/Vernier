@@ -6,8 +6,6 @@
 
 #include "hashtable.h"
 #include <cassert>
-#include <string>
-
 
 /**
  * @brief  Constructs a new entry in the hash table.
@@ -33,9 +31,8 @@ HashEntry::HashEntry(std::string_view region_name)
 HashTable::HashTable(int const tid)
   : tid_(tid)
 {
-
   // Set the name and hash of the profiler entry.
-  std::string const profiler_name = "__profiler__";
+  std::string const profiler_name = "__profiler__@" + std::to_string(tid);
   profiler_hash_ = hash_function_(profiler_name);
 
   // Insert special entry for the profiler overhead time.
@@ -113,56 +110,6 @@ void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_ti
 {
   auto& entry = table_.at(hash);
   entry.overhead_walltime_ += calliper_time;
-}
-
-/**
- * @brief  Writes all entries in the hashtable, sorted according to self times.
- *
- */
-
-void HashTable::print(std::ostream& outstream)
-{
-
-  // Ensure all computed times are up-to-date.
-  prepare_computed_times_all();
-
-  std::string routine_at_thread = "Thread: " + std::to_string(tid_);
-
-  // Write headings
-  outstream << "\n";
-  outstream
-    << std::setw(40) << std::left  << routine_at_thread  << " "
-    << std::setw(15) << std::right << "Self (s)"         << " "
-    << std::setw(15) << std::right << "Total (raw) (s)"  << " "
-    << std::setw(15) << std::right << "Total (s)"        << " "
-    << std::setw(10) << std::right << "Calls"            << "\n";
-
-  outstream << std::setfill('-');
-  outstream
-    << std::setw(40) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(10) << "-" << "\n";
-  outstream << std::setfill(' ');
-
-  // Create a vector from the hashtable and sort the entries according to self
-  // walltime.  If optimisation of this is needed, it ought to be possible to
-  // acquire a vector of hash-selftime pairs in the correct order, then use the
-  // hashes to look up other information directly from the hashtable.
-  auto hashvec = std::vector<std::pair<size_t, HashEntry>>(table_.cbegin(), table_.cend());
-  std::sort(begin(hashvec), end(hashvec),
-      [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_;});
-
-  // Data entries
-  for (auto& [hash, entry] : hashvec) {
-    outstream
-      << std::setw(40) << std::left  << entry.region_name_                << " "
-      << std::setw(15) << std::right << entry.self_walltime_.count()      << " "
-      << std::setw(15) << std::right << entry.total_raw_walltime_.count() << " "
-      << std::setw(15) << std::right << entry.total_walltime_.count()     << " "
-      << std::setw(10) << std::right << entry.call_count_                 << "\n";
-  }
 }
 
 /**
@@ -244,7 +191,14 @@ std::vector<size_t> HashTable::list_keys()
 
 void HashTable::append_to(std::vector<std::pair<size_t,HashEntry>>& hashvec)
 {
-  compute_self_times();
+  // Compute overhead and self times before appending
+  prepare_computed_times_all();
+
+  // Remove __profiler__ entries with 0 calls
+  auto it = table_.find(profiler_hash_);
+  if (it != NULL && it->second.call_count_ == 0) { table_.erase(it); }
+  
+  // Insert local table into hashvec
   hashvec.insert(hashvec.end(), table_.begin(), table_.end());
 }
 

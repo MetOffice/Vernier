@@ -5,6 +5,8 @@
  * -----------------------------------------------------------------------------
  */
 
+#include <chrono>
+
 /**
  * @file   prof_gettime.h
  * @brief  Declares time-measurement functionality.

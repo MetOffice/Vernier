@@ -5,10 +5,8 @@
 \*----------------------------------------------------------------------------*/
 
 #include "profiler.h"
-#include "prof_gettime.h"
-
 #include "writer.h"
-#include "hashvec.h"
+#include "formatter.h"
 
 #include <cassert>
 #include <chrono>
@@ -171,7 +169,14 @@ void Profiler::stop(size_t const hash)
 void Profiler::write()
 {
 
-  
+  const char* user_strat = std::getenv("PROF_IO_MODE");
+
+  if ( user_strat == NULL )
+  {
+    Writer writer(Writer::MultiFile);
+    writer.executeStrategy(Format::DrHook,thread_hashtables_);
+  }
+  else throw std::runtime_error("Invalid PROF_IO_MODE choice");
 
 }
 
