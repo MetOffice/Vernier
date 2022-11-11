@@ -69,7 +69,7 @@ size_t HashTable::query_insert(std::string_view region_name) noexcept
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(size_t const hash, time_duration_t time_delta)
+void HashTable::update(size_t const hash, time_duration_t const time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
@@ -93,6 +93,10 @@ time_duration_t* HashTable::add_child_time(
                          size_t const hash,
                          time_duration_t child_walltime)
 {
+  // Assertions
+  assert (table_.size() > 0);
+  assert (table_.count(hash) > 0);
+
   auto& entry = table_.at(hash);
   entry.child_walltime_ += child_walltime;
   return &entry.overhead_walltime_;

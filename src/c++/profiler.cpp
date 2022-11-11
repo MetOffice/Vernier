@@ -16,10 +16,17 @@ extern time_point_t logged_calliper_start_time;
 #pragma omp threadprivate(logged_calliper_start_time)
 time_point_t logged_calliper_start_time;
 
+extern int call_depth;
+#pragma omp threadprivate(call_depth)
+int call_depth;
+
 /**
  * @brief Constructor for StartCalliperValues struct.
  *
  */
+
+Profiler::StartCalliperValues::StartCalliperValues()
+  {}
 
 Profiler::StartCalliperValues::StartCalliperValues(
                                    time_point_t region_start_time, 
@@ -51,10 +58,13 @@ Profiler::Profiler()
     thread_hashtables_.push_back(new_table);
 
     // Create a new list
-    std::vector<std::pair<size_t,StartCalliperValues>> new_list;
+    std::array<std::pair<size_t,StartCalliperValues>, PROF_MAX_TRACEBACK_SIZE> new_list;
     thread_traceback_.push_back(new_list);
-
   }
+
+  // Initialise the call depth, which is threadprivate. Used as an array index,
+  // so the first element will be indexed by 0.
+  call_depth = -1;
 
   // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
@@ -116,7 +126,11 @@ size_t Profiler::start2(std::string_view region_name)
   auto region_start_time = prof_gettime();
   StartCalliperValues new_times = StartCalliperValues(
             region_start_time, logged_calliper_start_time);
-  thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
+
+
+  ++call_depth;
+  auto call_depth_it = static_cast<pair_iterator_t_>(call_depth);
+  thread_traceback_[tid].at(call_depth_it) = std::make_pair(hash, std::move(new_times));
 
   return hash;
 }
@@ -135,8 +149,8 @@ size_t Profiler::start2(std::string_view region_name)
 void Profiler::stop(size_t const hash)
 {
 
-  // Log the region stop time.
-  auto region_stop_time = prof_gettime();
+   // Log the region stop time.
+   auto region_stop_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -145,7 +159,8 @@ void Profiler::stop(size_t const hash)
 #endif
 
   // Checks - which hash is last on the traceback list?
-  size_t last_hash_on_list = thread_traceback_[tid].back().first;
+  auto call_depth_it = static_cast<pair_iterator_t_>(call_depth);
+  size_t last_hash_on_list = thread_traceback_[tid].at(call_depth_it).first;
 
   // Check that the hash is the one we expect. If it isn't, there is an error in
   // the instrumentation.
@@ -155,8 +170,7 @@ void Profiler::stop(size_t const hash)
   }
 
   // Get start calliper values needed for subsequent computation.
-  StartCalliperValues& start_calliper_times = 
-    thread_traceback_[tid].back().second;
+  auto& start_calliper_times = thread_traceback_[tid].at(call_depth_it).second;
 
   // Compute the region time
   auto region_duration = region_stop_time - start_calliper_times.region_start_time_;
@@ -171,16 +185,17 @@ void Profiler::stop(size_t const hash)
   //   calliper_time = (t4-t1) - (t3-t2)  = t4 - ( t3-t2 + t1)
   auto temp_sum = start_calliper_times.calliper_start_time_ + region_duration;
 
-  // Remove from the end of the list.
-  thread_traceback_[tid].pop_back();
+  // Move the end of the list.
+  --call_depth;
 
   // The sequence of code that follows is aimed at leaving only minimal and
   // simple operations after the call to prof_gettime().
   time_duration_t* parent_overhead_time_ptr = nullptr;
 
   // Acquire parent pointers
-  if (! thread_traceback_[tid].empty()){
-    size_t parent_hash = thread_traceback_[tid].back().first;
+  if (call_depth > 0){
+    call_depth_it = static_cast<pair_iterator_t_>(call_depth);
+    size_t parent_hash = thread_traceback_[tid].at(call_depth_it).first;
     parent_overhead_time_ptr = thread_hashtables_[tid].add_child_time(
                                          parent_hash, region_duration);
   }

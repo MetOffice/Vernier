@@ -19,10 +19,12 @@
 #include <string_view>
 #include <iterator>
 #include <vector>
+#include <array>
 #include <omp.h>
 
 #include "hashtable.h"
 
+#define PROF_MAX_TRACEBACK_SIZE 1000
 
 /**
  * @brief  Top-level profiler class.
@@ -45,6 +47,7 @@ class Profiler
       public:
 
         // Constructors
+        StartCalliperValues();
         StartCalliperValues(time_point_t, time_point_t);
 
         // Data members
@@ -55,12 +58,13 @@ class Profiler
     // Data members
     int max_threads_;
 
-    std::vector<HashTable>                                           thread_hashtables_;
-    std::vector<std::vector<std::pair<size_t,StartCalliperValues>>>   thread_traceback_;
+    std::vector<HashTable>                                                                  thread_hashtables_;
+    std::vector<std::array<std::pair<size_t,StartCalliperValues>,PROF_MAX_TRACEBACK_SIZE>>  thread_traceback_;
 
     // Type definitions for vector array indexing.
     typedef std::vector<HashTable>::size_type                                     hashtable_iterator_t_;
-    typedef std::vector<std::vector<std::pair<size_t,StartCalliperValues>>>::size_type pair_iterator_t_;
+    typedef std::vector<std::array<std::pair<size_t,StartCalliperValues>,PROF_MAX_TRACEBACK_SIZE>>
+                                                                           ::size_type pair_iterator_t_;
 
   public:
 

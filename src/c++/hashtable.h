@@ -88,7 +88,7 @@ class HashTable{
 
     // Prototypes
     size_t query_insert(std::string_view) noexcept;
-    void update(size_t const, time_duration_t);
+    void update(size_t const, time_duration_t const);
     void write();
 
     // Member functions
