@@ -8,10 +8,11 @@
 #include "prof_gettime.h"
 
 #include "writer.h"
+#include "hashvec.h"
 
-#include <iostream>
 #include <cassert>
 #include <chrono>
+#include <iostream>
 
 /**
  * @brief Constructor for StartCalliperValues struct.
@@ -82,7 +83,8 @@ size_t Profiler::start(std::string_view region_name)
   assert (tid <= thread_traceback_.size());
 
   // Insert this region into the thread's hash table.
-  size_t const hash = thread_hashtables_[tid].query_insert(region_name);
+  std::string new_region_name = std::string(region_name) + "@" + std::to_string(tid);
+  size_t const hash = thread_hashtables_[tid].query_insert(new_region_name);
 
   // Store the calliper and region start times.
   auto region_start_time = prof_gettime();
@@ -169,17 +171,10 @@ void Profiler::stop(size_t const hash)
 void Profiler::write()
 {
 
-  // Find user-defined IO method (will return NULL if empty)
-  const char* user_strat = std::getenv("PROF_IO_MODE");
-
-  if ( user_strat == NULL || static_cast<std::string>(user_strat) == "MultipleFiles" )
-  {
-    Writer scribe(Writer::MultiFile);
-    scribe.executeStrategy(thread_hashtables_);
-  }
-  else throw std::runtime_error("Invalid PROF_IO_MODE choice");
+  
 
 }
+
 
 /**
  * @brief  Get the total (inclusive) time taken by a region and everything below it.

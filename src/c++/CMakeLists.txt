@@ -15,6 +15,7 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         profiler.h    profiler.cpp
         prof_gettime.h  prof_gettime.cpp
         writer.h      writer.cpp
+        hashvec.h     hashvec.cpp
         hashtable.h   hashtable.cpp
         )
 

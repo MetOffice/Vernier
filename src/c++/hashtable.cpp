@@ -5,11 +5,9 @@
 \*----------------------------------------------------------------------------*/
 
 #include "hashtable.h"
-#include <iomanip>
 #include <cassert>
-#include <iostream>
 #include <string>
-#include <algorithm>
+
 
 /**
  * @brief  Constructs a new entry in the hash table.
@@ -172,6 +170,7 @@ void HashTable::print(std::ostream& outstream)
  *         code region.
  * @detail Times computed are: the region self time and the total time minus
  *         directly incurred profiling overhead costs.
+ * @brief  Computes self times from total times.
  *
  * @param [in] hash   The hash of the region to compute.
  */
@@ -239,8 +238,19 @@ std::vector<size_t> HashTable::list_keys()
 }
 
 /**
- * @brief  Get the total (inclusive) time of the specified region.
- * @param [in]  The hash corresponding to the region.
+ * @brief  Appends table_ onto the end of an input HashVec 
+ * 
+ */
+
+void HashTable::append_to(std::vector<std::pair<size_t,HashEntry>>& hashvec)
+{
+  compute_self_times();
+  hashvec.insert(hashvec.end(), table_.begin(), table_.end());
+}
+
+/**
+ * @brief  Get the total (inclusive) time corresponding to the input hash.
+ *
  */
 
 double HashTable::get_total_walltime(size_t const hash) const

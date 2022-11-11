@@ -66,10 +66,15 @@ void Writer::MultiFile(std::vector<HashTable> htv)
     //
     // Write to file 
     //
-    for (auto& it : htv)
+    HashVec new_hashvec;
+
+    for (auto& it : thread_hashtables_)
     {
-        it.print(output_stream);
+      it.append_to(new_hashvec.get());
     }
+
+    new_hashvec.sort();
+    new_hashvec.write();
 
     output_stream.flush();
     output_stream.close();

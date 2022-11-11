@@ -1,0 +1,102 @@
+name: Unit test coverage
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ] 
+    paths:
+      - 'src/**.h'
+      - 'src/**.cpp'
+      - 'tests/**'
+      - '.github/workflows/coverage.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest 
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [
+          {c: gcc-10, cpp: g++-10, fortran: gfortran-10}
+        ]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Create conda environment
+      # Setup a virtual conda environment
+      uses: conda-incubator/setup-miniconda@v2
+      with: 
+        auto-activate-base: false
+        python-version: 3.9 
+        channels: conda-forge, defaults
+        activate-environment: myenv
+
+    - name: Install Lcov
+      # Install lcov from conda (graphical front-end for gcov reports)
+      shell: bash -l {0}
+      run: conda install lcov
+
+    - name: Configure CMake 
+      # Configure CMake in a 'build' subdirectory
+      #   Key thing here is the "--coverage" CXX flag which generates
+      #   .gcno files for gcov. 
+      run: > 
+        cmake -B ${{github.workspace}}/build 
+        -DCMAKE_C_COMPILER=${{ matrix.compiler.c }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} 
+        -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }}
+        -DBUILD_TESTS=ON
+        -DBUILD_FORTRAN_TESTS=OFF
+        -DINCLUDE_GTEST=ON
+        -DCMAKE_CXX_FLAGS="-g --coverage" 
+        -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=ON 
+        -DENABLE_DOXYGEN=OFF 
+
+    - name: Build 
+      # Build with the given configuration
+      run: cmake --build ${{github.workspace}}/build
+
+    - name: Make  
+      working-directory: ${{github.workspace}}/build
+      run: make 
+
+    - name: Run tests 
+      # Run all the unit test executables
+      working-directory: ${{github.workspace}}/build
+      run: ctest 
+
+    - name: Run Gcov 
+      run: gcov --demangled-names --human-readable ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
+
+    - name: Inital Lcov Run
+      shell: bash -l {0}
+      run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file basecoverage.info
+
+    - name: Extract relevant info 
+      # Ignore all the STL header files from the initial lcov .info file
+      shell: bash -l {0}
+      run: lcov --extract basecoverage.info '${{github.workspace}}/src/*' --output-file coverage.info
+
+    - name: Generate html
+      shell: bash -l {0}
+      run: genhtml coverage.info --output-directory out
+
+    - name: Update github pages 
+      run: | 
+        mkdir -p ${{github.workspace}}/docs/coverage
+        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage/.
+        git config user.name 'github-actions[bot]'
+        git config user.email 'github-actions[bot]' 
+        git add --force docs/coverage
+        git stash
+        git checkout -b gh-pages
+        rm -rf ${{github.workspace}}/docs/coverage
+        git stash pop 
+        git reset 
+        git add --force docs/coverage
+        git commit --allow-empty -m "Update coverage documentation"
+        git push -f origin gh-pages
+
+  
