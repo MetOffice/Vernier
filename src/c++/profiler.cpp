@@ -16,9 +16,10 @@ extern time_point_t logged_calliper_start_time;
 #pragma omp threadprivate(logged_calliper_start_time)
 time_point_t logged_calliper_start_time;
 
+// The call depth must be initialised on all threads, so do it here.
 extern int call_depth;
 #pragma omp threadprivate(call_depth)
-int call_depth;
+int call_depth = -1;
 
 /**
  * @brief Constructor for StartCalliperValues struct.
@@ -61,10 +62,6 @@ Profiler::Profiler()
     std::array<std::pair<size_t,StartCalliperValues>, PROF_MAX_TRACEBACK_SIZE> new_list;
     thread_traceback_.push_back(new_list);
   }
-
-  // Initialise the call depth, which is threadprivate. Used as an array index,
-  // so the first element will be indexed by 0.
-  call_depth = -1;
 
   // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
@@ -190,23 +187,23 @@ void Profiler::stop(size_t const hash)
   //   calliper_time = (t4-t1) - (t3-t2)  = t4 - ( t3-t2 + t1)
   auto temp_sum = start_calliper_times.calliper_start_time_ + region_duration;
 
-  // Move the end of the list.
-  --call_depth;
-
   // The sequence of code that follows is aimed at leaving only minimal and
   // simple operations after the call to prof_gettime().
   time_duration_t* parent_overhead_time_ptr = nullptr;
 
   // Acquire parent pointers
   if (call_depth > 0){
-    call_depth_it = static_cast<pair_iterator_t_>(call_depth);
-    size_t parent_hash = thread_traceback_[tid].at(call_depth_it).first;
+    auto parent_depth_it = static_cast<pair_iterator_t_>(call_depth-1);
+    size_t parent_hash = thread_traceback_[tid].at(parent_depth_it).first;
     parent_overhead_time_ptr = thread_hashtables_[tid].add_child_time(
                                          parent_hash, region_duration);
   }
 
   // Increment profiler calls, and get a reference to the total overhead time.
   auto& total_overhead_time = thread_hashtables_[tid].increment_profiler_calls();
+
+  // Decrement index to last entry in the traceback.
+  --call_depth;
 
   // Account for time spent in the profiler itself. 
   auto calliper_stop_time = prof_gettime();
