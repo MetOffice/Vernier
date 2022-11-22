@@ -9,7 +9,12 @@
 #include "formatter.h"
 #include <mpi.h>
 
-void Multifile::write()
+/**
+ * @brief  Function that opens a file corresponding to the current mpirank
+ *
+ */
+
+void Multifile::openfile()
 {
     // Find current MPI rank
     int current_rank;
@@ -36,19 +41,39 @@ void Multifile::write()
     output_stream.open(out_filename);
 }
 
-void Multifile::VisitStandard(const std::unique_ptr<Standard> standard, std::vector<std::pair<size_t, HashEntry>> hashvec)
+/**
+ * @brief  Performs a flush-and-close of the output stream. 
+ *
+ */
+
+void Multifile::closefile()
 {
-    write();
-    standard->write(output_stream, hashvec);
     output_stream.flush();
     output_stream.close();
 }
 
+/**
+ * @brief  Bundles private methods together with a call to the standard format
+ *
+ */
+
+void Multifile::VisitStandard(const std::unique_ptr<Standard> standard, std::vector<std::pair<size_t, HashEntry>> hashvec)
+{
+    openfile();
+    standard->write(output_stream, hashvec);
+    closefile();
+}
+
+/**
+ * @brief  Bundles private methods together with a call to the drhook format
+ *
+ */
+
+
 void Multifile::VisitDrHook(const std::unique_ptr<DrHook> drhook, std::vector<std::pair<size_t, HashEntry>> hashvec)
 {
-    write();
+    openfile();
     drhook->write(output_stream, hashvec);
-    output_stream.flush();
-    output_stream.close();
+    closefile();
 }
 

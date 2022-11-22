@@ -10,10 +10,20 @@
 #include <iomanip>
 #include <algorithm>
 
+/**
+ * @brief  Accepts any unique Writer pointer and tells it to visit this format
+ *
+ */
+
 void Standard::accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec) 
 {
     writer->VisitStandard(std::make_unique<Standard>(), hashvec);
 }
+
+/**
+ * @brief  Write method that incorporates the "standard"/default format option
+ *
+ */
 
 void Standard::write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec)
 {
@@ -50,10 +60,20 @@ void Standard::write(std::ofstream& output_stream, std::vector<std::pair<size_t,
 
 }
 
+/**
+ * @brief  Accepts any unique Writer pointer and tells it to visit this format
+ *
+ */
+
 void DrHook::accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec)
 {
     writer->VisitDrHook(std::make_unique<DrHook>(), hashvec);
 }
+
+/**
+ * @brief  Write method that incorporates the drhook format option
+ *
+ */
 
 void DrHook::write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec)
 {

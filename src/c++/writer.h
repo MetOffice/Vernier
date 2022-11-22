@@ -23,53 +23,48 @@
 #include "hashtable.h"
 
 
-class Standard; // Forward declaration of formats
+// Forward declaration of formats
+class Standard; 
 class DrHook;
 
 
+/**
+ * @brief  Base writer class
+ *
+ * Essentially a visitor class that all IO modes will derive from. 
+ */
+
 class Writer {
-
-  protected:
-
-    //
-    std::ofstream output_stream;
 
   public:
 
     // Virtual destructor
     virtual ~Writer() = default;
 
-    // Members
+    // Members - any writer can "visit" any format
     virtual void VisitStandard(const std::unique_ptr<Standard> standard, std::vector<std::pair<size_t,HashEntry>> hashvec) = 0;
     virtual void VisitDrHook(const std::unique_ptr<DrHook> drhook, std::vector<std::pair<size_t,HashEntry>> hashvec) = 0;
 
 };
 
-class Singlefile : public Writer {
-
-  private:
-
-    //
-    void write();
-
-  public:
-
-    //
-    void VisitStandard(const std::unique_ptr<Standard> standard, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
-    void VisitDrHook(const std::unique_ptr<DrHook> drhook, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
-
-};
+/**
+ * @brief  Class for the multiple-file output option
+ */
 
 class Multifile : public Writer {
 
   private:
 
-    //
-    void write();
+    // Output stream
+    std::ofstream output_stream;
+
+    // Private init/finalise methods
+    void openfile();
+    void closefile();
 
   public:
 
-    //
+    // Override the visit methods
     void VisitStandard(const std::unique_ptr<Standard> standard, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
     void VisitDrHook(const std::unique_ptr<DrHook> drhook, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
 

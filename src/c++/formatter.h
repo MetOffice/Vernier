@@ -7,8 +7,8 @@
 
 /**
  * @file   formatter.h
- * @brief  
-
+ * @brief  Contains base format class and all derived classes.
+ *
  *
  */
 
@@ -21,8 +21,15 @@
 #include "hashtable.h"
 
 
-class Writer; // Forward declaration of writer
+// Forward declaration of writer
+class Writer; 
 
+
+/**
+ * @brief  Base format class
+ *
+ * Contains virtual write method and "accept" method for accepting visitors.
+ */
 
 class Format {
 
@@ -37,6 +44,13 @@ class Format {
 
 };
 
+/**
+ * @brief  Standard format
+ *
+ * Overloads the virtual write method in order to write an input hashvec out in
+ * the profiler's standard format
+ */
+
 class Standard : public Format {
 
   public:
@@ -46,6 +60,13 @@ class Standard : public Format {
     void write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
 
 };
+
+/**
+ * @brief  DrHook format
+ *
+ * Overloads the virtual write method in order to write an input hashvec out in
+ * a drhook-style format
+ */
 
 class DrHook : public Format {
 
