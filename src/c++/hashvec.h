@@ -37,9 +37,9 @@ class HashVec {
       std::vector<std::pair<size_t, HashEntry>> hashvec_;
 
       // Environment variables
-      const char* format_;
       const char* iomode_;
-
+      const char* format_;
+      
     public:
 
       // Constructor

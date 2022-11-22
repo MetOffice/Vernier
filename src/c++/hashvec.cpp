@@ -52,7 +52,11 @@ void HashVec::write()
 {
     if ( format_ == NULL && iomode_ == NULL )
     {
-        std::make_unique<Standard>()->accept(std::make_unique<Multifile>(), get());
+        // Create unique ptr
+        std::unique_ptr<Standard> standard_component = std::make_unique<Standard>();
+
+        // The standard format (component) accepts the multiple-file method (visitor)
+        standard_component->accept(std::make_unique<Multifile>(), this->get());
     }
     else throw std::runtime_error("Invalid PROF_IO_MODE choice");
 }
