@@ -16,46 +16,44 @@
 #define FORMATTER_H
 
 #include <vector>
-#include <functional>
+#include <memory>
+#include <fstream>
 #include "hashtable.h"
 
-/**
- * @brief  
- *
- *
- */
 
-class Formatter {
+class Writer; // Forward declaration of writer
 
-  private:
 
-    // Write strategy
-    std::function<void(std::ofstream&, Formatter&)> strategy_;
-
-    // Hashvec
-    std::vector<std::pair<size_t,HashEntry>> hashvec_;
+class Format {
 
   public:
 
-    // Constructor
-    explicit Formatter(std::function<void(std::ofstream&, Formatter&)>);
+    // Virtual destructor
+    virtual ~Format() = default;
 
-    // Member functions
-    std::vector<std::pair<size_t,HashEntry>>& get_hashvec();
-    void sort_hashvec();
-
-    // Execution method
-    void executeStrategy(std::ofstream&, Formatter&);
+    // Members
+    virtual void accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec) = 0;
+    virtual void write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec) = 0;
 
 };
 
-struct Format {
+class Standard : public Format {
 
-    public:
+  public:
 
-      // Strategies
-      static void Standard(std::ofstream&, Formatter&);
-      static void DrHook(std::ofstream&, Formatter&);
+    // Members  
+    void accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
+    void write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
+
+};
+
+class DrHook : public Format {
+
+  public:
+
+    // Members
+    void accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
+    void write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
 
 };
 

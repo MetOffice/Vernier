@@ -6,48 +6,16 @@
  */
 
 #include "formatter.h"
-#include <fstream>
+#include "writer.h"
 #include <iomanip>
+#include <algorithm>
 
-/**
- * @brief Formatter constructor.
- *
- */
-
-Formatter::Formatter(std::function<void(std::ofstream&, Formatter&)> in) 
-    : strategy_(std::move(in)) 
-    {} 
-
-// 
-
-std::vector<std::pair<size_t,HashEntry>>& Formatter::get_hashvec()
+void Standard::accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec) 
 {
-    return hashvec_;
+    writer->VisitStandard(std::make_unique<Standard>(), hashvec);
 }
 
-//
-
-void Formatter::sort_hashvec() 
-{
-    std::sort
-    (
-        begin(hashvec_), end(hashvec_),
-        [] (auto a, auto b) { 
-            return a.second.self_walltime_ > b.second.self_walltime_; 
-        }
-    );
-}
-
-//
-
-void Formatter::executeStrategy(std::ofstream& output_stream, Formatter& formatter)
-{
-    strategy_(output_stream, formatter);
-}
-
-//
-
-void Format::Standard(std::ofstream& output_stream, Formatter& formatter)
+void Standard::write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec)
 {
 
     std::string routine_at_thread = "Thread: " /*+ std::to_string(tid_)*/;
@@ -71,7 +39,7 @@ void Format::Standard(std::ofstream& output_stream, Formatter& formatter)
     output_stream << std::setfill(' ');
 
     // Data entries
-    for (auto& [hash, entry] : formatter.get_hashvec()) {
+    for (auto& [hash, entry] : hashvec) {
         output_stream
           << std::setw(40) << std::left  << entry.region_name_                << " "
           << std::setw(15) << std::right << entry.self_walltime_.count()      << " "
@@ -79,13 +47,17 @@ void Format::Standard(std::ofstream& output_stream, Formatter& formatter)
           << std::setw(15) << std::right << entry.total_walltime_.count()     << " "
           << std::setw(10) << std::right << entry.call_count_                 << "\n";
     }
-    
+
 }
 
-//
-
-void Format::DrHook(std::ofstream& output_stream, Formatter& formatter)
+void DrHook::accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec)
 {
+    writer->VisitDrHook(std::make_unique<DrHook>(), hashvec);
+}
+
+void DrHook::write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec)
+{
+
     // Preliminary info
     output_stream << "        " << "No. of instrumented routines called : 9\n";
     output_stream << "        " << "Instrumentation started : 20100521 171238\n";
@@ -130,7 +102,7 @@ void Format::DrHook(std::ofstream& output_stream, Formatter& formatter)
     // the program. This is used later when calculating '% Time'.
     double top_walltime = std::max_element
     ( 
-        std::begin(formatter.get_hashvec()), std::end(formatter.get_hashvec()),
+        std::begin(hashvec), std::end(hashvec),
         [] (auto a, auto b) {
         return a.second.total_walltime_ < b.second.total_walltime_; 
         } 
@@ -149,7 +121,7 @@ void Format::DrHook(std::ofstream& output_stream, Formatter& formatter)
 
     output_stream << std::fixed << std::showpoint << std::setprecision(3);
 
-    for (auto& [hash, entry] : formatter.get_hashvec()) {
+    for (auto& [hash, entry] : hashvec) {
 
         // Calculate non-HashEntry data
         region_number++;
@@ -160,17 +132,17 @@ void Format::DrHook(std::ofstream& output_stream, Formatter& formatter)
 
         // Write everything out 
         output_stream 
-        << "    "
-        << std::setw(3)  << std::left  << region_number    
-        << std::setw(7)  << std::right << percent_time                 
-        << std::setw(13) << std::right << cumul_walltime.count()       
-        << std::setw(13) << std::right << entry.self_walltime_.count() 
-        << std::setw(13) << std::right << entry.total_walltime_.count()
-        << std::setw(15) << std::right << entry.call_count_            
-        << std::setw(12) << std::right << self_per_call                
-        << std::setw(12) << std::right << total_per_call                << "    "        
-                                       << entry.region_name_            << "\n";
+          << "    "
+          << std::setw(3)  << std::left  << region_number    
+          << std::setw(7)  << std::right << percent_time                 
+          << std::setw(13) << std::right << cumul_walltime.count()       
+          << std::setw(13) << std::right << entry.self_walltime_.count() 
+          << std::setw(13) << std::right << entry.total_walltime_.count()
+          << std::setw(15) << std::right << entry.call_count_            
+          << std::setw(12) << std::right << self_per_call                
+          << std::setw(12) << std::right << total_per_call                << "    "        
+                                         << entry.region_name_            << "\n";
 
     }
-    
+
 }

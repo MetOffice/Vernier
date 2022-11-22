@@ -18,38 +18,62 @@
 #define WRITER_H
 
 #include <vector>
-#include <functional>
+#include <memory>
+#include <fstream>
 #include "hashtable.h"
-#include "formatter.h"
 
-/**
- * @brief  Writer class, which sits above hashtable and is constructed 
- *         within the profiler.
- *
- * Any callable function can be passed into the writer class constructor and
- * subsequently executed using the execute method. Different strategies can be
- * included as static member functions, such as MultiFile.
- *
- */
+
+class Standard; // Forward declaration of formats
+class DrHook;
+
 
 class Writer {
 
-  private:
+  protected:
 
-    // Strategy
-    std::function<void(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>)> strategy_;
+    //
+    std::ofstream output_stream;
 
   public:
 
-    // Constructor
-    explicit Writer(std::function<void(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>)>);
+    // Virtual destructor
+    virtual ~Writer() = default;
 
-    // Execution method
-    void executeStrategy(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>);
-
-    // Strategies 
-    static void MultiFile(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>);
+    // Members
+    virtual void VisitStandard(const std::unique_ptr<Standard> standard, std::vector<std::pair<size_t,HashEntry>> hashvec) = 0;
+    virtual void VisitDrHook(const std::unique_ptr<DrHook> drhook, std::vector<std::pair<size_t,HashEntry>> hashvec) = 0;
 
 };
+
+class Singlefile : public Writer {
+
+  private:
+
+    //
+    void write();
+
+  public:
+
+    //
+    void VisitStandard(const std::unique_ptr<Standard> standard, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
+    void VisitDrHook(const std::unique_ptr<DrHook> drhook, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
+
+};
+
+class Multifile : public Writer {
+
+  private:
+
+    //
+    void write();
+
+  public:
+
+    //
+    void VisitStandard(const std::unique_ptr<Standard> standard, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
+    void VisitDrHook(const std::unique_ptr<DrHook> drhook, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
+
+};
+
 
 #endif

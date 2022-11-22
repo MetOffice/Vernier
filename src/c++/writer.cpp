@@ -8,37 +8,8 @@
 #include "writer.h"
 #include "formatter.h"
 #include <mpi.h>
-#include <fstream>
 
-/**
- * @brief Writer constructor.
- *
- */
-
-Writer::Writer(std::function<void(std::function<void(std::ofstream&, Formatter&)>, std::vector<HashTable>)> in) 
-    : strategy_(std::move(in)) 
-    {} 
-
-/**
- * @brief Method that executes whatever function is passed to strategy_ via the
- *        constructor.
- *
- */
-
-void Writer::executeStrategy(std::function<void(std::ofstream&, Formatter&)> f_in, std::vector<HashTable> htv)
-{
-    strategy_(f_in, htv);
-}
-
-/**
- * @brief The multiple-output-files strategy.
- * 
- * Writes out data from the vector of HashTables given to it into one file per
- * mpi rank.
- *
- */
-
-void Writer::MultiFile(std::function<void(std::ofstream&, Formatter&)> f_in, std::vector<HashTable> htv)
+void Multifile::write()
 {
     // Find current MPI rank
     int current_rank;
@@ -61,22 +32,23 @@ void Writer::MultiFile(std::function<void(std::ofstream&, Formatter&)> f_in, std
     {
         out_filename = "profiler-output" + mpi_filename_tail;
     }
-    std::ofstream output_stream;
-    output_stream.open(out_filename);
-
-    //
-    // Write to file 
-    //
-    Formatter formatter(f_in);
-
-    for (auto& it : htv)
-    {
-        it.append_to(formatter.get_hashvec());
-    }
-
-    formatter.sort_hashvec();
-    formatter.executeStrategy(output_stream, formatter);
     
+    output_stream.open(out_filename);
+}
+
+void Multifile::VisitStandard(const std::unique_ptr<Standard> standard, std::vector<std::pair<size_t, HashEntry>> hashvec)
+{
+    write();
+    standard->write(output_stream, hashvec);
     output_stream.flush();
     output_stream.close();
 }
+
+void Multifile::VisitDrHook(const std::unique_ptr<DrHook> drhook, std::vector<std::pair<size_t, HashEntry>> hashvec)
+{
+    write();
+    drhook->write(output_stream, hashvec);
+    output_stream.flush();
+    output_stream.close();
+}
+

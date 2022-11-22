@@ -14,6 +14,7 @@ include(CMakePackageConfigHelpers)
 add_library(${CMAKE_PROJECT_NAME} SHARED
         profiler.h      profiler.cpp
         prof_gettime.h  prof_gettime.cpp
+        hashvec.h       hashvec.cpp
         writer.h        writer.cpp
         formatter.h     formatter.cpp
         hashtable.h     hashtable.cpp

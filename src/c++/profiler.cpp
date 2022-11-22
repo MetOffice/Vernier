@@ -5,8 +5,7 @@
 \*----------------------------------------------------------------------------*/
 
 #include "profiler.h"
-#include "writer.h"
-#include "formatter.h"
+#include "hashvec.h"
 
 #include <cassert>
 #include <chrono>
@@ -168,16 +167,15 @@ void Profiler::stop(size_t const hash)
 
 void Profiler::write()
 {
+  HashVec new_hashvec;
 
-  const char* user_strat = std::getenv("PROF_IO_MODE");
-
-  if ( user_strat == NULL )
+  for (auto& it : thread_hashtables_)
   {
-    Writer writer(Writer::MultiFile);
-    writer.executeStrategy(Format::DrHook,thread_hashtables_);
+    it.append_to(new_hashvec.get());
   }
-  else throw std::runtime_error("Invalid PROF_IO_MODE choice");
 
+  new_hashvec.sort();
+  new_hashvec.write();
 }
 
 
