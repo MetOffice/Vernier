@@ -6,51 +6,45 @@
  */
 
 #include "formatter.h"
-#include "writer.h"
 #include <iomanip>
 #include <algorithm>
 
-/**
- * @brief  Accepts any unique Writer pointer and tells it to visit this format
- *
- */
+Formatter::Formatter(std::function<void(std::ofstream&, std::vector<std::pair<size_t, HashEntry>>)> format)
+  : format_(std::move(format))
+  {}
 
-void Standard::accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec) 
+void Formatter::executeFormat(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
 {
-    writer->VisitStandard(std::make_unique<Standard>(), hashvec);
+    format_(os, hashvec);
 }
 
-/**
- * @brief  Write method that incorporates the "standard"/default format option
- *
- */
 
-void Standard::write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec)
+void Formats::standard(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
 {
 
     std::string routine_at_thread = "Thread: " /*+ std::to_string(tid_)*/;
 
     // Write headings
-    output_stream << "\n";
-    output_stream
+    os << "\n";
+    os
         << std::setw(40) << std::left  << routine_at_thread  << " "
         << std::setw(15) << std::right << "Self (s)"         << " "
         << std::setw(15) << std::right << "Total (raw) (s)"  << " "
         << std::setw(15) << std::right << "Total (s)"        << " "
         << std::setw(10) << std::right << "Calls"            << "\n";
 
-    output_stream << std::setfill('-');
-    output_stream
+    os << std::setfill('-');
+    os
         << std::setw(40) << "-" << " "
         << std::setw(15) << "-" << " "
         << std::setw(15) << "-" << " "
         << std::setw(15) << "-" << " "
         << std::setw(10) << "-" << "\n";
-    output_stream << std::setfill(' ');
+    os << std::setfill(' ');
 
     // Data entries
     for (auto& [hash, entry] : hashvec) {
-        output_stream
+        os
           << std::setw(40) << std::left  << entry.region_name_                << " "
           << std::setw(15) << std::right << entry.self_walltime_.count()      << " "
           << std::setw(15) << std::right << entry.total_raw_walltime_.count() << " "
@@ -60,36 +54,20 @@ void Standard::write(std::ofstream& output_stream, std::vector<std::pair<size_t,
 
 }
 
-/**
- * @brief  Accepts any unique Writer pointer and tells it to visit this format
- *
- */
-
-void DrHook::accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec)
+void Formats::drhook(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
 {
-    writer->VisitDrHook(std::make_unique<DrHook>(), hashvec);
-}
-
-/**
- * @brief  Write method that incorporates the drhook format option
- *
- */
-
-void DrHook::write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec)
-{
-
     // Preliminary info
-    output_stream << "        " << "No. of instrumented routines called : 9\n";
-    output_stream << "        " << "Instrumentation started : 20100521 171238\n";
-    output_stream << "        " << "Instrumentation   ended : 20100521 172033\n";
-    output_stream << "        " << "Instrumentation overhead: 0.90%\n";
-    output_stream << "        " << "Memory usage : Memory usage : 1346 MBytes (heap), 1315 MBytes (rss), 796 MBytes (stack), 1116 (paging)\n";
-    output_stream << "        " << "Wall-time is 472.28 sec on proc#1 (192 procs, 1 threads)\n";
-    output_stream << "        " << "Thread#1:      472.28 sec (100.00%)" << std::endl;
+    os << "        " << "No. of instrumented routines called : 9\n";
+    os << "        " << "Instrumentation started : 20100521 171238\n";
+    os << "        " << "Instrumentation   ended : 20100521 172033\n";
+    os << "        " << "Instrumentation overhead: 0.90%\n";
+    os << "        " << "Memory usage : Memory usage : 1346 MBytes (heap), 1315 MBytes (rss), 796 MBytes (stack), 1116 (paging)\n";
+    os << "        " << "Wall-time is 472.28 sec on proc#1 (192 procs, 1 threads)\n";
+    os << "        " << "Thread#1:      472.28 sec (100.00%)" << std::endl;
     
     // Table Headers
-    output_stream << "\n";
-    output_stream 
+    os << "\n";
+    os 
         << "    "
         << std::setw(3) << std::left   << "#"     
         << std::setw(7) << std::left   << "% Time"     
@@ -100,13 +78,13 @@ void DrHook::write(std::ofstream& output_stream, std::vector<std::pair<size_t,Ha
         << std::setw(12) << std::right << "Self"      
         << std::setw(12) << std::right << "Total"      << "    "
                                        << "Routine@"   << "\n";
-    output_stream
+    os
         << "    "
         << std::setw(73) << "" 
         << "(Size; Size/sec; Size/call; MinSize; MaxSize)" << "\n";
     
     // Subheaders
-    output_stream 
+    os 
         << "    "
         << std::setw(3)  << std::left  << ""     
         << std::setw(7)  << std::right << "(self)"    
@@ -139,7 +117,7 @@ void DrHook::write(std::ofstream& output_stream, std::vector<std::pair<size_t,Ha
     // Write data to file
     // 
 
-    output_stream << std::fixed << std::showpoint << std::setprecision(3);
+    os << std::fixed << std::showpoint << std::setprecision(3);
 
     for (auto& [hash, entry] : hashvec) {
 
@@ -151,7 +129,7 @@ void DrHook::write(std::ofstream& output_stream, std::vector<std::pair<size_t,Ha
         total_per_call  = 1000.0 * ( entry.total_walltime_.count() / static_cast<double>(entry.call_count_) );
 
         // Write everything out 
-        output_stream 
+        os 
           << "    "
           << std::setw(3)  << std::left  << region_number    
           << std::setw(7)  << std::right << percent_time                 

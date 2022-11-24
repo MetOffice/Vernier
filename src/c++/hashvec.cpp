@@ -12,7 +12,36 @@
  *
  */
 
-HashVec::HashVec() : iomode_(std::getenv("PROF_IO_MODE")), format_(std::getenv("PROF_OUT_FORMAT")) {}
+HashVec::HashVec() 
+  : format_(std::getenv("PROF_OUT_FORMAT"))
+  , iomode_(std::getenv("PROF_IO_MODE")) 
+  {}
+
+std::unique_ptr<Writer> HashVec::createWriter()
+{
+    std::string format = static_cast<std::string>(format_);
+    std::string iomode = static_cast<std::string>(iomode_);
+
+    // Creates format ptr first
+    std::unique_ptr<Formatter> formatter;
+    if (format.empty() || format == "standard") 
+    {
+        formatter = std::make_unique<Formatter>(Formats::standard);
+    }
+    else if (format == "drhook")
+    {
+        formatter = std::make_unique<Formatter>(Formats::drhook);
+    }
+    else throw std::runtime_error("Invalid format choice");
+
+
+    // Uses format in creation of writer
+    if (iomode.empty() || iomode == "multi")
+    {
+        return std::make_unique<Multi>(std::move(formatter));
+    }
+    else throw std::runtime_error("Invalid io mode choice");
+}
 
 /**
  * @brief  hashvec_ getter
@@ -50,13 +79,8 @@ void HashVec::sort()
 
 void HashVec::write()
 {
-    if ( format_ == NULL && iomode_ == NULL )
-    {
-        // Create unique ptr
-        std::unique_ptr<Standard> standard_component = std::make_unique<Standard>();
+    std::ofstream os;
 
-        // The standard format (component) accepts the multiple-file method (visitor)
-        standard_component->accept(std::make_unique<Multifile>(), this->get());
-    }
-    else throw std::runtime_error("Invalid PROF_IO_MODE choice");
+    auto writer = this->createWriter();
+    writer->write(os, hashvec_);
 }

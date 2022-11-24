@@ -16,66 +16,33 @@
 #define FORMATTER_H
 
 #include <vector>
-#include <memory>
+#include <functional>
 #include <fstream>
 #include "hashtable.h"
 
+class Formatter {
 
-// Forward declaration of writer
-class Writer; 
+  private:
 
-
-/**
- * @brief  Base format class
- *
- * Contains virtual write method and "accept" method for accepting visitors.
- */
-
-class Format {
+    std::function<void(std::ofstream&, std::vector<std::pair<size_t, HashEntry>>)> format_;
 
   public:
 
-    // Virtual destructor
-    virtual ~Format() = default;
+    // Constructor
+    explicit Formatter(std::function<void(std::ofstream&, std::vector<std::pair<size_t, HashEntry>>)> format);
 
-    // Members
-    virtual void accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec) = 0;
-    virtual void write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec) = 0;
-
+    void executeFormat(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec); 
+   
 };
 
-/**
- * @brief  Standard format
- *
- * Overloads the virtual write method in order to write an input hashvec out in
- * the profiler's standard format
- */
-
-class Standard : public Format {
+struct Formats {
 
   public:
 
-    // Members  
-    void accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
-    void write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
-
-};
-
-/**
- * @brief  DrHook format
- *
- * Overloads the virtual write method in order to write an input hashvec out in
- * a drhook-style format
- */
-
-class DrHook : public Format {
-
-  public:
-
-    // Members
-    void accept(std::unique_ptr<Writer> writer, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
-    void write(std::ofstream& output_stream, std::vector<std::pair<size_t,HashEntry>> hashvec) override;
-
+    // Format options
+    static void standard(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec);
+    static void drhook(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec);
+   
 };
 
 #endif

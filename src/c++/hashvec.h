@@ -37,8 +37,11 @@ class HashVec {
       std::vector<std::pair<size_t, HashEntry>> hashvec_;
 
       // Environment variables
-      const char* iomode_;
       const char* format_;
+      const char* iomode_;
+
+      // Private creation function
+      std::unique_ptr<Writer> createWriter();
       
     public:
 
