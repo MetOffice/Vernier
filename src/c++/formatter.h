@@ -34,14 +34,14 @@ class Formatter {
   private:
 
     // Format method
-    std::function<void(std::ofstream&, std::vector<std::pair<size_t, HashEntry>>)> format_;
+    const std::function<void(std::ofstream&, std::vector<std::pair<size_t, HashEntry>>)> format_;
 
   public:
 
     // Constructor
     explicit Formatter(std::function<void(std::ofstream&, std::vector<std::pair<size_t, HashEntry>>)> format);
 
-    void executeFormat(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec); 
+    void executeFormat(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) const; 
    
 };
 

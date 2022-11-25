@@ -27,7 +27,7 @@ Formatter::Formatter(std::function<void(std::ofstream&, std::vector<std::pair<si
  * @param[in] hashvec  Vector of pairs that the format method will operate on
  */
 
-void Formatter::executeFormat(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
+void Formatter::executeFormat(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) const
 {
     format_(os, hashvec);
 }

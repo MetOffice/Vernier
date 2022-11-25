@@ -36,7 +36,7 @@ class Writer {
   private:
 
     // Ptr to formatting class
-    std::unique_ptr<Formatter> formatter_;
+    const std::unique_ptr<Formatter> formatter_;
 
   protected:
 
@@ -44,7 +44,7 @@ class Writer {
     // above can be changed. It will be inherited by any derived classes.
     explicit Writer(std::unique_ptr<Formatter> formatter);
 
-    std::unique_ptr<Formatter>& get_formatter();
+    const std::unique_ptr<Formatter>& get_formatter();
 
   public:
 

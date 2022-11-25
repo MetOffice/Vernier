@@ -9,11 +9,8 @@
  * @file   hashvec.h
  * @brief  Contains the hashvec and decides on format/IO mode.
  *
- * The hashvec is a vector of pairs that acts as an alternative hashtable for 
- * sorting via self-walltime. The HashVec constructor grabs the appropriate
- * format and IO strategy environment variables then uses the writer/formatter 
- * visitor pattern.
- *
+ * Contains hashvec get and sort methods, aswell as a write method that
+ * utilises the Formatter and Writer classes.
  */
 
 #ifndef HASHVEC_H
@@ -45,7 +42,7 @@ class HashVec {
       const char* iomode_;
 
       // Writer creation function
-      std::unique_ptr<Writer> createWriter();
+      const std::unique_ptr<Writer> createWriter() const;
       
     public:
 

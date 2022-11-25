@@ -28,7 +28,7 @@ HashVec::HashVec()
  *                                  passed to in order to write out data
  */
 
-std::unique_ptr<Writer> HashVec::createWriter()
+const std::unique_ptr<Writer> HashVec::createWriter() const
 {
     std::string format = static_cast<std::string>(format_);
     std::string iomode = static_cast<std::string>(iomode_);

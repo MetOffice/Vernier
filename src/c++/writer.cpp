@@ -25,7 +25,7 @@ Writer::Writer(std::unique_ptr<Formatter> formatter)
  * @returns std::unique_ptr<Formatter>&  Returns the private formatter pointer
  */
 
-std::unique_ptr<Formatter>& Writer::get_formatter()
+const std::unique_ptr<Formatter>& Writer::get_formatter()
 {
   return formatter_;
 }
@@ -36,7 +36,7 @@ std::unique_ptr<Formatter>& Writer::get_formatter()
  * @param[in] os  Output stream to write to
  */
 
-void Multi::prep(std::ofstream& os) 
+void Multi::prep(std::ofstream& os)
 {
   // Find current MPI rank
   int current_rank;
@@ -82,7 +82,7 @@ Multi::Multi(std::unique_ptr<Formatter> formatter)
  * @param[in] hashvec  The vector containing all necessary data
  */
 
-void Multi::write(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
+void Multi::write(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) 
 {
   prep(os);
   this->get_formatter()->executeFormat(os, hashvec);
