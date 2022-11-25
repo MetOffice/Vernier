@@ -21,6 +21,7 @@
 
 #include "formatter.h"
 #include "writer.h"
+#include "hashtable.h"
 #include <algorithm>
 
 /**

@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <omp.h>
+#include <iostream>
 
 #include "profiler.h"
 
@@ -17,11 +18,12 @@ TEST(HashEntryTest,CallCountTest)
   // Declare a shared sub-region hash. Initialise num_threads so that the
   // compiler knows the 'for' loop inside the parallel region will definitely
   // happen, and therefore doesn't think prof_sub_private remains unitialised.
-  size_t prof_sub_shared;
+  //size_t prof_sub_shared;
+  std::vector<std::pair<int,size_t>> prof_sub_shared;
   int num_threads = 1;
 
   // Start parallel region
-#pragma omp parallel default(none) shared(prof_sub_shared, prof, num_threads)
+#pragma omp parallel default(none) shared(prof_sub_shared, prof, num_threads, std::cout)
   {
     // Get total number of threads, only need to calculate on a single thread
     // since value won't change.
@@ -48,10 +50,7 @@ TEST(HashEntryTest,CallCountTest)
     }
 
     // Give prof_sub_shared a value for later use in EXPECT's
-#pragma omp single
-    {
-      prof_sub_shared = prof_sub_private;
-    }
+    prof_sub_shared.push_back( std::make_pair(thread_id, prof_sub_private) );
   }
 
   // Stop main region
@@ -62,8 +61,10 @@ TEST(HashEntryTest,CallCountTest)
   // zero which includes the main region callipers.
   for (int j = 0; j < num_threads; ++j)
   {
-    EXPECT_EQ(prof.get_call_count(prof_sub_shared,j),num_threads-j);
-
+    size_t J = static_cast<size_t>(j);
+    int    i = prof_sub_shared[J].first;
+    EXPECT_EQ(prof.get_call_count(prof_sub_shared[J].second,i),num_threads-i);
+    
     int incr = (j==0) ? 1 : 0;
     EXPECT_EQ(prof.get_prof_call_count(j),num_threads-j+incr);
   }

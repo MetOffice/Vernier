@@ -18,7 +18,9 @@
 #include <vector>
 #include <functional>
 #include <fstream>
+
 #include "hashtable.h"
+
 
 /**
  * @brief  Formatting class

@@ -42,7 +42,7 @@ void Formatter::executeFormat(std::ofstream& os, std::vector<std::pair<size_t, H
 void Formats::standard(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
 {
 
-    std::string routine_at_thread = "Thread: " /*+ std::to_string(tid_)*/;
+    std::string routine_at_thread = "Thread: All" /*+ std::to_string(tid_)*/;
 
     // Write headings
     os << "\n";

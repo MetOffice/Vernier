@@ -20,8 +20,9 @@
 #include <vector>
 #include <memory>
 #include <fstream>
-#include "hashtable.h"
 #include "formatter.h"
+
+struct HashEntry;
 
 /**
  * @brief  Writer class
