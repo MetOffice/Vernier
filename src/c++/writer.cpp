@@ -8,14 +8,33 @@
 #include "writer.h"
 #include <mpi.h>
 
+/**
+ * @brief  Writer constructor
+ * 
+ * @param[in] formatter  A pointer to the formatter class that will replace 
+ *                       Writer::formatter_
+ */
+
 Writer::Writer(std::unique_ptr<Formatter> formatter) 
   : formatter_(std::move(formatter))
   {}
+
+/**
+ * @brief  Tool via which any derived classes can access formatter_
+ * 
+ * @returns std::unique_ptr<Formatter>&  Returns the private formatter pointer
+ */
 
 std::unique_ptr<Formatter>& Writer::get_formatter()
 {
   return formatter_;
 }
+
+/**
+ * @brief  Opens a unique file per mpi rank
+ * 
+ * @param[in] os  Output stream to write to
+ */
 
 void Multi::prep(std::ofstream& os) 
 {
@@ -44,14 +63,31 @@ void Multi::prep(std::ofstream& os)
   os.open(out_filename);
 }
 
+/**
+ * @brief  Multiple-file-output "Multi" class constructor
+ * 
+ * @param[in] formatter  An input formatter pointer that will be used to call
+ *                       Writer's constructor 
+ */
+
 Multi::Multi(std::unique_ptr<Formatter> formatter) 
   : Writer(std::move(formatter))
   {}
 
+/**
+ * @brief  The main write method, combines prep() with formatter_'s format,
+ *         before then flushing and closing the output stream.
+ * 
+ * @param[in] os       The output stream to write to
+ * @param[in] hashvec  The vector containing all necessary data
+ */
+
 void Multi::write(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
 {
-  this->prep(os);
+  prep(os);
   this->get_formatter()->executeFormat(os, hashvec);
+  os.flush();
+  os.close();
 }
 
 

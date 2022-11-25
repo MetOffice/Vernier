@@ -23,15 +23,24 @@
 #include "hashtable.h"
 #include "formatter.h"
 
+/**
+ * @brief  Writer class
+ *
+ * Abstract class that stores a pointer to the formatter. Both the formatter
+ * and the virtual write method can be changed by any derived classes.
+ */
+
 class Writer {
 
   private:
 
+    // Ptr to formatting class
     std::unique_ptr<Formatter> formatter_;
 
   protected:
 
-    // Constructor
+    // The constructor, this is the only way in which the formatter pointer
+    // above can be changed. It will be inherited by any derived classes.
     explicit Writer(std::unique_ptr<Formatter> formatter);
 
     std::unique_ptr<Formatter>& get_formatter();
@@ -41,20 +50,25 @@ class Writer {
     virtual ~Writer() = default;
     Writer() = delete;
 
+    // Virtual write method
     virtual void write(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) = 0;
 
 };
+
+/**
+ * @brief  Class for multiple-file output
+ */
 
 class Multi : public Writer {
 
   private:
 
+    // Method 
     void prep(std::ofstream& os);
 
   public:
 
     ~Multi() override = default;
-
     explicit Multi(std::unique_ptr<Formatter> formatter);
 
     void write(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) override;

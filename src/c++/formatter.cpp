@@ -9,15 +9,35 @@
 #include <iomanip>
 #include <algorithm>
 
+/**
+ * @brief  Formatter constructor
+ *
+ * @param[in] format  An input callable function that will replace format_
+ *
+ */
+
 Formatter::Formatter(std::function<void(std::ofstream&, std::vector<std::pair<size_t, HashEntry>>)> format)
   : format_(std::move(format))
   {}
+
+/**
+ * @brief  Executes format_
+ * 
+ * @param[in] os       Output stream that the format method will write to
+ * @param[in] hashvec  Vector of pairs that the format method will operate on
+ */
 
 void Formatter::executeFormat(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
 {
     format_(os, hashvec);
 }
 
+/**
+ * @brief  Our standard output format
+ * 
+ * @param[in] os       Output stream to write to
+ * @param[in] hashvec  Vector containing all the necessary data
+ */
 
 void Formats::standard(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
 {
@@ -54,6 +74,14 @@ void Formats::standard(std::ofstream& os, std::vector<std::pair<size_t, HashEntr
 
 }
 
+/**
+ * @brief  Drhook-style output format, important for using the same post
+ *         processing tools
+ * 
+ * @param[in] os       Output stream to write to
+ * @param[in] hashvec  Vector containing all the necessary data
+ */
+
 void Formats::drhook(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec)
 {
     // Preliminary info
@@ -68,33 +96,33 @@ void Formats::drhook(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>
     // Table Headers
     os << "\n";
     os 
-        << "    "
-        << std::setw(3) << std::left   << "#"     
-        << std::setw(7) << std::left   << "% Time"     
-        << std::setw(13) << std::right << "Cumul"      
-        << std::setw(13) << std::right << "Self"       
-        << std::setw(13) << std::right << "Total"      
-        << std::setw(15) << std::right << "# of calls"
-        << std::setw(12) << std::right << "Self"      
-        << std::setw(12) << std::right << "Total"      << "    "
-                                       << "Routine@"   << "\n";
+      << "    "
+      << std::setw(3) << std::left   << "#"     
+      << std::setw(7) << std::left   << "% Time"     
+      << std::setw(13) << std::right << "Cumul"      
+      << std::setw(13) << std::right << "Self"       
+      << std::setw(13) << std::right << "Total"      
+      << std::setw(15) << std::right << "# of calls"
+      << std::setw(12) << std::right << "Self"      
+      << std::setw(12) << std::right << "Total"      << "    "
+                                     << "Routine@"   << "\n";
     os
-        << "    "
-        << std::setw(73) << "" 
-        << "(Size; Size/sec; Size/call; MinSize; MaxSize)" << "\n";
+      << "    "
+      << std::setw(73) << "" 
+      << "(Size; Size/sec; Size/call; MinSize; MaxSize)" << "\n";
     
     // Subheaders
     os 
-        << "    "
-        << std::setw(3)  << std::left  << ""     
-        << std::setw(7)  << std::right << "(self)"    
-        << std::setw(13) << std::right << "(sec)"     
-        << std::setw(13) << std::right << "(sec)"     
-        << std::setw(13) << std::right << "(sec)"     
-        << std::setw(15) << std::right << ""          
-        << std::setw(12) << std::right << "ms/call"   
-        << std::setw(12) << std::right << "ms/call"   
-                                    << "\n\n";
+      << "    "
+      << std::setw(3)  << std::left  << ""     
+      << std::setw(7)  << std::right << "(self)"    
+      << std::setw(13) << std::right << "(sec)"     
+      << std::setw(13) << std::right << "(sec)"     
+      << std::setw(13) << std::right << "(sec)"     
+      << std::setw(15) << std::right << ""          
+      << std::setw(12) << std::right << "ms/call"   
+      << std::setw(12) << std::right << "ms/call"   
+                                     << "\n\n";
 
     // Find the highest walltime in table_, which should be the total runtime of
     // the program. This is used later when calculating '% Time'.

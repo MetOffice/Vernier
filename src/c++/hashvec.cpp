@@ -9,6 +9,9 @@
 
 /**
  * @brief  HashVec constructor
+ * 
+ * The format_ and iomode_ variables are set via std::getenv, which checks for 
+ * the given environment variable.
  *
  */
 
@@ -16,6 +19,14 @@ HashVec::HashVec()
   : format_(std::getenv("PROF_OUT_FORMAT"))
   , iomode_(std::getenv("PROF_IO_MODE")) 
   {}
+
+/**
+ * @brief  Creates a new unique Writer pointer for a particular format and 
+ *         "IO mode" - i.e. singular file output or multiple file output
+ * 
+ * @return std::unique_ptr<Writer>  Unique Writer pointer that hashvec_ is 
+ *                                  passed to in order to write out data
+ */
 
 std::unique_ptr<Writer> HashVec::createWriter()
 {
@@ -81,6 +92,6 @@ void HashVec::write()
 {
     std::ofstream os;
 
-    auto writer = this->createWriter();
+    auto writer = createWriter();
     writer->write(os, hashvec_);
 }

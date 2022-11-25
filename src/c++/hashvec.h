@@ -24,9 +24,12 @@
 #include <algorithm>
 
 /**
- * @brief  Base writer class
- *
- * Essentially a visitor class that all IO modes will derive from. 
+ * @brief  HashVec class
+ * 
+ * The hashvec is a vector of pairs containing information from one or more 
+ * hashtables, since data in unordered_map's cannot be sorted. This class wraps
+ * the hashvec container with additional functionality that lets it pick a 
+ * format/iomode and create a pointer to the writer class.
  */
 
 class HashVec {
@@ -40,7 +43,7 @@ class HashVec {
       const char* format_;
       const char* iomode_;
 
-      // Private creation function
+      // Writer creation function
       std::unique_ptr<Writer> createWriter();
       
     public:
