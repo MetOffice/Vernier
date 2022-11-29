@@ -46,7 +46,7 @@ HashTable::HashTable(int const tid)
 
   // Insert special entry for the profiler overhead time.
   assert (lookup_table_.count(profiler_hash_) == 0);
-  hashvec_.emplace_back(RegionRecord(profiler_hash_, profiler_name));
+  hashvec_.emplace_back(profiler_hash_, profiler_name);
   record_iterator_t profiler_iterator = static_cast<record_iterator_t>(hashvec_.size()-1);
   lookup_table_.emplace(profiler_hash_, profiler_iterator);
   assert (lookup_table_.count(profiler_hash_) > 0);
@@ -63,17 +63,21 @@ void HashTable::query_insert(std::string_view region_name,
 {
   hash = hash_function_(region_name);
 
-  if (auto search = lookup_table_.find(hash); search != lookup_table_.end())
+  auto null_iterator = static_cast<record_iterator_t>(-1);
+  auto [it, inserted] = lookup_table_.try_emplace(hash, null_iterator);
+
+  // If insertion happened, then this is new entry ...
+  if (inserted)
   {
-    record_iterator = search->second;
-  }
-  else
-  {
-    hashvec_.emplace_back(RegionRecord(hash, region_name));
+    hashvec_.emplace_back(hash, region_name);
     record_iterator = static_cast<record_iterator_t>(hashvec_.size()-1);
-    lookup_table_.emplace(hash, record_iterator);
+    it->second = record_iterator;
     assert (lookup_table_.count(hash) > 0);
   }
+  else{
+    record_iterator = it->second;
+  }
+
 }
 
 /**
