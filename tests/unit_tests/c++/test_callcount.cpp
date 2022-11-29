@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <omp.h>
 #include <iostream>
+#include <vector>
 
 #include "profiler.h"
 
@@ -50,7 +51,7 @@ TEST(HashEntryTest,CallCountTest)
     }
 
     // Give prof_sub_shared a value for later use in EXPECT's
-    prof_sub_shared.push_back( std::make_pair(thread_id, prof_sub_private) );
+    prof_sub_shared.push_back(std::make_pair(thread_id, prof_sub_private));
   }
 
   // Stop main region
@@ -59,14 +60,12 @@ TEST(HashEntryTest,CallCountTest)
   // Check call_count_ is the number expected on all threads. On most threads,
   // the profiler calliper call count should match this number, except on thread
   // zero which includes the main region callipers.
-  for (int j = 0; j < num_threads; ++j)
+  for (auto& [thread, hash] : prof_sub_shared)
   {
-    size_t J = static_cast<size_t>(j);
-    int    i = prof_sub_shared[J].first;
-    EXPECT_EQ(prof.get_call_count(prof_sub_shared[J].second,i),num_threads-i);
+    EXPECT_EQ(prof.get_call_count(hash,thread), num_threads-thread);
     
-    int incr = (j==0) ? 1 : 0;
-    EXPECT_EQ(prof.get_prof_call_count(j),num_threads-j+incr);
+    int incr = (thread==0) ? 1 : 0;
+    EXPECT_EQ(prof.get_prof_call_count(thread), num_threads-thread+incr);
   }
 
 }
