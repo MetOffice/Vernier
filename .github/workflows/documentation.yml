@@ -42,17 +42,17 @@ jobs:
 
       - name: Update Doxygen Pages
         run: |
-          mkdir -p ${{github.workspace}}/docs/documentation
-          cp -rf ${{github.workspace}}/build/html/* ${{github.workspace}}/docs/documentation/.
+          mkdir -p ${{github.workspace}}/docs
+          cp -rf ${{github.workspace}}/build/html/* ${{github.workspace}}/docs/.
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add --force docs/documentation
+          git add --force docs
           git stash
           git remote update
           git checkout gh-pages
-          rm -rf ${{github.workspace}}/docs/documentation
+          git rm -rf docs
           git stash pop
           git reset
-          git add --force docs/documentation
+          git add --force docs
           git commit --allow-empty -m "Update Doxygen documentation"
           git push
