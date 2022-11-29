@@ -59,21 +59,21 @@ HashTable::HashTable(int const tid)
 
 void HashTable::query_insert(std::string_view region_name, 
                              size_t& hash,
-                             record_iterator_t& record_it) noexcept
+                             record_iterator_t& record_iterator) noexcept
 {
   hash = hash_function_(region_name);
 
-  if (lookup_table_.count(hash) == 0){
-    hashvec_.emplace_back(RegionRecord(hash, region_name));
-    record_it = static_cast<record_iterator_t>(hashvec_.size()-1);
-    lookup_table_.emplace(hash, record_it);
-    assert (lookup_table_.count(hash) > 0);
+  if (auto search = lookup_table_.find(hash); search != lookup_table_.end())
+  {
+    record_iterator = search->second;
   }
   else
   {
-    record_it = hash2iterator(hash);
+    hashvec_.emplace_back(RegionRecord(hash, region_name));
+    record_iterator = static_cast<record_iterator_t>(hashvec_.size()-1);
+    lookup_table_.emplace(hash, record_iterator);
+    assert (lookup_table_.count(hash) > 0);
   }
-
 }
 
 /**
@@ -82,10 +82,10 @@ void HashTable::query_insert(std::string_view region_name,
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(record_iterator_t record_it, time_duration_t const time_delta)
+void HashTable::update(record_iterator_t const record_iterator, time_duration_t const time_delta)
 {
 
-  auto& record = hashvec_[record_it];
+  auto& record = hashvec_[record_iterator];
 
   // Increment the walltime for this hash entry.
   record.total_walltime_ += time_delta;
@@ -101,10 +101,10 @@ void HashTable::update(record_iterator_t record_it, time_duration_t const time_d
  */
 
 time_duration_t* HashTable::add_child_time(
-                         record_iterator_t record_it,
+                         record_iterator_t const record_iterator,
                          time_duration_t child_walltime)
 {
-  auto& record = hashvec_[record_it];
+  auto& record = hashvec_[record_iterator];
   record.child_walltime_ += child_walltime;
   return &record.overhead_walltime_;
 }

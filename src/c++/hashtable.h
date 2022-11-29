@@ -31,6 +31,11 @@
 
 #include "prof_gettime.h"
 
+struct NullHashFunction {
+  std::size_t operator()(std::size_t const& key) const {
+      return key;
+  }
+};
 
 /**
  * @brief  Structure to hold information for a particular routine.
@@ -81,7 +86,7 @@ class HashTable{
     std::hash<std::string_view> hash_function_;
     
     // Hashtable containing locations of region records. 
-    std::unordered_map<size_t, record_iterator_t> lookup_table_;
+    std::unordered_map<size_t, record_iterator_t, NullHashFunction> lookup_table_;
 
     // Vector of region records.
     std::vector<RegionRecord> hashvec_;
@@ -98,12 +103,12 @@ class HashTable{
 
     // Prototypes
     void query_insert(std::string_view, size_t&, record_iterator_t&) noexcept;
-    void update(record_iterator_t, time_duration_t const);
+    void update(record_iterator_t const, time_duration_t const);
     void write();
 
     // Member functions
     std::vector<size_t> list_keys();
-    time_duration_t* add_child_time(size_t const, time_duration_t);
+    time_duration_t* add_child_time(record_iterator_t const, time_duration_t);
     time_duration_t& increment_profiler_calls();
 
     // Getters
