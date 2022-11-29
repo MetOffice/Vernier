@@ -16,9 +16,7 @@
 #ifndef HASHVEC_H
 #define HASHVEC_H
 
-#include "formatter.h"
 #include "writer.h"
-#include "hashtable.h"
 #include <algorithm>
 
 /**

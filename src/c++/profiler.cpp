@@ -80,10 +80,10 @@ size_t Profiler::start(std::string_view region_name)
   assert (tid <= thread_traceback_.size());
 
   // Insert this region into the thread's hash table.
-  //std::string new_region_name = std::string(region_name) + "@" + std::to_string(tid);
-  region_name += "@";
-  region_name += std::to_string(tid);
-  size_t const hash = thread_hashtables_[tid].query_insert(region_name);
+  std::string new_region_name = std::string(region_name);
+  new_region_name += '@';
+  new_region_name += std::to_string(tid);
+  size_t const hash = thread_hashtables_[tid].query_insert(new_region_name);
 
   // Store the calliper and region start times.
   auto region_start_time = prof_gettime();

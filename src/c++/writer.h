@@ -22,8 +22,6 @@
 #include <fstream>
 #include "formatter.h"
 
-struct HashEntry;
-
 /**
  * @brief  Writer class
  *
@@ -33,18 +31,14 @@ struct HashEntry;
 
 class Writer {
 
-  private:
+  protected:
 
     // Ptr to formatting class
     const std::unique_ptr<Formatter> formatter_;
 
-  protected:
-
-    // The constructor, this is the only way in which the formatter pointer
-    // above can be changed. It will be inherited by any derived classes.
+    // The constructor, which gives the formatter pointer above a value. 
+    // It will be inherited by any derived classes.
     explicit Writer(std::unique_ptr<Formatter> formatter);
-
-    const std::unique_ptr<Formatter>& get_formatter();
 
   public:
 

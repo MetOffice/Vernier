@@ -25,10 +25,10 @@ Writer::Writer(std::unique_ptr<Formatter> formatter)
  * @returns std::unique_ptr<Formatter>&  Returns the private formatter pointer
  */
 
-const std::unique_ptr<Formatter>& Writer::get_formatter()
-{
-  return formatter_;
-}
+// const std::unique_ptr<Formatter> Writer::get_formatter()
+// {
+//   return formatter_;
+// }
 
 /**
  * @brief  Opens a unique file per mpi rank
@@ -85,7 +85,7 @@ Multi::Multi(std::unique_ptr<Formatter> formatter)
 void Multi::write(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) 
 {
   prep(os);
-  this->get_formatter()->executeFormat(os, hashvec);
+  this->formatter_->executeFormat(os, hashvec);
   os.flush();
   os.close();
 }
