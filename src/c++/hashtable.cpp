@@ -196,7 +196,7 @@ void HashTable::append_to(std::vector<std::pair<size_t,HashEntry>>& hashvec)
 
   // Remove __profiler__ entries with 0 calls
   auto it = table_.find(profiler_hash_);
-  if (it != NULL && it->second.call_count_ == 0) { table_.erase(it); }
+  if (it != table_.end() && it->second.call_count_ == 0) { table_.erase(it); }
   
   // Insert local table into hashvec
   hashvec.insert(hashvec.end(), table_.begin(), table_.end());
