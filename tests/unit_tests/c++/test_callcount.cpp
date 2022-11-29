@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 #include <omp.h>
-#include <iostream>
 #include <vector>
 
 #include "profiler.h"
@@ -24,7 +23,7 @@ TEST(HashEntryTest,CallCountTest)
   int num_threads = 1;
 
   // Start parallel region
-#pragma omp parallel default(none) shared(prof_sub_shared, prof, num_threads, std::cout)
+#pragma omp parallel default(none) shared(prof_sub_shared, prof, num_threads)
   {
     // Get total number of threads, only need to calculate on a single thread
     // since value won't change.
@@ -51,7 +50,10 @@ TEST(HashEntryTest,CallCountTest)
     }
 
     // Give prof_sub_shared a value for later use in EXPECT's
-    prof_sub_shared.push_back(std::make_pair(thread_id, prof_sub_private));
+#pragma omp critical
+    {
+      prof_sub_shared.push_back(std::make_pair(thread_id, prof_sub_private));
+    } 
   }
 
   // Stop main region
