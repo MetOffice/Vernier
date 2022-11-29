@@ -48,9 +48,10 @@ class Profiler
 
         // Constructors
         StartCalliperValues();
-        StartCalliperValues(time_point_t, time_point_t);
+        StartCalliperValues(record_iterator_t, time_point_t, time_point_t);
 
         // Data members
+        record_iterator_t my_iterator_;
         time_point_t region_start_time_;
         time_point_t calliper_start_time_;
     };

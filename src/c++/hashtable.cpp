@@ -16,8 +16,9 @@
  *
  */
 
-HashEntry::HashEntry(std::string_view region_name)
-      : region_name_(region_name)
+RegionRecord::RegionRecord(size_t const region_hash, std::string_view region_name)
+      : region_hash_(region_hash)
+      , region_name_(region_name)
       , total_walltime_      (time_duration_t::zero())
       , total_raw_walltime_  (time_duration_t::zero())
       , self_walltime_       (time_duration_t::zero())
@@ -36,14 +37,19 @@ HashTable::HashTable(int const tid)
   : tid_(tid)
 {
 
+  // Reserve enough places in hashvec_
+  hashvec_.reserve(1000);
+
   // Set the name and hash of the profiler entry.
   std::string const profiler_name = "__profiler__";
   profiler_hash_ = hash_function_(profiler_name);
 
   // Insert special entry for the profiler overhead time.
-  assert (table_.count(profiler_hash_) == 0);
-  table_.emplace(profiler_hash_, HashEntry(profiler_name));
-  assert (table_.count(profiler_hash_) > 0);
+  assert (lookup_table_.count(profiler_hash_) == 0);
+  hashvec_.emplace_back(RegionRecord(profiler_hash_, profiler_name));
+  record_iterator_t profiler_iterator = static_cast<record_iterator_t>(hashvec_.size()-1);
+  lookup_table_.emplace(profiler_hash_, profiler_iterator);
+  assert (lookup_table_.count(profiler_hash_) > 0);
 }
 
 /**
@@ -51,16 +57,23 @@ HashTable::HashTable(int const tid)
  *
  */
 
-size_t HashTable::query_insert(std::string_view region_name) noexcept
+void HashTable::query_insert(std::string_view region_name, 
+                             size_t& hash,
+                             record_iterator_t& record_it) noexcept
 {
-  size_t hash = hash_function_(region_name);
+  hash = hash_function_(region_name);
 
-  if (table_.count(hash) == 0){
-    table_.emplace(hash,HashEntry(region_name));
-    assert (table_.count(hash) > 0);
+  if (lookup_table_.count(hash) == 0){
+    hashvec_.emplace_back(RegionRecord(hash, region_name));
+    record_it = static_cast<record_iterator_t>(hashvec_.size()-1);
+    lookup_table_.emplace(hash, record_it);
+    assert (lookup_table_.count(hash) > 0);
+  }
+  else
+  {
+    record_it = hash2iterator(hash);
   }
 
-  return hash;
 }
 
 /**
@@ -69,18 +82,16 @@ size_t HashTable::query_insert(std::string_view region_name) noexcept
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(size_t const hash, time_duration_t const time_delta)
+void HashTable::update(record_iterator_t record_it, time_duration_t const time_delta)
 {
-  // Assertions
-  assert (table_.size() > 0);
-  assert (table_.count(hash) > 0);
+
+  auto& record = hashvec_[record_it];
 
   // Increment the walltime for this hash entry.
-  auto& entry = table_.at(hash);
-  entry.total_walltime_ += time_delta;
+  record.total_walltime_ += time_delta;
 
   // Update the number of times this region has been called
-  ++entry.call_count_;
+  ++record.call_count_;
 
 }
 
@@ -90,16 +101,12 @@ void HashTable::update(size_t const hash, time_duration_t const time_delta)
  */
 
 time_duration_t* HashTable::add_child_time(
-                         size_t const hash,
+                         record_iterator_t record_it,
                          time_duration_t child_walltime)
 {
-  // Assertions
-  assert (table_.size() > 0);
-  assert (table_.count(hash) > 0);
-
-  auto& entry = table_.at(hash);
-  entry.child_walltime_ += child_walltime;
-  return &entry.overhead_walltime_;
+  auto& record = hashvec_[record_it];
+  record.child_walltime_ += child_walltime;
+  return &record.overhead_walltime_;
 }
 
 /**
@@ -109,9 +116,9 @@ time_duration_t* HashTable::add_child_time(
 
 time_duration_t& HashTable::increment_profiler_calls()
 {
-  auto& entry = table_.at(profiler_hash_);
-  ++entry.call_count_;
-  return entry.total_walltime_;
+  auto& record = hashvec_[profiler_iterator_];
+  ++record.call_count_;
+  return record.total_walltime_;
 }
 
 /**
@@ -155,18 +162,17 @@ void HashTable::write()
   // walltime.  If optimisation of this is needed, it ought to be possible to
   // acquire a vector of hash-selftime pairs in the correct order, then use the
   // hashes to look up other information directly from the hashtable.
-  hashvec = std::vector<std::pair<size_t, HashEntry>>(table_.cbegin(), table_.cend());
-  std::sort(begin(hashvec), end(hashvec),
-      [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_;});
+  std::sort(begin(hashvec_), end(hashvec_),
+      [](auto a, auto b) { return a.self_walltime_ > b.self_walltime_;});
 
   // Data entries
-  for (auto& [hash, entry] : hashvec) {
+  for (auto& record : hashvec_) {
     std::cout
-      << std::setw(40) << std::left  << entry.region_name_                << " "
-      << std::setw(15) << std::right << entry.self_walltime_.count()      << " "
-      << std::setw(15) << std::right << entry.total_raw_walltime_.count() << " "
-      << std::setw(15) << std::right << entry.total_walltime_.count()     << " "
-      << std::setw(10) << std::right << entry.call_count_                 << "\n";
+      << std::setw(40) << std::left  << record.region_name_                << " "
+      << std::setw(15) << std::right << record.self_walltime_.count()      << " "
+      << std::setw(15) << std::right << record.total_raw_walltime_.count() << " "
+      << std::setw(15) << std::right << record.total_walltime_.count()     << " "
+      << std::setw(10) << std::right << record.call_count_                 << "\n";
   }
 }
 
@@ -179,18 +185,17 @@ void HashTable::write()
  * @param [in] hash   The hash of the region to compute.
  */
 
-void HashTable::prepare_computed_times(size_t const hash)
+void HashTable::prepare_computed_times(RegionRecord& record)
 {
-  auto& entry = table_.at(hash);
 
   // Self time
-  entry.self_walltime_ = entry.total_walltime_
-                       - entry.child_walltime_
-                       - entry.overhead_walltime_;
+  record.self_walltime_ = record.total_walltime_
+                        - record.child_walltime_
+                        - record.overhead_walltime_;
 
   // Total walltime with overheads attributed to the parent removed.
-  entry.total_raw_walltime_ = entry.total_walltime_
-                            - entry.overhead_walltime_;
+  record.total_raw_walltime_ = record.total_walltime_
+                             - record.overhead_walltime_;
 }
 
 /**
@@ -204,24 +209,24 @@ void HashTable::prepare_computed_times(size_t const hash)
    auto total_overhead_time = time_duration_t::zero();
 
    // Loop over entries in the hashtable. This would include the special
-   // profiler entry, but the HashEntry constructor will have ensured that all
+   // profiler entry, but the RegionRecord constructor will have ensured that all
    // corresponding values are zero thus far.
-   for (auto& [hash, entry] : table_) {
-     prepare_computed_times(hash);
+   for (auto& [hash, entry] : lookup_table_) {
+     prepare_computed_times(hashvec_[hash2iterator(hash)]);
    }
 
    /// // Check that the special profiler hash entries are all zero, even after the
    /// // above loop.
-   /// assert(table_.at(profiler_hash_).self_walltime_      == time_duration_t::zero());
-   /// assert(table_.at(profiler_hash_).child_walltime_     == time_duration_t::zero());
-   /// assert(table_.at(profiler_hash_).total_walltime_     == time_duration_t::zero());
-   /// assert(table_.at(profiler_hash_).total_raw_walltime_ == time_duration_t::zero());
+   /// assert(lookup_table_.at(profiler_hash_).self_walltime_      == time_duration_t::zero());
+   /// assert(lookup_table_.at(profiler_hash_).child_walltime_     == time_duration_t::zero());
+   /// assert(lookup_table_.at(profiler_hash_).total_walltime_     == time_duration_t::zero());
+   /// assert(lookup_table_.at(profiler_hash_).total_raw_walltime_ == time_duration_t::zero());
 
    // Set values for the profiler entry specifically in the hashtable.
-   // table_.at(profiler_hash_).self_walltime_      = total_overhead_time_;
-   // table_.at(profiler_hash_).child_walltime_     = time_duration_t::zero();
-   // table_.at(profiler_hash_).total_walltime_     = total_overhead_time_;
-   // table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time_;
+   // lookup_table_.at(profiler_hash_).self_walltime_      = total_overhead_time_;
+   // lookup_table_.at(profiler_hash_).child_walltime_     = time_duration_t::zero();
+   // lookup_table_.at(profiler_hash_).total_walltime_     = total_overhead_time_;
+   // lookup_table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time_;
 
    // std::cout << "My    thread ID: " << omp_get_thread_num() << std::endl;
    // std::cout << "Table thread ID: " << tid_                 << std::endl;
@@ -236,7 +241,7 @@ void HashTable::prepare_computed_times(size_t const hash)
 std::vector<size_t> HashTable::list_keys()
 {
   std::vector<size_t> keys;
-  for (auto const& key : table_)
+  for (auto const& key : lookup_table_)
   {
     keys.push_back(key.first);
   }
@@ -250,7 +255,8 @@ std::vector<size_t> HashTable::list_keys()
 
 double HashTable::get_total_walltime(size_t const hash) const
 {
-  return table_.at(hash).total_walltime_.count();
+  auto& record = hashvec_[hash2iterator_const(hash)];
+  return record.total_walltime_.count();
 }
 
 /**
@@ -263,8 +269,9 @@ double HashTable::get_total_walltime(size_t const hash) const
 
 double HashTable::get_total_raw_walltime(size_t const hash)
 {
-   prepare_computed_times(hash);
-   return table_.at(hash).total_raw_walltime_.count();
+  auto& record = hashvec_[hash2iterator(hash)];
+   prepare_computed_times(record);
+   return record.total_raw_walltime_.count();
 }
 
 /**
@@ -275,7 +282,8 @@ double HashTable::get_total_raw_walltime(size_t const hash)
 
 double HashTable::get_overhead_walltime(size_t const hash) const
 {
-  return table_.at(hash).overhead_walltime_.count();
+  auto& record = hashvec_[hash2iterator_const(hash)];
+  return record.overhead_walltime_.count();
 }
 
 /**
@@ -287,8 +295,9 @@ double HashTable::get_overhead_walltime(size_t const hash) const
 
 double HashTable::get_self_walltime(size_t const hash)
 {
-  prepare_computed_times(hash);
-  return table_.at(hash).self_walltime_.count();
+  auto& record = hashvec_[hash2iterator(hash)];
+  prepare_computed_times(record);
+  return record.self_walltime_.count();
 }
 
 /**
@@ -300,7 +309,8 @@ double HashTable::get_self_walltime(size_t const hash)
 
 double HashTable::get_child_walltime(size_t const hash) const
 {
-  return table_.at(hash).child_walltime_.count();
+  auto& record = hashvec_[hash2iterator_const(hash)];
+  return record.child_walltime_.count();
 }
 
 /**
@@ -310,7 +320,8 @@ double HashTable::get_child_walltime(size_t const hash) const
 
 std::string HashTable::get_region_name(size_t const hash) const
 {
-  return table_.at(hash).region_name_;
+  auto& record = hashvec_[hash2iterator_const(hash)];
+  return record.region_name_;
 }
 
 /**
@@ -325,7 +336,8 @@ std::string HashTable::get_region_name(size_t const hash) const
 
 unsigned long long int HashTable::get_call_count(size_t const hash) const
 {
-    return table_.at(hash).call_count_;
+  auto& record = hashvec_[hash2iterator_const(hash)];
+  return record.call_count_;
 }
 
 /**
@@ -338,6 +350,31 @@ unsigned long long int HashTable::get_call_count(size_t const hash) const
 
 unsigned long long int HashTable::get_prof_call_count() const
 {
-    return table_.at(profiler_hash_).call_count_;
+    auto& record = hashvec_[hash2iterator_const(profiler_hash_)];
+    return record.call_count_;
 }
+
+/**
+ * @ brief
+ *
+ */
+
+record_iterator_t HashTable::hash2iterator(size_t const hash)
+{
+  // Assertions
+  assert (lookup_table_.size() > 0);
+  assert (lookup_table_.count(hash) > 0);
+
+  return lookup_table_.at(hash);
+}
+
+record_iterator_t HashTable::hash2iterator_const(size_t const hash) const
+{
+  // Assertions
+  assert (lookup_table_.size() > 0);
+  assert (lookup_table_.count(hash) > 0);
+
+  return lookup_table_.at(hash);
+}
+
 

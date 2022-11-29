@@ -30,9 +30,11 @@ Profiler::StartCalliperValues::StartCalliperValues()
   {}
 
 Profiler::StartCalliperValues::StartCalliperValues(
+                                   record_iterator_t my_iterator,
                                    time_point_t region_start_time, 
                                    time_point_t calliper_start_time)
-  : region_start_time_(region_start_time)
+  : my_iterator_        (my_iterator)
+  , region_start_time_  (region_start_time)
   , calliper_start_time_(calliper_start_time)
   {}
 
@@ -117,13 +119,14 @@ size_t Profiler::start2(std::string_view region_name)
   assert (tid <= thread_traceback_.size());
 
   // Insert this region into the thread's hash table.
-  size_t const hash = thread_hashtables_[tid].query_insert(region_name);
+  size_t hash;
+  record_iterator_t record_iterator;
+  thread_hashtables_[tid].query_insert(region_name, hash, record_iterator);
 
   // Store the calliper and region start times.
   auto region_start_time = prof_gettime();
   StartCalliperValues new_times = StartCalliperValues(
-            region_start_time, logged_calliper_start_time);
-
+            record_iterator, region_start_time, logged_calliper_start_time);
 
   ++call_depth;
   auto call_depth_it = static_cast<pair_iterator_t_>(call_depth);
@@ -178,7 +181,7 @@ void Profiler::stop(size_t const hash)
   auto region_duration = region_stop_time - start_calliper_times.region_start_time_;
 
   // Do the hashtable update for the child region.
-  thread_hashtables_[tid].update(hash, region_duration);
+  thread_hashtables_[tid].update(start_calliper_times.my_iterator_, region_duration);
 
   // Precompute times as far as possible. We just need the calliper stop time
   // later.
@@ -194,9 +197,9 @@ void Profiler::stop(size_t const hash)
   // Acquire parent pointers
   if (call_depth > 0){
     auto parent_depth_it = static_cast<pair_iterator_t_>(call_depth-1);
-    size_t parent_hash = thread_traceback_[tid].at(parent_depth_it).first;
+    record_iterator_t parent_iterator = thread_traceback_[tid].at(parent_depth_it).second.my_iterator_;
     parent_overhead_time_ptr = thread_hashtables_[tid].add_child_time(
-                                         parent_hash, region_duration);
+                                         parent_iterator, region_duration);
   }
 
   // Increment profiler calls, and get a reference to the total overhead time.

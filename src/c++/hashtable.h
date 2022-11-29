@@ -9,7 +9,7 @@
  *  @brief  Handles entries for each timed region.
  *
  *  In order to store region timings, one struct and one class are defined. The
- *  struct (HashEntry) collects together information pertinent to a single
+ *  struct (RegionRecord) collects together information pertinent to a single
  *  profiled region, such as its name, total time and self time.
  *
  *  The HashTable class contains a hashtable to hold the hash entries (see
@@ -39,14 +39,15 @@
  *
  */
 
-struct HashEntry{
+struct RegionRecord{
   public:
 
     // Constructor
-    HashEntry() = delete;
-    explicit HashEntry(std::string_view);
+    RegionRecord() = delete;
+    explicit RegionRecord(size_t const, std::string_view);
 
     // Data members
+    size_t           region_hash_;
     std::string      region_name_;
     time_duration_t  total_walltime_;
     time_duration_t  total_raw_walltime_;
@@ -56,6 +57,8 @@ struct HashEntry{
     unsigned long long int call_count_;
 
 };
+
+typedef std::vector<RegionRecord>::size_type  record_iterator_t;
 
 /**
  * @brief  Wraps STL hashtables with additional functionality.
@@ -72,12 +75,19 @@ class HashTable{
     // Members
     int tid_;
     size_t profiler_hash_;
-    std::unordered_map<size_t,HashEntry> table_;
+    record_iterator_t profiler_iterator_;
+    
+    // Hash function
     std::hash<std::string_view> hash_function_;
-    std::vector<std::pair<size_t, HashEntry>> hashvec;
+    
+    // Hashtable containing locations of region records. 
+    std::unordered_map<size_t, record_iterator_t> lookup_table_;
+
+    // Vector of region records.
+    std::vector<RegionRecord> hashvec_;
 
     // Private member functions
-    void prepare_computed_times(size_t const);
+    void prepare_computed_times(RegionRecord&);
     void prepare_computed_times_all();
 
   public:
@@ -87,8 +97,8 @@ class HashTable{
     HashTable(int);
 
     // Prototypes
-    size_t query_insert(std::string_view) noexcept;
-    void update(size_t const, time_duration_t const);
+    void query_insert(std::string_view, size_t&, record_iterator_t&) noexcept;
+    void update(record_iterator_t, time_duration_t const);
     void write();
 
     // Member functions
@@ -105,6 +115,8 @@ class HashTable{
     std::string            get_region_name(size_t const hash) const;
     unsigned long long int get_call_count(size_t const hash) const;
     unsigned long long int get_prof_call_count() const;
+    record_iterator_t      hash2iterator(size_t const);
+    record_iterator_t      hash2iterator_const(size_t const) const;
 };
 #endif
 
