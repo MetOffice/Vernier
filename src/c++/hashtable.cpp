@@ -47,8 +47,8 @@ HashTable::HashTable(int const tid)
   // Insert special entry for the profiler overhead time.
   assert (lookup_table_.count(profiler_hash_) == 0);
   hashvec_.emplace_back(profiler_hash_, profiler_name);
-  record_iterator_t profiler_iterator = static_cast<record_iterator_t>(hashvec_.size()-1);
-  lookup_table_.emplace(profiler_hash_, profiler_iterator);
+  profiler_index_ = hashvec_.size()-1;
+  lookup_table_.emplace(profiler_hash_, profiler_index_);
   assert (lookup_table_.count(profiler_hash_) > 0);
 }
 
@@ -59,23 +59,21 @@ HashTable::HashTable(int const tid)
 
 void HashTable::query_insert(std::string_view region_name, 
                              size_t& hash,
-                             record_iterator_t& record_iterator) noexcept
+                             record_index_t& record_index) noexcept
 {
   hash = hash_function_(region_name);
 
-  auto null_iterator = static_cast<record_iterator_t>(-1);
-  auto [it, inserted] = lookup_table_.try_emplace(hash, null_iterator);
-
-  // If insertion happened, then this is new entry ...
-  if (inserted)
+  // Found entry,
+  if (auto search = lookup_table_.find(hash); search != lookup_table_.end())
+  {
+    record_index = search->second;
+  }
+  else
   {
     hashvec_.emplace_back(hash, region_name);
-    record_iterator = static_cast<record_iterator_t>(hashvec_.size()-1);
-    it->second = record_iterator;
+    record_index = hashvec_.size()-1;
+    lookup_table_.emplace(hash, record_index);
     assert (lookup_table_.count(hash) > 0);
-  }
-  else{
-    record_iterator = it->second;
   }
 
 }
@@ -86,10 +84,10 @@ void HashTable::query_insert(std::string_view region_name,
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(record_iterator_t const record_iterator, time_duration_t const time_delta)
+void HashTable::update(record_index_t const record_index, time_duration_t const time_delta)
 {
 
-  auto& record = hashvec_[record_iterator];
+  auto& record = hashvec_[record_index];
 
   // Increment the walltime for this hash entry.
   record.total_walltime_ += time_delta;
@@ -105,10 +103,10 @@ void HashTable::update(record_iterator_t const record_iterator, time_duration_t 
  */
 
 time_duration_t* HashTable::add_child_time(
-                         record_iterator_t const record_iterator,
-                         time_duration_t child_walltime)
+                         record_index_t const record_index,
+                         time_duration_t const child_walltime)
 {
-  auto& record = hashvec_[record_iterator];
+  auto& record = hashvec_[record_index];
   record.child_walltime_ += child_walltime;
   return &record.overhead_walltime_;
 }
@@ -120,7 +118,7 @@ time_duration_t* HashTable::add_child_time(
 
 time_duration_t& HashTable::increment_profiler_calls()
 {
-  auto& record = hashvec_[profiler_iterator_];
+  auto& record = hashvec_[profiler_index_];
   ++record.call_count_;
   return record.total_walltime_;
 }
@@ -215,8 +213,8 @@ void HashTable::prepare_computed_times(RegionRecord& record)
    // Loop over entries in the hashtable. This would include the special
    // profiler entry, but the RegionRecord constructor will have ensured that all
    // corresponding values are zero thus far.
-   for (auto& [hash, entry] : lookup_table_) {
-     prepare_computed_times(hashvec_[hash2iterator(hash)]);
+   for (auto& [hash, index] : lookup_table_) {
+     prepare_computed_times(hash2record(hash));
    }
 
    /// // Check that the special profiler hash entries are all zero, even after the
@@ -259,7 +257,8 @@ std::vector<size_t> HashTable::list_keys()
 
 double HashTable::get_total_walltime(size_t const hash) const
 {
-  auto& record = hashvec_[hash2iterator_const(hash)];
+  auto& record = hash2record_const(hash);
+
   return record.total_walltime_.count();
 }
 
@@ -273,7 +272,7 @@ double HashTable::get_total_walltime(size_t const hash) const
 
 double HashTable::get_total_raw_walltime(size_t const hash)
 {
-  auto& record = hashvec_[hash2iterator(hash)];
+  auto& record = hash2record(hash);
    prepare_computed_times(record);
    return record.total_raw_walltime_.count();
 }
@@ -286,7 +285,7 @@ double HashTable::get_total_raw_walltime(size_t const hash)
 
 double HashTable::get_overhead_walltime(size_t const hash) const
 {
-  auto& record = hashvec_[hash2iterator_const(hash)];
+  auto& record = hash2record_const(hash);
   return record.overhead_walltime_.count();
 }
 
@@ -299,7 +298,7 @@ double HashTable::get_overhead_walltime(size_t const hash) const
 
 double HashTable::get_self_walltime(size_t const hash)
 {
-  auto& record = hashvec_[hash2iterator(hash)];
+  auto& record = hash2record(hash);
   prepare_computed_times(record);
   return record.self_walltime_.count();
 }
@@ -313,7 +312,7 @@ double HashTable::get_self_walltime(size_t const hash)
 
 double HashTable::get_child_walltime(size_t const hash) const
 {
-  auto& record = hashvec_[hash2iterator_const(hash)];
+  auto& record = hash2record_const(hash);
   return record.child_walltime_.count();
 }
 
@@ -324,7 +323,7 @@ double HashTable::get_child_walltime(size_t const hash) const
 
 std::string HashTable::get_region_name(size_t const hash) const
 {
-  auto& record = hashvec_[hash2iterator_const(hash)];
+  auto& record = hash2record_const(hash);
   return record.region_name_;
 }
 
@@ -340,7 +339,7 @@ std::string HashTable::get_region_name(size_t const hash) const
 
 unsigned long long int HashTable::get_call_count(size_t const hash) const
 {
-  auto& record = hashvec_[hash2iterator_const(hash)];
+  auto& record = hash2record_const(hash);
   return record.call_count_;
 }
 
@@ -354,7 +353,7 @@ unsigned long long int HashTable::get_call_count(size_t const hash) const
 
 unsigned long long int HashTable::get_prof_call_count() const
 {
-    auto& record = hashvec_[hash2iterator_const(profiler_hash_)];
+    auto& record = hash2record_const(profiler_hash_);
     return record.call_count_;
 }
 
@@ -363,22 +362,22 @@ unsigned long long int HashTable::get_prof_call_count() const
  *
  */
 
-record_iterator_t HashTable::hash2iterator(size_t const hash)
+RegionRecord& HashTable::hash2record(size_t const hash)
 {
   // Assertions
   assert (lookup_table_.size() > 0);
   assert (lookup_table_.count(hash) > 0);
 
-  return lookup_table_.at(hash);
+  return hashvec_[lookup_table_.at(hash)];
 }
 
-record_iterator_t HashTable::hash2iterator_const(size_t const hash) const
+RegionRecord const& HashTable::hash2record_const(size_t const hash) const
 {
   // Assertions
   assert (lookup_table_.size() > 0);
   assert (lookup_table_.count(hash) > 0);
 
-  return lookup_table_.at(hash);
+  return hashvec_[lookup_table_.at(hash)];
 }
 
 

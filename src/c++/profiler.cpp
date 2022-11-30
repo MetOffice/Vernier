@@ -30,7 +30,7 @@ Profiler::StartCalliperValues::StartCalliperValues()
   {}
 
 Profiler::StartCalliperValues::StartCalliperValues(
-                                   record_iterator_t my_iterator,
+                                   record_index_t my_iterator,
                                    time_point_t region_start_time, 
                                    time_point_t calliper_start_time)
   : my_iterator_        (my_iterator)
@@ -120,13 +120,13 @@ size_t Profiler::start2(std::string_view region_name)
 
   // Insert this region into the thread's hash table.
   size_t hash;
-  record_iterator_t record_iterator;
-  thread_hashtables_[tid].query_insert(region_name, hash, record_iterator);
+  record_index_t record_index;
+  thread_hashtables_[tid].query_insert(region_name, hash, record_index);
 
   // Store the calliper and region start times.
   auto region_start_time = prof_gettime();
   StartCalliperValues new_times = StartCalliperValues(
-            record_iterator, region_start_time, logged_calliper_start_time);
+            record_index, region_start_time, logged_calliper_start_time);
 
   ++call_depth;
   auto call_depth_it = static_cast<pair_iterator_t_>(call_depth);
@@ -196,10 +196,10 @@ void Profiler::stop(size_t const hash)
 
   // Acquire parent pointers
   if (call_depth > 0){
-    auto parent_depth_it = static_cast<pair_iterator_t_>(call_depth-1);
-    record_iterator_t parent_iterator = thread_traceback_[tid].at(parent_depth_it).second.my_iterator_;
+    auto parent_depth = static_cast<pair_iterator_t_>(call_depth-1);
+    record_index_t parent_index = thread_traceback_[tid].at(parent_depth).second.my_iterator_;
     parent_overhead_time_ptr = thread_hashtables_[tid].add_child_time(
-                                         parent_iterator, region_duration);
+                                         parent_index, region_duration);
   }
 
   // Increment profiler calls, and get a reference to the total overhead time.

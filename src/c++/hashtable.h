@@ -63,7 +63,7 @@ struct RegionRecord{
 
 };
 
-typedef std::vector<RegionRecord>::size_type  record_iterator_t;
+typedef std::vector<RegionRecord>::size_type  record_index_t;
 
 /**
  * @brief  Wraps STL hashtables with additional functionality.
@@ -80,13 +80,13 @@ class HashTable{
     // Members
     int tid_;
     size_t profiler_hash_;
-    record_iterator_t profiler_iterator_;
+    record_index_t profiler_index_;
     
     // Hash function
     std::hash<std::string_view> hash_function_;
     
     // Hashtable containing locations of region records. 
-    std::unordered_map<size_t, record_iterator_t, NullHashFunction> lookup_table_;
+    std::unordered_map<size_t, record_index_t, NullHashFunction> lookup_table_;
 
     // Vector of region records.
     std::vector<RegionRecord> hashvec_;
@@ -94,6 +94,8 @@ class HashTable{
     // Private member functions
     void prepare_computed_times(RegionRecord&);
     void prepare_computed_times_all();
+    RegionRecord&  hash2record(size_t const);
+    RegionRecord const&  hash2record_const(size_t const) const;
 
   public:
 
@@ -102,13 +104,13 @@ class HashTable{
     HashTable(int);
 
     // Prototypes
-    void query_insert(std::string_view, size_t&, record_iterator_t&) noexcept;
-    void update(record_iterator_t const, time_duration_t const);
+    void query_insert(std::string_view, size_t&, record_index_t&) noexcept;
+    void update(record_index_t const, time_duration_t const);
     void write();
 
     // Member functions
     std::vector<size_t> list_keys();
-    time_duration_t* add_child_time(record_iterator_t const, time_duration_t);
+    time_duration_t* add_child_time(record_index_t const, time_duration_t const);
     time_duration_t& increment_profiler_calls();
 
     // Getters
@@ -120,8 +122,6 @@ class HashTable{
     std::string            get_region_name(size_t const hash) const;
     unsigned long long int get_call_count(size_t const hash) const;
     unsigned long long int get_prof_call_count() const;
-    record_iterator_t      hash2iterator(size_t const);
-    record_iterator_t      hash2iterator_const(size_t const) const;
 };
 #endif
 
