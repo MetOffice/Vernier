@@ -62,14 +62,6 @@ TEST(HashEntryTest,CallCountTest)
   // Check call_count_ is the number expected on all threads. On most threads,
   // the profiler calliper call count should match this number, except on thread
   // zero which includes the main region callipers.
-  /*for (auto& hash : prof_sub_shared)
-  {
-    EXPECT_EQ(prof.get_call_count(hash,thread), num_threads-thread);
-    
-    int incr = (thread==0) ? 1 : 0;
-    EXPECT_EQ(prof.get_prof_call_count(thread), num_threads-thread+incr);
-  } */
-
   for (int thread = 0; thread < num_threads; ++thread)
   {
     size_t hash = prof_sub_shared[static_cast<size_t>(thread)];
