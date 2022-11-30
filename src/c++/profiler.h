@@ -51,9 +51,9 @@ class Profiler
         StartCalliperValues(record_index_t, time_point_t, time_point_t);
 
         // Data members
-        record_index_t my_iterator_;
-        time_point_t region_start_time_;
-        time_point_t calliper_start_time_;
+        record_index_t record_index_;
+        time_point_t   region_start_time_;
+        time_point_t   calliper_start_time_;
     };
 
     // Data members

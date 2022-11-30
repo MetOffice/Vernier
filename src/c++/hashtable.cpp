@@ -166,6 +166,13 @@ void HashTable::write()
   // hashes to look up other information directly from the hashtable.
   std::sort(begin(hashvec_), end(hashvec_),
       [](auto a, auto b) { return a.self_walltime_ > b.self_walltime_;});
+  
+  // Need to re-store the indices in the lookup table, since they will have all
+  // moved around as a result of the above sort.
+  for (auto it = begin(hashvec_); it != end(hashvec_); ++it) {
+    auto current_index = it - hashvec_.begin();
+    lookup_table_[it->region_hash_] =  static_cast<record_index_t>(current_index);
+  }
 
   // Data entries
   for (auto& record : hashvec_) {
