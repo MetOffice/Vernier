@@ -36,7 +36,8 @@ include(cmake/TestingSetup.cmake)
 # Include the installation options.
 include(cmake/Installation.cmake)
 
-# Choose: static or dynamic
+# Choose to link statically or dynamically, BUILD_SHARED_LIBS alters the 
+# behavior of add_library and is ON (dynamic) by default
 option(BUILD_SHARED_LIBS "Build using shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
