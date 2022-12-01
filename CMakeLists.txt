@@ -27,12 +27,6 @@ find_package(OpenMP 2.5 REQUIRED)
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)
 
-# Choose: static or dynamic
-option(BUILD_SHARED_LIBS "Build using shared libs" ON)
-if(NOT BUILD_SHARED_LIBS)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif()
-
 # Add src directory to build.
 add_subdirectory(src)
 
@@ -42,4 +36,8 @@ include(cmake/TestingSetup.cmake)
 # Include the installation options.
 include(cmake/Installation.cmake)
 
-
+# Choose: static or dynamic
+option(BUILD_SHARED_LIBS "Build using shared libs" ON)
+if(NOT BUILD_SHARED_LIBS)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()

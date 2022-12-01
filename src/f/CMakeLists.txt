@@ -32,5 +32,3 @@ install(TARGETS ${CMAKE_PROJECT_NAME}_f EXPORT "${CMAKE_PROJECT_NAME}Targets"
 
 # On installation, copy .mod files to the `include` directory.
 install(DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}/ DESTINATION include)
-
-
