@@ -6,7 +6,7 @@
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/modules)
 
 # Testing for building a fortran lib and executable.
-add_library(profiler_f SHARED "profiler_mod.F90")
+add_library(profiler_f "profiler_mod.F90")
 target_link_libraries(profiler_f PUBLIC OpenMP::OpenMP_Fortran profiler_c)
 
 include(FortranCInterface)
