@@ -57,7 +57,7 @@ HashTable::HashTable(int const tid)
  *
  */
 
-void HashTable::query_insert(std::string_view region_name, 
+void HashTable::query_insert(std::string_view const region_name, 
                              size_t& hash,
                              record_index_t& record_index) noexcept
 {
@@ -129,6 +129,23 @@ time_duration_t& HashTable::increment_profiler_calls()
  * @param [in] time_delta  The time spent in the child region.
  */
 
+
+void HashTable::sort_records()
+{
+
+   // Sort the entries according to self walltime.
+   std::sort(begin(hashvec_), end(hashvec_),
+       [](auto a, auto b) { return a.self_walltime_ > b.self_walltime_;});
+
+  // Need to re-store the indices in the lookup table, since they will have all
+  // moved around as a result of the above sort.
+  for (auto it = begin(hashvec_); it != end(hashvec_); ++it) {
+    auto current_index = it - hashvec_.begin();
+    lookup_table_[it->region_hash_] =  static_cast<record_index_t>(current_index);
+  }
+
+}
+
 /**
  * @brief  Writes all entries in the hashtable, sorted according to self times.
  *
@@ -139,6 +156,7 @@ void HashTable::write()
 
   // Ensure all computed times are up-to-date.
   prepare_computed_times_all();
+  sort_records();
 
   std::string routine_at_thread = "Thread: " + std::to_string(tid_);
 
@@ -159,20 +177,6 @@ void HashTable::write()
     << std::setw(15) << "-" << " "
     << std::setw(10) << "-" << "\n";
   std::cout << std::setfill(' ');
-
-  // Create a vector from the hashtable and sort the entries according to self
-  // walltime.  If optimisation of this is needed, it ought to be possible to
-  // acquire a vector of hash-selftime pairs in the correct order, then use the
-  // hashes to look up other information directly from the hashtable.
-  std::sort(begin(hashvec_), end(hashvec_),
-      [](auto a, auto b) { return a.self_walltime_ > b.self_walltime_;});
-  
-  // Need to re-store the indices in the lookup table, since they will have all
-  // moved around as a result of the above sort.
-  for (auto it = begin(hashvec_); it != end(hashvec_); ++it) {
-    auto current_index = it - hashvec_.begin();
-    lookup_table_[it->region_hash_] =  static_cast<record_index_t>(current_index);
-  }
 
   // Data entries
   for (auto& record : hashvec_) {

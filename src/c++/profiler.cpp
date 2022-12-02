@@ -22,18 +22,20 @@ extern int call_depth;
 int call_depth = -1;
 
 /**
- * @brief Constructor for StartCalliperValues struct.
+ * @brief Constructor for TracebackEntry struct.
  *
  */
 
-Profiler::StartCalliperValues::StartCalliperValues()
+Profiler::TracebackEntry::TracebackEntry()
   {}
 
-Profiler::StartCalliperValues::StartCalliperValues(
+Profiler::TracebackEntry::TracebackEntry(
+                                   size_t         record_hash,
                                    record_index_t record_index,
                                    time_point_t region_start_time, 
                                    time_point_t calliper_start_time)
-  : record_index_       (record_index)
+  : record_hash_        (record_hash)
+  , record_index_       (record_index)
   , region_start_time_  (region_start_time)
   , calliper_start_time_(calliper_start_time)
   {}
@@ -61,7 +63,7 @@ Profiler::Profiler()
     thread_hashtables_.push_back(new_table);
 
     // Create a new list
-    std::array<std::pair<size_t,StartCalliperValues>, PROF_MAX_TRACEBACK_SIZE> new_list;
+    std::array<TracebackEntry, PROF_MAX_TRACEBACK_SIZE> new_list;
     thread_traceback_.push_back(new_list);
   }
 
@@ -124,13 +126,11 @@ size_t Profiler::start2(std::string_view region_name)
   thread_hashtables_[tid].query_insert(region_name, hash, record_index);
 
   // Store the calliper and region start times.
-  auto region_start_time = prof_gettime();
-  StartCalliperValues new_times = StartCalliperValues(
-             record_index, region_start_time, logged_calliper_start_time);
-
   ++call_depth;
-  auto call_depth_it = static_cast<pair_iterator_t_>(call_depth);
-  thread_traceback_[tid].at(call_depth_it) = std::make_pair(hash, std::move(new_times));
+  auto call_depth_index = static_cast<traceback_index_t>(call_depth);
+  auto region_start_time = prof_gettime();
+  thread_traceback_[tid].at(call_depth_index) 
+     = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time);
 
   return hash;
 }
@@ -158,8 +158,6 @@ void Profiler::stop(size_t const hash)
   tid = static_cast<hashtable_iterator_t_>(omp_get_thread_num());
 #endif
 
-  auto call_depth_it = static_cast<pair_iterator_t_>(call_depth);
-
   // Check that we have called a start calliper before the stop calliper.
   // If not, then the call depth would be -1.
   if (call_depth < 0) {
@@ -167,28 +165,29 @@ void Profiler::stop(size_t const hash)
     exit (101);
   }
 
+ // Get reference to the traceback entry.
+ auto call_depth_index = static_cast<traceback_index_t>(call_depth);
+ auto& traceback_entry = thread_traceback_[tid].at(call_depth_index);
+
   // Check: which hash is last on the traceback list?
-  size_t last_hash_on_list = thread_traceback_[tid].at(call_depth_it).first;
+  size_t last_hash_on_list = traceback_entry.record_hash_;
   if (hash != last_hash_on_list){
     std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
     exit (100);
   }
 
-  // Get start calliper values needed for subsequent computation.
-  auto& start_calliper_times = thread_traceback_[tid].at(call_depth_it).second;
-
   // Compute the region time
-  auto region_duration = region_stop_time - start_calliper_times.region_start_time_;
+  auto region_duration = region_stop_time - traceback_entry.region_start_time_;
 
   // Do the hashtable update for the child region.
-  thread_hashtables_[tid].update(start_calliper_times.record_index_, region_duration);
+  thread_hashtables_[tid].update(traceback_entry.record_index_, region_duration);
 
   // Precompute times as far as possible. We just need the calliper stop time
   // later.
   //   (t4-t1) = calliper time + region duration
   //   (t3-t2) = region_duration
   //   calliper_time = (t4-t1) - (t3-t2)  = t4 - ( t3-t2 + t1)
-  auto temp_sum = start_calliper_times.calliper_start_time_ + region_duration;
+  auto temp_sum = traceback_entry.calliper_start_time_ + region_duration;
 
   // The sequence of code that follows is aimed at leaving only minimal and
   // simple operations after the call to prof_gettime().
@@ -196,8 +195,8 @@ void Profiler::stop(size_t const hash)
 
   // Acquire parent pointers
   if (call_depth > 0){
-    auto parent_depth = static_cast<pair_iterator_t_>(call_depth-1);
-    record_index_t parent_index = thread_traceback_[tid].at(parent_depth).second.record_index_;
+    auto parent_depth = static_cast<traceback_index_t>(call_depth-1);
+    record_index_t parent_index = thread_traceback_[tid].at(parent_depth).record_index_;
     parent_overhead_time_ptr = thread_hashtables_[tid].add_child_time(
                                          parent_index, region_duration);
   }

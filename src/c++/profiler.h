@@ -42,15 +42,16 @@ class Profiler
      *         the stop calliper.
      */
 
-    struct StartCalliperValues
+    struct TracebackEntry
     {
       public:
 
         // Constructors
-        StartCalliperValues();
-        StartCalliperValues(record_index_t, time_point_t, time_point_t);
+        TracebackEntry();
+        TracebackEntry(size_t, record_index_t, time_point_t, time_point_t);
 
         // Data members
+        size_t         record_hash_;
         record_index_t record_index_;
         time_point_t   region_start_time_;
         time_point_t   calliper_start_time_;
@@ -59,13 +60,13 @@ class Profiler
     // Data members
     int max_threads_;
 
-    std::vector<HashTable>                                                                  thread_hashtables_;
-    std::vector<std::array<std::pair<size_t,StartCalliperValues>,PROF_MAX_TRACEBACK_SIZE>>  thread_traceback_;
+    std::vector<HashTable>                                           thread_hashtables_;
+    std::vector<std::array<TracebackEntry,PROF_MAX_TRACEBACK_SIZE>>  thread_traceback_;
 
     // Type definitions for vector array indexing.
-    typedef std::vector<HashTable>::size_type                                     hashtable_iterator_t_;
-    typedef std::vector<std::array<std::pair<size_t,StartCalliperValues>,PROF_MAX_TRACEBACK_SIZE>>
-                                                                           ::size_type pair_iterator_t_;
+    typedef std::vector<HashTable>::size_type                        hashtable_iterator_t_;
+    typedef std::vector<std::array<TracebackEntry,PROF_MAX_TRACEBACK_SIZE>>
+                                                                     ::size_type traceback_index_t;
 
   public:
 

@@ -94,6 +94,7 @@ class HashTable{
     // Private member functions
     void prepare_computed_times(RegionRecord&);
     void prepare_computed_times_all();
+    void sort_records();
     RegionRecord&  hash2record(size_t const);
     RegionRecord const&  hash2record_const(size_t const) const;
 
@@ -104,7 +105,7 @@ class HashTable{
     HashTable(int);
 
     // Prototypes
-    void query_insert(std::string_view, size_t&, record_index_t&) noexcept;
+    void query_insert(std::string_view const, size_t&, record_index_t&) noexcept;
     void update(record_index_t const, time_duration_t const);
     void write();
 
