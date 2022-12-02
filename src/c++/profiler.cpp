@@ -11,7 +11,11 @@
 #include <cassert>
 #include <chrono>
 
-// Work around a GNU compiler bug.
+// The following two code blocks contain a workaround for a GNU compiler bug.
+// Formally, the `threadprivate` pragma ought to be *after* the variable
+// declaration. GNU does not allow this at present.  The `extern` is merely a
+// portable way of getting around this.
+
 extern time_point_t logged_calliper_start_time;
 #pragma omp threadprivate(logged_calliper_start_time)
 time_point_t logged_calliper_start_time;
@@ -28,6 +32,17 @@ int call_depth = -1;
 
 Profiler::TracebackEntry::TracebackEntry()
   {}
+
+/**
+ * @brief Constructor for TracebackEntry struct.
+ * @param [in]  record_hash   The hash of the region name.
+ * @param [in]  record_index  The index of the region record.
+ * @param [in]  region_start_time  The clock measurement just before leaving the
+ *                                 start calliper.
+ * @param [in]  calliper_start_time The clock measurement on entry to the start
+ *                                  calliper.
+ *
+ */
 
 Profiler::TracebackEntry::TracebackEntry(
                                    size_t         record_hash,
@@ -81,7 +96,7 @@ Profiler::Profiler()
  * @todo        Revisit profiling overhead measurement.  (#64)
  */
 
-size_t Profiler::start(std::string_view region_name)
+size_t Profiler::start(std::string_view const region_name)
 {
   start1();
   auto hash = start2(region_name);
@@ -108,7 +123,7 @@ void Profiler::start1()
  * @todo        Revisit profiling overhead measurement.  (#64)
  */
 
-size_t Profiler::start2(std::string_view region_name)
+size_t Profiler::start2(std::string_view const region_name)
 {
 
   // Determine the thread number

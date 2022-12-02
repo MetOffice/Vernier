@@ -31,6 +31,13 @@
 
 #include "prof_gettime.h"
 
+/**
+ * @brief  Defines a null hash function. 
+ *
+ * Having already hashed region names, we won't need to hash the hashtable keys.
+ *
+ */
+
 struct NullHashFunction {
   std::size_t operator()(std::size_t const& key) const {
       return key;
@@ -49,7 +56,7 @@ struct RegionRecord{
 
     // Constructor
     RegionRecord() = delete;
-    explicit RegionRecord(size_t const, std::string_view);
+    explicit RegionRecord(size_t const, std::string_view const);
 
     // Data members
     size_t           region_hash_;
@@ -63,7 +70,8 @@ struct RegionRecord{
 
 };
 
-typedef std::vector<RegionRecord>::size_type  record_index_t;
+// Type definitions
+using record_index_t = std::vector<RegionRecord>::size_type;
 
 /**
  * @brief  Wraps STL hashtables with additional functionality.

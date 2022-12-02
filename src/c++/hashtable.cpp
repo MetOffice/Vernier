@@ -11,12 +11,16 @@
 #include <string>
 #include <algorithm>
 
+#define PROF_HASHVEC_RESERVE_SIZE 1000
+
 /**
- * @brief  Constructs a new entry in the hash table.
+ * @brief  Constructs a new region record.
+ * @param [in]  region_hash_  Hash of the region name.
+ * @param [in]  region_name_  The region name.
  *
  */
 
-RegionRecord::RegionRecord(size_t const region_hash, std::string_view region_name)
+RegionRecord::RegionRecord(size_t const region_hash, std::string_view const region_name)
       : region_hash_(region_hash)
       , region_name_(region_name)
       , total_walltime_      (time_duration_t::zero())
@@ -36,24 +40,18 @@ RegionRecord::RegionRecord(size_t const region_hash, std::string_view region_nam
 HashTable::HashTable(int const tid)
   : tid_(tid)
 {
-
   // Reserve enough places in hashvec_
-  hashvec_.reserve(1000);
-
-  // Set the name and hash of the profiler entry.
-  std::string const profiler_name = "__profiler__";
-  profiler_hash_ = hash_function_(profiler_name);
+  hashvec_.reserve(PROF_HASHVEC_RESERVE_SIZE);
 
   // Insert special entry for the profiler overhead time.
-  assert (lookup_table_.count(profiler_hash_) == 0);
-  hashvec_.emplace_back(profiler_hash_, profiler_name);
-  profiler_index_ = hashvec_.size()-1;
-  lookup_table_.emplace(profiler_hash_, profiler_index_);
-  assert (lookup_table_.count(profiler_hash_) > 0);
+  query_insert("__profiler__", profiler_hash_, profiler_index_);
 }
 
 /**
  * @brief  Inserts a new entry into the hashtable.
+ * @param [in]  region_name  The name of the region.
+ * @param [out] hash          Hash of the region name.
+ * @param [out] record_index  Array index of the region record.
  *
  */
 
@@ -75,7 +73,6 @@ void HashTable::query_insert(std::string_view const region_name,
     lookup_table_.emplace(hash, record_index);
     assert (lookup_table_.count(hash) > 0);
   }
-
 }
 
 /**
@@ -98,12 +95,14 @@ void HashTable::update(record_index_t const record_index, time_duration_t const 
 }
 
 /**
- * @brief
- *
+ * @brief  Add child region and overhead times to parent.
+ * @param [in] record_index  The index corresponding to the region record.
+ * @param [in] time_delta    The time spent in the child region.
+ * @returns  Pointer to the overhead time for this region. 
  */
 
 time_duration_t* HashTable::add_child_time(
-                         record_index_t const record_index,
+                         record_index_t  const record_index,
                          time_duration_t const child_walltime)
 {
   auto& record = hashvec_[record_index];
@@ -112,8 +111,8 @@ time_duration_t* HashTable::add_child_time(
 }
 
 /**
- * @brief
- *
+ * @brief    Add child region and overhead times to parent.
+ * @returns  Reference to the total profiling overhead time.
  */
 
 time_duration_t& HashTable::increment_profiler_calls()
@@ -124,18 +123,16 @@ time_duration_t& HashTable::increment_profiler_calls()
 }
 
 /**
- * @brief  Add child region and overhead times to parent.
- * @param [in] hash        The hash of the child region to update.
- * @param [in] time_delta  The time spent in the child region.
+ * @brief  Sorts entries in the vector of region records according to self time
+ *         and updates the hashtable with the new indices.
  */
-
 
 void HashTable::sort_records()
 {
 
-   // Sort the entries according to self walltime.
-   std::sort(begin(hashvec_), end(hashvec_),
-       [](auto a, auto b) { return a.self_walltime_ > b.self_walltime_;});
+  // Sort the entries according to self walltime.
+  std::sort(begin(hashvec_), end(hashvec_),
+      [](auto a, auto b) { return a.self_walltime_ > b.self_walltime_;});
 
   // Need to re-store the indices in the lookup table, since they will have all
   // moved around as a result of the above sort.
@@ -147,7 +144,8 @@ void HashTable::sort_records()
 }
 
 /**
- * @brief  Writes all entries in the hashtable, sorted according to self times.
+ * @brief  Writes all entries in the hashtable.
+ * @note   Calls the method to sort times according to their region self-time.
  *
  */
 
@@ -195,7 +193,7 @@ void HashTable::write()
  * @detail Times computed are: the region self time and the total time minus
  *         directly incurred profiling overhead costs.
  *
- * @param [in] hash   The hash of the region to compute.
+ * @param [in] record  The region record to compute.
  */
 
 void HashTable::prepare_computed_times(RegionRecord& record)
@@ -213,36 +211,18 @@ void HashTable::prepare_computed_times(RegionRecord& record)
 
 /**
  * @brief  Evaluates times derived from other times measured, looping over all
- *         code regions; includes updating the special profiling overhead entry.
+ *         code regions.
  */
 
- void HashTable::prepare_computed_times_all()
- {
+void HashTable::prepare_computed_times_all()
+{
 
-   auto total_overhead_time = time_duration_t::zero();
+  auto total_overhead_time = time_duration_t::zero();
 
-   // Loop over entries in the hashtable. This would include the special
-   // profiler entry, but the RegionRecord constructor will have ensured that all
-   // corresponding values are zero thus far.
-   for (auto& [hash, index] : lookup_table_) {
-     prepare_computed_times(hash2record(hash));
-   }
-
-   /// // Check that the special profiler hash entries are all zero, even after the
-   /// // above loop.
-   /// assert(lookup_table_.at(profiler_hash_).self_walltime_      == time_duration_t::zero());
-   /// assert(lookup_table_.at(profiler_hash_).child_walltime_     == time_duration_t::zero());
-   /// assert(lookup_table_.at(profiler_hash_).total_walltime_     == time_duration_t::zero());
-   /// assert(lookup_table_.at(profiler_hash_).total_raw_walltime_ == time_duration_t::zero());
-
-   // Set values for the profiler entry specifically in the hashtable.
-   // lookup_table_.at(profiler_hash_).self_walltime_      = total_overhead_time_;
-   // lookup_table_.at(profiler_hash_).child_walltime_     = time_duration_t::zero();
-   // lookup_table_.at(profiler_hash_).total_walltime_     = total_overhead_time_;
-   // lookup_table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time_;
-
-   // std::cout << "My    thread ID: " << omp_get_thread_num() << std::endl;
-   // std::cout << "Table thread ID: " << tid_                 << std::endl;
+  // Loop over entries in the hashtable.
+  for (auto& [hash, index] : lookup_table_) {
+    prepare_computed_times(hash2record(hash));
+  }
 
 }
 
@@ -369,7 +349,9 @@ unsigned long long int HashTable::get_prof_call_count() const
 }
 
 /**
- * @ brief
+ * @brief   Gets a reference to a region record for a given hash.
+ * @param [in]  hash   The region
+ * @returns     Region record reference.
  *
  */
 
@@ -381,6 +363,14 @@ RegionRecord& HashTable::hash2record(size_t const hash)
 
   return hashvec_[lookup_table_.at(hash)];
 }
+
+/**
+ * @brief   Gets a const reference to a region record for a given hash. Can be
+ *          called from const methods.
+ * @param [in]  hash   The region
+ * @returns     Region record reference.
+ *
+ */
 
 RegionRecord const& HashTable::hash2record_const(size_t const hash) const
 {
