@@ -343,6 +343,7 @@ unsigned long long int HashTable::get_call_count(size_t const hash) const
 unsigned long long int HashTable::get_prof_call_count() const
 {
     auto& record = hash2record_const(profiler_hash_);
+    assert (lookup_table_.count(profiler_hash_) > 0);
     return record.call_count_;
 }
 
@@ -355,10 +356,6 @@ unsigned long long int HashTable::get_prof_call_count() const
 
 RegionRecord& HashTable::hash2record(size_t const hash)
 {
-  // Assertions
-  assert (lookup_table_.size() > 0);
-  assert (lookup_table_.count(hash) > 0);
-
   return hashvec_[lookup_table_.at(hash)];
 }
 
@@ -372,10 +369,6 @@ RegionRecord& HashTable::hash2record(size_t const hash)
 
 RegionRecord const& HashTable::hash2record_const(size_t const hash) const
 {
-  // Assertions
-  assert (lookup_table_.size() > 0);
-  assert (lookup_table_.count(hash) > 0);
-
   return hashvec_[lookup_table_.at(hash)];
 }
 
