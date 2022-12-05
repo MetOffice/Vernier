@@ -217,8 +217,6 @@ void HashTable::prepare_computed_times(RegionRecord& record)
 void HashTable::prepare_computed_times_all()
 {
 
-  auto total_overhead_time = time_duration_t::zero();
-
   // Loop over entries in the hashtable.
   for (auto& [hash, index] : lookup_table_) {
     prepare_computed_times(hash2record(hash));
