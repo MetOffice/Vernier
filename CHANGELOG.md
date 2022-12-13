@@ -2,6 +2,7 @@
 
 ### Authors (in alphabetical order) ###
 
+* Ben Copley, UK Met Office
 * Andrew Coughtrie, UK Met Office
 * Maff Glover, UK Met Office
 * Iva Kavcic, UK Met Office
