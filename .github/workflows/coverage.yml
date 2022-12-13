@@ -88,20 +88,38 @@ jobs:
       shell: bash -l {0}
       run: genhtml coverage.info --output-directory out
 
-    - name: Update Coverage Pages 
-      run: | 
-        mkdir -p ${{github.workspace}}/docs/coverage
-        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage/.
-        git config user.name 'github-actions[bot]'
-        git config user.email 'github-actions[bot]' 
-        git add --force docs/coverage
-        git stash
-        git remote update
-        git checkout -b gh-pages
-        git stash pop 
-        git reset 
-        git add --force docs/coverage
-        git commit --allow-empty -m "Update coverage documentation"
-        git push origin gh-pages
+  deploy:
+    environment:
+      name: gh-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v2 
+      - name: Upload 
+        uses: actions/upload-pages-artifact@v1
+        with: 
+          path: '.'
+      - name: Deploy 
+        id: deployment 
+        uses: actions/deploy-pages@v1
+
+    # - name: Update Coverage Pages 
+    #   run: | 
+    #     mkdir -p ${{github.workspace}}/docs/coverage
+    #     cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage/.
+    #     git config user.name 'github-actions[bot]'
+    #     git config user.email 'github-actions[bot]' 
+    #     git add --force docs/coverage
+    #     git stash
+    #     git remote update
+    #     git checkout -b gh-pages
+    #     git stash pop 
+    #     git reset 
+    #     git add --force docs/coverage
+    #     git commit --allow-empty -m "Update coverage documentation"
+    #     git push origin gh-pages
 
   
