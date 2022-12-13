@@ -11,7 +11,7 @@ The current implementation is a work in progress.
 # Build Options {#Options}
 
 There are a number of options which can be passed to CMake on the command line
-or set using ccmake.
+or set using ccmake. Passing options to CMake via the command line looks something like this: `cmake -DBUILD_FORTRAN_TESTS=OFF -DBUILD_SHARED_LIBS=OFF`. Alternatively, `ccmake ..` will bring up a terminal wherein the user can change build options interactively. 
 
 Argument | Options (Default **Bold**)| Description
 :---:|:---:|:---
@@ -19,6 +19,7 @@ Argument | Options (Default **Bold**)| Description
  `-DBUILD_FORTRAN_TESTS`   |  **ON** / OFF | Build Fortran tests.
  `-DINCLUDE_GTEST`         |  ON / **OFF** | Fetches and populates GoogleTest within the project build (requires `BUILD_TESTS=ON`).
  `-DENABLE_DOXYGEN`        |  **ON** / OFF | Build the Doxygen documentation.
+ `-DBUILD_SHARED_LIBS`     |  **ON** / OFF | Determines whether the libraries are linked statically (`OFF`) or dynamically (`ON`). 
 
 
 # Metrics  {#metrics}
