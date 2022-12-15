@@ -101,6 +101,5 @@ jobs:
         rm -rf docs/coverage
         git stash pop 
         git reset 
-      # git add --force docs/coverage
         git commit -am "Update coverage documentation"
-        git push -f
+        git push -f origin gh-pages
