@@ -89,17 +89,18 @@ jobs:
       run: genhtml coverage.info --output-directory out
 
     - name: Update Coverage Pages 
-      run: | 
+      run: |
         mkdir -p ${{github.workspace}}/docs/coverage
         cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage/.
         git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]' 
+        git config --global user.email 'github-actions[bot]'
         git add --force docs/coverage
         git stash
         git remote update
         git checkout gh-pages
         rm -rf docs/coverage
-        git stash pop 
-        git reset 
-        git commit -am "Update coverage documentation"
-        git push -f origin gh-pages
+        git stash pop
+        git reset
+        git add --force docs/coverage
+        git commit --allow-empty -m "Update coverage documentation"
+        git push
