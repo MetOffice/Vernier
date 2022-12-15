@@ -2,6 +2,7 @@
 
 ### Authors (in alphabetical order) ###
 
+* Ben Copley, UK Met Office
 * Andrew Coughtrie, UK Met Office
 * Maff Glover, UK Met Office
 * Iva Kavcic, UK Met Office
@@ -27,4 +28,5 @@
 13/09/2022 PR #60 for #59: Allow manual triggering of workflows. \
 22/09/2022 PR #57 for #56: Remove unwanted getters and their associated tests. \
 04/10/2022 PR #63 for #62: Add copyright statements to all files. \
-27/10/2022 PR #67 for #50: Account separately for time spent inside the profiler.
+27/10/2022 PR #67 for #50: Account separately for time spent inside the profiler. \
+13/12/2022 PR #75 for #73: Enable CMake option for static and dynamic linking (dynamic by default).
