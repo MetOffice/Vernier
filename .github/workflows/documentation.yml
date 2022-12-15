@@ -54,5 +54,5 @@ jobs:
           git stash pop
           git reset
           git add --force docs/documentation
-          git commit --allow-empty -m "Update Doxygen documentation"
-          git push origin gh-pages
+          git commit -a --allow-empty -m "Update Doxygen documentation"
+          git push

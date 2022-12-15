@@ -102,5 +102,5 @@ jobs:
         git stash pop 
         git reset 
         git add --force docs/coverage
-        git commit --allow-empty -m "Update coverage documentation"
-        git push origin gh-pages
+        git commit -a --allow-empty -m "Update coverage documentation"
+        git push
