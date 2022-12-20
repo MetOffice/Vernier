@@ -1,0 +1,57 @@
+name: Run System Tests
+
+on: 
+  workflow_run:
+    workflows: [ "Build Dynamically", "Build Statically" ] 
+    branches: [ main ]
+    types: 
+      - completed
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request: 
+    branches: [ main ]
+
+env: 
+  BUILD_TYPE: Debug
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        threads: [1, 4]
+        compiler: [gcc, clang]
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - run: echo "Triggering workflow was a success, running unit tests..."
+      - uses: actions/checkout@v2
+
+    ## DOwnload the binary artifact here???? <<<
+      - name: Download binary
+        uses: actions/download-artifact@v3 
+        with:
+          name: Upload-binary
+          path: ${{ github.workspace }}/build
+
+      # Run tests 
+      - name: Compile system test
+        # Compile tests using installed libraries
+        working-directory: ${{ github.workspace }}/build/
+        env:
+          LB_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib64
+        run: |
+          ${{ matrix.compiler }} \
+          ../tests/system_tests/system_test.cpp \
+          -I./include -L./lib64 -lprofiler -fopenmp
+
+      - name: Run system test
+        # Run tests using installed libraries
+        working-directory: ${{ github.workspace }}/build/
+        run: ./a.out
+
+  dont-run:
+    runs-on: ubunutu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - run: echo "Triggering workflow failed"
