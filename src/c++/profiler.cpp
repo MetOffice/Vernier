@@ -142,11 +142,16 @@ size_t Profiler::start2(std::string_view const region_name)
 
   // Store the calliper and region start times.
   ++call_depth;
-  auto call_depth_index = static_cast<traceback_index_t>(call_depth);
-  auto region_start_time = prof_gettime();
-  thread_traceback_[tid].at(call_depth_index) 
-     = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time);
-
+  if (call_depth < PROF_MAX_TRACEBACK_SIZE){
+    auto call_depth_index = static_cast<traceback_index_t>(call_depth);
+    auto region_start_time = prof_gettime();
+    thread_traceback_[tid].at(call_depth_index) 
+       = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time);
+  }
+  else {
+    std::cerr << "EMERGENCY STOP: Traceback array exhausted." << "\n";
+    exit (102);
+  }
   return hash;
 }
 
