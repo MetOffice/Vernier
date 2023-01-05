@@ -51,9 +51,13 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+    - name: Install
+      # Install program
+      run: cmake --install ${{github.workspace}}/build
+
     - uses: actions/upload-artifact@v3
       with: 
-        name: Upload-binary 
+        name: my-artifact
         # Upload the entire build directorys
         path: ${{github.workspace}}/build/
         retention-days: 1

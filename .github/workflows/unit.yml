@@ -1,17 +1,16 @@
 name: Run Unit Tests
 
-on: 
-#page_build ?
+on:
   workflow_run:
-    workflows: [ "Build Dynamically", "Build Statically" ] 
+    workflows: [ "Build Dynamically" ] 
     branches: [ main ]
-    types: 
+    types:
       - completed
-  workflow_dispatch:
-  push:
-    branches: [ main ]
-  pull_request: 
-    branches: [ main ]
+  #workflow_dispatch:
+  # push:
+  #   branches: [ main ]
+  # pull_request: 
+  #   branches: [ main ]
 
 env: 
   BUILD_TYPE: Debug
@@ -30,8 +29,8 @@ jobs:
     ## DOwnload the binary artifact here???? <<<
       - uses: actions/download-artifact@v3 
         with:
-          name: Upload-binary
-          path: ${{ github.workspace }}/build
+          name: ym-artifact
+          path: ${{ github.workspace }}
 
       # Run tests 
       - name: "Test (${{ matrix.threads }} threads)"
