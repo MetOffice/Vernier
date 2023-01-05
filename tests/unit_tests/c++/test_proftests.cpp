@@ -64,7 +64,7 @@ TEST(ProfilerDeathTest, TooManyTracebackEntries) {
   EXPECT_EXIT({
     const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;
     for (int i=0; i<beyond_maximum; ++i){
-      auto prof_handle = prof.start("TracebackEntry");
+      [[maybe_unused]] auto prof_handle = prof.start("TracebackEntry");
     }
   }, ExitedWithCode(102), "EMERGENCY STOP: Traceback array exhausted.");
 
