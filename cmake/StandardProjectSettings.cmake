@@ -53,3 +53,11 @@ endif ()
 if (${CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT})
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}" CACHE PATH "..." FORCE)
 endif ()
+
+# Choose to link statically or dynamically. BUILD_SHARED_LIBS alters the 
+# behavior of add_library and is ON (dynamic) by default.
+option(BUILD_SHARED_LIBS "Building shared libraries" ON)
+if(NOT BUILD_SHARED_LIBS)
+  message(STATUS "Building static libraries")
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
