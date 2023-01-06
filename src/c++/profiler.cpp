@@ -11,19 +11,29 @@
 #include <cassert>
 #include <chrono>
 
-// The following two code blocks contain a workaround for a GNU compiler bug.
-// Formally, the `threadprivate` pragma ought to be *after* the variable
+// Define threadprivate variables.
+// `extern` keywords in the code below represent a workaround for a GNU compiler
+// bug.  Formally, the `threadprivate` pragma ought to be *after* the variable
 // declaration. GNU does not allow this at present.  The `extern` is merely a
-// portable way of getting around this.
-
-extern time_point_t logged_calliper_start_time;
+// portable way of getting around this, with the unwanted side effect of
+// introducing external linkage. The anonymous namespace removes that.
+namespace{
+  // `logged_calliper_start_time` is needed for the Fortran interface.
+  // Noting that:
+  //    (i) the start region procedure must be separated into two parts, and
+  //   (ii) the time point is an instance of a C++ class,
+  // we avoid passing time objects into other interface layers by declaring
+  // storage here.
+  extern time_point_t logged_calliper_start_time;
 #pragma omp threadprivate(logged_calliper_start_time)
-time_point_t logged_calliper_start_time;
+  time_point_t logged_calliper_start_time;
 
-// The call depth must be initialised on all threads, so do it here.
-extern int call_depth;
+   // The call depth must be stored separately for all threads. Important to
+   // initialise it here, so that it's initialised correctly on all threads.
+  extern int call_depth;
 #pragma omp threadprivate(call_depth)
-int call_depth = -1;
+  int call_depth = -1;
+}
 
 /**
  * @brief Constructor for TracebackEntry struct.
@@ -90,40 +100,36 @@ Profiler::Profiler()
 
 /**
  * @brief  Start timing a profiled code region.
- * @detail Calls two other start routines.
+ * @detail Calls both part1 and part2 start routines in succession.
  * @param [in]  region_name   The code region name.
  * @returns     Unique hash for the code region being started.
- * @todo        Revisit profiling overhead measurement.  (#64)
  */
 
 size_t Profiler::start(std::string_view const region_name)
 {
-  start1();
-  auto hash = start2(region_name);
+  start_part1();
+  auto hash = start_part2(region_name);
   return hash;
 }
 
 /**
- * @brief  Start timing a profiled code region, part 1: make a 
+ * @brief  Start timing a profiled code region, part 1 of 2: make a 
  *         threadprivate note of the time.
- * @param [in]  region_name   The code region name.
- * @returns     Unique hash for the code region being started.
- * @todo        Revisit profiling overhead measurement.  (#64)
  */
 
-void Profiler::start1()
+void Profiler::start_part1()
 {
+  // Store the calliper start time, which is used in part2.
   logged_calliper_start_time = prof_gettime();
 }
 
 /**
- * @brief  Start timing a profiled code region, part 2.
+ * @brief  Start timing a profiled code region, part 2 of 2.
  * @param [in]  region_name   The code region name.
  * @returns     Unique hash for the code region being started.
- * @todo        Revisit profiling overhead measurement.  (#64)
  */
 
-size_t Profiler::start2(std::string_view const region_name)
+size_t Profiler::start_part2(std::string_view const region_name)
 {
 
   // Determine the thread number
@@ -163,7 +169,6 @@ size_t Profiler::start2(std::string_view const region_name)
  *        calliper, and subtracting the measured region time. Hence larger
  *        absolute times are being measured, which are less likely to suffer
  *        fractional error from precision limitations of the clock.   
- * @todo  Revisit profiling overhead measurement. (#64)
  */
 
 void Profiler::stop(size_t const hash)

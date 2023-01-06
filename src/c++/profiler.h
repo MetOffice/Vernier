@@ -75,8 +75,8 @@ class Profiler
 
     // Member functions
     size_t start(std::string_view const);
-    void   start1();
-    size_t start2(std::string_view const);
+    void   start_part1();
+    size_t start_part2(std::string_view const);
     void   stop (size_t const);
     void   write();
 

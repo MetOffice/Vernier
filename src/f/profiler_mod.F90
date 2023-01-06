@@ -37,16 +37,17 @@ module profiler_mod
 
   interface
 
-    subroutine interface_profiler_start1() bind(C, name='c_profiler_start1')
+    subroutine interface_profiler_start_part1()  &
+               bind(C, name='c_profiler_start_part1')
         !No arguments to handle
-    end subroutine interface_profiler_start1
+    end subroutine interface_profiler_start_part1
 
-    subroutine interface_profiler_start2(hash_out, region_name) &
-               bind(C, name='c_profiler_start2')
+    subroutine interface_profiler_start_part2(hash_out, region_name) &
+               bind(C, name='c_profiler_start_part2')
       import :: c_char, pik
       character(kind=c_char, len=1), intent(in)  :: region_name(*)
       integer(kind=pik),             intent(out) :: hash_out
-    end subroutine interface_profiler_start2
+    end subroutine interface_profiler_start_part2
 
     subroutine profiler_stop(hash_in) bind(C, name='c_profiler_stop')
       import :: pik
@@ -87,11 +88,11 @@ module profiler_mod
       !Local variables
       character(len=len_trim(region_name)+1) :: local_region_name
 
-      call interface_profiler_start1()
+      call interface_profiler_start_part1()
 
       call append_null_char(region_name, local_region_name, len_trim(region_name))
 
-      call interface_profiler_start2(hash_out, local_region_name)
+      call interface_profiler_start_part2(hash_out, local_region_name)
 
     end subroutine profiler_start
 
