@@ -61,11 +61,13 @@ void HashTable::query_insert(std::string_view const region_name,
 {
   hash = hash_function_(region_name);
 
-  // Found entry,
+  // Does the entry exist already?
   if (auto search = lookup_table_.find(hash); search != lookup_table_.end())
   {
     record_index = search->second;
   }
+  
+  // If not, create new entry.
   else
   {
     hashvec_.emplace_back(hash, region_name);
