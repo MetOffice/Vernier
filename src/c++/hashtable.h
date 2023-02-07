@@ -28,32 +28,9 @@
 #include <string>
 #include <string_view>
 
+#include "hashvec.h"
+#include "hashvec_handler.h"
 #include "prof_gettime.h"
-
-/**
- * @brief  Structure to hold information for a particular routine.
- *
- * Bundles together any information pertinent to a specific profiled region.
- *
- */
-
-struct HashEntry{
-  public:
-
-    // Constructor
-    HashEntry() = delete;
-    explicit HashEntry(std::string_view);
-
-    // Data members
-    std::string      region_name_;
-    time_duration_t  total_walltime_;
-    time_duration_t  total_raw_walltime_;
-    time_duration_t  self_walltime_;
-    time_duration_t  child_walltime_;
-    time_duration_t  overhead_walltime_;
-    unsigned long long int call_count_;
-
-};
 
 /**
  * @brief  Wraps STL hashtables with additional functionality.
@@ -92,7 +69,7 @@ class HashTable{
     void add_child_time(size_t const, time_duration_t);
     void add_overhead_time(size_t const, time_duration_t);
     void compute_self_times();
-    void append_to(std::vector<std::pair<size_t,HashEntry>>& hashvec);
+    void append_to(HashVecHandler&);
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;

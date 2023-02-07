@@ -7,51 +7,54 @@
 
 /**
  * @file   writer.h
- * @brief  Contains the writer class, which handles IO.
- *
- * Implements a strategy pattern that favours using functions over 
- * single-method objects, hence reducing the number of classes required. 
+ * @brief  Writer strategy classes.
  *
  */
 
 #ifndef WRITER_H
 #define WRITER_H
 
+#include <mpi.h>
 #include <vector>
 #include <memory>
 #include <fstream>
+#include "hashvec.h"
 #include "formatter.h"
 
 /**
- * @brief  Writer class
+ * @brief   Abstract Writer strategy class.
+ * @details Specific implementations of this class override the `write` function
+ *          to produce different behaviour.
  *
- * Abstract class that stores a pointer to the formatter. Both the formatter
- * and the virtual write method can be changed by any derived classes.
  */
 
 class Writer {
 
   protected:
 
-    // Ptr to formatting class
-    const std::unique_ptr<Formatter> formatter_;
+    // Formatter strategy
+    Formatter formatter_;
 
-    // The constructor, which gives the formatter pointer above a value. 
-    // It will be inherited by any derived classes.
-    explicit Writer(std::unique_ptr<Formatter> formatter);
+    std::string output_filename_ = "profiler-output";
+
+    // MPI handling
+    int my_rank_;
+    MPI_Comm prof_comm_;
 
   public:
 
+    explicit Writer();
     virtual ~Writer() = default;
-    Writer() = delete;
 
-    // Virtual write method
-    virtual void write(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) = 0;
+    // Pure virtual write method
+    virtual void write(std::ofstream& os, hashvec_t) = 0;
 
 };
 
 /**
- * @brief  Class for multiple-file output
+ * @brief   Multiple-file output strategy
+ * @details Creates one file per MPI rank.
+ *
  */
 
 class Multi : public Writer {
@@ -59,14 +62,12 @@ class Multi : public Writer {
   private:
 
     // Method 
-    void prep(std::ofstream& os);
+    void open_files(std::ofstream& os);
 
   public:
 
-    ~Multi() override = default;
-    explicit Multi(std::unique_ptr<Formatter> formatter);
-
-    void write(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) override;
+    // Implementation of pure virtual function.
+    void write(std::ofstream& os, hashvec_t) override;
 
 };
 

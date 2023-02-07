@@ -7,8 +7,8 @@
 
 /**
  * @file   formatter.h
- * @brief  Contains base format class and all derived classes.
- *
+ * @brief  Formatter class, which contains methods for writing in different
+ *         output formats..
  *
  */
 
@@ -16,17 +16,19 @@
 #define FORMATTER_H
 
 #include <vector>
-#include <functional>
 #include <fstream>
 
-#include "hashtable.h"
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
+#include "hashvec.h"
 
 /**
- * @brief  Formatting class
- *
- * Any callable function can be passed to this class and ran via the execute 
- * method.
+ * @brief  Formatter class. Methods write profile data.
+ * @note   Different formats are coded in different class methods. A function
+ *         pointer to the appropriate method is set on construction, according
+ *         to the value of the environment variable PROF_OUTPUT_FORMAT.
  */
 
 class Formatter {
@@ -34,29 +36,21 @@ class Formatter {
   private:
 
     // Format method
-    const std::function<void(std::ofstream&, std::vector<std::pair<size_t, HashEntry>>)> format_;
+    void (Formatter::*format_)(std::ofstream&, hashvec_t);
+
+    // Individual formatter functions
+    void  threads  (std::ofstream& os, hashvec_t);
+    void  drhook   (std::ofstream& os, hashvec_t);
 
   public:
 
     // Constructor
-    explicit Formatter(std::function<void(std::ofstream&, std::vector<std::pair<size_t, HashEntry>>)> format);
+    explicit Formatter();
 
-    void executeFormat(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) const; 
-   
-};
-
-/**
- * @brief  Struct to store the formats of interest.
- */
-
-struct Formats {
-
-  public:
-
-    // Format options
-    static void standard(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec);
-    static void drhook(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec);
+    // Execute the format method
+    void execute_format(std::ofstream& os, hashvec_t); 
    
 };
 
 #endif
+

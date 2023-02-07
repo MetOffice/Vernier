@@ -6,29 +6,23 @@
  */
 
 #include "writer.h"
-#include <mpi.h>
 
 /**
- * @brief  Writer constructor
- * 
- * @param[in] formatter  A pointer to the formatter class that will replace 
- *                       Writer::formatter_
+ * @brief  Set data members common to all Writer objects. 
+ *
  */
 
-Writer::Writer(std::unique_ptr<Formatter> formatter) 
-  : formatter_(std::move(formatter))
-  {}
+Writer::Writer()
+{
+  // Pick up environment variable filename if it exists. If it's not set, a
+  // suitable default is set in the data member declaration. 
+  const char* env_output_filename = std::getenv("PROF_OUTPUT_FILENAME");
+  if (env_output_filename) {output_filename_ = env_output_filename;}
 
-/**
- * @brief  Tool via which any derived classes can access formatter_
- * 
- * @returns std::unique_ptr<Formatter>&  Returns the private formatter pointer
- */
-
-// const std::unique_ptr<Formatter> Writer::get_formatter()
-// {
-//   return formatter_;
-// }
+  // MPI handling
+  MPI_Comm_dup(MPI_COMM_WORLD, &prof_comm_);
+  MPI_Comm_rank(prof_comm_, &my_rank_);
+}
 
 /**
  * @brief  Opens a unique file per mpi rank
@@ -36,56 +30,28 @@ Writer::Writer(std::unique_ptr<Formatter> formatter)
  * @param[in] os  Output stream to write to
  */
 
-void Multi::prep(std::ofstream& os)
+void Multi::open_files(std::ofstream& os)
 {
-  // Find current MPI rank
-  int current_rank;
-  MPI_Comm prof_comm_ = MPI_COMM_WORLD;
-  MPI_Comm_rank(prof_comm_, &current_rank);
 
-  // For later appending onto the end of the output file name 
-  std::string mpi_filename_tail = "-" + std::to_string(current_rank);
-
-  // Pickup environment variable filename if it exists, if not use the 
-  // default name of "profiler-output". In either case, include the MPI rank
-  // in the name of the file.
-  std::string out_filename;
-  const char* env_variable = std::getenv("PROF_OUTFILE");
-  if (env_variable != NULL)
-  {
-      out_filename = static_cast<std::string>(env_variable) + mpi_filename_tail;
-  }
-  else
-  {
-      out_filename = "profiler-output" + mpi_filename_tail;
-  }
+  // Append the MPI rank to the output filename.
+  std::string mpi_filename_tail = "-" + std::to_string(my_rank_);
+  output_filename_ += mpi_filename_tail;
     
-  os.open(out_filename);
+  os.open(output_filename_);
 }
 
 /**
- * @brief  Multiple-file-output "Multi" class constructor
- * 
- * @param[in] formatter  An input formatter pointer that will be used to call
- *                       Writer's constructor 
- */
-
-Multi::Multi(std::unique_ptr<Formatter> formatter) 
-  : Writer(std::move(formatter))
-  {}
-
-/**
- * @brief  The main write method, combines prep() with formatter_'s format,
- *         before then flushing and closing the output stream.
- * 
+ * @brief  The main write method. Includes filehandling and calls formatter
+ *         strategy.
+ *
  * @param[in] os       The output stream to write to
  * @param[in] hashvec  The vector containing all necessary data
  */
 
-void Multi::write(std::ofstream& os, std::vector<std::pair<size_t, HashEntry>> hashvec) 
+void Multi::write(std::ofstream& os, hashvec_t hashvec) 
 {
-  prep(os);
-  this->formatter_->executeFormat(os, hashvec);
+  open_files(os);
+  formatter_.execute_format(os, hashvec);
   os.flush();
   os.close();
 }
