@@ -8,14 +8,13 @@
 /**
  * @file   formatter.h
  * @brief  Formatter class, which contains methods for writing in different
- *         output formats..
+ *         output formats.
  *
  */
 
 #ifndef FORMATTER_H
 #define FORMATTER_H
 
-#include <vector>
 #include <fstream>
 
 #ifdef _OPENMP
@@ -39,8 +38,8 @@ class Formatter {
     void (Formatter::*format_)(std::ofstream&, hashvec_t);
 
     // Individual formatter functions
-    void  threads  (std::ofstream& os, hashvec_t);
-    void  drhook   (std::ofstream& os, hashvec_t);
+    void  threads(std::ofstream& os, hashvec_t);
+    void  drhook (std::ofstream& os, hashvec_t);
 
   public:
 

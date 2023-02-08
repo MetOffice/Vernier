@@ -24,9 +24,6 @@
 #define PROFILER_HASHTABLE_H
 
 #include <unordered_map>
-#include <vector>
-#include <string>
-#include <string_view>
 
 #include "hashvec.h"
 #include "hashvec_handler.h"

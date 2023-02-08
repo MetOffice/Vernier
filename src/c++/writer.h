@@ -15,9 +15,7 @@
 #define WRITER_H
 
 #include <mpi.h>
-#include <vector>
-#include <memory>
-#include <fstream>
+
 #include "hashvec.h"
 #include "formatter.h"
 
@@ -35,6 +33,7 @@ class Writer {
     // Formatter strategy
     Formatter formatter_;
 
+    // Default filename 
     std::string output_filename_ = "profiler-output";
 
     // MPI handling

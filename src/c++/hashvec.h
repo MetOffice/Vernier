@@ -13,8 +13,8 @@
 #ifndef PROFILER_HASHVEC_H
 #define PROFILER_HASHVEC_H
 
-#include <string>
 #include <string_view>
+#include <vector>
 
 #include "prof_gettime.h"
 
@@ -24,6 +24,7 @@
  */
 
 struct HashEntry{
+  
   public:
 
     // Constructor

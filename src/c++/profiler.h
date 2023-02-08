@@ -16,9 +16,7 @@
 #ifndef PROFILER_H
 #define PROFILER_H
 
-#include <string_view>
 #include <iterator>
-#include <vector>
 #include <omp.h>
 
 #include "hashtable.h"
@@ -55,8 +53,8 @@ class Profiler
     // Data members
     int max_threads_;
 
-    std::vector<HashTable>                                           thread_hashtables_;
-    std::vector<std::vector<std::pair<size_t,StartCalliperValues>>>   thread_traceback_;
+    std::vector<HashTable>                                         thread_hashtables_;
+    std::vector<std::vector<std::pair<size_t,StartCalliperValues>>> thread_traceback_;
 
     // Type definitions for vector array indexing.
     typedef std::vector<HashTable>::size_type                                     hashtable_iterator_t_;

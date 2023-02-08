@@ -188,7 +188,7 @@ std::vector<size_t> HashTable::list_keys()
  * 
  */
 
-void HashTable::append_to(HashVecHandler& hashvec)
+void HashTable::append_to(HashVecHandler& hashvec_handler)
 {
   // Compute overhead and self times before appending
   prepare_computed_times_all();
@@ -198,10 +198,10 @@ void HashTable::append_to(HashVecHandler& hashvec)
   if (it != table_.end() && it->second.call_count_ == 0) { table_.erase(it); }
   
   // Create hashvec from the table data.
+  hashvec_t new_hashvec(table_.cbegin(), table_.cend());
 
   // Append hashvec to argument. 
-  hashvec_t new_hashvec (table_.cbegin(), table_.cend());
-  hashvec.append(new_hashvec);
+  hashvec_handler.append(new_hashvec);
 }
 
 /**

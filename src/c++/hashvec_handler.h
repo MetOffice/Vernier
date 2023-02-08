@@ -14,9 +14,11 @@
 #ifndef PROFILER_HASHVEC_HANDLER_H
 #define PROFILER_HASHVEC_HANDLER_H
 
+#include <algorithm>
+#include <memory>
+
 #include "writer.h"
 #include "hashvec.h"
-#include <algorithm>
 
 /**
  * @brief  HashVecHandler class
