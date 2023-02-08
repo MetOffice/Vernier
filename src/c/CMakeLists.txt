@@ -7,7 +7,7 @@
 include(CMakePackageConfigHelpers)
 
 # Add files source files to library.
-add_library(${CMAKE_PROJECT_NAME}_c SHARED
+add_library(${CMAKE_PROJECT_NAME}_c 
         profiler_c.cpp)
 
 # Link library to and external libs (also use project warnings and options).

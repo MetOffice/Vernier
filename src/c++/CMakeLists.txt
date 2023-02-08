@@ -10,8 +10,9 @@
 # Include helper functions for creating config files.
 include(CMakePackageConfigHelpers)
 
-# Add files source files to library.
-add_library(${CMAKE_PROJECT_NAME} SHARED
+# Add files source files to library. This is STATIC by default and SHARED when
+# the BUILD_SHARED_LIBS option is turned ON.
+add_library(${CMAKE_PROJECT_NAME}
         profiler.h         profiler.cpp
         prof_gettime.h     prof_gettime.cpp
         hashvec_handler.h  hashvec_handler.cpp
