@@ -24,11 +24,9 @@
 #define PROFILER_HASHTABLE_H
 
 #include <unordered_map>
-#include <vector>
-#include <string>
-#include <string_view>
-#include <chrono>
 
+#include "hashvec.h"
+#include "hashvec_handler.h"
 #include "prof_gettime.h"
 
 /**
@@ -43,35 +41,6 @@ struct NullHashFunction {
       return key;
   }
 };
-
-/**
- * @brief  Structure to hold information for a particular routine.
- *
- * Bundles together any information pertinent to a specific profiled region.
- *
- */
-
-struct RegionRecord{
-  public:
-
-    // Constructor
-    RegionRecord() = delete;
-    explicit RegionRecord(size_t const, std::string_view const);
-
-    // Data members
-    size_t           region_hash_;
-    std::string      region_name_;
-    time_duration_t  total_walltime_;
-    time_duration_t  total_raw_walltime_;
-    time_duration_t  self_walltime_;
-    time_duration_t  child_walltime_;
-    time_duration_t  overhead_walltime_;
-    unsigned long long int call_count_;
-
-};
-
-// Type definitions
-using record_index_t = std::vector<RegionRecord>::size_type;
 
 /**
  * @brief  Wraps STL hashtables with additional functionality.
@@ -103,6 +72,8 @@ class HashTable{
     void prepare_computed_times(RegionRecord&);
     void prepare_computed_times_all();
     void sort_records();
+    void erase_record(size_t const);
+    void sync_lookup();
     RegionRecord&  hash2record(size_t const);
     RegionRecord const&  hash2record_const(size_t const) const;
 
@@ -115,12 +86,14 @@ class HashTable{
     // Prototypes
     void query_insert(std::string_view const, size_t&, record_index_t&) noexcept;
     void update(record_index_t const, time_duration_t const);
-    void write();
 
     // Member functions
     std::vector<size_t> list_keys();
     time_duration_t* add_child_time(record_index_t const, time_duration_t const);
     time_duration_t& increment_profiler_calls();
+    void add_overhead_time(size_t const, time_duration_t);
+    void compute_self_times();
+    void append_to(HashVecHandler&);
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;

@@ -5,11 +5,8 @@
 \*----------------------------------------------------------------------------*/
 
 #include "hashtable.h"
-#include <iomanip>
 #include <cassert>
-#include <iostream>
-#include <string>
-#include <algorithm>
+#include <iterator>
 
 #define PROF_HASHVEC_RESERVE_SIZE 1000
 
@@ -42,6 +39,10 @@ HashTable::HashTable(int const tid)
 {
   // Reserve enough places in hashvec_
   hashvec_.reserve(PROF_HASHVEC_RESERVE_SIZE);
+
+  // Set the name and hash of the profiler entry.
+  std::string const profiler_name = "__profiler__@" + std::to_string(tid);
+  profiler_hash_ = hash_function_(profiler_name);
 
   // Insert special entry for the profiler overhead time.
   query_insert("__profiler__", profiler_hash_, profiler_index_);
@@ -138,62 +139,15 @@ void HashTable::sort_records()
 
   // Need to re-store the indices in the lookup table, since they will have all
   // moved around as a result of the above sort.
-  for (auto it = begin(hashvec_); it != end(hashvec_); ++it) {
-    auto current_index = it - hashvec_.begin();
-    lookup_table_[it->region_hash_] =  static_cast<record_index_t>(current_index);
-  }
+  sync_lookup();
 
 }
 
 /**
- * @brief  Writes all entries in the hashtable.
- * @note   Calls the method to sort times according to their region self-time.
- *
- */
-
-void HashTable::write()
-{
-
-  // Ensure all computed times are up-to-date.
-  prepare_computed_times_all();
-  sort_records();
-
-  std::string routine_at_thread = "Thread: " + std::to_string(tid_);
-
-  // Write headings
-  std::cout << "\n";
-  std::cout
-    << std::setw(40) << std::left  << routine_at_thread  << " "
-    << std::setw(15) << std::right << "Self (s)"         << " "
-    << std::setw(15) << std::right << "Total (raw) (s)"  << " "
-    << std::setw(15) << std::right << "Total (s)"        << " "
-    << std::setw(10) << std::right << "Calls"            << "\n";
-
-  std::cout << std::setfill('-');
-  std::cout
-    << std::setw(40) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(10) << "-" << "\n";
-  std::cout << std::setfill(' ');
-
-  // Data entries
-  for (auto& record : hashvec_) {
-    std::cout
-      << std::setw(40) << std::left  << record.region_name_                << " "
-      << std::setw(15) << std::right << record.self_walltime_.count()      << " "
-      << std::setw(15) << std::right << record.total_raw_walltime_.count() << " "
-      << std::setw(15) << std::right << record.total_walltime_.count()     << " "
-      << std::setw(10) << std::right << record.call_count_                 << "\n";
-  }
-}
-
-/**
- * @brief  Evaluates times derived from other times measured, for a particular
- *         code region.
- * @detail Times computed are: the region self time and the total time minus
- *         directly incurred profiling overhead costs.
+ * @brief   Evaluates times derived from other times measured, for a particular
+ *          code region.
+ * @details Times computed are: the region self time and the total time minus
+ *          directly incurred profiling overhead costs.
  *
  * @param [in] record  The region record to compute.
  */
@@ -242,8 +196,76 @@ std::vector<size_t> HashTable::list_keys()
 }
 
 /**
- * @brief  Get the total (inclusive) time of the specified region.
- * @param [in]  The hash corresponding to the region.
+ * @brief  Appends table_ onto the end of an input hashvec. 
+ * @param[inout]  HashVecHandler containing the hashvec to amend.
+ * 
+ */
+
+void HashTable::append_to(HashVecHandler& hashvec_handler)
+{
+  // Compute overhead and self times before appending
+  prepare_computed_times_all();
+
+  // Loop over entries in the hashtable.
+  for (auto& [hash, index] : lookup_table_) {
+    prepare_computed_times(hash2record(hash));
+  }
+
+  // Erase profiler entry if call count is zero.
+  if(hash2record(profiler_hash_).call_count_ == 0) {
+    erase_record(profiler_hash_);
+  }
+
+  // Sync-up the lookup table and hashvec.
+  sync_lookup();
+  
+  // Append hashvec to that passed through the argument list.
+  hashvec_handler.append(hashvec_);
+}
+
+/**
+ * @brief Erases record from the hashvec and lookup table.
+ * @param[in] hash   Hash of the record to erase.
+ *
+ */
+
+void HashTable::erase_record(size_t const hash)
+{
+
+  // Find the lookup table (hashtable) iterator.
+  auto iterator    = lookup_table_.find(hash);
+  auto const index = lookup_table_.at(hash);
+
+  // Get the hashvec iterator from the index
+  auto record_iterator = begin(hashvec_);
+  std::advance( record_iterator, index);
+
+  // Erase from both the hashvec and the lookup table.
+  hashvec_.erase(record_iterator);
+  lookup_table_.erase(iterator);
+
+}
+
+/**
+ * @brief Updates vector indices stored in the lookup table.
+ *
+ */
+
+void HashTable::sync_lookup()
+{
+  // Need to re-store the indices in the lookup table, since there will be a gap
+  // as a result of the erase().
+  for (auto it = begin(hashvec_); it != end(hashvec_); ++it) {
+    auto current_index = it - hashvec_.begin();
+    lookup_table_[it->region_hash_] =  static_cast<record_index_t>(current_index);
+  }
+}
+
+/**
+ * @brief  Get the total (inclusive) time corresponding to the input hash.
+ * @param[in]  hash  Fetches the total wallclock time for the region
+ *                   with this hash.
+ *
  */
 
 double HashTable::get_total_walltime(size_t const hash) const
@@ -256,7 +278,7 @@ double HashTable::get_total_walltime(size_t const hash) const
 /**
  * @brief  Get the total time of the specified region, minus profiling overheads
  *         incurred by calling direct children.
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  * @note   This time is derived from other measured times, therefore a to
  *         `prepare_computed_times` is need to update its value. 
  */
@@ -271,7 +293,7 @@ double HashTable::get_total_raw_walltime(size_t const hash)
 /**
  * @brief  Get the profiling overhead time for a specified region, as incurred
  *         by calling direct children. 
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  */
 
 double HashTable::get_overhead_walltime(size_t const hash) const
@@ -282,7 +304,7 @@ double HashTable::get_overhead_walltime(size_t const hash) const
 
 /**
  * @brief  Get the profiler self (exclusive) time corresponding to the input hash.
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  * @note   This time is derived from other measured times, therefore a to
  *         `prepare_computed_times` is need to update its value. 
  */
@@ -296,7 +318,7 @@ double HashTable::get_self_walltime(size_t const hash)
 
 /**
  * @brief  Get the child time corresponding to the input hash.
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  * @note   This time is derived from other measured times, therefore a to
  *         `prepare_computed_times` is need to update its value. 
  */
@@ -309,7 +331,7 @@ double HashTable::get_child_walltime(size_t const hash) const
 
 /**
  * @brief  Get the region name corresponding to the input hash.
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  */
 
 std::string HashTable::get_region_name(size_t const hash) const

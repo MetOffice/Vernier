@@ -13,14 +13,19 @@ include(CMakePackageConfigHelpers)
 # Add files source files to library. This is STATIC by default and SHARED when
 # the BUILD_SHARED_LIBS option is turned ON.
 add_library(${CMAKE_PROJECT_NAME}
-        profiler.h      profiler.cpp
-        hashtable.h     hashtable.cpp
-        prof_gettime.h  prof_gettime.cpp
+        profiler.h         profiler.cpp
+        prof_gettime.h     prof_gettime.cpp
+        hashvec_handler.h  hashvec_handler.cpp
+        writer.h           writer.cpp
+        formatter.h        formatter.cpp
+        hashtable.h        hashtable.cpp
+        hashvec.h
         )
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-        OpenMP::OpenMP_CXX)
+        OpenMP::OpenMP_CXX
+        MPI::MPI_CXX)
 
 set_project_warnings(${CMAKE_PROJECT_NAME})
 

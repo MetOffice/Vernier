@@ -16,7 +16,6 @@
 #ifndef PROFILER_H
 #define PROFILER_H
 
-#include <string_view>
 #include <iterator>
 #include <vector>
 #include <array>
