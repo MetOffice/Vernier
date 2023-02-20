@@ -30,7 +30,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get -y install doxygen graphviz
-
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
         # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -42,17 +41,17 @@ jobs:
 
       - name: Update Doxygen Pages
         run: |
-          mkdir -p ${{github.workspace}}/docs
-          cp -rf ${{github.workspace}}/build/html/* ${{github.workspace}}/docs/.
+          mkdir -p ${{github.workspace}}/docs/documentation
+          cp -rf ${{github.workspace}}/build/html/* ${{github.workspace}}/docs/documentation/.
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add --force docs
+          git add --force docs/documentation
           git stash
           git remote update
           git checkout gh-pages
-          git rm -rf docs
+          rm -rf docs/documentation
           git stash pop
           git reset
-          git add --force docs
-          git commit --allow-empty -m "Update Doxygen documentation"
+          git add --force docs/documentation
+          git commit -a --allow-empty -m "Update Doxygen documentation"
           git push

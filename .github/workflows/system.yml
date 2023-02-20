@@ -1,57 +1,79 @@
-name: Run System Tests
+name: Run system tests
 
-on: 
-  workflow_run:
-    workflows: [ "Build Statically" ] 
-    branches: [ main ]
-    types: 
-      - completed
-  # workflow_dispatch:
-  # push:
-  #   branches: [ main ]
-  # pull_request: 
-  #   branches: [ main ]
-
-env: 
-  BUILD_TYPE: Debug
+on:
+  workflow_call:
+    inputs:
+      cpp_compiler:
+        description:
+          'Name of the C++ compiler used to build and install beforehand.'
+        required: true
+        type: string
+      fortran_compiler:
+        description:
+          'Name of the fortran compiler used to build and install.'
+        required: true
+        type: string
+      shared_libs:
+        description:
+          'Determines whether the static or dynamic binaries are downloaded.'
+        required: true
+        type: boolean
 
 jobs:
   run:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        threads: [1, 4]
-        compiler: [gcc, clang]
-    if: ${{ github.event.workflow_run.conclusion == 'success' }} # Run if build workflow worked
+    name: "${{ inputs.shared_libs && 'dynamic' || 'static' }}"
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
     steps:
-      - run: echo "Triggering workflow was a success, running unit tests..."
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    ## DOwnload the binary artifact here???? <<<
-      - name: Download binary 
-        uses: actions/download-artifact@v3 
-        with:
-          name: my-artifact # Download artifact
-          path: ${{ github.workspace }}
+    - name: Install libomp and mpich
+      run: |
+        sudo apt update
+        sudo apt install -y libomp-12-dev
+        sudo apt install -y mpich
 
-      # Run tests 
-      - name: Compile system test
-        # Compile tests using installed libraries
-        working-directory: ${{ github.workspace }}/build/
-        env:
-          LB_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib64
-        run: |
-          ${{ matrix.compiler }} \
-          ../tests/system_tests/system_test.cpp \
-          -I./include -L./lib64 -lprofiler -fopenmp
+    - name: Setup
+      run: |
+        if [[ ${{ inputs.shared_libs }} ]]
+        then
+          LINKING=dynamic
+        else
+          LINKING=static
+        fi
+        COMPILER=${{ inputs.cpp_compiler }}
+        echo "INSTALL_NAME=${COMPILER:0:-3}_${LINKING}_install" >> $GITHUB_ENV
 
-      - name: Run system test
-        # Run tests using installed libraries
-        working-directory: ${{ github.workspace }}/build/
-        run: ./a.out
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.INSTALL_NAME }}
 
-  dont-run:
-    runs-on: ubunutu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-    steps:
-      - run: echo "Triggering workflow failed"
+    - name: Unzip and update ld path
+      run: |
+        tar xzvf ${{ env.INSTALL_NAME }}.tar.gz -C /
+        PROF="/home/runner/work/${{ env.INSTALL_NAME }}"
+        echo "PROF=$PROF" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROF/lib" >> $GITHUB_ENV
+       
+    - name: Compile and run C++ test
+      # Test installed libraries using a C++ and fortran system test. Both use
+      # 2 OpenMP threads on 4 MPI ranks.
+      env:
+        OMP_NUM_THREADS: 2
+      run: |
+        mpicxx -o systest -cxx=${{ inputs.cpp_compiler }} -std=c++17 \
+           -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.cpp \
+           -lprofiler -fopenmp
+        mpirun -n 4 ./systest
+
+    - name: Compile and run f90 test
+      env:
+        OMP_NUM_THREADS: 2
+      run: |
+        mpifort -o systest -fc=${{ inputs.fortran_compiler }} \
+          -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
+          -lprofiler_f -lprofiler_c -fopenmp
+        mpirun -n 4 ./systest

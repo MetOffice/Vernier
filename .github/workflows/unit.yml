@@ -1,46 +1,47 @@
-name: Run Unit Tests
+name: Run unit tests
 
 on:
-  workflow_run:
-    workflows: [ "Build Dynamically" ] 
-    branches: [ main ]
-    types:
-      - completed
-  #workflow_dispatch:
-  # push:
-  #   branches: [ main ]
-  # pull_request: 
-  #   branches: [ main ]
+  workflow_call:
+    inputs:
+      cpp_compiler:
+        description:
+          'Name of the C++ compiler used to build beforehand.'
+        required: true
+        type: string
 
-env: 
+env:
   BUILD_TYPE: Debug
 
 jobs:
   run:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        threads: [1, 4]
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-20.04
     steps:
-      - run: echo "Triggering workflow was a success, running unit tests..."
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    ## DOwnload the binary artifact here???? <<<
-      - uses: actions/download-artifact@v3 
-        with:
-          name: ym-artifact
-          path: ${{ github.workspace }}
+    - name: Setup
+      # This time only the compiler matters, unit tests are only ran for the
+      # dynamic build directories.
+      run: |
+        COMPILER=${{ inputs.cpp_compiler }}
+        echo "BUILD_NAME=${COMPILER:0:-3}_dynamic_build" >> $GITHUB_ENV
 
-      # Run tests 
-      - name: "Test (${{ matrix.threads }} threads)"
-        env:
-          OMP_NUM_THREADS: ${{ matrix.threads }}
-        working-directory: ${{github.workspace}}/build
-        run: ctest -VV -C ${{env.BUILD_TYPE}}
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.BUILD_NAME }}
 
-  dont-run:
-    runs-on: ubunutu-latest 
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-    steps:
-      - run: echo "Triggering workflow failed"
+    - name: Unzip
+      run: tar xzvf ${{ env.BUILD_NAME }}.tar.gz -C /
+
+    - name: Run Unit Tests (1 thread)
+      # Do single and multi threaded unit test runs
+      env:
+        OMP_NUM_THREADS: 1
+      working-directory: ${{ github.workspace }}/${{ env.BUILD_NAME}}
+      run: ctest -VV -C ${{ env.BUILD_TYPE }}
+
+    - name: Run Unit Tests (4 threads)
+      env:
+        OMP_NUM_THREADS: 4
+      working-directory: ${{ github.workspace}}/${{ env.BUILD_NAME}}
+      run: ctest -VV -C ${{ env.BUILD_TYPE }}

@@ -1,0 +1,53 @@
+name: install
+
+on:
+  workflow_call:
+    inputs:
+      cpp_compiler:
+        description:
+          'Name of the C++ compiler used to build beforehand.'
+        required: true
+        type: string
+      shared_libs:
+        description:
+          'Determines the DBUILD_SHARED_LIBS option.'
+        required: true
+        type: boolean
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Debug
+
+jobs:
+  install:
+    name: "dynamic = ${{ inputs.shared_libs }}"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup
+        # The name of the build directory and uploaded artifact varies depending
+        # on the value of the build_shared_libs.
+        run: |
+          if [[ ${{ inputs.shared_libs }} ]]
+          then
+            LINKING=dynamic
+          else
+            LINKING=static
+          fi
+          COMPILER=${{ inputs.cpp_compiler }}
+          echo "BUILD_NAME=${COMPILER:0:-3}_${LINKING}_build" >> $GITHUB_ENV
+          echo "INSTALL_NAME=${COMPILER:0:-3}_${LINKING}_install" >> $GITHUB_ENV
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.BUILD_NAME }}
+
+      - name: Unzip
+        # Runs 'tar xzvf' for all tar.gz files in current directory.
+        run: tar xzvf ${{ env.BUILD_NAME }}.tar.gz
+
+     
+
+      
