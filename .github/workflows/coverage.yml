@@ -27,9 +27,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-20.04
-    defaults:
-      run:
-        shell: bash
     steps:
       - uses: actions/checkout@v3
 
@@ -77,10 +74,10 @@ jobs:
         # GCOVR_FLAGS will be used when calling gcovr, and is different
         # depending on whether the triggering event was a push or pull request.
         run: |
-          if [ ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }} ]
+          if ![ ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }} ]
           then
             GCOVR_FLAGS='--html --html-details -o gcovr/index.html --print-summary'
-          elif [ ${{ github.event_name == 'pull_request' }} ]
+          elif ![ ${{ github.event_name == 'pull_request' }} ]
           then
             GCOVR_FLAGS='--txt -o gcovr/report.txt'
           fi
