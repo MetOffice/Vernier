@@ -55,9 +55,9 @@ jobs:
       run: |
         tar xzvf ${{ env.INSTALL_NAME }}.tar.gz -C /
         PROF="/home/runner/work/${{ env.INSTALL_NAME }}"
+        ls -al $PROF
         echo "PROF=$PROF" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROF/lib" >> $GITHUB_ENV
-        ls -al $PROF
        
     - name: Compile and run C++ test
       # Test installed libraries using a C++ and fortran system test. Both use
@@ -74,10 +74,7 @@ jobs:
       env:
         OMP_NUM_THREADS: 2
       run: |
-        mpifort -o systest -pedantic -Wall -show -fc=${{ inputs.fortran_compiler }} \
+        mpifort -fc=${{ inputs.fortran_compiler }} -o test -pedantic \
           -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
-          -lprofiler_f -lprofiler_c -fopenmp
-        mpifort -o systest -pedantic -Wall -fc=${{ inputs.fortran_compiler }} \
-          -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
-          -lprofiler_f -lprofiler_c -fopenmp
-        mpirun -n 4 ./systest
+          -lprofiler_f -lprofiler_c -lprofiler -fopenmp
+        mpirun -n 4 ./test
