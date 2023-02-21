@@ -16,7 +16,8 @@ on:
 jobs:
 
   build-install:
-    # The reusable build workflow is called using strategy matrices as input.
+    # The reusable build workflow is called for each compiler configuration
+    # and for both static and dynamic linking.
     name: "Build/install: ${{ matrix.compiler.cpp }}"
     strategy:
       matrix: 
@@ -33,8 +34,8 @@ jobs:
       shared_libs:      ${{ matrix.shared_libs }}
 
   unit_test:
-    # Unit tests ran for the same compiler configurations as before, but no
-    # need to test both the dynamic and static libraries.
+    # Unit tests ran for the same compiler configurations as before, but only
+    # the dynamic build is tested.
     name: "Unit test: ${{ matrix.compiler.cpp }}"
     needs: [ build-install ]
     strategy:

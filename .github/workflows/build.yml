@@ -3,7 +3,8 @@ name: Build and install
 on:
   workflow_call:
     inputs:
-      # Inputs are provided that allow various CMake options to be changed.
+      # A host of inputs to this workflow are provided that allow various CMake
+      # options to be changed.
       c_compiler:
         description:
           'Provide a C compiler to use for the DCMAKE_C_COMPILER CMake option.'
@@ -48,8 +49,8 @@ jobs:
         sudo apt install -y mpich
 
     - name: Setup
-      # The name of the build directory and uploaded artifact varies depending
-      # on whether static or dynamic linking is being done.
+      # The name of the build directory and uploaded artifact depends on both
+      # the compiler and the 'shared_libs' input.
       run: |
         if [[ ${{ inputs.shared_libs }} ]]
         then
