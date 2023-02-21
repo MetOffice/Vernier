@@ -70,42 +70,37 @@ jobs:
         working-directory: ${{ github.workspace }}/build/
         run: ctest
 
-      - name: Install and run gcovr (push)
-        # Generates a full html report aswell as a one-line summary of the
-        # overall line coverage.
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      - name: Setup environment variable for gcovr step
+        # GCOVR_FLAGS will be used when calling gcovr, and is different
+        # depending on whether the triggering event was a push or pull request.
+        run: |
+          if [ ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }} ]
+          then
+            GCOVR_FLAGS='--html --html-details -o gcovr/index.html --print-summary'
+          elif [ ${{ github.event_name == 'pull_request' }} ]
+          then
+            GCOVR_FLAGS='--txt -o gcovr/report.txt --print-summary'
+          fi
+          echo $GCOVR_FLAGS
+          echo "GCOVR_FLAGS=$GCOVR_FLAGS" >> $GITHUB_ENV
+
+      - name: Install and run gcovr
         working-directory: ${{ github.workspace }}/build/
         env:
           ROOT_DIR: ${{ github.workspace }}
         run: |
           source $(conda info --base)/etc/profile.d/conda.sh
+          conda update
+          conda clean
           conda create -q -y -n gcovr-env gcovr -c conda-forge --override-channels
           conda activate gcovr-env
           mkdir gcovr
           gcovr --root "${ROOT_DIR}/" \
             --filter "${ROOT_DIR}/src/c++" \
-            --html --html-details -o gcovr/index.html --print-summary \
+            ${GCOVR_FLAGS} \
             "${ROOT_DIR}/build/src/c++/CMakeFiles/profiler.dir/" \
             > ./brief-summary.txt
           conda deactivate
-
-      - name: Install and run gcovr (PR)
-        # Generates a small text report.
-        if: ${{ github.event_name == 'pull_request' }}
-        working-directory: ${{ github.workspace }}/build/
-        env:
-          ROOT_DIR: ${{ github.workspace }}
-        run: |
-          source $(conda info --base)/etc/profile.d/conda.sh
-          conda create -q -y -n gcovr-env gcovr -c conda-forge --override-channels
-          conda activate gcovr-env
-          mkdir gcovr
-          gcovr --root "${ROOT_DIR}/" \
-            --filter "${ROOT_DIR}/src/c++" \
-            --txt -o gcovr/report.txt \
-            "${ROOT_DIR}/build/src/c++/CMakeFiles/profiler.dir/" \
-          conda deactivate
-          ls -al gcovr
 
       - name: Tar the html directory (push)
         # Only the directory containing the gcovr-generated html's is archived
