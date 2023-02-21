@@ -73,7 +73,7 @@ jobs:
       env:
         OMP_NUM_THREADS: 2
       run: |
-        mpifort -o systest -fc=${{ inputs.fortran_compiler }} \
+        mpifort -o systest -pedantic -Wall -fc=${{ inputs.fortran_compiler }} \
           -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
           -lprofiler_f -lprofiler_c -fopenmp
         mpirun -n 4 ./systest
