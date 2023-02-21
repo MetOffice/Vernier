@@ -97,7 +97,7 @@ jobs:
         tar czvf ${{ env.INSTALL_NAME }}.tar.gz /home/runner/work/${{ env.INSTALL_NAME }}/*
 
     - name: Upload build artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2.2.4
       with:
         name: ${{ env.BUILD_NAME }}
         path: ${{ env.BUILD_NAME }}.tar.gz
@@ -105,7 +105,7 @@ jobs:
         if-no-files-found: error
 
     - name: Upload install artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2.2.4
       with:
         name: ${{ env.INSTALL_NAME }}
         path: ${{ env.INSTALL_NAME }}.tar.gz
