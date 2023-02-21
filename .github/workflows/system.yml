@@ -75,12 +75,11 @@ jobs:
         OMP_NUM_THREADS: 2
       run: |
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROF/lib
-        export CPPFLAGS="-std=c++17"
-        export CXXFLAGS="-std=c++17"
-        mpifort -fc=${{ inputs.fortran_compiler }} -o test -pedantic -fexceptions \
+        mpifort -v
+        mpifort -fc=${{ inputs.fortran_compiler }} -o test -pedantic -lstdc++ \
           -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
           -lprofiler_f -lprofiler_c -lprofiler -fopenmp -show
-        mpifort -fc=${{ inputs.fortran_compiler }} -o test -pedantic -fexceptions \
+        mpifort -fc=${{ inputs.fortran_compiler }} -o test -pedantic -lstdc++ \
           -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
           -lprofiler_f -lprofiler_c -lprofiler -fopenmp
         mpirun -n 4 ./test
