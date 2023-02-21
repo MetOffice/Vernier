@@ -34,7 +34,6 @@ jobs:
         sudo apt update
         sudo apt install -y libomp-12-dev
         sudo apt install -y mpich
-        sudo apt install -y libstdc++17
 
     - name: Setup
       run: |
