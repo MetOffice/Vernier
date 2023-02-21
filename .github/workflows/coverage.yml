@@ -92,7 +92,7 @@ jobs:
           source $(conda info --base)/etc/profile.d/conda.sh
           conda create -q -y -n gcovr-env gcovr -c conda-forge --override-channels
           conda activate gcovr-env
-          conda clean
+          conda clean --all
           mkdir gcovr
           gcovr --root "${ROOT_DIR}/" \
             --filter "${ROOT_DIR}/src/c++" \
