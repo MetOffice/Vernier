@@ -1,4 +1,4 @@
-name: Unit test coverage
+name: Update test coverage
 
 on:
   workflow_dispatch:
@@ -7,100 +7,258 @@ on:
     paths:
       - 'src/**.h'
       - 'src/**.cpp'
-      - 'tests/**'
+      - 'tests/unit_tests/**'
+      - '.github/workflows/coverage.yml'
+  pull_request:
+    branches: [ main ] 
+    paths:
+      - 'src/**.h'
+      - 'src/**.cpp'
+      - 'tests/unit_tests/**'
       - '.github/workflows/coverage.yml'
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+  # Workflow-wide environment variables for the names of the three uploaded
+  # artifacts at the end of the 'build' job.
+  html-artifact: html-artifact
+  bage-artifact: badge-artifact
+  pr-report-artifact: pr-report-artifact
 
 jobs:
   build:
-    runs-on: ubuntu-latest 
-    strategy:
-      fail-fast: false
-      matrix:
-        compiler: [
-          {c: gcc-10, cpp: g++-10, fortran: gfortran-10}
-        ]
-
+    runs-on: ubuntu-20.04
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-    - name: Create conda environment
-      # Setup a virtual conda environment
-      uses: conda-incubator/setup-miniconda@v2
-      with: 
-        auto-activate-base: false
-        python-version: 3.9 
-        channels: conda-forge, defaults
-        activate-environment: myenv
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.7'
 
-    - name: Install Lcov
-      # Install lcov from conda (graphical front-end for gcov reports)
-      shell: bash -l {0}
-      run: conda install lcov
+      - name: Change default g++ version
+        # Set the default g++ and gcov versions to be 10 to avoid a mismatch
+        # between the g++ version that the code is built with and the gcov
+        # version that gcovr uses.
+        run: |
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 10 \
+            --slave /usr/bin/gcov gcov /usr/bin/gcov-9
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 20 \
+            --slave /usr/bin/gcov gcov /usr/bin/gcov-10
+          sudo update-alternatives --set c++ /usr/bin/g++
+          g++ --version
+          gcov --version
 
-    - name: Configure CMake 
-      # Configure CMake in a 'build' subdirectory
-      #   Key thing here is the "--coverage" CXX flag which generates
-      #   .gcno files for gcov. 
-      run: > 
-        cmake -B ${{github.workspace}}/build 
-        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-        -DCMAKE_C_COMPILER=${{ matrix.compiler.c }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} 
-        -DCMAKE_Fortran_COMPILER=${{ matrix.compiler.fortran }}
-        -DBUILD_TESTS=ON
-        -DBUILD_FORTRAN_TESTS=OFF
-        -DINCLUDE_GTEST=ON
-        -DCMAKE_CXX_FLAGS="-g --coverage" 
-        -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=ON 
-        -DENABLE_DOXYGEN=OFF 
+      - name: Configure CMake
+        # Key thing here is the "--coverage" CXX flag, which generates the 
+        # .gcno files required by gcov. It bundles together '-fprofile-arcs 
+        # -ftest-coverage' (when compiling) with '-lgcov' (when linking).
+        run: >
+          cmake -B ${{ github.workspace }}/build
+          -DCMAKE_CXX_FLAGS="-g -O0 --coverage"
+          -DBUILD_TESTS=ON
+          -DBUILD_FORTRAN_TESTS=OFF
+          -DINCLUDE_GTEST=ON
+          -DWARNINGS_AS_ERRORS=ON
+          -DUSE_SANITIZERS=OFF
+          -DENABLE_DOXYGEN=OFF 
+          -DBUILD_SHARED_LIBS=ON
 
-    - name: Build 
-      # Build with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      - name: Build
+        # Build with the given configuration
+        run: cmake --build ${{ github.workspace }}/build 
 
-    - name: Make  
-      working-directory: ${{github.workspace}}/build
-      run: make 
+      - name: Run unit tests
+        working-directory: ${{ github.workspace }}/build/
+        run: ctest
 
-    - name: Run tests 
-      # Run all the unit test executables
-      working-directory: ${{github.workspace}}/build
-      run: ctest 
+      - name: Setup environment variable for gcovr step
+        # OPTIONAL_ARGS will be used when calling gcovr, and is different
+        # depending on whether the triggering event was a push or pull request.
+        run: |
+          if [ ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }} ]
+          then
+            OPTIONAL_ARGS='--html --html-details -o gcovr/index.html --print-summary'
+          elif [ ${{ github.event_name == 'pull_request' }} ]
+          then
+            OPTIONAL_ARGS='--txt -o gcovr/report.txt --print-summary'
+          fi
+          echo $OPTIONAL_ARGS
+          echo "OPTIONAL_ARGS=$OPTIONAL_ARGS" >> $GITHUB_ENV
 
-    - name: Run Gcov 
-      run: gcov --demangled-names --human-readable ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
+      - name: Install and run gcovr
+        working-directory: ${{ github.workspace }}/build/
+        env:
+          ROOT: ${{ github.workspace }}
+        run: |
+          source $(conda info --base)/etc/profile.d/conda.sh
+          conda create -q -y -n gcovr-env gcovr -c conda-forge --override-channels
+          conda activate gcovr-env
+          mkdir gcovr
+          gcovr --root "${ROOT}/" \
+            --filter "${ROOT}/src/c++" \
+            ${OPTIONAL_ARGS} \
+            "${ROOT}/build/src/c++/CMakeFiles/profiler.dir/" \
+            > ./brief-summary.txt
+          conda deactivate
 
-    - name: Inital Lcov Run
-      shell: bash -l {0}
-      run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file basecoverage.info
+      - name: Tar the gcovr html directory
+        # Only the directory containing the gcovr-generated html's is archived
+        # since the other two artifact uploads are only uploading a single file.
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        working-directory: ${{ github.workspace }}/build/
+        run: tar czvf gcovr-html.tar.gz ./gcovr/*
 
-    - name: Extract Relevant Paths
-      # Ignore all the STL header files from the initial lcov .info file
-      shell: bash -l {0}
-      run: lcov --extract basecoverage.info '${{github.workspace}}/src/*' --output-file coverage.info
+      - name: Upload html directory artifact
+        # Required for updating the gh-pages documentation.
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.html-dir-artifact }}
+          path: ${{ github.workspace }}/build/gcovr-html.tar.gz
+          retention-days: 1
+          if-no-files-found: error
 
-    - name: Generate html
-      shell: bash -l {0}
-      run: genhtml coverage.info --output-directory out
+      - name: Upload brief-summary.txt artifact
+        # Required for updating the coverage badge at the top of the README.
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.badge-artifact }}
+          path: ${{ github.workspace }}/build/brief-summary.txt
+          retention-days: 1
+          if-no-files-found: error
 
-    - name: Update Coverage Pages 
-      run: |
-        mkdir -p ${{github.workspace}}/docs/coverage
-        cp -rf ${{github.workspace}}/out/* ${{github.workspace}}/docs/coverage/.
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]'
-        git add --force docs/coverage
-        git stash
-        git remote update
-        git checkout gh-pages
-        rm -rf docs/coverage
-        git stash pop
-        git reset
-        git add --force docs/coverage
-        git commit --allow-empty -m "Update coverage documentation"
-        git push
+      - name: Upload report.txt artifact
+        # Required for commenting a coverage summary under pull requests.
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.pr-report-artifact }}
+          path: ${{ github.workspace }}/build/gcovr/report.txt
+          retention-days: 1
+          if-no-files-found: error
+
+  Update_docs:
+    needs: [ build ]
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.html-artifact }}
+
+      - name: Unzip
+        run: |
+          mkdir build
+          cd build/
+          tar xzvf ../gcovr-html.tar.gz
+
+      - name: Push to pages branch
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+        run: |
+          mkdir -p ${{ github.workspace }}/docs/coverage
+          cp -rf ${{ github.workspace }}/build/gcovr/* ${{ github.workspace }}/docs/coverage/.
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]'
+          git add --force docs/coverage
+          git stash
+          git remote update
+          git checkout gh-pages
+          git rm -r --ignore-unmatch docs/coverage/
+          rm -rf docs/coverage/
+          git stash pop
+          git reset
+          git add --force docs/coverage
+          git commit --allow-empty -am "Update unit test coverage"
+          git push
+
+  Update_README:
+    needs: [ build ]
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.badge-artifact }}
+
+      - name: Determine overall line coverage
+        # Line coverage percentage is grabbed from the downloaded txt file and
+        # put into an environment variable
+        env:
+          # Criterion for high and medium level line coverage, these values
+          # determine the colour of the README coverage badge.
+          HIGH: 90
+          MEDIUM: 75
+        run: |
+          PERCENT=$(grep -oP "lines: \K(\d+(\.\d+)?(?=%))" brief-summary.txt)
+          if (( $(echo "$PERCENT >= $HIGH" |bc -l) )); then
+            COLOUR="success"
+          elif (( $(echo "$PERCENT < $HIGH" |bc -l) && $(echo "$PERCENT >= $MEDIUM" |bc -l) )); then
+            COLOUR="yellow"
+          else 
+            COLOUR="red"
+          fi
+          echo $PERCENT $COLOUR
+          echo "PERCENT=$PERCENT" >> $GITHUB_ENV
+          echo "COLOUR=$COLOUR" >> $GITHUB_ENV
+        
+      - name: Update coverage badge in README
+        env:
+          WORKFLOW_URL: https://github.com/MetOffice/profiler/actions/workflows/coverage.yml
+          BADGE_URL: '[![Coverage](https://img.shields.io/badge/coverage-${{ env.PERCENT }}%25-${{ env.COLOUR }})](${WORKFLOW_URL})'
+        run: |
+          git reset
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]'
+          sed -i '5s#.*#${{ env.BADGE_URL }}#' ${{ github.workspace }}/README.md
+          git add --force ./README.md
+          git commit --allow-empty -m "Update README.md"
+          git push --force
+
+  PR_comment:
+    needs: [ build ]
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.pr-report-artifact }}
+
+      - name: Put .txt output into an environment variable
+        # Utilises an EOF delimiter trick in order to store multiple lines of 
+        # text in an environment variable, often referred to as 'here document'
+        # or 'heredoc' style syntax.
+        run: |
+          echo 'SUMMARY<<EOF' >> $GITHUB_ENV
+          cat ./report.txt >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+      - name: Comment coverage summary under PR
+        # The script action comes with functionality that allows for commenting
+        # on issues/pull requests, this is used is conjunction with the SUMMARY
+        # environment variable to shove the coverage summary in a comment under
+        # the triggering PR.
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { SUMMARY } = process.env
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: ` 
+              ### Unit Test Coverage
+              \`\`\`
+              ${process.env.SUMMARY}
+              \`\`\` 
+              `
+            })
