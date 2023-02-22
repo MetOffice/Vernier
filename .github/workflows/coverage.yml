@@ -9,20 +9,12 @@ on:
       - 'src/**.cpp'
       - 'tests/unit_tests/**'
       - '.github/workflows/coverage.yml'
-  pull_request:
-    branches: [ main ] 
-    paths:
-      - 'src/**.h'
-      - 'src/**.cpp'
-      - 'tests/unit_tests/**'
-      - '.github/workflows/coverage.yml'
 
 env:
   # Workflow-wide environment variables for the names of the three uploaded
   # artifacts at the end of the 'build' job.
-  HTML-ARTIFACT:      html-artifact
-  BADGE-ARTIFACT:     badge-artifact
-  PR-REPORT-ARTIFACT: pr-report-artifact
+  HTML-ARTIFACT:  html-artifact
+  BADGE-ARTIFACT: badge-artifact
 
 jobs:
   build:
@@ -70,21 +62,6 @@ jobs:
         working-directory: ${{ github.workspace }}/build/
         run: ctest
 
-      - name: Setup environment variable for gcovr step
-        # GCOVR_FLAGS will be used when calling gcovr, and is different
-        # depending on whether the triggering event was a push or pull request.
-        shell: bash
-        run: |
-          if ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-          then
-            GCOVR_FLAGS='--html --html-details -o gcovr/index.html --print-summary'
-          elif ${{ github.event_name == 'pull_request' }}
-          then
-            GCOVR_FLAGS='--txt -o gcovr/report.txt'
-          fi
-          echo $GCOVR_FLAGS
-          echo "GCOVR_FLAGS=$GCOVR_FLAGS" >> $GITHUB_ENV
-
       - name: Install and run gcovr
         working-directory: ${{ github.workspace }}/build/
         env:
@@ -97,21 +74,19 @@ jobs:
           mkdir gcovr
           gcovr --root "${ROOT_DIR}/" \
             --filter "${ROOT_DIR}/src/c++" \
-            ${GCOVR_FLAGS} \
+            --html --html-details -o gcovr/index.html --print-summary \
             "${ROOT_DIR}/build/src/c++/CMakeFiles/profiler.dir/" \
             > ./brief-summary.txt
           conda deactivate
-          ls -al
-          ls -al gcovr
 
-      - name: Tar the html directory (push)
+      - name: Tar the html directory
         # Only the directory containing the gcovr-generated html's is archived
         # since the other two artifact uploads are only uploading a single file.
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         working-directory: ${{ github.workspace }}/build/
         run: tar czvf gcovr-html.tar.gz ./gcovr/*
 
-      - name: Upload html artifact (push)
+      - name: Upload html artifact
         # Required for updating the gh-pages documentation.
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v3
@@ -121,23 +96,13 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-      - name: Upload brief-summary.txt artifact (push)
+      - name: Upload brief-summary.txt artifact
         # Required for updating the coverage badge at the top of the README.
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.BADGE-ARTIFACT }}
           path: ${{ github.workspace }}/build/brief-summary.txt
-          retention-days: 1
-          if-no-files-found: error
-
-      - name: Upload report.txt artifact (PR)
-        # Required for commenting a coverage summary under pull requests.
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.PR-REPORT-ARTIFACT }}
-          path: ${{ github.workspace }}/build/gcovr/report.txt
           retention-days: 1
           if-no-files-found: error
 
@@ -212,7 +177,7 @@ jobs:
           echo $PERCENT $COLOUR
           echo "PERCENT=$PERCENT" >> $GITHUB_ENV
           echo "COLOUR=$COLOUR" >> $GITHUB_ENV
-        
+
       - name: Update coverage badge in README
         env:
           WORKFLOW_URL: https://github.com/MetOffice/profiler/actions/workflows/coverage.yml
@@ -225,46 +190,3 @@ jobs:
           git add --force ./README.md
           git commit --allow-empty -m "Update README.md"
           git push --force
-
-  PR:
-    name: Comment on PR
-    needs: [ build ]
-    if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.PR-REPORT-ARTIFACT }}
-
-      - name: Put .txt output into an environment variable
-        # EOF delimiter trick to store multiple lines of text in an environment
-        # variable, often referred to as 'heredoc' style syntax.
-        run: |
-          echo 'SUMMARY<<EOF' >> $GITHUB_ENV
-          cat ./report.txt >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-
-      - name: Comment coverage summary under PR
-        # The github-script action comes with functionality that allows for 
-        # commenting on pull requests. This is used is conjunction with the 
-        # environment variable that was just set-up in order to comment a 
-        # report under the pull request that triggered this run.
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { SUMMARY } = process.env
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: ` 
-              ### Unit Test Coverage
-              \`\`\`
-              ${process.env.SUMMARY}
-              \`\`\` 
-              `
-            })
