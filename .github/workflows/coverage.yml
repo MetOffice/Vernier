@@ -82,13 +82,11 @@ jobs:
       - name: Tar the html directory
         # Only the directory containing the gcovr-generated html's is archived
         # since the other two artifact uploads are only uploading a single file.
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         working-directory: ${{ github.workspace }}/build/
         run: tar czvf gcovr-html.tar.gz ./gcovr/*
 
       - name: Upload html artifact
         # Required for updating the gh-pages documentation.
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.HTML-DIR-ARTIFACT }}
@@ -98,7 +96,6 @@ jobs:
 
       - name: Upload brief-summary.txt artifact
         # Required for updating the coverage badge at the top of the README.
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.BADGE-ARTIFACT }}
@@ -109,7 +106,6 @@ jobs:
   gh-pages:
     name: Update documentation
     needs: [ build ]
-    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -126,7 +122,6 @@ jobs:
           tar xzvf ../gcovr-html.tar.gz
 
       - name: Push to pages branch
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         run: |
           mkdir -p ${{ github.workspace }}/docs/coverage
           cp -rf ${{ github.workspace }}/build/gcovr/* ${{ github.workspace }}/docs/coverage/.
@@ -147,7 +142,6 @@ jobs:
   README:
     name: Update README badge
     needs: [ build ]
-    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
