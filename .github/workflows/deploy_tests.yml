@@ -20,13 +20,19 @@ env:
 
 jobs:
 
+  setup:
+    runs-on: ubuntu-20.04
+    outputs:
+      compiler_matrix: ${{ env.COMPILER_MATRIX }}
+
   build-install:
     # The reusable build workflow is called for each compiler configuration
     # and for both static and dynamic linking.
     name: "Build/install: ${{ matrix.compiler.cpp }}"
+    needs: [ setup ]
     strategy:
       matrix: 
-        compiler: ${{ env.COMPILER_MATRIX }}
+        compiler: ${{ needs.setup.outputs.compiler_matrix }}
         shared_libs: [ true, false ]
     uses: ./.github/workflows/build.yml
     with:
@@ -39,10 +45,10 @@ jobs:
     # Unit tests ran for the same compiler configurations as before, but only
     # the dynamic build is tested.
     name: "Unit test: ${{ matrix.compiler.cpp }}"
-    needs: [ build-install ]
+    needs: [ setup, build-install ]
     strategy:
       matrix:
-        compiler: ${{ env.COMPILER_MATRIX }}
+        compiler: ${{ needs.setup.outputs.compiler_matrix }}
     uses: ./.github/workflows/unit.yml
     with:
       cpp_compiler: ${{ matrix.compiler.cpp }}
@@ -51,10 +57,10 @@ jobs:
     # System test is compiled and ran for all compiler configurations, using
     # both the static and dynamic artifacts.
     name: "System test: ${{ matrix.compiler.cpp }}"
-    needs: [ build-install ]
+    needs: [ setup, build-install ]
     strategy:
       matrix: 
-        compiler: ${{ env.COMPILER_MATRIX }}
+        compiler: ${{ needs.setup.outputs.compiler_matrix }}
         shared_libs: [ true, false ]
     uses: ./.github/workflows/system.yml
     with:
