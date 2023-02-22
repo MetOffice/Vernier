@@ -93,7 +93,7 @@ jobs:
         # Required for updating the gh-pages documentation.
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.HTML-DIR-ARTIFACT }}
+          name: ${{ env.HTML-ARTIFACT }}
           path: ${{ github.workspace }}/build/gcovr-html.tar.gz
           retention-days: 1
           if-no-files-found: error
