@@ -19,8 +19,7 @@ env:
   # follow the same format as shown.
   COMPILER_MATRIX: >
     [ {"c": "gcc-10",   "cpp": "g++-10",     "fortran": "gfortran-10" }, 
-      {"c": "clang-12", "cpp": "clang++-12", "fortran": "gfortran-10" },
-      {"c": "gcc-11",   "cpp": "g++-11",     "fortran": "gfortran-11" } ]
+      {"c": "clang-12", "cpp": "clang++-12", "fortran": "gfortran-10" } ]
 
 jobs:
 
@@ -30,7 +29,7 @@ jobs:
       compiler_matrix: ${{ env.COMPILER_MATRIX }}
     steps:
       - name: Setup
-        run: echo "Adding matrices to this jobs output for use in subsequent jobs"
+        run: echo "Adding matrix to this jobs output for use in subsequent jobs"
 
   build-install:
     # The reusable build workflow is called for each compiler configuration

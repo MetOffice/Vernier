@@ -35,7 +35,7 @@ jobs:
         sudo apt install -y libomp-12-dev
         sudo apt install -y mpich
 
-    - name: Setup
+    - name: Prepare to download correct artifact
       run: |
         if [[ ${{ inputs.shared_libs }} ]]
         then
@@ -70,15 +70,11 @@ jobs:
            -lprofiler -fopenmp
         mpirun -n 4 ./systest
 
-    - name: Compile and run f90 test
+    - name: Compile and run Fortran test
       env:
         OMP_NUM_THREADS: 2
       run: |
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROF/lib
-        mpifort -v
-        mpifort -fc=${{ inputs.fortran_compiler }} -o test -pedantic \
-          -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
-          -lprofiler_f -lprofiler_c -lprofiler -lstdc++ -fopenmp -show
         mpifort -fc=${{ inputs.fortran_compiler }} -o test -pedantic \
           -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
           -lprofiler_f -lprofiler_c -lprofiler -lstdc++ -fopenmp
