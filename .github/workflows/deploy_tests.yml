@@ -23,10 +23,9 @@ jobs:
   setup:
     runs-on: ubuntu-20.04
     outputs:
-      compiler_matrix: ${{ steps.setup.outputs.compiler_matrix }}
+      compiler_matrix: ${{ env.COMPILER_MATRIX }}
     steps:
-      - id: setup
-        run: echo "compiler_matrix=${{ env.COMPILER_MATRIX }}" >> $GITHUB_OUTPUT
+      - run: echo "done"
 
   build-install:
     # The reusable build workflow is called for each compiler configuration
