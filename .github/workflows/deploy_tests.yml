@@ -14,9 +14,13 @@ on:
       - '.github/workflows/coverage.yml'
 
 env:
+  # Define the compiler matrix here as it is regularly reused. Additional
+  # configurations can easily be added by adding a new row of entries that
+  # follow the same format as shown.
   COMPILER_MATRIX: >
     [ {"c": "gcc-10",   "cpp": "g++-10",     "fortran": "gfortran-10" }, 
-      {"c": "clang-12", "cpp": "clang++-12", "fortran": "gfortran-10" } ]
+      {"c": "clang-12", "cpp": "clang++-12", "fortran": "gfortran-10" },
+      {"c": "gcc-11",   "cpp": "g++-11",     "fortran": "gfortran-11" } ]
 
 jobs:
 
@@ -25,7 +29,8 @@ jobs:
     outputs:
       compiler_matrix: ${{ env.COMPILER_MATRIX }}
     steps:
-      - run: echo "done"
+      - name: Setup
+        run: echo "Adding matrices to this jobs output for use in subsequent jobs"
 
   build-install:
     # The reusable build workflow is called for each compiler configuration
