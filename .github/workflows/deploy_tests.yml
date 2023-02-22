@@ -13,6 +13,11 @@ on:
       - '.github/workflows/documentation.yml'
       - '.github/workflows/coverage.yml'
 
+env:
+  COMPILER_MATRIX: >
+    [ {c: gcc-10,   cpp: g++-10,     fortran: gfortran-10 }, 
+      {c: clang-12, cpp: clang++-12, fortran: gfortran-10 } ]
+
 jobs:
 
   build-install:
@@ -21,10 +26,7 @@ jobs:
     name: "Build/install: ${{ matrix.compiler.cpp }}"
     strategy:
       matrix: 
-        compiler: [
-          {c: gcc-10,   cpp: g++-10,     fortran: gfortran-10},
-          {c: clang-12, cpp: clang++-12, fortran: gfortran-10}
-        ]
+        compiler: ${{ env.COMPILER_MATRIX }}
         shared_libs: [ true, false ]
     uses: ./.github/workflows/build.yml
     with:
@@ -40,10 +42,7 @@ jobs:
     needs: [ build-install ]
     strategy:
       matrix:
-        compiler: [
-          {c: gcc-10,   cpp: g++-10,     fortran: gfortran-10},
-          {c: clang-12, cpp: clang++-12, fortran: gfortran-10}
-        ]
+        compiler: ${{ env.COMPILER_MATRIX }}
     uses: ./.github/workflows/unit.yml
     with:
       cpp_compiler: ${{ matrix.compiler.cpp }}
@@ -55,10 +54,7 @@ jobs:
     needs: [ build-install ]
     strategy:
       matrix: 
-        compiler: [
-          {c: gcc-10,   cpp: g++-10,     fortran: gfortran-10},
-          {c: clang-12, cpp: clang++-12, fortran: gfortran-10}
-        ]
+        compiler: ${{ env.COMPILER_MATRIX }}
         shared_libs: [ true, false ]
     uses: ./.github/workflows/system.yml
     with:
