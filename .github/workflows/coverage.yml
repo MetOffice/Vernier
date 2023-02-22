@@ -16,6 +16,10 @@ env:
   HTML-ARTIFACT:  html-artifact
   BADGE-ARTIFACT: badge-artifact
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -127,16 +131,16 @@ jobs:
           cp -rf ${{ github.workspace }}/build/gcovr/* ${{ github.workspace }}/docs/coverage/.
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]'
+          git remote update
           git add --force docs/coverage
           git stash
-          git remote update
           git checkout gh-pages
           git rm -r --ignore-unmatch docs/coverage/
           rm -rf docs/coverage/
           git stash pop
           git reset
           git add --force docs/coverage
-          git commit --allow-empty -am "Update unit test coverage"
+          git commit --allow-empty -m "Update unit test coverage"
           git push
 
   README:
