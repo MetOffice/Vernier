@@ -26,7 +26,7 @@ jobs:
       compiler_matrix: ${{ env.COMPILER_MATRIX }}
     steps:
       - name: Print matrix
-        run: echo ${{ env.COMPILER_MATRIX }}
+        run: echo "${{ env.COMPILER_MATRIX }}"
 
   build-install:
     # The reusable build workflow is called for each compiler configuration
