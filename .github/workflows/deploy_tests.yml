@@ -15,18 +15,18 @@ on:
 
 env:
   COMPILER_MATRIX: >
-    [ {c: gcc-10,   cpp: g++-10,     fortran: gfortran-10 }, 
-      {c: clang-12, cpp: clang++-12, fortran: gfortran-10 } ]
+    [ {"c": "gcc-10",   "cpp": "g++-10",     "fortran": "gfortran-10" }, 
+      {"c": "clang-12", "cpp": "clang++-12", "fortran": "gfortran-10" } ]
 
 jobs:
 
   setup:
     runs-on: ubuntu-20.04
     outputs:
-      compiler_matrix: ${{ env.COMPILER_MATRIX }}
+      compiler_matrix: ${{ steps.setup.outputs.compiler_matrix }}
     steps:
-      - name: Print matrix
-        run: echo "${{ env.COMPILER_MATRIX }}"
+      - id: setup
+        run: echo "compiler_matrix=${{ env.COMPILER_MATRIX }}" >> $GITHUB_OUTPUT
 
   build-install:
     # The reusable build workflow is called for each compiler configuration
@@ -35,7 +35,7 @@ jobs:
     needs: [ setup ]
     strategy:
       matrix: 
-        compiler: ${{ needs.setup.outputs.compiler_matrix }}
+        compiler: ${{ fromJSON(needs.setup.outputs.compiler_matrix) }}
         shared_libs: [ true, false ]
     uses: ./.github/workflows/build.yml
     with:
@@ -51,7 +51,7 @@ jobs:
     needs: [ setup, build-install ]
     strategy:
       matrix:
-        compiler: ${{ needs.setup.outputs.compiler_matrix }}
+        compiler: ${{ fromJSON(needs.setup.outputs.compiler_matrix) }}
     uses: ./.github/workflows/unit.yml
     with:
       cpp_compiler: ${{ matrix.compiler.cpp }}
@@ -63,7 +63,7 @@ jobs:
     needs: [ setup, build-install ]
     strategy:
       matrix: 
-        compiler: ${{ needs.setup.outputs.compiler_matrix }}
+        compiler: ${{ fromJSON(needs.setup.outputs.compiler_matrix) }}
         shared_libs: [ true, false ]
     uses: ./.github/workflows/system.yml
     with:
