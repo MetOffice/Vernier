@@ -59,7 +59,6 @@ jobs:
           -DBUILD_SHARED_LIBS=ON
 
       - name: Build
-        # Build with the given configuration
         run: cmake --build ${{ github.workspace }}/build 
 
       - name: Run unit tests
@@ -67,6 +66,9 @@ jobs:
         run: ctest
 
       - name: Install and run gcovr
+        # A conda virtual environment is activated in order to install and run
+        # gcovr. Gcovr calls gcov and will generate a handful of .html files in
+        # the "gcovr" directory that eventually get uploaded to GitHub pages.
         working-directory: ${{ github.workspace }}/build/
         env:
           ROOT_DIR: ${{ github.workspace }}
@@ -84,8 +86,6 @@ jobs:
           conda deactivate
 
       - name: Tar the html directory
-        # Only the directory containing the gcovr-generated html's is archived
-        # since the other two artifact uploads are only uploading a single file.
         working-directory: ${{ github.workspace }}/build/
         run: tar czvf gcovr-html.tar.gz ./gcovr/*
 
