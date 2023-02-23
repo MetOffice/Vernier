@@ -34,7 +34,7 @@ program main
         ! Profile a simple print statement
         call profiler_start(prof_print, "print statement")
         !$OMP CRITICAL
-            print *, 'MPI rank ', crank, ', OMP thread ', cthread
+            write(*,'(A,I2,A,I2)') 'MPI rank ', crank, ', OMP thread ', cthread
         !$OMP END CRITICAL
         call profiler_stop(prof_print)
         

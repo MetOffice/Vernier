@@ -77,5 +77,5 @@ jobs:
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROF/lib
         mpifort -fc=${{ inputs.fortran_compiler }} -o test -pedantic \
           -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
-          -lprofiler_f -lprofiler_c -lprofiler -lstdc++ -fopenmp
+          -lprofiler_f -lprofiler_c -lprofiler -fopenmp -lstdc++
         mpirun -n 4 ./test
