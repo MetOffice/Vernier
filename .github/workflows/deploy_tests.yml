@@ -1,0 +1,75 @@
+name: Deploy all tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '.github/workflows/documentation.yml'
+      - '.github/workflows/coverage.yml'
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '.github/workflows/documentation.yml'
+      - '.github/workflows/coverage.yml'
+
+env:
+  # Define the compiler matrix here as it is regularly reused. Additional
+  # configurations can easily be added by adding a new row of entries that
+  # follow the same format as shown.
+  COMPILER_MATRIX: >
+    [ {"c": "gcc-10",   "cpp": "g++-10",     "fortran": "gfortran-10" }, 
+      {"c": "clang-12", "cpp": "clang++-12", "fortran": "gfortran-10" } ]
+
+jobs:
+
+  setup:
+    runs-on: ubuntu-20.04
+    outputs:
+      compiler_matrix: ${{ env.COMPILER_MATRIX }}
+    steps:
+      - name: Setup
+        run: echo "Adding matrix to this jobs output for use in subsequent jobs"
+
+  build-install:
+    # The reusable build workflow is called for each compiler configuration
+    # and for both static and dynamic linking.
+    name: "Build/install: ${{ matrix.compiler.cpp }}"
+    needs: [ setup ]
+    strategy:
+      matrix: 
+        compiler: ${{ fromJSON(needs.setup.outputs.compiler_matrix) }}
+        shared_libs: [ true, false ]
+    uses: ./.github/workflows/build.yml
+    with:
+      c_compiler:       ${{ matrix.compiler.c }}
+      cpp_compiler:     ${{ matrix.compiler.cpp }}
+      fortran_compiler: ${{ matrix.compiler.fortran }}
+      shared_libs:      ${{ matrix.shared_libs }}
+
+  unit_test:
+    # Unit tests ran for the same compiler configurations as before, but only
+    # the dynamic build is tested.
+    name: "Unit test: ${{ matrix.compiler.cpp }}"
+    needs: [ setup, build-install ]
+    strategy:
+      matrix:
+        compiler: ${{ fromJSON(needs.setup.outputs.compiler_matrix) }}
+    uses: ./.github/workflows/unit.yml
+    with:
+      cpp_compiler: ${{ matrix.compiler.cpp }}
+
+  system_test:
+    # System test is compiled and ran for all compiler configurations, using
+    # both the static and dynamic artifacts.
+    name: "System test: ${{ matrix.compiler.cpp }}"
+    needs: [ setup, build-install ]
+    strategy:
+      matrix: 
+        compiler: ${{ fromJSON(needs.setup.outputs.compiler_matrix) }}
+        shared_libs: [ true, false ]
+    uses: ./.github/workflows/system.yml
+    with:
+      cpp_compiler: ${{ matrix.compiler.cpp }}
+      fortran_compiler: ${{ matrix.compiler.fortran }}
+      shared_libs: ${{ matrix.shared_libs}}

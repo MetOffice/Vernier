@@ -7,7 +7,7 @@ on:
     paths:
       - 'src/**.h'
       - 'src/**.cpp'
-      - 'tests/**'
+      - 'tests/unit_tests/**'
       - '.github/workflows/coverage.yml'
 
 env:

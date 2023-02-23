@@ -1,0 +1,47 @@
+name: Run unit tests
+
+on:
+  workflow_call:
+    inputs:
+      cpp_compiler:
+        description:
+          'Name of the C++ compiler used to build beforehand.'
+        required: true
+        type: string
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  run:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup
+      # This time only the compiler matters, unit tests are only ran for the
+      # dynamic build directories.
+      run: |
+        COMPILER=${{ inputs.cpp_compiler }}
+        echo "BUILD_NAME=${COMPILER:0:-3}_dynamic_build" >> $GITHUB_ENV
+
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.BUILD_NAME }}
+
+    - name: Unzip
+      run: tar xzvf ${{ env.BUILD_NAME }}.tar.gz -C /
+
+    - name: Run Unit Tests (1 thread)
+      # Do single and multi threaded unit test runs
+      env:
+        OMP_NUM_THREADS: 1
+      working-directory: ${{ github.workspace }}/${{ env.BUILD_NAME}}
+      run: ctest -VV -C ${{ env.BUILD_TYPE }}
+
+    - name: Run Unit Tests (4 threads)
+      env:
+        OMP_NUM_THREADS: 4
+      working-directory: ${{ github.workspace}}/${{ env.BUILD_NAME}}
+      run: ctest -VV -C ${{ env.BUILD_TYPE }}

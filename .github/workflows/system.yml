@@ -1,0 +1,81 @@
+name: Run system tests
+
+on:
+  workflow_call:
+    inputs:
+      cpp_compiler:
+        description:
+          'Name of the C++ compiler used to build and install beforehand.'
+        required: true
+        type: string
+      fortran_compiler:
+        description:
+          'Name of the fortran compiler used to build and install.'
+        required: true
+        type: string
+      shared_libs:
+        description:
+          'Determines whether the static or dynamic binaries are downloaded.'
+        required: true
+        type: boolean
+
+jobs:
+  run:
+    name: "${{ inputs.shared_libs && 'dynamic' || 'static' }}"
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install libomp and mpich
+      run: |
+        sudo apt update
+        sudo apt install -y libomp-12-dev
+        sudo apt install -y mpich
+
+    - name: Prepare to download correct artifact
+      run: |
+        if [[ ${{ inputs.shared_libs }} ]]
+        then
+          LINKING=dynamic
+        else
+          LINKING=static
+        fi
+        COMPILER=${{ inputs.cpp_compiler }}
+        echo "INSTALL_NAME=${COMPILER:0:-3}_${LINKING}_install" >> $GITHUB_ENV
+
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ env.INSTALL_NAME }}
+
+    - name: Unzip and setup PROF variable
+      run: |
+        tar xzvf ${{ env.INSTALL_NAME }}.tar.gz -C /
+        PROF="/home/runner/work/${{ env.INSTALL_NAME }}"
+        ls -al $PROF
+        echo "PROF=$PROF" >> $GITHUB_ENV
+       
+    - name: Compile and run C++ test
+      # Test installed libraries using a C++ and fortran system test. Both use
+      # 2 OpenMP threads on 4 MPI ranks.
+      env:
+        OMP_NUM_THREADS: 2
+      run: |
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROF/lib
+        mpicxx -o systest -cxx=${{ inputs.cpp_compiler }} -std=c++17 \
+           -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.cpp \
+           -lprofiler -fopenmp
+        mpirun -n 4 ./systest
+
+    - name: Compile and run Fortran test
+      env:
+        OMP_NUM_THREADS: 2
+      run: |
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROF/lib
+        mpifort -fc=${{ inputs.fortran_compiler }} -o test -pedantic \
+          -L${PROF}/lib -I${PROF}/include ./tests/system_tests/system_test.f90 \
+          -lprofiler_f -lprofiler_c -lprofiler -fopenmp -lstdc++
+        mpirun -n 4 ./test
