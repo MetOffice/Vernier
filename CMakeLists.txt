@@ -18,14 +18,12 @@ project(profiler LANGUAGES CXX C Fortran
 # Include general project setting files.
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/CompilerWarnings.cmake)
-include(cmake/Doxygen.cmake)
-enable_doxygen()
-
-# OpenMP required
-find_package(OpenMP 2.5 REQUIRED) 
 
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)
+
+# OpenMP required
+find_package(OpenMP 2.5 REQUIRED)
 
 # Add src directory to build.
 add_subdirectory(src)
@@ -35,3 +33,8 @@ include(cmake/TestingSetup.cmake)
 
 # Include the installation options.
 include(cmake/Installation.cmake)
+
+# Include documentation related files.
+include(cmake/Doxygen.cmake)
+include(cmake/Sphinx.cmake)
+add_dependencies(sphinx doxygen)
