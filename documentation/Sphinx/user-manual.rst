@@ -1,13 +1,13 @@
-Usage Guide
+User Manual
 ===========
 
-Adding profiler to your program
--------------------------------
+Setting up
+----------
 
 Manually linking to installed libraries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Instructions on how to install profiler's libraries and public header
+Instructions on how to install [name]'s libraries and public header
 files can be found :ref:`here <installation>`. The ``lib`` directory contains
 libraries to be linked against, whereas the ``include`` directory contains any
 public header files (C++) or modules (Fortran) that need to be included to gain
@@ -33,7 +33,8 @@ profiler calls in your code:
    # when compiling Fortran code
    -I/path/to/include -L/path/to/lib -lprofiler_f -lprofiler_c -lprofiler
 
-*A full example of how to compile and run:*
+For example, the full process of compiling and running a fortran program called
+``example.f90`` may look something like this:
 
 .. code-block:: shell
 
@@ -45,26 +46,35 @@ Including profiler in a CMake project
 
 TBD
 
-API calls
----------
+API
+---
 
-The profiler's API consists of three primary functions; start, stop, and write.
-A new timed region is declared by a start-stop pair. Internally, these regions
-are defined by hashing the region name it is given at start time. 
+The profiler's API consists of three primary functions; **start**, **stop**,
+and **write**. A timed region is defined by a start-stop pair.
+
+How calls to these functions are made differs slightly between C++ and Fortran,
+but the core functionality is the same. 
+
+In both cases, a region name must be provided that will appear in the final 
+output table. Also, a variable must be declared that [name] can use to store
+the associated region's hash.
+
+This hash variable is of type ``size_t`` in C++. In Fortran, the ``profiler_mod``
+module introduces a new integer kind for these: ``pik`` (*profiler* *integer*
+*kind*).
 
 C++
 ^^^
 
 .. code-block:: cpp
-
-   // Prerequisites 
+ 
    #include "profiler.h"
 
    // Start
-   size_t profiler_hash = prof.start("Main region");
+   auto prof_handle = prof.start("Main region");
 
    // Stop
-   prof.stop(profiler_hash);
+   prof.stop(prof_handle);
 
    // Write
    prof.write();
@@ -74,15 +84,14 @@ Fortran
 
 .. code-block:: f90
 
-   ! Prerequisites
    use profiler_mod
-   integer (kind=pik) :: profiler_hash
+   integer (kind=pik) :: prof_handle
 
    ! Start
-   call profiler_start(profiler_hash, "Main region")
+   call profiler_start(prof_handle, "Main region")
 
    ! Stop
-   call profiler_stop(profiler_hash)
+   call profiler_stop(prof_handle)
 
    ! Write
    call profiler_write()
@@ -90,24 +99,24 @@ Fortran
 Dos and don'ts
 ^^^^^^^^^^^^^^
 
-Do:
+**Do**:
 
 * Initialise MPI before profiling
 * Nest timed regions nicely (no overlap)
 
-Don't:
+**Don't**:
 
 * Add milk to your bowl before cereal
 
-Examples
-^^^^^^^^
+Example API Usage
+^^^^^^^^^^^^^^^^^
 
-More fleshed out examples can be found in the ``profiler/tests/system_tests`` directory.
+More fleshed out examples can be seen in the ``profiler/tests/system_tests`` directory.
 
-Interpreting output
+Interpreting Output
 -------------------
 
-By default profiler will write information out into one file per MPI rank.
+By default [name] will write information out into one file per MPI rank.
 Single file output is not currently supported but is achievable via
 post-processing techniques.
 
@@ -124,12 +133,21 @@ Environment Variables
      This environment variable determines the format of the outputted tables of
      data. There are currently two options:
 
-     * drhook  - Mimics the output format of the DrHook profiling tool so that
-                 the same post-processing techniques can be used.
-     * threads - Threads have their own seperate table of walltimes.
+     * **drhook**: Mimics the output format of the DrHook profiling tool so 
+       that the same post-processing techniques can be used.
 
+     * **threads**: A custom, strung-together, format where threads have
+       their own seperate table of walltimes.
 
-Examples
-^^^^^^^^
+     If this environment variable remains unset, then the default output format
+     is the **drhook** option.
+
+   ``PROF_IO_MODE``
+
+     Determines the output mode to use. Currently only supports being set to 
+     **multi** but single-file-output may be added in the future.
+
+Example Outputs
+^^^^^^^^^^^^^^^
 
 TODO

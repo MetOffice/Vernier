@@ -1,13 +1,15 @@
-Profiler
-========
+Profiler Documentation
+======================
 
-Profiler for scientific code on HPC platforms, designed for use with the Unified Model and LFRic.
+[name] is a caliper-based profiling tool for scientific code on HPC platforms.
+It was designed with the Unified Model and LFRic in mind, but may be utilised
+by any distributed memory C++ or Fortran projects. 
 
 .. toctree::
    :maxdepth: 2
 
-   building
-   using
-   testing
+   build-guide
+   user-manual
    performance-metrics
-   src-doc/index
+   case-studies/index
+   dev-corner/index

@@ -1,4 +1,4 @@
-Performance metrics
+Performance Metrics
 ===================
 
 The metrics to be included are going to be based on Performance Optimisation
