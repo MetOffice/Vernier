@@ -1,6 +1,8 @@
 Testing
 =======
 
+.. TODO: link to where tests live in the repo ?
+
 Unit Tests
 ----------
 
@@ -16,13 +18,13 @@ Running
    cd build
    cmake ..
    make 
-   # either 'make test' or 'ctest' will suffice
+   # either 'make test' or 'ctest'
    make test
 
 Writing
 ^^^^^^^
 
-TBD
+TODO
 
 Coverage
 ^^^^^^^^
@@ -32,7 +34,7 @@ which wraps the GCC tool "gcov" with additional functionality. A detailed
 coverage report can be found `here <https://metoffice.github.io/profiler/coverage>`_.
 
 
-To see the coverage of any changes you have made.... (TBD)
+To see the coverage of any changes you have made.... (TODO)
 
 System Tests
 ------------
@@ -47,8 +49,8 @@ in their respective language.
 Running
 ^^^^^^^
 
-The requirements and supported compilers can be found
-`here <https://github.com/MetOffice/profiler/blob/main/README.md>`__.
+The requirements and supported compilers can be found in the
+:ref:`build guide <requirements>`.
 
 Instructions on how to install profiler's libraries and public header
 files can be found :ref:`here <installation>`.

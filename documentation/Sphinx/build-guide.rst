@@ -1,6 +1,8 @@
 Build Guide
 ===========
 
+.. _requirements:
+
 Requirements
 ------------
 
@@ -23,7 +25,7 @@ For testing and documenation:
 * Doxygen 1.8.5
 * Sphinx 4.3.1
   
-  * docutils 0.16 (higher versions have been known to render things such as bullet point lists incorrectly)
+  * docutils 0.16 (higher versions may render things such as bullet point lists incorrectly)
   
 * Breathe 4.34.0
 
@@ -84,7 +86,7 @@ build options interactively.
         dynamically (``ON``).
 
 The table above pertains to options unique to the [name] project. An extensive
-list of CMake variables can be found 
+list of CMake internal variables can be found 
 `here <https://cmake.org/cmake/help/v3.13/manual/cmake-variables.7.html>`_.
 
 .. _installation:
@@ -96,15 +98,14 @@ The "install" target will install [name]'s public header files and libraries.
 
 .. code-block:: shell
 
-  mkdir build
-  cd build
-  cmake -DBUILD_TESTS=OFF ..
-  make
-  make install
+   mkdir build
+   cd build
+   cmake ..
+   make
+   make install
 
-By default the ``include`` and ``lib`` directories will appear in your build 
-directory but this can be changed via the ``-DCMAKE_INSTALL_PREFIX`` CMake 
-option.
+The default installation location is in ``profiler/build`` but this can be
+changed via the ``-DCMAKE_INSTALL_PREFIX`` CMake option.
 
 Additional Targets
 ------------------

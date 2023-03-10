@@ -1,7 +1,7 @@
 Profiler Documentation
 ======================
 
-[name] is a caliper-based profiling tool for scientific code on HPC platforms.
+[name] is a calliper-based profiling tool for scientific code on HPC platforms.
 It was designed with the Unified Model and LFRic in mind, but may be utilised
 by any distributed memory C++ or Fortran projects. 
 
@@ -10,6 +10,5 @@ by any distributed memory C++ or Fortran projects.
 
    build-guide
    user-manual
-   performance-metrics
-   case-studies/index
+   post-processing
    dev-corner/index

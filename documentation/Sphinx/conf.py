@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'profiler'
-copyright = 'Crown copyright 2022 Met Office'
+copyright = '2023 British Crown (Met Office)'
 author = ''
 
 # The full version, including alpha/beta/rc tags
