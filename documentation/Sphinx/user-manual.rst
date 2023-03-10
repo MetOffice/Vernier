@@ -77,11 +77,7 @@ C++
 Fortran
 ^^^^^^^
 
-.. doxygenfunction:: profiler_start
-
-.. doxygenfunction:: profiler_stop
-
-.. doxygenfunction:: profiler_write
+.. doxygenfunction:: profiler_mod
 
 Dos and don'ts
 ^^^^^^^^^^^^^^
