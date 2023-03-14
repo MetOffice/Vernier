@@ -70,6 +70,8 @@ html_permalinks = False
 
 # -- Breathe ------------------------------------------------------------------
 
+# Tell breathe about the profiler project, and where to find the associated XML
+# files (the path is relative to the location of this conf.py file).
 breathe_projects = {
     'profiler': '../../build/doxygen/xml'
 }

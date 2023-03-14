@@ -4,92 +4,40 @@ User Manual
 Setting Up
 ----------
 
+Manually linking to installed libraries
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Instructions on how to install [name]'s libraries and public header
 files can be found :ref:`here <installation>`. The ``lib`` directory contains
 libraries to be linked against, whereas the ``include`` directory contains any
 public header files (C++) or modules (Fortran) that need to be included to gain
 access to the API.
 
-Linking via ldpath
-^^^^^^^^^^^^^^^^^^
+The ``-DBUILD_SHARED_LIBS`` CMake option is used to choose whether the libraries
+are built statically or dynamically.
 
-First, the path to the installed libraries will need to be added to
-``LD_LIBRARY_PATH``.
-
-.. code-block:: shell
-
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/lib
-
-The following flags can then be used at the compile step in order to use
-profiler calls in your code:
+**Linking via LD_LIBRARY_PATH**:
 
 .. code-block:: shell
 
-   # when compiling C++ code
-   -I/path/to/include -L/path/to/lib -lprofiler
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
+   mpicxx foo.cpp -L./lib -I./include -lprofiler
+
+**Linking via rpath**: (recommended)
 
 .. code-block:: shell
 
-   # when compiling Fortran code
-   -I/path/to/include -L/path/to/lib -lprofiler_f -lprofiler_c -lprofiler
+   mpicxx foo.cpp -Wl,rpath=./lib -L./lib -I./include -lprofiler
 
-For example, the full process of compiling and running a fortran program may
-look something like this:
+.. note:: 
 
-.. code-block:: shell
-
-   mpifort -o test example.f90 -I./include -L./lib64 -lprofiler_f -lprofiler_c -lprofiler -lstdc++ -fopenmp
-   mpirun -n 6 ./test
-
-Linking via rpath
-^^^^^^^^^^^^^^^^^
-
-TODO
-
-Static versus dynamic
-^^^^^^^^^^^^^^^^^^^^^
-
-TODO
+   The ``-lprofiler_f -lprofiler_c`` flags are also needed when compiling
+   fortran code.
 
 Including profiler in a CMake project
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 TODO
-
-API
----
-
-The profiler's API consists of three primary functions; **start**, **stop**,
-and **write**. A timed region is defined by a start-stop pair.
-
-How calls to these functions are made differs slightly between C++ and Fortran,
-but the core functionality is the same. 
-
-C++
-^^^
-
-.. doxygenfunction:: Profiler::start
-
-.. doxygenfunction:: Profiler::stop
-
-.. doxygenfunction:: Profiler::write
-
-Fortran
-^^^^^^^
-
-.. doxygenfunction:: profiler_mod
-
-Dos and don'ts
-^^^^^^^^^^^^^^
-
-**Do**:
-
-* Initialise MPI before profiling.
-* Nest timed regions nicely (no overlap).
-
-**Don't**:
-
-* Add milk to your bowl before cereal.
 
 Environment Variables
 ^^^^^^^^^^^^^^^^^^^^^
@@ -120,6 +68,51 @@ Environment Variables
      Sets the output filename, which is "profiler-output" by default. [name]
      will append the MPI rank onto the end of this name by default, resulting
      in a file called "profiler-output-0" for the first MPI rank, for example.
+
+API
+---
+
+The profiler's API consists of three primary functions; **start**, **stop**,
+and **write**. A timed region is defined by a start-stop pair.
+
+How calls to these functions are made differs slightly between C++ and Fortran,
+but the core functionality is the same. 
+
+C++
+^^^
+
+.. doxygenfunction:: Profiler::start
+   :project: profiler
+
+.. doxygenfunction:: Profiler::stop
+   :project: profiler
+
+.. doxygenfunction:: Profiler::write
+   :project: profiler
+
+Fortran
+^^^^^^^
+
+.. doxygennamespace:: profiler_mod
+   :project: profiler
+   :content-only:
+
+.. doxygeninterface:: profiler_mod::profiler_stop
+
+.. doxygeninterface:: profiler_mod::profiler_write
+
+
+Dos and don'ts
+^^^^^^^^^^^^^^
+
+**Do**:
+
+* Initialise MPI before profiling.
+* Nest timed regions nicely (no overlap).
+
+**Don't**:
+
+* Add milk to your bowl before cereal.
 
 Examples
 ^^^^^^^^
@@ -167,6 +160,3 @@ post-processing techniques.
 
 Each file contains a table of the all the declared regions and their
 associated walltimes. 
-
-.. examples here
-TODO

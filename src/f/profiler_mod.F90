@@ -44,11 +44,14 @@ module profiler_mod
       integer(kind=pik),             intent(out) :: hash_out
     end subroutine interface_profiler_start
 
+    !> @brief Stop profiling a code region.
+    !> @param [in] hash_in  The unique hash of the region being stopped.
     subroutine profiler_stop(hash_in) bind(C, name='c_profiler_stop')
       import :: pik
       integer(kind=pik), intent(in) :: hash_in
     end subroutine profiler_stop
 
+    !> @brief Write out all profiled information.
     subroutine profiler_write() bind(C, name='c_profiler_write')
         !No arguments to handle
     end subroutine profiler_write

@@ -170,8 +170,8 @@ void HashTable::write()
 /**
  * @brief  Evaluates times derived from other times measured, for a particular
  *         code region.
- * @detail Times computed are: the region self time and the total time minus
- *         directly incurred profiling overhead costs.
+ * @details Times computed are: the region self time and the total time minus
+ *          directly incurred profiling overhead costs.
  *
  * @param [in] hash   The hash of the region to compute.
  */

@@ -31,7 +31,7 @@ For testing and documenation:
 
 .. note::
    
-   Unless stated otherwise, versions are a *minimum*, newer versions
+   Unless stated otherwise versions are a *minimum*. Newer versions
    should be backwards compatible but haven't necessarily been tested.
 
 Building & Options
