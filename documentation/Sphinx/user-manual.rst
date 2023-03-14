@@ -112,7 +112,8 @@ Dos and don'ts
 
 **Don't**:
 
-* Add milk to your bowl before cereal.
+* Use a singular hash (or "handle") for all regions.
+* Have a stop calliper after any ``return`` statements.
 
 Examples
 ^^^^^^^^
