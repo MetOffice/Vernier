@@ -9,6 +9,6 @@ by any distributed memory C++ or Fortran projects.
    :maxdepth: 2
 
    build-guide
-   user-manual
+   user-manual/index
    post-processing
    dev-corner/index

@@ -18,11 +18,11 @@ if(ENABLE_DOXYGEN)
         set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/doxygen/Doxyfile.out)
         configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
         # Custom doxygen target
-        add_custom_target(doxygen ALL
-                            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
-                            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                            COMMENT "Generating Doxygen source code documentation"
-                            VERBATIM)
+        add_custom_target(doxygendocs
+                          COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
+                          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                          COMMENT "Generating Doxygen source code documentation"
+                          VERBATIM)
     endif()
 else()
     if(BUILD_DOCS)

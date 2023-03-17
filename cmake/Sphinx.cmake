@@ -15,13 +15,13 @@ if(ENABLE_SPHINX)
         set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
         set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
         # Custom sphinx target
-        add_custom_target(sphinx ALL
-                            COMMAND ${SPHINX_EXECUTABLE} -b html
-                                    -Dbreathe_projects.profler=${CMAKE_CURRENT_BINARY_DIR}/doxygen/xml
-                                    ${SPHINX_SOURCE} ${SPHINX_BUILD}
-                            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                            COMMENT "Generating docs with Sphinx"
-                            VERBATIM)
+        add_custom_target(sphinxdocs
+                          COMMAND ${SPHINX_EXECUTABLE} -b html
+                                  -Dbreathe_projects.profler=${CMAKE_CURRENT_BINARY_DIR}/doxygen/xml
+                                  ${SPHINX_SOURCE} ${SPHINX_BUILD}
+                          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                          COMMENT "Generating docs with Sphinx"
+                          VERBATIM)
     endif()
 else()
     if(BUILD_DOCS)

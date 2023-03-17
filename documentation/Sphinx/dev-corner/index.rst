@@ -7,7 +7,17 @@ Here you can find information relevant to developers who wish to contribute to
 .. toctree::
    :maxdepth: 2
 
-   dev-process
    testing
-   review-guidance
    src-doc
+
+Development Process
+-------------------
+
+Information about the development process can be found 
+`here <https://github.com/MetOffice/profiler/wiki/DevelopmentTesting>`_.
+
+Code Review Guidance
+--------------------
+
+Guidlines for requesting and performing a code review are
+`here <https://github.com/MetOffice/profiler/wiki/CodeReview>`_.

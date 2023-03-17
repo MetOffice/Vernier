@@ -15,26 +15,37 @@ project(profiler LANGUAGES CXX C Fortran
         DESCRIPTION "Met Office profiler"
         VERSION 0.1.0)
 
-# Include general project setting files.
-include(cmake/StandardProjectSettings.cmake)
-include(cmake/CompilerWarnings.cmake)
+# OpenMP required
+find_package(OpenMP 2.5 REQUIRED)
 
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)
 
-# OpenMP required
-find_package(OpenMP 2.5 REQUIRED)
+# Instructions only relevant if current project is profiler
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+
+        # Include general project setting files.
+        include(cmake/StandardProjectSettings.cmake)
+        include(cmake/CompilerWarnings.cmake)
+
+        # Include the testing setup.
+        include(cmake/TestingSetup.cmake)
+
+        # Include documentation related files.
+        include(cmake/Doxygen.cmake)
+        include(cmake/Sphinx.cmake)
+
+        # Make sphinx target depend on builing doxygen docs first
+        if(ENABLE_SPHINX)
+                add_dependencies(sphinxdocs doxygendocs)
+        endif()
+
+endif()
 
 # Add src directory to build.
 add_subdirectory(src)
 
-# Include the testing setup.
-include(cmake/TestingSetup.cmake)
-
 # Include the installation options.
 include(cmake/Installation.cmake)
 
-# Include documentation related files.
-include(cmake/Doxygen.cmake)
-include(cmake/Sphinx.cmake)
-add_dependencies(sphinx doxygen)
+

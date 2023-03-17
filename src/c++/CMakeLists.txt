@@ -22,6 +22,9 @@ add_library(${CMAKE_PROJECT_NAME}
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         OpenMP::OpenMP_CXX)
 
+# Set library C++ standard
+target_compile_features(${CMAKE_PROJECT_NAME} PUBLIC cxx_std_17)
+
 set_project_warnings(${CMAKE_PROJECT_NAME})
 
 set(PUBLIC_HEADER_FILES profiler.h hashtable.h prof_gettime.h)

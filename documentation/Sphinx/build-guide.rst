@@ -37,8 +37,15 @@ For testing and documenation:
 Building & Options
 ------------------
 
-After checking out [name]'s repository, the steps below can be done to do a full
-build.
+To get started, checkout the [name] repository:
+
+.. code-block:: shell
+
+   git clone git@github.com:MetOffice/profiler.git
+   cd profiler
+
+It's also recommended that a build directory is setup, as in-source builds are
+not supported. After this, CMake can then be used to perform a full build.
 
 .. code-block:: shell
 
@@ -48,10 +55,9 @@ build.
    make
 
 There are a number of options which can be passed to CMake on the command line
-or set using ``ccmake``. Passing options to CMake via the command line looks 
-something like this: ``cmake -DBUILD_FORTRAN_TESTS=OFF -DBUILD_SHARED_LIBS=OFF ..``. 
-Alternatively, ``ccmake ..`` will bring up a terminal wherein the user can change 
-build options interactively. 
+or set using ``ccmake``. The table below highlights some of the flags that can
+be passed to CMake on the command line. Alternatively, ``ccmake ..`` will bring
+up a terminal wherein the user can change build options interactively. 
 
 ..  list-table::
     :widths: 20 15 30
@@ -95,17 +101,18 @@ Installation
 ------------
 
 The "install" target will install [name]'s public header files and libraries.
+After navigating to your build directory:
 
 .. code-block:: shell
 
-   mkdir build
-   cd build
    cmake ..
-   make
    make install
 
-The default installation location is in ``profiler/build`` but this can be
-changed via the ``-DCMAKE_INSTALL_PREFIX`` CMake option.
+**The default installation location is in** ``profiler/build`` **but this can be
+changed via the** ``-DCMAKE_INSTALL_PREFIX`` **CMake option**.
+
+The next page (the :ref:`user manual<settingup>`) describes how to link [name]
+to your program.
 
 Additional Targets
 ------------------
@@ -120,11 +127,11 @@ Additional Targets
      Builds just the main profiler target and its associated source code, no
      tests or documentation.
 
-   doxygen
+   doxygendocs
      Uses Doxygen to generate source code documentation based on comment blocks
      in the code. The generated files are put into a ``doxygen`` subdirectory.
 
-   sphinx
+   sphinxdocs
      Uses Sphinx to build the written documentation. This target builds the 
      Doxygen documentation first. The generated files are put into a 
      ``sphinx`` subdirectory.
