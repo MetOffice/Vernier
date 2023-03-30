@@ -3,7 +3,7 @@
 Setting Up
 ----------
 
-Instructions on how to install [name]'s libraries and public header
+Instructions on how to install profler's libraries and public header
 files can be found :ref:`here <installation>`. The ``lib`` directory contains
 libraries to be linked against, whereas the ``include`` directory contains any
 public header files (C++) or modules (Fortran) that need to be included to gain
@@ -38,15 +38,12 @@ long as profiler is found *before* linking/using.
 
 .. code-block:: cmake
 
-   # Find MPI
-   find_package(MPI REQUIRED)
-
    # The find_package function needs to know where to go looking for the
    # profiler package
    set(CMAKE_PREFIX_PATH /path/to/lib)
 
    # Find profiler
-   find_package(profiler REQUIRED CONFIG)
+   find_package(profiler CONFIG)
 
 .. note::
 
@@ -65,14 +62,15 @@ dependencies may look something like:
 
 .. code-block:: cmake
 
-   # Link profiler libraries to MyProgram
-   target_link_libraries(MyProgram PUBLIC 
-           MPI::MPI_CXX
+   # Link profiler libraries 
+   target_link_libraries(foo PUBLIC
+           profiler::profiler_f  # Only required for Fortran
+           profiler::profiler_c  # Only required for Fortran
            profiler::profiler
            )
 
-   # Include profiler headers in MyProgram
-   target_include_directories(MyProgram PUBLIC
+   # Include profiler headers 
+   target_include_directories(foo PUBLIC
            /path/to/include
            )
 
@@ -102,6 +100,6 @@ Environment Variables
 
    ``PROF_OUTPUT_FILENAME``
 
-     Sets the output filename, which is "profiler-output" by default. [name]
+     Sets the output filename, which is "profiler-output" by default. profler
      will append the MPI rank onto the end of this name by default, resulting
      in a file called "profiler-output-0" for the first MPI rank, for example.

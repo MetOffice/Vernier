@@ -37,7 +37,7 @@ For testing and documenation:
 Building & Options
 ------------------
 
-To get started, checkout the [name] repository:
+To get started, checkout the profiler repository:
 
 .. code-block:: shell
 
@@ -91,7 +91,7 @@ up a terminal wherein the user can change build options interactively.
       - Determines whether the libraries are linked statically (``OFF``) or 
         dynamically (``ON``).
 
-The table above pertains to options unique to the [name] project. An extensive
+The table above pertains to options specific to the profiler project. An extensive
 list of CMake internal variables can be found 
 `here <https://cmake.org/cmake/help/v3.13/manual/cmake-variables.7.html>`_.
 
@@ -100,7 +100,7 @@ list of CMake internal variables can be found
 Installation
 ------------
 
-The "install" target will install [name]'s public header files and libraries.
+The "install" target will install profiler's public header files and libraries.
 After navigating to your build directory:
 
 .. code-block:: shell
@@ -111,8 +111,8 @@ After navigating to your build directory:
 **The default installation location is in** ``profiler/build`` **but this can be
 changed via the** ``-DCMAKE_INSTALL_PREFIX`` **CMake option**.
 
-The next page (the :ref:`user manual<settingup>`) describes how to link [name]
-to your program.
+The next page (the :ref:`user manual<settingup>`) describes how to link the
+installed libraries to your program.
 
 Additional Targets
 ------------------

@@ -26,10 +26,9 @@ Fortran
    :project: profiler
    :content-only:
 
-.. doxygeninterface:: profiler_mod::profiler_stop
+.. doxygenfunction:: profiler_write
 
-.. doxygeninterface:: profiler_mod::profiler_write
-
+.. doxygenfunction:: profiler_stop
 
 Dos and don'ts
 ^^^^^^^^^^^^^^
@@ -78,5 +77,6 @@ Examples
    ! Write
    call profiler_write()
 
-More fleshed out examples can be seen in the ``profiler/tests/system_tests``
-directory.
+Although their primary purpose is for system testing, the tests in
+``profiler/tests/system_tests`` also serve as more fleshed-out examples on how
+calls to profiler are made. 
