@@ -15,6 +15,8 @@ are built statically or dynamically.
 Manually linking to installed libraries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Flags of interest when compiling manually:
+
 .. code-block:: shell
 
    # C++
@@ -23,7 +25,7 @@ Manually linking to installed libraries
    # Fortran
    mpifort bar.f90 -I/path/to/include -Wl,-rpath=/path/to/lib -L/path/to/lib -lprofiler_f -lprofiler_c -lprofiler
 
-It's also possible to use ``LD_LIBRARY_PATH`` instead of ``rpath``:
+It's also possible to use ``LD_LIBRARY_PATH`` instead of ``-Wl,-rpath=``:
 
 .. code-block:: shell
 
@@ -73,6 +75,8 @@ dependencies may look something like:
    target_include_directories(foo PUBLIC
            /path/to/include
            )
+
+.. _env-variables:
 
 Environment Variables
 ^^^^^^^^^^^^^^^^^^^^^
