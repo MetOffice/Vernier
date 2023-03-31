@@ -26,9 +26,9 @@ Fortran
    :project: profiler
    :content-only:
 
-.. doxygenfunction:: profiler_write
-
 .. doxygenfunction:: profiler_stop
+
+.. doxygenfunction:: profiler_write
 
 Dos and don'ts
 ^^^^^^^^^^^^^^

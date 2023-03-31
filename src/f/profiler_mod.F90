@@ -44,13 +44,14 @@ module profiler_mod
       integer(kind=pik),             intent(out) :: hash_out
     end subroutine interface_profiler_start
 
-    subroutine profiler_stop(hash_in) bind(C, name='c_profiler_stop')
+    subroutine profiler_stop(hash_in) bind(C, name='c_profiler_stop') 
       import :: pik
+      !> The hash of the region being stopped.
       integer(kind=pik), intent(in) :: hash_in
     end subroutine profiler_stop
 
     subroutine profiler_write() bind(C, name='c_profiler_write')
-        !No arguments to handle
+      ! No arguments to handle.
     end subroutine profiler_write
 
     function profiler_get_total_walltime(hash_in, thread_id) result(walltime) &
