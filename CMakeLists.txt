@@ -47,5 +47,3 @@ add_subdirectory(src)
 
 # Include the installation options.
 include(cmake/Installation.cmake)
-
-
