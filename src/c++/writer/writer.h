@@ -7,8 +7,8 @@
 
 /**
  * @file   writer.h
- * @brief  Writer strategy classes.
- *
+ * @brief  Writer base strategy class.
+ * 
  */
 
 #ifndef WRITER_H
@@ -16,14 +16,13 @@
 
 #include <mpi.h>
 
-#include "hashvec.h"
-#include "formatter.h"
+#include "../formatter.h"
 
 /**
  * @brief   Abstract Writer strategy class.
- * @details Specific implementations of this class override the `write` function
+ * @details Specific implementations of this class override the 'write' function
  *          to produce different behaviour.
- *
+ * 
  */
 
 class Writer {
@@ -50,24 +49,6 @@ class Writer {
 
 };
 
-/**
- * @brief   Multiple-file output strategy
- * @details Creates one file per MPI rank.
- *
- */
-
-class Multi : public Writer {
-
-  private:
-
-    // Method 
-    void open_files(std::ofstream& os);
-
-  public:
-
-    // Implementation of pure virtual function.
-    void write(std::ofstream& os, hashvec_t) override;
-
-};
-
 #endif
+
+ 

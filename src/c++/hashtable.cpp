@@ -5,6 +5,7 @@
 \*----------------------------------------------------------------------------*/
 
 #include "hashtable.h"
+#include "hashvec_handler.h"
 #include <cassert>
 
 /**

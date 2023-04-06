@@ -60,6 +60,10 @@ class Profiler
     typedef std::vector<HashTable>::size_type                                     hashtable_iterator_t_;
     typedef std::vector<std::vector<std::pair<size_t,StartCalliperValues>>>::size_type pair_iterator_t_;
 
+    // Time points for estimating overall program runtime
+    time_point_t construct_time;
+    time_point_t last_call_time;
+
   public:
 
     // Constructors

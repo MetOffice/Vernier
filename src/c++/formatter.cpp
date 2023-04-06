@@ -6,6 +6,8 @@
 */
 
 #include "formatter.h"
+#include "clock.h"
+
 #include <iomanip>
 #include <algorithm>
 
@@ -31,7 +33,13 @@ Formatter::Formatter()
   {
       format_ = &Formatter::drhook;
   }
-  else throw std::runtime_error("Invalid format choice");
+  else
+  {
+    std::string error_msg = "Invalid profiler output format choice. Expected 'threads' or 'drhook'. Currently set to '"
+                            + format
+                            + "'.";
+    throw std::runtime_error( error_msg );
+  }
 }
 
 /**
@@ -109,44 +117,37 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
   
   // Table Headers
   os << "\n";
-  os 
+  os
     << "    "
-    << std::setw(3) << std::left   << "#"     
-    << std::setw(7) << std::left   << "% Time"     
-    << std::setw(13) << std::right << "Cumul"      
-    << std::setw(13) << std::right << "Self"       
-    << std::setw(13) << std::right << "Total"      
+    << std::setw(3) << std::left   << "#"
+    << std::setw(7) << std::left   << "% Time"
+    << std::setw(13) << std::right << "Cumul"
+    << std::setw(13) << std::right << "Self"
+    << std::setw(13) << std::right << "Total"
     << std::setw(15) << std::right << "# of calls"
-    << std::setw(12) << std::right << "Self"      
+    << std::setw(12) << std::right << "Self"
     << std::setw(12) << std::right << "Total"      << "    "
                                    << "Routine@"   << "\n";
   os
     << "    "
-    << std::setw(73) << "" 
+    << std::setw(73) << ""
     << "(Size; Size/sec; Size/call; MinSize; MaxSize)" << "\n";
   
   // Subheaders
-  os 
+  os
     << "    "
-    << std::setw(3)  << std::left  << ""     
-    << std::setw(7)  << std::right << "(self)"    
-    << std::setw(13) << std::right << "(sec)"     
-    << std::setw(13) << std::right << "(sec)"     
-    << std::setw(13) << std::right << "(sec)"     
-    << std::setw(15) << std::right << ""          
-    << std::setw(12) << std::right << "ms/call"   
-    << std::setw(12) << std::right << "ms/call"   
+    << std::setw(3)  << std::left  << ""
+    << std::setw(7)  << std::right << "(self)"
+    << std::setw(13) << std::right << "(sec)"
+    << std::setw(13) << std::right << "(sec)"
+    << std::setw(13) << std::right << "(sec)"
+    << std::setw(15) << std::right << ""
+    << std::setw(12) << std::right << "ms/call"
+    << std::setw(12) << std::right << "ms/call"
                                    << "\n\n";
 
-  // Find the highest walltime in table_, which should be the total runtime of
-  // the program. This is used later when calculating '% Time'.
-  double top_walltime = std::max_element
-  ( 
-      std::begin(hashvec), std::end(hashvec),
-      [] (auto a, auto b) {
-      return a.second.total_walltime_ < b.second.total_walltime_; 
-      } 
-  )->second.total_walltime_.count(); 
+  // Find the total runtime, this is used later when calculating '% Time'.
+  double total_walltime = prof_clock.program_duration.count();
 
   // Declare any variables external to HashEntry
   int             region_number = 0;
@@ -161,29 +162,28 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
 
   os << std::fixed << std::showpoint << std::setprecision(3);
 
-  for (auto& [hash, entry] : hashvec) {
+  for (auto const& [hash, entry] : hashvec) {
 
     // Calculate non-HashEntry data
     region_number++;
-    percent_time    = 100.0 * ( entry.self_walltime_.count() / top_walltime );
+    percent_time    = 100.0 * ( entry.self_walltime_.count() / total_walltime );
     cumul_walltime += entry.self_walltime_;
     self_per_call   = 1000.0 * ( entry.self_walltime_.count()  / static_cast<double>(entry.call_count_) );
     total_per_call  = 1000.0 * ( entry.total_walltime_.count() / static_cast<double>(entry.call_count_) );
 
     // Write everything out 
-    os 
+    os
       << "    "
-      << std::setw(3)  << std::left  << region_number    
-      << std::setw(7)  << std::right << percent_time                 
-      << std::setw(13) << std::right << cumul_walltime.count()       
-      << std::setw(13) << std::right << entry.self_walltime_.count() 
+      << std::setw(3)  << std::left  << region_number
+      << std::setw(7)  << std::right << percent_time
+      << std::setw(13) << std::right << cumul_walltime.count()
+      << std::setw(13) << std::right << entry.self_walltime_.count()
       << std::setw(13) << std::right << entry.total_walltime_.count()
-      << std::setw(15) << std::right << entry.call_count_            
-      << std::setw(12) << std::right << self_per_call                
-      << std::setw(12) << std::right << total_per_call        << "    "        
-                                       << entry.region_name_  << "\n";
+      << std::setw(15) << std::right << entry.call_count_
+      << std::setw(12) << std::right << self_per_call
+      << std::setw(12) << std::right << total_per_call      << "    "   
+                                     << entry.region_name_  << "\n";
 
   }
 
 }
-
