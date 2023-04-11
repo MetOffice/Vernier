@@ -47,7 +47,8 @@ jobs:
         -DINCLUDE_GTEST=ON
         -DWARNINGS_AS_ERRORS=ON 
         -DUSE_SANITIZERS=ON
-        -DENABLE_DOXYGEN=OFF 
+        -DENABLE_DOXYGEN=OFF
+        -DBUILD_DOCS=OFF
 
     - name: Build
       # Build your program with the given configuration
