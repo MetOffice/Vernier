@@ -5,7 +5,7 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "clock.h"
+#include "prof_gettime.h"
 
 /**
  * @brief Returns the current time.
@@ -13,7 +13,7 @@
  * @returns The present time point.
  */
 
-time_point_t Clock::get_time()
+time_point_t prof_gettime()
 {
   return std::chrono::steady_clock::now();
 }

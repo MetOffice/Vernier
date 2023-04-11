@@ -6,20 +6,22 @@
  */
 
 /**
- * @file   time_types.h
- * @brief  Contains custom type definitions for chrono durations and time 
- *         points.
- * 
+ * @file   prof_gettime.h
+ * @brief  Declares time-measurement functionality.
+ *
+ * Contains abstractions for time points, time durations and the clock itself.
  */
 
-#include <chrono>
+#ifndef PROF_GETTIME_H
+#define PROF_GETTIME_H
 
-#ifndef TIME_TYPES_H
-#define TIME_TYPES_H
+#include <chrono>
 
 // Type definitions for chrono steady clock time points and durations
 using time_duration_t = std::chrono::duration<double>;
 using time_point_t    = std::chrono::time_point<std::chrono::steady_clock, time_duration_t>;
 
-#endif
+// Function prototypes
+time_point_t prof_gettime();
 
+#endif

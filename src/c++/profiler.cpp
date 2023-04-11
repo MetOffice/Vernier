@@ -6,7 +6,6 @@
 
 #include "profiler.h"
 #include "hashvec_handler.h"
-#include "clock.h"
 
 #include <cassert>
 #include <chrono>
@@ -56,9 +55,6 @@ Profiler::Profiler()
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
   assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
 
-  // Make a note of the time at the end of Profiler construction
-  construct_time = prof_clock.get_time();
-
 }
 
 /**
@@ -72,7 +68,7 @@ size_t Profiler::start(std::string_view region_name)
 {
 
   // Note the time on entry to the profiler call.
-  time_point_t calliper_start_time = prof_clock.get_time();
+  time_point_t calliper_start_time = prof_gettime();
   
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -92,7 +88,7 @@ size_t Profiler::start(std::string_view region_name)
   size_t const hash = thread_hashtables_[tid].query_insert(new_region_name);
 
   // Store the calliper and region start times.
-  auto region_start_time = prof_clock.get_time();
+  auto region_start_time = prof_gettime();
   StartCalliperValues new_times = StartCalliperValues(region_start_time, calliper_start_time);
   thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
 
@@ -114,10 +110,7 @@ void Profiler::stop(size_t const hash)
 {
 
   // Log the region stop time.
-  auto region_stop_time = prof_clock.get_time();
-
-  // Update the last known call time.
-  last_call_time = region_stop_time;
+  auto region_stop_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -161,7 +154,7 @@ void Profiler::stop(size_t const hash)
    thread_hashtables_[tid].add_child_time(parent_hash, region_duration);
 
    // Account for time spent in the profiler itself. 
-   auto calliper_stop_time = prof_clock.get_time();
+   auto calliper_stop_time = prof_gettime();
    auto calliper_time = calliper_stop_time - temp_sum;
    thread_hashtables_[tid].add_overhead_time(parent_hash, calliper_time);
   }
@@ -177,9 +170,6 @@ void Profiler::stop(size_t const hash)
 
 void Profiler::write()
 {
-  // Assign program duration 
-  prof_clock.program_duration = last_call_time - construct_time;
-
   // Create hashvec handler object and feed in data from thread_hashtables_
   HashVecHandler output_data;
   for (auto& table : thread_hashtables_)

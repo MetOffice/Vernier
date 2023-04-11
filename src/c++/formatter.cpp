@@ -6,7 +6,6 @@
 */
 
 #include "formatter.h"
-#include "clock.h"
 
 #include <iomanip>
 #include <algorithm>
@@ -146,8 +145,15 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
     << std::setw(12) << std::right << "ms/call"
                                    << "\n\n";
 
-  // Find the total runtime, this is used later when calculating '% Time'.
-  double total_walltime = prof_clock.program_duration.count();
+  // Find the highest walltime in table_, which should be the total runtime of
+  // the program. This is used later when calculating '% Time'.
+  double top_walltime = std::max_element
+  ( 
+      std::begin(hashvec), std::end(hashvec),
+      [] (auto a, auto b) {
+      return a.second.total_walltime_ < b.second.total_walltime_; 
+      } 
+  )->second.total_walltime_.count(); 
 
   // Declare any variables external to HashEntry
   int             region_number = 0;
@@ -166,7 +172,7 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
 
     // Calculate non-HashEntry data
     region_number++;
-    percent_time    = 100.0 * ( entry.self_walltime_.count() / total_walltime );
+    percent_time    = 100.0 * ( entry.self_walltime_.count() / top_walltime );
     cumul_walltime += entry.self_walltime_;
     self_per_call   = 1000.0 * ( entry.self_walltime_.count()  / static_cast<double>(entry.call_count_) );
     total_per_call  = 1000.0 * ( entry.total_walltime_.count() / static_cast<double>(entry.call_count_) );

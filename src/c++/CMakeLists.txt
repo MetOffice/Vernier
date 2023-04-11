@@ -21,11 +21,10 @@ add_library(${CMAKE_PROJECT_NAME}
         writer/multi.h     writer/multi.cpp
         formatter.h        formatter.cpp
         hashvec.h
-        clock.h            clock.cpp 
-        time_types.h
+        prof_gettime.h     prof_gettime.cpp
         )
 
-set(PUBLIC_HEADER_FILES profiler.h hashtable.h hashvec.h time_types.h)
+set(PUBLIC_HEADER_FILES profiler.h hashtable.h hashvec.h prof_gettime.h)
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

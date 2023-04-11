@@ -17,7 +17,7 @@
 #include <string_view>
 #include <vector>
 
-#include "time_types.h"
+#include "prof_gettime.h"
 
 /**
  * @brief  Structure to hold information for a particular region.
