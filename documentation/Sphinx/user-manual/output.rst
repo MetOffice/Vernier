@@ -54,6 +54,13 @@ To reiterate, the two output format options are **threads** and **drhook**.
 
 * % Time: The percentage of the overall time this region took up (calculated
   from self time).
+
+  .. warning::
+
+    The percentage is calculated from the highest total walltime of all profiled
+    regions, so it is therefore assumed that a top-level pair of callipers
+    encompassing the entire program is in place.
+
 * Cumul: The cumulative self time so far (the self times are ordered from high
   to low, this column sums the self times as it descends down the list).
 * Self: Total time spent inside the corresponding region only (excluding calls
