@@ -17,7 +17,6 @@
 #define PROFILER_H
 
 #include <iterator>
-#include <vector>
 
 #include "hashtable.h"
 
