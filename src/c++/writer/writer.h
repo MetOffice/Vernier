@@ -50,5 +50,3 @@ class Writer {
 };
 
 #endif
-
- 

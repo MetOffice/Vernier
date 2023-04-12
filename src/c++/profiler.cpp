@@ -10,6 +10,7 @@
 #include <cassert>
 #include <chrono>
 #include <iostream>
+#include <omp.h>
 
 /**
  * @brief Constructor for StartCalliperValues struct.

@@ -17,10 +17,9 @@
 #define PROFILER_H
 
 #include <iterator>
-#include <omp.h>
+#include <vector>
 
 #include "hashtable.h"
-
 
 /**
  * @brief  Top-level profiler class.
