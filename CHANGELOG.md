@@ -31,3 +31,4 @@
 27/10/2022 PR #67 for #50: Account separately for time spent inside the profiler. \
 13/12/2022 PR #75 for #73: Enable CMake option for static and dynamic linking (dynamic by default). \
 16/12/2022 PR #69 for #45: Add unit test coverage.
+18/04/2023 PR #74 for #72: Add multiple output format options
