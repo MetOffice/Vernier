@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <omp.h>
+#include <vector>
 
 #include "profiler.h"
 
@@ -17,7 +18,7 @@ TEST(HashEntryTest,CallCountTest)
   // Declare a shared sub-region hash. Initialise num_threads so that the
   // compiler knows the 'for' loop inside the parallel region will definitely
   // happen, and therefore doesn't think prof_sub_private remains unitialised.
-  size_t prof_sub_shared;
+  std::vector<size_t> prof_sub_shared;
   int num_threads = 1;
 
   // Start parallel region
@@ -28,10 +29,11 @@ TEST(HashEntryTest,CallCountTest)
 #pragma omp single
     {
       num_threads = omp_get_num_threads();
+      prof_sub_shared.resize(static_cast<size_t>(num_threads));
     }
 
     // Current thread ID
-    int thread_id  = omp_get_thread_num();
+    int thread_id = omp_get_thread_num();
 
     // Also initialise prof_sub_private. The compiler doesn't know how many
     // iterations of the subsequent 'for' loop there will be, and may flag
@@ -48,10 +50,10 @@ TEST(HashEntryTest,CallCountTest)
     }
 
     // Give prof_sub_shared a value for later use in EXPECT's
-#pragma omp single
-    {
-      prof_sub_shared = prof_sub_private;
-    }
+#pragma omp critical
+    { 
+      prof_sub_shared[static_cast<size_t>(thread_id)] = prof_sub_private;
+    } 
   }
 
   // Stop main region
@@ -60,12 +62,13 @@ TEST(HashEntryTest,CallCountTest)
   // Check call_count_ is the number expected on all threads. On most threads,
   // the profiler calliper call count should match this number, except on thread
   // zero which includes the main region callipers.
-  for (int j = 0; j < num_threads; ++j)
+  for (int thread = 0; thread < num_threads; ++thread)
   {
-    EXPECT_EQ(prof.get_call_count(prof_sub_shared,j),num_threads-j);
+    size_t hash = prof_sub_shared[static_cast<size_t>(thread)];
+    EXPECT_EQ(prof.get_call_count(hash,thread), num_threads-thread);
 
-    int incr = (j==0) ? 1 : 0;
-    EXPECT_EQ(prof.get_prof_call_count(j),num_threads-j+incr);
+    int incr = (thread==0) ? 1 : 0;
+    EXPECT_EQ(prof.get_prof_call_count(thread), num_threads-thread+incr);
   }
 
 }

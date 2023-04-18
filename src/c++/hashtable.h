@@ -24,38 +24,10 @@
 #define PROFILER_HASHTABLE_H
 
 #include <unordered_map>
-#include <vector>
-#include <string>
-#include <string_view>
-#include <chrono>
 
-#include "prof_gettime.h"
+#include "hashvec.h"
 
-
-/**
- * @brief  Structure to hold information for a particular routine.
- *
- * Bundles together any information pertinent to a specific profiled region.
- *
- */
-
-struct HashEntry{
-  public:
-
-    // Constructor
-    HashEntry() = delete;
-    explicit HashEntry(std::string_view);
-
-    // Data members
-    std::string      region_name_;
-    time_duration_t  total_walltime_;
-    time_duration_t  total_raw_walltime_;
-    time_duration_t  self_walltime_;
-    time_duration_t  child_walltime_;
-    time_duration_t  overhead_walltime_;
-    unsigned long long int call_count_;
-
-};
+class HashVecHandler;
 
 /**
  * @brief  Wraps STL hashtables with additional functionality.
@@ -74,7 +46,6 @@ class HashTable{
     size_t profiler_hash_;
     std::unordered_map<size_t,HashEntry> table_;
     std::hash<std::string_view> hash_function_;
-    std::vector<std::pair<size_t, HashEntry>> hashvec;
 
     // Private member functions
     void prepare_computed_times(size_t const);
@@ -89,12 +60,13 @@ class HashTable{
     // Prototypes
     size_t query_insert(std::string_view) noexcept;
     void update(size_t, time_duration_t);
-    void write();
 
     // Member functions
     std::vector<size_t> list_keys();
-    void add_child_time   (size_t const, time_duration_t);
+    void add_child_time(size_t const, time_duration_t);
     void add_overhead_time(size_t const, time_duration_t);
+    void compute_self_times();
+    void append_to(HashVecHandler&);
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;
@@ -106,5 +78,6 @@ class HashTable{
     unsigned long long int get_call_count(size_t const hash) const;
     unsigned long long int get_prof_call_count() const;
 };
+
 #endif
 

@@ -12,7 +12,6 @@
 
 TEST(SystemTests, TimingTest)
 {
-
   // Start timing: noddy way, and using Profiler.
   auto prof_main = prof.start("MAIN");
   double t1 = omp_get_wtime();
@@ -45,9 +44,6 @@ TEST(SystemTests, TimingTest)
   // End of profiling; record t2 immediately before.
   double t2 = omp_get_wtime();
   prof.stop(prof_main);
-
-  // Write the profile
-  prof.write();
 
   // Check that the total time measured by the profiler is within some tolerance
   // of the actual time measured by simple t2-t1.  This only tests the top-level
