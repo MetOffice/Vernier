@@ -5,11 +5,8 @@
 \*----------------------------------------------------------------------------*/
 
 #include "hashtable.h"
-#include <iomanip>
+#include "hashvec_handler.h"
 #include <cassert>
-#include <iostream>
-#include <string>
-#include <algorithm>
 
 /**
  * @brief  Constructs a new entry in the hash table.
@@ -35,9 +32,8 @@ HashEntry::HashEntry(std::string_view region_name)
 HashTable::HashTable(int const tid)
   : tid_(tid)
 {
-
   // Set the name and hash of the profiler entry.
-  std::string const profiler_name = "__profiler__";
+  std::string const profiler_name = "__profiler__@" + std::to_string(tid);
   profiler_hash_ = hash_function_(profiler_name);
 
   // Insert special entry for the profiler overhead time.
@@ -118,60 +114,10 @@ void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_ti
 }
 
 /**
- * @brief  Writes all entries in the hashtable, sorted according to self times.
- *
- */
-
-void HashTable::write()
-{
-
-  // Ensure all computed times are up-to-date.
-  prepare_computed_times_all();
-
-  std::string routine_at_thread = "Thread: " + std::to_string(tid_);
-
-  // Write headings
-  std::cout << "\n";
-  std::cout
-    << std::setw(40) << std::left  << routine_at_thread  << " "
-    << std::setw(15) << std::right << "Self (s)"         << " "
-    << std::setw(15) << std::right << "Total (raw) (s)"  << " "
-    << std::setw(15) << std::right << "Total (s)"        << " "
-    << std::setw(10) << std::right << "Calls"            << "\n";
-
-  std::cout << std::setfill('-');
-  std::cout
-    << std::setw(40) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(15) << "-" << " "
-    << std::setw(10) << "-" << "\n";
-  std::cout << std::setfill(' ');
-
-  // Create a vector from the hashtable and sort the entries according to self
-  // walltime.  If optimisation of this is needed, it ought to be possible to
-  // acquire a vector of hash-selftime pairs in the correct order, then use the
-  // hashes to look up other information directly from the hashtable.
-  hashvec = std::vector<std::pair<size_t, HashEntry>>(table_.cbegin(), table_.cend());
-  std::sort(begin(hashvec), end(hashvec),
-      [](auto a, auto b) { return a.second.self_walltime_ > b.second.self_walltime_;});
-
-  // Data entries
-  for (auto& [hash, entry] : hashvec) {
-    std::cout
-      << std::setw(40) << std::left  << entry.region_name_                << " "
-      << std::setw(15) << std::right << entry.self_walltime_.count()      << " "
-      << std::setw(15) << std::right << entry.total_raw_walltime_.count() << " "
-      << std::setw(15) << std::right << entry.total_walltime_.count()     << " "
-      << std::setw(10) << std::right << entry.call_count_                 << "\n";
-  }
-}
-
-/**
- * @brief  Evaluates times derived from other times measured, for a particular
- *         code region.
- * @detail Times computed are: the region self time and the total time minus
- *         directly incurred profiling overhead costs.
+ * @brief   Evaluates times derived from other times measured, for a particular
+ *          code region.
+ * @details Times computed are: the region self time and the total time minus
+ *          directly incurred profiling overhead costs.
  *
  * @param [in] hash   The hash of the region to compute.
  */
@@ -239,8 +185,29 @@ std::vector<size_t> HashTable::list_keys()
 }
 
 /**
- * @brief  Get the total (inclusive) time of the specified region.
- * @param [in]  The hash corresponding to the region.
+ * @brief  Appends table_ onto the end of an input hashvec. 
+ * 
+ */
+
+void HashTable::append_to(HashVecHandler& hashvec_handler)
+{
+  // Compute overhead and self times before appending
+  prepare_computed_times_all();
+
+  // Remove __profiler__ entries with 0 calls
+  auto it = table_.find(profiler_hash_);
+  if (it != table_.end() && it->second.call_count_ == 0) { table_.erase(it); }
+  
+  // Create hashvec from the table data.
+  hashvec_t new_hashvec(table_.cbegin(), table_.cend());
+
+  // Append hashvec to argument. 
+  hashvec_handler.append(new_hashvec);
+}
+
+/**
+ * @brief  Get the total (inclusive) time corresponding to the input hash.
+ *
  */
 
 double HashTable::get_total_walltime(size_t const hash) const
@@ -251,7 +218,7 @@ double HashTable::get_total_walltime(size_t const hash) const
 /**
  * @brief  Get the total time of the specified region, minus profiling overheads
  *         incurred by calling direct children.
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  * @note   This time is derived from other measured times, therefore a to
  *         `prepare_computed_times` is need to update its value. 
  */
@@ -265,7 +232,7 @@ double HashTable::get_total_raw_walltime(size_t const hash)
 /**
  * @brief  Get the profiling overhead time for a specified region, as incurred
  *         by calling direct children. 
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  */
 
 double HashTable::get_overhead_walltime(size_t const hash) const
@@ -275,7 +242,7 @@ double HashTable::get_overhead_walltime(size_t const hash) const
 
 /**
  * @brief  Get the profiler self (exclusive) time corresponding to the input hash.
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  * @note   This time is derived from other measured times, therefore a to
  *         `prepare_computed_times` is need to update its value. 
  */
@@ -288,7 +255,7 @@ double HashTable::get_self_walltime(size_t const hash)
 
 /**
  * @brief  Get the child time corresponding to the input hash.
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  * @note   This time is derived from other measured times, therefore a to
  *         `prepare_computed_times` is need to update its value. 
  */
@@ -300,7 +267,7 @@ double HashTable::get_child_walltime(size_t const hash) const
 
 /**
  * @brief  Get the region name corresponding to the input hash.
- * @param [in]  The hash corresponding to the region.
+ * @param [in] hash  The hash corresponding to the region.
  */
 
 std::string HashTable::get_region_name(size_t const hash) const
