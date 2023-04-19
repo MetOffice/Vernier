@@ -47,7 +47,7 @@ class Formatter {
     explicit Formatter();
 
     // Execute the format method
-    void execute_format(std::ofstream& os, hashvec_t); 
+    void execute_format(std::ofstream& os, hashvec_t);
    
 };
 

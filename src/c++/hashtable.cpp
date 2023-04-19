@@ -56,7 +56,7 @@ HashTable::HashTable(int const tid)
  *
  */
 
-void HashTable::query_insert(std::string_view const region_name, 
+void HashTable::query_insert(std::string_view const region_name,
                              size_t& hash,
                              record_index_t& record_index) noexcept
 {

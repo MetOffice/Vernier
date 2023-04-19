@@ -10,6 +10,7 @@
 #include <cassert>
 #include <chrono>
 #include <iostream>
+#include <omp.h>
 
 // Define threadprivate variables.
 // `extern` keywords in the code below represent a workaround for a GNU compiler
@@ -131,7 +132,6 @@ void Profiler::start_part1()
 
 size_t Profiler::start_part2(std::string_view const region_name)
 {
-
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
 #ifdef _OPENMP
@@ -143,7 +143,7 @@ size_t Profiler::start_part2(std::string_view const region_name)
 
   // Insert this region into the thread's hash table.
   std::string new_region_name;
-  new_region_name.reserve(region_name.size()+10);
+  new_region_name.reserve(region_name.size()+5);
   new_region_name += region_name;
   new_region_name += '@';
   new_region_name += std::to_string(tid);
@@ -180,8 +180,8 @@ size_t Profiler::start_part2(std::string_view const region_name)
 void Profiler::stop(size_t const hash)
 {
 
-   // Log the region stop time.
-   auto region_stop_time = prof_gettime();
+  // Log the region stop time.
+  auto region_stop_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -251,20 +251,21 @@ void Profiler::stop(size_t const hash)
 /**
  * @brief  Write profile information to file.
  *
- * @note   The default output file seedname is  "profiler-output". There also
- *         exists the option to set a custom name via an environment variable.
+ * @note  The default output file seedname is  "profiler-output". There also
+ *        exists the option to set a custom name via an environment variable.
  *
  */
 
 void Profiler::write()
 {
+  // Create hashvec handler object and feed in data from thread_hashtables_
   HashVecHandler output_data;
-
   for (auto& table : thread_hashtables_)
   {
     table.append_to(output_data);
   }
 
+  // Sort hashvec from high to low self walltimes then write
   output_data.sort();
   output_data.write();
 }

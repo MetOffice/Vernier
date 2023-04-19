@@ -17,8 +17,9 @@
 #include <algorithm>
 #include <memory>
 
-#include "writer.h"
 #include "hashvec.h"
+#include "writer/writer.h"
+#include "writer/multi.h"
 
 /**
  * @brief  HashVecHandler class

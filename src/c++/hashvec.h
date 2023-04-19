@@ -20,7 +20,7 @@
 #include "prof_gettime.h"
 
 /**
- * @brief  Structure to hold information for a particular routine.
+ * @brief  Structure to hold information for a particular region.
  *
  * Bundles together any information pertinent to a specific profiled region.
  *

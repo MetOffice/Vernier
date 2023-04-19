@@ -31,7 +31,13 @@ Formatter::Formatter()
   {
       format_ = &Formatter::drhook;
   }
-  else throw std::runtime_error("Invalid format choice");
+  else
+  {
+    std::string error_msg = "Invalid profiler output format choice. Expected 'threads' or 'drhook'. Currently set to '"
+                            + format
+                            + "'.";
+    throw std::runtime_error( error_msg );
+  }
 }
 
 /**
@@ -109,33 +115,33 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
   
   // Table Headers
   os << "\n";
-  os 
+  os
     << "    "
-    << std::setw(3) << std::left   << "#"     
-    << std::setw(7) << std::left   << "% Time"     
-    << std::setw(13) << std::right << "Cumul"      
-    << std::setw(13) << std::right << "Self"       
-    << std::setw(13) << std::right << "Total"      
+    << std::setw(3) << std::left   << "#"
+    << std::setw(7) << std::left   << "% Time"
+    << std::setw(13) << std::right << "Cumul"
+    << std::setw(13) << std::right << "Self"
+    << std::setw(13) << std::right << "Total"
     << std::setw(15) << std::right << "# of calls"
-    << std::setw(12) << std::right << "Self"      
+    << std::setw(12) << std::right << "Self"
     << std::setw(12) << std::right << "Total"      << "    "
                                    << "Routine@"   << "\n";
   os
     << "    "
-    << std::setw(73) << "" 
+    << std::setw(73) << ""
     << "(Size; Size/sec; Size/call; MinSize; MaxSize)" << "\n";
   
   // Subheaders
-  os 
+  os
     << "    "
-    << std::setw(3)  << std::left  << ""     
-    << std::setw(7)  << std::right << "(self)"    
-    << std::setw(13) << std::right << "(sec)"     
-    << std::setw(13) << std::right << "(sec)"     
-    << std::setw(13) << std::right << "(sec)"     
-    << std::setw(15) << std::right << ""          
-    << std::setw(12) << std::right << "ms/call"   
-    << std::setw(12) << std::right << "ms/call"   
+    << std::setw(3)  << std::left  << ""
+    << std::setw(7)  << std::right << "(self)"
+    << std::setw(13) << std::right << "(sec)"
+    << std::setw(13) << std::right << "(sec)"
+    << std::setw(13) << std::right << "(sec)"
+    << std::setw(15) << std::right << ""
+    << std::setw(12) << std::right << "ms/call"
+    << std::setw(12) << std::right << "ms/call"
                                    << "\n\n";
 
   // Find the highest walltime in table_, which should be the total runtime of
@@ -148,7 +154,7 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
       } 
   )->total_walltime_.count(); 
 
-  // Declare any variables external to RecordRecord
+  // Declare any variables external to RegionRecord
   int             region_number = 0;
   double          percent_time;
   time_duration_t cumul_walltime = time_duration_t::zero();
@@ -163,7 +169,7 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
 
   for (auto& record : hashvec) {
 
-    // Calculate non-RecordRecord data
+    // Calculate non-RegionRecord data
     region_number++;
     percent_time    = 100.0 * ( record.self_walltime_.count() / top_walltime );
     cumul_walltime += record.self_walltime_;
@@ -182,8 +188,8 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
       << std::setw(12) << std::right << self_per_call                
       << std::setw(12) << std::right << total_per_call        << "    "        
                                        << record.region_name_  << "\n";
-
   }
 
 }
+
 
