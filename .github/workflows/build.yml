@@ -22,7 +22,7 @@ jobs:
       matrix:
         compiler: [
           {c: gcc-10, cpp: g++-10, fortran: gfortran-10},
-          {c: clang-14, cpp: clang++-14, fortran: gfortran-10}
+          {c: clang-13, cpp: clang++-13, fortran: gfortran-10}
         ]
  
     steps:
@@ -32,7 +32,7 @@ jobs:
       # Ensure that the OpenMP development libraries are installed.
       run: |
         sudo apt update
-        sudo apt install -y libomp-12-dev
+        sudo apt install -y libomp-13-dev
         sudo apt install -y mpich
 
     - name: Check versions
@@ -75,4 +75,3 @@ jobs:
         OMP_NUM_THREADS: 4
       working-directory: ${{github.workspace}}/build
       run: ctest -VV -C ${{env.BUILD_TYPE}}
-
