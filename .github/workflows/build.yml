@@ -37,8 +37,9 @@ jobs:
 
     - name: Check versions
       # Print the version number of installed libraries 
-      run: | 
+      run: |
         gcc --version
+        clang --version
         $ echo |cpp -fopenmp -dM |grep -i open
         mpichversion
        
