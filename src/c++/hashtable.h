@@ -105,5 +105,6 @@ class HashTable{
     unsigned long long int get_call_count(size_t const hash) const;
     unsigned long long int get_prof_call_count() const;
 };
+
 #endif
 

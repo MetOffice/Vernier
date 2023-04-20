@@ -91,6 +91,7 @@ Profiler::Profiler()
     // Create a new list
     std::array<TracebackEntry, PROF_MAX_TRACEBACK_SIZE> new_list;
     thread_traceback_.push_back(new_list);
+
   }
 
   // Assertions

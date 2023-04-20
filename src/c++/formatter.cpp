@@ -6,6 +6,7 @@
 */
 
 #include "formatter.h"
+
 #include <iomanip>
 #include <algorithm>
 
@@ -83,7 +84,7 @@ void Formatter::threads(std::ofstream& os, hashvec_t hashvec)
   os << std::setfill(' ');
 
   // Data entries
-  for (auto& record : hashvec) {
+  for (auto const& record : hashvec) {
       os
         << std::setw(40) << std::left  << record.region_name_                << " "
         << std::setw(15) << std::right << record.self_walltime_.count()      << " "
@@ -167,7 +168,7 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
 
   os << std::fixed << std::showpoint << std::setprecision(3);
 
-  for (auto& record : hashvec) {
+  for (auto const& record : hashvec) {
 
     // Calculate non-RegionRecord data
     region_number++;
@@ -177,17 +178,17 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
     total_per_call  = 1000.0 * ( record.total_walltime_.count() / static_cast<double>(record.call_count_) );
 
     // Write everything out 
-    os 
+    os
       << "    "
-      << std::setw(3)  << std::left  << region_number    
-      << std::setw(7)  << std::right << percent_time                 
-      << std::setw(13) << std::right << cumul_walltime.count()       
-      << std::setw(13) << std::right << record.self_walltime_.count() 
+      << std::setw(3)  << std::left  << region_number
+      << std::setw(7)  << std::right << percent_time
+      << std::setw(13) << std::right << cumul_walltime.count()
+      << std::setw(13) << std::right << record.self_walltime_.count()
       << std::setw(13) << std::right << record.total_walltime_.count()
-      << std::setw(15) << std::right << record.call_count_            
-      << std::setw(12) << std::right << self_per_call                
-      << std::setw(12) << std::right << total_per_call        << "    "        
-                                       << record.region_name_  << "\n";
+      << std::setw(15) << std::right << record.call_count_
+      << std::setw(12) << std::right << self_per_call
+      << std::setw(12) << std::right << total_per_call       << "    "
+                                     << record.region_name_  << "\n";
   }
 
 }

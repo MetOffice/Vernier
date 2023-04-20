@@ -5,6 +5,8 @@
 \*----------------------------------------------------------------------------*/
 
 #include "hashtable.h"
+#include "hashvec_handler.h"
+
 #include <cassert>
 #include <iterator>
 
@@ -45,7 +47,7 @@ HashTable::HashTable(int const tid)
   profiler_hash_ = hash_function_(profiler_name);
 
   // Insert special entry for the profiler overhead time.
-  query_insert("__profiler__", profiler_hash_, profiler_index_);
+  query_insert(profiler_name, profiler_hash_, profiler_index_);
 }
 
 /**

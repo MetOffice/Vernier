@@ -17,4 +17,3 @@ time_point_t prof_gettime()
 {
   return std::chrono::steady_clock::now();
 }
-
