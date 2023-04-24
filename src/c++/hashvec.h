@@ -22,6 +22,9 @@
 namespace meto
 {
 
+namespace meto
+{
+
 /**
  * @brief  Structure to hold information for a particular region.
  *
@@ -55,6 +58,8 @@ using hashvec_t = std::vector<RegionRecord>;
 using record_index_t = std::vector<RegionRecord>::size_type;
 
 } // End meto namespace
+
+} // End namespace meto
 
 #endif
 
