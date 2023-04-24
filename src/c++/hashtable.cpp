@@ -13,24 +13,6 @@
 #define PROF_HASHVEC_RESERVE_SIZE 1000
 
 /**
- * @brief  Constructs a new region record.
- * @param [in]  region_hash_  Hash of the region name.
- * @param [in]  region_name_  The region name.
- *
- */
-
-RegionRecord::RegionRecord(size_t const region_hash, std::string_view const region_name)
-      : region_hash_(region_hash)
-      , region_name_(region_name)
-      , total_walltime_      (time_duration_t::zero())
-      , total_raw_walltime_  (time_duration_t::zero())
-      , self_walltime_       (time_duration_t::zero())
-      , child_walltime_      (time_duration_t::zero())
-      , overhead_walltime_   (time_duration_t::zero())
-      , call_count_(0)
-      {}
-
-/**
  * @brief Hashtable constructor
  * @param [in] tid  The thread ID.
  *
