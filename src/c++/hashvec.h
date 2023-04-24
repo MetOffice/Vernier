@@ -19,6 +19,9 @@
 
 #include "prof_gettime.h"
 
+namespace meto
+{
+
 /**
  * @brief  Structure to hold information for a particular region.
  *
@@ -45,6 +48,8 @@ struct HashEntry{
 
 // Define the hashvec type.
 using hashvec_t = std::vector<std::pair<size_t, HashEntry>>;
+
+} // End namespace meto
 
 #endif
 

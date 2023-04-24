@@ -20,6 +20,9 @@
 
 #include "hashtable.h"
 
+namespace meto
+{
+
 /**
  * @brief  Top-level profiler class.
  *
@@ -80,7 +83,9 @@ class Profiler
 
 };
 
+} // End namespace meto
+
 // Declare global profiler
-inline Profiler prof;
+inline meto::Profiler prof; // TODO: Should this be inside & Does inline meaning change when in namespace?
 
 #endif

@@ -20,6 +20,9 @@
 #include "writer/writer.h"
 #include "writer/multi.h"
 
+namespace meto
+{
+
 /**
  * @brief  HashVecHandler class
  * 
@@ -35,7 +38,7 @@ class HashVecHandler {
   private:
 
     // Vector of hash entries.
-    hashvec_t hashvec_;
+    meto::hashvec_t hashvec_;
 
     // Writer strategy
     std::unique_ptr<Writer> writer_strategy_;
@@ -48,9 +51,11 @@ class HashVecHandler {
     // Member functions
     void sort();
     void write();
-    void append(hashvec_t const&);
+    void append(meto::hashvec_t const&);
     
 };
+
+} // End namespace meto
 
 #endif
 

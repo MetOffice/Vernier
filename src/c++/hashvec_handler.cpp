@@ -15,7 +15,7 @@
  *
  */
 
-HashVecHandler::HashVecHandler() 
+meto::HashVecHandler::HashVecHandler() 
 {
 
     // Default the IO mode to one file per MPI rank.
@@ -39,7 +39,7 @@ HashVecHandler::HashVecHandler()
  *
  */
 
-void HashVecHandler::append(hashvec_t const& append_hashvec)
+void meto::HashVecHandler::append(meto::hashvec_t const& append_hashvec)
 {
   hashvec_.insert(hashvec_.end(), append_hashvec.begin(), append_hashvec.end());
 }
@@ -49,7 +49,7 @@ void HashVecHandler::append(hashvec_t const& append_hashvec)
  *
  */
 
-void HashVecHandler::sort()
+void meto::HashVecHandler::sort()
 {
     std::sort
     (
@@ -65,7 +65,7 @@ void HashVecHandler::sort()
  *
  */
 
-void HashVecHandler::write()
+void meto::HashVecHandler::write()
 {
     std::ofstream os;
     writer_strategy_->write(os, hashvec_);

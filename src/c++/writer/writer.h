@@ -18,6 +18,9 @@
 
 #include "../formatter.h"
 
+namespace meto
+{
+
 /**
  * @brief   Abstract Writer strategy class.
  * @details Specific implementations of this class override the 'write' function
@@ -48,5 +51,7 @@ class Writer {
     virtual void write(std::ofstream& os, hashvec_t) = 0;
 
 };
+
+} // End namespace meto
 
 #endif

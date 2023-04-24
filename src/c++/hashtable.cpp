@@ -13,13 +13,13 @@
  *
  */
 
-HashEntry::HashEntry(std::string_view region_name)
+meto::HashEntry::HashEntry(std::string_view region_name)
       : region_name_(region_name)
-      , total_walltime_      (time_duration_t::zero())
-      , total_raw_walltime_  (time_duration_t::zero())
-      , self_walltime_       (time_duration_t::zero())
-      , child_walltime_      (time_duration_t::zero())
-      , overhead_walltime_   (time_duration_t::zero())
+      , total_walltime_      (meto::time_duration_t::zero())
+      , total_raw_walltime_  (meto::time_duration_t::zero())
+      , self_walltime_       (meto::time_duration_t::zero())
+      , child_walltime_      (meto::time_duration_t::zero())
+      , overhead_walltime_   (meto::time_duration_t::zero())
       , call_count_(0)
       {}
 
@@ -29,7 +29,7 @@ HashEntry::HashEntry(std::string_view region_name)
  *
  */
 
-HashTable::HashTable(int const tid)
+meto::HashTable::HashTable(int const tid)
   : tid_(tid)
 {
   // Set the name and hash of the profiler entry.
@@ -47,7 +47,7 @@ HashTable::HashTable(int const tid)
  *
  */
 
-size_t HashTable::query_insert(std::string_view region_name) noexcept
+size_t meto::HashTable::query_insert(std::string_view region_name) noexcept
 {
   size_t hash = hash_function_(region_name);
 
@@ -65,7 +65,7 @@ size_t HashTable::query_insert(std::string_view region_name) noexcept
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(size_t hash, time_duration_t time_delta)
+void meto::HashTable::update(size_t hash, meto::time_duration_t time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
@@ -89,7 +89,7 @@ void HashTable::update(size_t hash, time_duration_t time_delta)
  * @param [in] time_delta  The time spent in the child region.
  */
 
-void HashTable::add_child_time(size_t const hash, time_duration_t time_delta)
+void meto::HashTable::add_child_time(size_t const hash, meto::time_duration_t time_delta)
 {
   // Assertions
   assert (table_.size() > 0);
@@ -107,7 +107,7 @@ void HashTable::add_child_time(size_t const hash, time_duration_t time_delta)
  * @param [in] calliper_time  The profiling overhead time.
  */
 
-void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_time) 
+void meto::HashTable::add_overhead_time(size_t const hash, meto::time_duration_t calliper_time) 
 {
   auto& entry = table_.at(hash);
   entry.overhead_walltime_ += calliper_time;
@@ -122,7 +122,7 @@ void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_ti
  * @param [in] hash   The hash of the region to compute.
  */
 
-void HashTable::prepare_computed_times(size_t const hash)
+void meto::HashTable::prepare_computed_times(size_t const hash)
 {
   auto& entry = table_.at(hash);
 
@@ -141,10 +141,10 @@ void HashTable::prepare_computed_times(size_t const hash)
  *         code regions; includes updating the special profiling overhead entry.
  */
 
- void HashTable::prepare_computed_times_all()
+ void meto::HashTable::prepare_computed_times_all()
  {
 
-   auto total_overhead_time = time_duration_t::zero();
+   auto total_overhead_time = meto::time_duration_t::zero();
 
    // Loop over entries in the hashtable. This would include the special
    // profiler entry, but the HashEntry constructor will have ensured that all
@@ -156,14 +156,14 @@ void HashTable::prepare_computed_times(size_t const hash)
 
    // Check that the special profiler hash entries are all zero, even after the
    // above loop.
-   assert(table_.at(profiler_hash_).self_walltime_      == time_duration_t::zero());
-   assert(table_.at(profiler_hash_).child_walltime_     == time_duration_t::zero());
-   assert(table_.at(profiler_hash_).total_walltime_     == time_duration_t::zero());
-   assert(table_.at(profiler_hash_).total_raw_walltime_ == time_duration_t::zero());
+   assert(table_.at(profiler_hash_).self_walltime_      == meto::time_duration_t::zero());
+   assert(table_.at(profiler_hash_).child_walltime_     == meto::time_duration_t::zero());
+   assert(table_.at(profiler_hash_).total_walltime_     == meto::time_duration_t::zero());
+   assert(table_.at(profiler_hash_).total_raw_walltime_ == meto::time_duration_t::zero());
 
    // Set values for the profiler entry specifically in the hashtable.
    table_.at(profiler_hash_).self_walltime_      = total_overhead_time;
-   table_.at(profiler_hash_).child_walltime_     = time_duration_t::zero();
+   table_.at(profiler_hash_).child_walltime_     = meto::time_duration_t::zero();
    table_.at(profiler_hash_).total_walltime_     = total_overhead_time;
    table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time;
 
@@ -174,7 +174,7 @@ void HashTable::prepare_computed_times(size_t const hash)
  *
  */
 
-std::vector<size_t> HashTable::list_keys()
+std::vector<size_t> meto::HashTable::list_keys()
 {
   std::vector<size_t> keys;
   for (auto const& key : table_)
@@ -189,7 +189,7 @@ std::vector<size_t> HashTable::list_keys()
  * 
  */
 
-void HashTable::append_to(HashVecHandler& hashvec_handler)
+void meto::HashTable::append_to(HashVecHandler& hashvec_handler)
 {
   // Compute overhead and self times before appending
   prepare_computed_times_all();
@@ -199,7 +199,7 @@ void HashTable::append_to(HashVecHandler& hashvec_handler)
   if (it != table_.end() && it->second.call_count_ == 0) { table_.erase(it); }
   
   // Create hashvec from the table data.
-  hashvec_t new_hashvec(table_.cbegin(), table_.cend());
+  meto::hashvec_t new_hashvec(table_.cbegin(), table_.cend());
 
   // Append hashvec to argument. 
   hashvec_handler.append(new_hashvec);
@@ -210,7 +210,7 @@ void HashTable::append_to(HashVecHandler& hashvec_handler)
  *
  */
 
-double HashTable::get_total_walltime(size_t const hash) const
+double meto::HashTable::get_total_walltime(size_t const hash) const
 {
   return table_.at(hash).total_walltime_.count();
 }
@@ -223,7 +223,7 @@ double HashTable::get_total_walltime(size_t const hash) const
  *         `prepare_computed_times` is need to update its value. 
  */
 
-double HashTable::get_total_raw_walltime(size_t const hash)
+double meto::HashTable::get_total_raw_walltime(size_t const hash)
 {
    prepare_computed_times(hash);
    return table_.at(hash).total_raw_walltime_.count();
@@ -235,7 +235,7 @@ double HashTable::get_total_raw_walltime(size_t const hash)
  * @param [in] hash  The hash corresponding to the region.
  */
 
-double HashTable::get_overhead_walltime(size_t const hash) const
+double meto::HashTable::get_overhead_walltime(size_t const hash) const
 {
   return table_.at(hash).overhead_walltime_.count();
 }
@@ -247,7 +247,7 @@ double HashTable::get_overhead_walltime(size_t const hash) const
  *         `prepare_computed_times` is need to update its value. 
  */
 
-double HashTable::get_self_walltime(size_t const hash)
+double meto::HashTable::get_self_walltime(size_t const hash)
 {
   prepare_computed_times(hash);
   return table_.at(hash).self_walltime_.count();
@@ -260,7 +260,7 @@ double HashTable::get_self_walltime(size_t const hash)
  *         `prepare_computed_times` is need to update its value. 
  */
 
-double HashTable::get_child_walltime(size_t const hash) const
+double meto::HashTable::get_child_walltime(size_t const hash) const
 {
   return table_.at(hash).child_walltime_.count();
 }
@@ -270,7 +270,7 @@ double HashTable::get_child_walltime(size_t const hash) const
  * @param [in] hash  The hash corresponding to the region.
  */
 
-std::string HashTable::get_region_name(size_t const hash) const
+std::string meto::HashTable::get_region_name(size_t const hash) const
 {
   return table_.at(hash).region_name_;
 }
@@ -285,7 +285,7 @@ std::string HashTable::get_region_name(size_t const hash) const
  *
  */
 
-unsigned long long int HashTable::get_call_count(size_t const hash) const
+unsigned long long int meto::HashTable::get_call_count(size_t const hash) const
 {
     return table_.at(hash).call_count_;
 }
@@ -298,7 +298,7 @@ unsigned long long int HashTable::get_call_count(size_t const hash) const
  *           
  */
 
-unsigned long long int HashTable::get_prof_call_count() const
+unsigned long long int meto::HashTable::get_prof_call_count() const
 {
     return table_.at(profiler_hash_).call_count_;
 }

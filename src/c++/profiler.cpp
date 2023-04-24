@@ -17,9 +17,9 @@
  *
  */
 
-Profiler::StartCalliperValues::StartCalliperValues(
-                                   time_point_t region_start_time, 
-                                   time_point_t calliper_start_time)
+meto::Profiler::StartCalliperValues::StartCalliperValues(
+                                   meto::time_point_t region_start_time, 
+                                   meto::time_point_t calliper_start_time)
   : region_start_time_(region_start_time)
   , calliper_start_time_(calliper_start_time)
   {}
@@ -29,7 +29,7 @@ Profiler::StartCalliperValues::StartCalliperValues(
  *
  */
 
-Profiler::Profiler()
+meto::Profiler::Profiler()
 {
 
   // Set the maximum number of threads.
@@ -65,11 +65,11 @@ Profiler::Profiler()
  * @todo        Revisit profiling overhead measurement.  (#64)
  */
 
-size_t Profiler::start(std::string_view region_name)
+size_t meto::Profiler::start(std::string_view region_name)
 {
 
   // Note the time on entry to the profiler call.
-  time_point_t calliper_start_time = prof_gettime();
+  meto::time_point_t calliper_start_time = meto::prof_gettime();
   
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -89,7 +89,7 @@ size_t Profiler::start(std::string_view region_name)
   size_t const hash = thread_hashtables_[tid].query_insert(new_region_name);
 
   // Store the calliper and region start times.
-  auto region_start_time = prof_gettime();
+  auto region_start_time = meto::prof_gettime();
   StartCalliperValues new_times = StartCalliperValues(region_start_time, calliper_start_time);
   thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
 
@@ -107,11 +107,11 @@ size_t Profiler::start(std::string_view region_name)
  * @todo  Revisit profiling overhead measurement. (#64)
  */
 
-void Profiler::stop(size_t const hash)
+void meto::Profiler::stop(size_t const hash)
 {
 
   // Log the region stop time.
-  auto region_stop_time = prof_gettime();
+  auto region_stop_time = meto::prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -155,7 +155,7 @@ void Profiler::stop(size_t const hash)
    thread_hashtables_[tid].add_child_time(parent_hash, region_duration);
 
    // Account for time spent in the profiler itself. 
-   auto calliper_stop_time = prof_gettime();
+   auto calliper_stop_time = meto::prof_gettime();
    auto calliper_time = calliper_stop_time - temp_sum;
    thread_hashtables_[tid].add_overhead_time(parent_hash, calliper_time);
   }
@@ -169,7 +169,7 @@ void Profiler::stop(size_t const hash)
  *
  */
 
-void Profiler::write()
+void meto::Profiler::write()
 {
   // Create hashvec handler object and feed in data from thread_hashtables_
   HashVecHandler output_data;
@@ -192,7 +192,7 @@ void Profiler::write()
  *
  */
 
-double Profiler::get_total_walltime(size_t const hash, int const thread_id)
+double meto::Profiler::get_total_walltime(size_t const hash, int const thread_id)
 {
   auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_total_walltime(hash);
@@ -207,7 +207,7 @@ double Profiler::get_total_walltime(size_t const hash, int const thread_id)
  *
  */
 
-double Profiler::get_total_raw_walltime(size_t const hash, int const thread_id)
+double meto::Profiler::get_total_raw_walltime(size_t const hash, int const thread_id)
 {
   auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_total_raw_walltime(hash);
@@ -222,7 +222,7 @@ double Profiler::get_total_raw_walltime(size_t const hash, int const thread_id)
  *
  */
 
-double Profiler::get_overhead_walltime(size_t const hash, int const thread_id)
+double meto::Profiler::get_overhead_walltime(size_t const hash, int const thread_id)
 {
   auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_overhead_walltime(hash);
@@ -237,7 +237,7 @@ double Profiler::get_overhead_walltime(size_t const hash, int const thread_id)
  *
  */
 
-double Profiler::get_self_walltime(size_t const hash, int const input_tid)
+double meto::Profiler::get_self_walltime(size_t const hash, int const input_tid)
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_self_walltime(hash);
@@ -255,7 +255,7 @@ double Profiler::get_self_walltime(size_t const hash, int const input_tid)
  *
  */
 
-double Profiler::get_child_walltime(size_t const hash, int const input_tid) const
+double meto::Profiler::get_child_walltime(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_child_walltime(hash);
@@ -273,7 +273,7 @@ double Profiler::get_child_walltime(size_t const hash, int const input_tid) cons
  *
  */
 
-std::string Profiler::get_region_name(size_t const hash, int const input_tid) const
+std::string meto::Profiler::get_region_name(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_region_name(hash);
@@ -291,7 +291,7 @@ std::string Profiler::get_region_name(size_t const hash, int const input_tid) co
  *
  */
 
-unsigned long long int Profiler::get_call_count(size_t const hash, int const input_tid) const
+unsigned long long int meto::Profiler::get_call_count(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_call_count(hash);
@@ -307,7 +307,7 @@ unsigned long long int Profiler::get_call_count(size_t const hash, int const inp
  *
  */
 
-unsigned long long int Profiler::get_prof_call_count(int const input_tid) const
+unsigned long long int meto::Profiler::get_prof_call_count(int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_prof_call_count();
