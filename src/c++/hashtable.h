@@ -84,7 +84,8 @@ class HashTable{
     HashTable(int);
 
     // Prototypes
-    void query_insert(std::string_view const, size_t&, record_index_t&) noexcept;
+    size_t compute_hash(std::string_view, int);
+    void query_insert(std::string_view const, int, size_t&, record_index_t&) noexcept;
     void update(record_index_t const, time_duration_t const);
 
     // Member functions
@@ -101,7 +102,7 @@ class HashTable{
     double                 get_overhead_walltime(size_t const hash) const;
     double                 get_self_walltime(size_t const hash);
     double                 get_child_walltime(size_t const hash) const;
-    std::string            get_region_name(size_t const hash) const;
+    std::string            get_decorated_region_name(size_t const hash) const;
     unsigned long long int get_call_count(size_t const hash) const;
     unsigned long long int get_prof_call_count() const;
 };

@@ -8,7 +8,7 @@
 #include <chrono>
 #include <profiler.h>
 #include <gtest/gtest.h>
-#include <chrono>
+#include <string_view>
 
 #include "profiler.h"
 
@@ -17,6 +17,10 @@
 //  All main and sub-regions should give the expected string. Various
 //  other funky region names will potentially be tested in the future.
 //
+
+int const tid = 0;
+std::string tid_str(std::to_string(tid));
+std::string tid_bytes(reinterpret_cast<char const*>(&tid), sizeof(tid));
 
 TEST(RegionNameTest,NamesMatchTest) {
 
@@ -31,8 +35,8 @@ TEST(RegionNameTest,NamesMatchTest) {
     const auto& prof_latte = prof.start(myString);
 
     // Get subregion name out from profiler and check it is what we expect
-    std::string subregionName = prof.get_region_name(prof_latte,0);
-    EXPECT_EQ("Latte@0", subregionName);
+    std::string subregionName = prof.get_decorated_region_name(prof_latte, tid);
+    EXPECT_EQ("Latte@" + tid_str, subregionName);
 
     prof.stop(prof_latte);
   }
@@ -41,17 +45,17 @@ TEST(RegionNameTest,NamesMatchTest) {
     SCOPED_TRACE("Problem with main region name");
 
     // Get main region name out from profiler and test
-    std::string regionName = prof.get_region_name(prof_cappucino,0);
-    EXPECT_EQ("Cappucino@0", regionName);
+    std::string regionName = prof.get_decorated_region_name(prof_cappucino, tid);
+    EXPECT_EQ("Cappucino@" + tid_str, regionName);
   }
 
   {
     SCOPED_TRACE("Problem with the profiler region name");
 
     // Get profiler region name out from the profiler and test
-    auto const prof_self_handle = std::hash<std::string_view>{}("__profiler__@0");
-    std::string profilerRegionName = prof.get_region_name(prof_self_handle,0);
-    EXPECT_EQ("__profiler__@0", profilerRegionName);
+    auto const prof_self_handle = std::hash<std::string_view>{}("__profiler__@" + tid_bytes);
+    std::string profilerRegionName = prof.get_decorated_region_name(prof_self_handle, tid);
+    EXPECT_EQ("__profiler__@" + tid_str, profilerRegionName);
   }
 
   prof.stop(prof_cappucino);

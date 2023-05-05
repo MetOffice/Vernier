@@ -85,7 +85,7 @@ class Profiler
     double                 get_overhead_walltime (size_t const, int const);
     double                 get_self_walltime(size_t const hash, int const input_tid);
     double                 get_child_walltime(size_t const hash, int const input_tid) const;
-    std::string            get_region_name(size_t const hash, int const input_tid) const;
+    std::string            get_decorated_region_name(size_t const hash, int const input_tid) const;
     unsigned long long int get_call_count(size_t const hash, int const input_tid) const;
     unsigned long long int get_prof_call_count(int const input_tid) const;
 

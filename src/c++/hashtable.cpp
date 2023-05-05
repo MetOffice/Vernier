@@ -8,9 +8,13 @@
 #include "hashvec_handler.h"
 
 #include <cassert>
+#include <cstring>
 #include <iterator>
+#include <cstddef>
 
 #define PROF_HASHVEC_RESERVE_SIZE 1000
+#define PROF_STRING_BUFFER_LENGTH 100
+
 
 /**
  * @brief Hashtable constructor
@@ -25,11 +29,77 @@ HashTable::HashTable(int const tid)
   hashvec_.reserve(PROF_HASHVEC_RESERVE_SIZE);
 
   // Set the name and hash of the profiler entry.
-  std::string const profiler_name = "__profiler__@" + std::to_string(tid);
-  profiler_hash_ = hash_function_(profiler_name);
+  std::string const profiler_name = "__profiler__";
 
   // Insert special entry for the profiler overhead time.
-  query_insert(profiler_name, profiler_hash_, profiler_index_);
+  query_insert(profiler_name, tid, profiler_hash_, profiler_index_);
+
+}
+
+/**
+ * @brief  Decorates a region name with the thread ID and computes the
+ *         corresponding hash.
+ * 
+ * @param [in] region_name  The code region name.
+ * @param [in] tid          The thread ID
+ * 
+ * @note The integer thread ID is not converted to a string before it is
+ *       appended to the hash string.  This is a performance measure.
+ *       Conversions to strings are expensive and not strictly necessary.
+ *       Since the physical bit pattern is unique for each integer, that
+ *       will do the job. The hash function input does not need to be
+ *       human-readable.
+ * 
+ */
+
+size_t HashTable::compute_hash(std::string_view region_name, int tid)
+{
+
+  // Get the bit-pattern of the thread ID.
+  std::array<std::byte, sizeof(tid)> tid_bytes;
+  std::memcpy(tid_bytes.data(), &tid, sizeof(tid));
+
+  [[maybe_unused]] int const* tid_back = reinterpret_cast<int const*>(tid_bytes.data());
+  assert (*tid_back == tid);
+
+  // Store special characters in an array container, so that we have STL syntax
+  // available to us later.
+  std::array<char, 1> constexpr delimiter = {'@'};
+
+  // Extra bytes to accommodate the thread ID. 
+  int constexpr num_extra_bytes = sizeof(tid)
+                                + sizeof(delimiter);
+
+  // Avoid dynamic memory allocation for performance reasons. Instead, fix the
+  // size of the buffer and perform a runtime check that we're not exceeding it.
+  std::array<char, 80>  new_chars;
+  new_chars.fill('\0');
+
+  if (region_name.length() + num_extra_bytes > new_chars.size()) {
+    std::string error_msg = "Internal error: character buffer exhausted.";
+    throw std::runtime_error(error_msg);
+  }
+
+  // Get iterator to the start of the string buffer.
+  auto new_chars_iterator = new_chars.begin();
+
+  // Copy the region name into the char buffer.
+  std::copy(region_name.begin(), region_name.end(), new_chars_iterator);
+  std::advance(new_chars_iterator, region_name.size());
+
+  // Add delimiter
+  std::copy(delimiter.begin(), delimiter.end(), new_chars_iterator);
+  std::advance(new_chars_iterator, delimiter.size());
+
+  // Add thread ID (physical representation)
+  std::memcpy(&(*new_chars_iterator), tid_bytes.data(), tid_bytes.size());
+  std::advance(new_chars_iterator, tid_bytes.size());
+
+  [[maybe_unused]] int const expected_size = region_name.length() + num_extra_bytes;
+  int new_chars_size = std::distance(new_chars.begin(), new_chars_iterator); 
+  assert (new_chars_size == expected_size);
+
+  return hash_function_(std::string_view(new_chars.data(), new_chars_size)); 
 }
 
 /**
@@ -41,10 +111,13 @@ HashTable::HashTable(int const tid)
  */
 
 void HashTable::query_insert(std::string_view const region_name,
+                             int tid,
                              size_t& hash,
                              record_index_t& record_index) noexcept
 {
-  hash = hash_function_(region_name);
+
+  // Compute the hash
+  hash = compute_hash(region_name, tid);
 
   // Does the entry exist already?
   if (auto search = lookup_table_.find(hash); search != lookup_table_.end())
@@ -55,7 +128,8 @@ void HashTable::query_insert(std::string_view const region_name,
   // If not, create new entry.
   else
   {
-    hashvec_.emplace_back(hash, region_name);
+    // Insert this region into the thread's hash table.
+    hashvec_.emplace_back(hash, region_name, tid);
     record_index = hashvec_.size()-1;
     lookup_table_.emplace(hash, record_index);
     assert (lookup_table_.count(hash) > 0);
@@ -68,7 +142,8 @@ void HashTable::query_insert(std::string_view const region_name,
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(record_index_t const record_index, time_duration_t const time_delta)
+void HashTable::update(record_index_t const record_index, 
+                       time_duration_t const time_delta)
 {
 
   auto& record = hashvec_[record_index];
@@ -318,10 +393,10 @@ double HashTable::get_child_walltime(size_t const hash) const
  * @param [in] hash  The hash corresponding to the region.
  */
 
-std::string HashTable::get_region_name(size_t const hash) const
+std::string HashTable::get_decorated_region_name(size_t const hash) const
 {
   auto& record = hash2record_const(hash);
-  return record.region_name_;
+  return record.decorated_region_name_;
 }
 
 /**
