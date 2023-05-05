@@ -72,7 +72,7 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
 
   // Avoid dynamic memory allocation for performance reasons. Instead, fix the
   // size of the buffer and perform a runtime check that we're not exceeding it.
-  std::array<char, 80>  new_chars;
+  std::array<char, PROF_STRING_BUFFER_LENGTH>  new_chars;
   new_chars.fill('\0');
 
   if (region_name.length() + num_extra_bytes > new_chars.size()) {
