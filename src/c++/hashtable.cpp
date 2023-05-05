@@ -95,11 +95,12 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
   std::memcpy(&(*new_chars_iterator), tid_bytes.data(), tid_bytes.size());
   std::advance(new_chars_iterator, tid_bytes.size());
 
-  [[maybe_unused]] int const expected_size = region_name.length() + num_extra_bytes;
-  int new_chars_size = std::distance(new_chars.begin(), new_chars_iterator); 
+  [[maybe_unused]] auto const expected_size = region_name.length() + num_extra_bytes;
+  auto new_chars_size = std::distance(new_chars.begin(), new_chars_iterator); 
   assert (new_chars_size == expected_size);
 
-  return hash_function_(std::string_view(new_chars.data(), new_chars_size)); 
+  return hash_function_(std::string_view(new_chars.data(), 
+        static_cast<std::string_view::size_type>(new_chars_size))); 
 }
 
 /**
