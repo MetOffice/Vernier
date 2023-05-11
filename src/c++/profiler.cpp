@@ -216,18 +216,20 @@ void Profiler::stop(size_t const hash)
 
   // The sequence of code that follows is aimed at leaving only minimal and
   // simple operations after the call to prof_gettime().
-  time_duration_t* parent_overhead_time_ptr = nullptr;
+  time_duration_t* parent_overhead_time_ptr   = nullptr;
+  time_duration_t* profiler_overhead_time_ptr = nullptr;
 
   // Acquire parent pointers
   if (call_depth > 0){
     auto parent_depth = static_cast<traceback_index_t>(call_depth-1);
     record_index_t parent_index = thread_traceback_[tid].at(parent_depth).record_index_;
-    parent_overhead_time_ptr = thread_hashtables_[tid].add_child_time(
-                                         parent_index, region_duration);
+    thread_hashtables_[tid].add_child_time(
+                              parent_index, region_duration,
+                              parent_overhead_time_ptr);
   }
 
   // Increment profiler calls, and get a reference to the total overhead time.
-  auto& total_overhead_time = thread_hashtables_[tid].increment_profiler_calls();
+  thread_hashtables_[tid].add_profiler_call(profiler_overhead_time_ptr);
 
   // Decrement index to last entry in the traceback.
   --call_depth;
@@ -236,10 +238,12 @@ void Profiler::stop(size_t const hash)
   auto calliper_stop_time = prof_gettime();
   auto calliper_time = calliper_stop_time - temp_sum;
 
-  // Increment the overhead time both the parent and total overhead times, using
-  // previously-obtained pointers or references, as appropriate.
-  if(parent_overhead_time_ptr){ *parent_overhead_time_ptr += calliper_time; }
-  total_overhead_time += calliper_time;
+  // Increment the overhead time specific to this region, incurred when calling
+  // direct children, and also the overall profiling overhead time.
+  // Being outside the stop calliper, these operations need to be as cheap
+  // as possible.
+  if(parent_overhead_time_ptr) { *parent_overhead_time_ptr += calliper_time; }
+  *profiler_overhead_time_ptr += calliper_time;
 }
 
 /**
