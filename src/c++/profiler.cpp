@@ -93,8 +93,8 @@ Profiler::Profiler()
 }
 
 /**
- * @brief  Start timing a profiled code region.
- * @detail Calls both part1 and part2 start routines in succession.
+ * @brief   Start timing a profiled code region.
+ * @details Calls both part1 and part2 start routines in succession.
  * @param [in]  region_name   The code region name.
  * @returns     Unique hash for the code region being started.
  */
