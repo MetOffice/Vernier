@@ -46,7 +46,7 @@ class Profiler
       public:
 
         // Constructors
-        TracebackEntry();
+        TracebackEntry() = default;
         TracebackEntry(size_t, record_index_t, time_point_t, time_point_t);
 
         // Data members

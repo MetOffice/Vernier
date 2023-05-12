@@ -38,14 +38,6 @@ namespace{
 
 /**
  * @brief Constructor for TracebackEntry struct.
- *
- */
-
-Profiler::TracebackEntry::TracebackEntry()
-  {}
-
-/**
- * @brief Constructor for TracebackEntry struct.
  * @param [in]  record_hash   The hash of the region name.
  * @param [in]  record_index  The index of the region record.
  * @param [in]  region_start_time  The clock measurement just before leaving the
