@@ -91,9 +91,10 @@ class HashTable{
 
     // Member functions
     std::vector<size_t> list_keys();
-    time_duration_t* add_child_time(record_index_t const, time_duration_t const);
-    time_duration_t& increment_profiler_calls();
-    void add_overhead_time(size_t const, time_duration_t);
+
+    void add_child_time(record_index_t const, time_duration_t const, time_duration_t*&);
+    void add_profiler_call(time_duration_t*&);
+
     void compute_self_times();
     void append_to(HashVecHandler&);
 

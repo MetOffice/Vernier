@@ -83,31 +83,39 @@ void HashTable::update(record_index_t const record_index, time_duration_t const 
 }
 
 /**
- * @brief  Add child region and overhead times to parent.
- * @param [in] record_index    The index corresponding to the region record.
- * @param [in] child_walltime  The time spent in the child region.
- * @returns  Pointer to the overhead time for this region. 
+ * @brief  Add in time spent calling child regions. Also retuns a pointer
+ *         to the overhead time so that it can be incremented downstream,
+ *         outside this function, with minimal additional overhead. 
+ * @param [in]  record_index   The index corresponding to the region record.
+ * @param [in]  time_delta     The time spent in the child region.
+ * @param [out] overhead_time_ptr  Pointer to the profiling overhead time 
+ *                                 incurred by calling children of this region. 
  */
 
-time_duration_t* HashTable::add_child_time(
-                         record_index_t  const record_index,
-                         time_duration_t const child_walltime)
+void HashTable::add_child_time(
+                    record_index_t  const record_index,
+                    time_duration_t const child_walltime,
+                    time_duration_t*& overhead_time_ptr)
 {
   auto& record = hashvec_[record_index];
   record.child_walltime_ += child_walltime;
-  return &record.overhead_walltime_;
+  overhead_time_ptr = &record.overhead_walltime_;
 }
 
 /**
- * @brief    Add child region and overhead times to parent.
- * @returns  Reference to the total profiling overhead time.
+ * @brief Increment the number of calls to the profiler callipers. Also returns
+ *        a pointer to the total profiling overhead time so that it can be
+ *        incremented downstream, outside this function, with minimal
+ *        additional overhead.
+ * @param [out] overhead_time_ptr  Pointer to the total profiling overhead time 
+ *                                 incurred by calling every set of profiler
+ *                                 calls. 
  */
 
-time_duration_t& HashTable::increment_profiler_calls()
-{
+void HashTable::add_profiler_call(time_duration_t*& overhead_time_ptr) {
   auto& record = hashvec_[profiler_index_];
   ++record.call_count_;
-  return record.total_walltime_;
+  overhead_time_ptr = &record.total_walltime_;
 }
 
 /**
