@@ -227,7 +227,7 @@ void Profiler::stop(size_t const hash)
                               parent_overhead_time_ptr);
   }
 
-  // Increment profiler calls, and get a reference to the total overhead time.
+  // Increment profiler calls, and get a pointer to the total overhead time.
   thread_hashtables_[tid].add_profiler_call(profiler_overhead_time_ptr);
 
   // Decrement index to last entry in the traceback.
