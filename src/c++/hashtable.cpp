@@ -91,12 +91,12 @@ void HashTable::update(record_index_t const record_index, time_duration_t const 
  *                                 incurred by calling children of this region. 
  */
 
-void HashTable::add_child_time(
-                    record_index_t  const record_index,
+void HashTable::add_child_time_to_parent(
+                    record_index_t  const parent_index,
                     time_duration_t const child_walltime,
                     time_duration_t*& overhead_time_ptr)
 {
-  auto& record = hashvec_[record_index];
+  auto& record = hashvec_[parent_index];
   record.child_walltime_ += child_walltime;
   overhead_time_ptr = &record.overhead_walltime_;
 }

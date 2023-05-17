@@ -92,7 +92,7 @@ class HashTable{
     // Member functions
     std::vector<size_t> list_keys();
 
-    void add_child_time(record_index_t const, time_duration_t const, time_duration_t*&);
+    void add_child_time_to_parent(record_index_t const, time_duration_t const, time_duration_t*&);
     void add_profiler_call(time_duration_t*&);
 
     void compute_self_times();

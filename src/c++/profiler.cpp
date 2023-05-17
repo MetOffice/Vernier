@@ -222,7 +222,7 @@ void Profiler::stop(size_t const hash)
   if (call_depth > 0){
     auto parent_depth = static_cast<traceback_index_t>(call_depth-1);
     record_index_t parent_index = thread_traceback_[tid].at(parent_depth).record_index_;
-    thread_hashtables_[tid].add_child_time(
+    thread_hashtables_[tid].add_child_time_to_parent(
                               parent_index, region_duration,
                               parent_overhead_time_ptr);
   }
