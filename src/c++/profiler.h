@@ -18,12 +18,20 @@
 
 #include <iterator>
 #include <vector>
+#include <string_view>
 #include <array>
 #include <omp.h>
 
 #include "hashtable.h"
 
 #define PROF_MAX_TRACEBACK_SIZE 1000
+
+// Forward declarations. The definitions of these functions will require access
+// to private methods.
+extern "C" {
+  void c_profiler_start_part1();
+  void c_profiler_start_part2(long int& hash_out, char const* name);
+}
 
 /**
  * @brief  Top-level profiler class.
@@ -46,7 +54,7 @@ class Profiler
       public:
 
         // Constructors
-        TracebackEntry();
+        TracebackEntry() = default;
         TracebackEntry(size_t, record_index_t, time_point_t, time_point_t);
 
         // Data members
@@ -67,6 +75,10 @@ class Profiler
     typedef std::vector<std::array<TracebackEntry,PROF_MAX_TRACEBACK_SIZE>>
                                                                      ::size_type traceback_index_t;
 
+    // Private methods
+    void   start_part1();
+    size_t start_part2(std::string_view const);
+
   public:
 
     // Constructors
@@ -74,8 +86,6 @@ class Profiler
 
     // Member functions
     size_t start(std::string_view const);
-    void   start_part1();
-    size_t start_part2(std::string_view const);
     void   stop (size_t const);
     void   write();
 
@@ -89,6 +99,9 @@ class Profiler
     unsigned long long int get_call_count(size_t const hash, int const input_tid) const;
     unsigned long long int get_prof_call_count(int const input_tid) const;
 
+    // Grant these functions access to private methods.
+    void friend c_profiler_start_part1();
+    void friend c_profiler_start_part2(long int& hash_out, char const* name);
 };
 
 // Declare global profiler

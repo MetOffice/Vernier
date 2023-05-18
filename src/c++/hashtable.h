@@ -26,8 +26,10 @@
 #include <unordered_map>
 
 #include "hashvec.h"
-#include "hashvec_handler.h"
 #include "prof_gettime.h"
+
+// Forward declarations
+class HashVecHandler;
 
 /**
  * @brief  Defines a null hash function. 
@@ -66,7 +68,7 @@ class HashTable{
     std::unordered_map<size_t, record_index_t, NullHashFunction> lookup_table_;
 
     // Vector of region records.
-    std::vector<RegionRecord> hashvec_;
+    hashvec_t hashvec_;
 
     // Private member functions
     void prepare_computed_times(RegionRecord&);
@@ -90,8 +92,10 @@ class HashTable{
 
     // Member functions
     std::vector<size_t> list_keys();
-    void add_child_time(record_index_t const, time_duration_t const, time_duration_t*&);
+
+    void add_child_time_to_parent(record_index_t const, time_duration_t const, time_duration_t*&);
     void add_profiler_call(time_duration_t*&);
+
     void compute_self_times();
     void append_to(HashVecHandler&);
 

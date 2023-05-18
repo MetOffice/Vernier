@@ -139,7 +139,8 @@ void HashTable::query_insert(std::string_view const region_name,
 
 /**
  * @brief  Updates the total walltime and call count for the specified region. 
- * @param [in] hash  The hash corresponding to the profiled region.
+ * @param [in] record_index  The index in hashvec_ corresponding to the
+ *                           profiled region.
  * @param [in] time_delta  The time increment to add.
  */
 
@@ -167,12 +168,12 @@ void HashTable::update(record_index_t const record_index,
  *                                 incurred by calling children of this region. 
  */
 
-void HashTable::add_child_time(
-                    record_index_t  const record_index,
+void HashTable::add_child_time_to_parent(
+                    record_index_t  const parent_index,
                     time_duration_t const child_walltime,
                     time_duration_t*& overhead_time_ptr)
 {
-  auto& record = hashvec_[record_index];
+  auto& record = hashvec_[parent_index];
   record.child_walltime_ += child_walltime;
   overhead_time_ptr = &record.overhead_walltime_;
 }
@@ -265,7 +266,8 @@ std::vector<size_t> HashTable::list_keys()
 
 /**
  * @brief  Appends table_ onto the end of an input hashvec. 
- * @param[inout]  HashVecHandler containing the hashvec to amend.
+ * @param[inout] hashvec_handler  HashVecHandler object containing the
+ *                                hashvec to amend.
  * 
  */
 

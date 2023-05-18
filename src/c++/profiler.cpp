@@ -38,14 +38,6 @@ namespace{
 
 /**
  * @brief Constructor for TracebackEntry struct.
- *
- */
-
-Profiler::TracebackEntry::TracebackEntry()
-  {}
-
-/**
- * @brief Constructor for TracebackEntry struct.
  * @param [in]  record_hash   The hash of the region name.
  * @param [in]  record_index  The index of the region record.
  * @param [in]  region_start_time  The clock measurement just before leaving the
@@ -101,8 +93,8 @@ Profiler::Profiler()
 }
 
 /**
- * @brief  Start timing a profiled code region.
- * @detail Calls both part1 and part2 start routines in succession.
+ * @brief   Start timing a profiled code region.
+ * @details Calls both part1 and part2 start routines in succession.
  * @param [in]  region_name   The code region name.
  * @returns     Unique hash for the code region being started.
  */
@@ -223,12 +215,12 @@ void Profiler::stop(size_t const hash)
   if (call_depth > 0){
     auto parent_depth = static_cast<traceback_index_t>(call_depth-1);
     record_index_t parent_index = thread_traceback_[tid].at(parent_depth).record_index_;
-    thread_hashtables_[tid].add_child_time(
+    thread_hashtables_[tid].add_child_time_to_parent(
                               parent_index, region_duration,
                               parent_overhead_time_ptr);
   }
 
-  // Increment profiler calls, and get a reference to the total overhead time.
+  // Increment profiler calls, and get a pointer to the total overhead time.
   thread_hashtables_[tid].add_profiler_call(profiler_overhead_time_ptr);
 
   // Decrement index to last entry in the traceback.
