@@ -17,12 +17,14 @@ RegionRecord::RegionRecord(size_t const region_hash,
                            int tid)
 : region_hash_(region_hash)
 , region_name_(region_name)
-, total_walltime_      (time_duration_t::zero())
-, total_raw_walltime_  (time_duration_t::zero())
-, self_walltime_       (time_duration_t::zero())
-, child_walltime_      (time_duration_t::zero())
-, overhead_walltime_   (time_duration_t::zero())
+, total_walltime_           (time_duration_t::zero())
+, recursion_total_walltime_ (time_duration_t::zero())
+, total_raw_walltime_       (time_duration_t::zero())
+, self_walltime_            (time_duration_t::zero())
+, child_walltime_           (time_duration_t::zero())
+, overhead_walltime_        (time_duration_t::zero())
 , call_count_(0)
+, recursion_level_(0)
 {
   decorated_region_name_ = region_name_;
   decorated_region_name_ += '@';

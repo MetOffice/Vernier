@@ -138,6 +138,8 @@ size_t Profiler::start_part2(std::string_view const region_name)
   size_t hash;
   record_index_t record_index;
   thread_hashtables_[tid].query_insert(region_name, tid_int, hash, record_index);
+  thread_hashtables_[tid].increment_recursion_level(record_index);
+
   // Store the calliper and region start times.
   ++call_depth;
   if (call_depth < PROF_MAX_TRACEBACK_SIZE){
@@ -197,6 +199,7 @@ void Profiler::stop(size_t const hash)
   auto region_duration = region_stop_time - traceback_entry.region_start_time_;
 
   // Do the hashtable update for the child region.
+  thread_hashtables_[tid].decrement_recursion_level(traceback_entry.record_index_);
   thread_hashtables_[tid].update(traceback_entry.record_index_, region_duration);
 
   // Precompute times as far as possible. We just need the calliper stop time

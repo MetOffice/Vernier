@@ -108,6 +108,10 @@ class HashTable{
     std::string            get_decorated_region_name(size_t const hash) const;
     unsigned long long int get_call_count(size_t const hash) const;
     unsigned long long int get_prof_call_count() const;
+
+    void increment_recursion_level(record_index_t const);
+    void decrement_recursion_level(record_index_t const);
+
 };
 
 #endif

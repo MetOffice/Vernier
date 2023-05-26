@@ -152,10 +152,25 @@ void HashTable::update(record_index_t const record_index,
 
   // Increment the walltime for this hash entry.
   record.total_walltime_ += time_delta;
+  if (record.recursion_level_ > 0){
+    record.recursion_total_walltime_ += time_delta;
+  }
 
   // Update the number of times this region has been called
   ++record.call_count_;
 
+}
+
+void HashTable::increment_recursion_level(record_index_t const record_index)
+{
+  auto& record = hashvec_[record_index];
+  ++record.recursion_level_;
+}
+
+void HashTable::decrement_recursion_level(record_index_t const record_index)
+{
+  auto& record = hashvec_[record_index];
+  --record.recursion_level_;
 }
 
 /**
@@ -231,6 +246,7 @@ void HashTable::prepare_computed_times(RegionRecord& record)
 
   // Total walltime with overheads attributed to the parent removed.
   record.total_raw_walltime_ = record.total_walltime_
+                             - record.recursion_total_walltime_
                              - record.overhead_walltime_;
 }
 
