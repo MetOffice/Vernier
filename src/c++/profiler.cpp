@@ -12,29 +12,9 @@
 #include <iostream>
 #include <omp.h>
 
-// Define threadprivate variables.
-// `extern` keywords in the code below represent a workaround for a GNU compiler
-// bug.  Formally, the `threadprivate` pragma ought to be *after* the variable
-// declaration. GNU does not allow this at present.  The `extern` is merely a
-// portable way of getting around this, with the unwanted side effect of
-// introducing external linkage. The anonymous namespace removes that.
-namespace{
-  // `logged_calliper_start_time` is needed for the Fortran interface.
-  // Noting that:
-  //    (i) the start region procedure must be separated into two parts, and
-  //   (ii) the time point is an instance of a C++ class,
-  // we avoid passing time objects into other interface layers by declaring
-  // storage here.
-  extern time_point_t logged_calliper_start_time;
-#pragma omp threadprivate(logged_calliper_start_time)
-  time_point_t logged_calliper_start_time;
-
-   // The call depth must be stored separately for all threads. Important to
-   // initialise it here, so that it's initialised correctly on all threads.
-  extern int call_depth;
-#pragma omp threadprivate(call_depth)
-  int call_depth = -1;
-}
+// Initialize static data members.
+int Profiler::call_depth_ = -1;
+time_point_t Profiler::logged_calliper_start_time_{};
 
 /**
  * @brief Constructor for TracebackEntry struct.
@@ -114,7 +94,7 @@ size_t Profiler::start(std::string_view const region_name)
 void Profiler::start_part1()
 {
   // Store the calliper start time, which is used in part2.
-  logged_calliper_start_time = prof_gettime();
+  logged_calliper_start_time_ = prof_gettime();
 }
 
 /**
@@ -146,12 +126,12 @@ size_t Profiler::start_part2(std::string_view const region_name)
   thread_hashtables_[tid].query_insert(new_region_name, hash, record_index);
 
   // Store the calliper and region start times.
-  ++call_depth;
-  if (call_depth < PROF_MAX_TRACEBACK_SIZE){
-    auto call_depth_index = static_cast<traceback_index_t>(call_depth);
+  ++call_depth_;
+  if (call_depth_ < PROF_MAX_TRACEBACK_SIZE){
+    auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
     auto region_start_time = prof_gettime();
     thread_traceback_[tid].at(call_depth_index) 
-       = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time);
+       = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time_);
   }
   else {
     std::cerr << "EMERGENCY STOP: Traceback array exhausted." << "\n";
@@ -184,13 +164,13 @@ void Profiler::stop(size_t const hash)
 
   // Check that we have called a start calliper before the stop calliper.
   // If not, then the call depth would be -1.
-  if (call_depth < 0) {
+  if (call_depth_ < 0) {
     std::cerr << "EMERGENCY STOP: stop called before start calliper." << "\n";
     exit (101);
   }
 
  // Get reference to the traceback entry.
- auto call_depth_index = static_cast<traceback_index_t>(call_depth);
+ auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
  auto& traceback_entry = thread_traceback_[tid].at(call_depth_index);
 
   // Check: which hash is last on the traceback list?
@@ -219,8 +199,8 @@ void Profiler::stop(size_t const hash)
   time_duration_t* profiler_overhead_time_ptr = nullptr;
 
   // Acquire parent pointers
-  if (call_depth > 0){
-    auto parent_depth = static_cast<traceback_index_t>(call_depth-1);
+  if (call_depth_ > 0){
+    auto parent_depth = static_cast<traceback_index_t>(call_depth_-1);
     record_index_t parent_index = thread_traceback_[tid].at(parent_depth).record_index_;
     thread_hashtables_[tid].add_child_time_to_parent(
                               parent_index, region_duration,
@@ -231,7 +211,7 @@ void Profiler::stop(size_t const hash)
   thread_hashtables_[tid].add_profiler_call(profiler_overhead_time_ptr);
 
   // Decrement index to last entry in the traceback.
-  --call_depth;
+  --call_depth_;
 
   // Account for time spent in the profiler itself. 
   auto calliper_stop_time = prof_gettime();

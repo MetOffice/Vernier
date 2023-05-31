@@ -67,6 +67,12 @@ class Profiler
     // Data members
     int max_threads_;
 
+    // Static, threadprivate data members
+    static time_point_t logged_calliper_start_time_;
+    static int call_depth_;
+    #pragma omp threadprivate(call_depth_, logged_calliper_start_time_)
+
+    // Hashtables and tracebacks
     std::vector<HashTable>                                           thread_hashtables_;
     std::vector<std::array<TracebackEntry,PROF_MAX_TRACEBACK_SIZE>>  thread_traceback_;
 
