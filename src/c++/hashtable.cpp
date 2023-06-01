@@ -263,7 +263,7 @@ void HashTable::sync_lookup()
 
 double HashTable::get_total_walltime(size_t const hash) const
 {
-  auto& record = hash2record_const(hash);
+  auto& record = hash2record(hash);
 
   return record.total_walltime_.count();
 }
@@ -291,7 +291,7 @@ double HashTable::get_total_raw_walltime(size_t const hash)
 
 double HashTable::get_overhead_walltime(size_t const hash) const
 {
-  auto& record = hash2record_const(hash);
+  auto& record = hash2record(hash);
   return record.overhead_walltime_.count();
 }
 
@@ -318,7 +318,7 @@ double HashTable::get_self_walltime(size_t const hash)
 
 double HashTable::get_child_walltime(size_t const hash) const
 {
-  auto& record = hash2record_const(hash);
+  auto& record = hash2record(hash);
   return record.child_walltime_.count();
 }
 
@@ -329,7 +329,7 @@ double HashTable::get_child_walltime(size_t const hash) const
 
 std::string HashTable::get_region_name(size_t const hash) const
 {
-  auto& record = hash2record_const(hash);
+  auto& record = hash2record(hash);
   return record.region_name_;
 }
 
@@ -345,7 +345,7 @@ std::string HashTable::get_region_name(size_t const hash) const
 
 unsigned long long int HashTable::get_call_count(size_t const hash) const
 {
-  auto& record = hash2record_const(hash);
+  auto& record = hash2record(hash);
   return record.call_count_;
 }
 
@@ -359,7 +359,7 @@ unsigned long long int HashTable::get_call_count(size_t const hash) const
 
 unsigned long long int HashTable::get_prof_call_count() const
 {
-    auto& record = hash2record_const(profiler_hash_);
+    auto& record = hash2record(profiler_hash_);
     assert (lookup_table_.count(profiler_hash_) > 0);
     return record.call_count_;
 }
@@ -384,7 +384,7 @@ RegionRecord& HashTable::hash2record(size_t const hash)
  *
  */
 
-RegionRecord const& HashTable::hash2record_const(size_t const hash) const
+RegionRecord const& HashTable::hash2record(size_t const hash) const
 {
   return hashvec_[lookup_table_.at(hash)];
 }
