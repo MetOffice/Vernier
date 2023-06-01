@@ -77,7 +77,7 @@ class HashTable{
     void erase_record(size_t const);
     void sync_lookup();
     RegionRecord&  hash2record(size_t const);
-    RegionRecord const&  hash2record_const(size_t const) const;
+    RegionRecord const&  hash2record(size_t const) const;
 
   public:
 
