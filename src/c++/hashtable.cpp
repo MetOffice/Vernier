@@ -150,10 +150,13 @@ void HashTable::update(record_index_t const record_index,
 
   auto& record = hashvec_[record_index];
 
-  // Increment the walltime for this hash entry.
-  record.total_walltime_ += time_delta;
+  // Increment the walltime for this hash entry. If this region has been called
+  // recursively, directly or indirectly, the time goes into a different bucket.
   if (record.recursion_level_ > 0){
     record.recursion_total_walltime_ += time_delta;
+  }
+  else{
+    record.total_walltime_ += time_delta;
   }
 
   // Update the number of times this region has been called
@@ -233,7 +236,7 @@ void HashTable::sort_records()
  * @details Times computed are: the region self time and the total time minus
  *          directly incurred profiling overhead costs.
  *
- * @param [in] record  The region record to compute.
+ * @param [inout] record  The region record to compute.
  */
 
 void HashTable::prepare_computed_times(RegionRecord& record)
@@ -241,12 +244,12 @@ void HashTable::prepare_computed_times(RegionRecord& record)
 
   // Self time
   record.self_walltime_ = record.total_walltime_
+                        + record.recursion_total_walltime_
                         - record.child_walltime_
                         - record.overhead_walltime_;
 
   // Total walltime with overheads attributed to the parent removed.
   record.total_raw_walltime_ = record.total_walltime_
-                             - record.recursion_total_walltime_
                              - record.overhead_walltime_;
 }
 
