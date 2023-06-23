@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <memory>
 
+#include "hashvec.h"
 #include "writer/writer.h"
 #include "writer/multi.h"
 

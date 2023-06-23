@@ -20,7 +20,7 @@ add_library(${CMAKE_PROJECT_NAME}
         writer/writer.h    writer/writer.cpp
         writer/multi.h     writer/multi.cpp
         formatter.h        formatter.cpp
-        hashvec.h
+        hashvec.h          hashvec.cpp
         prof_gettime.h     prof_gettime.cpp
         )
 

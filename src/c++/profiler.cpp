@@ -4,23 +4,37 @@
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
-#include "profiler.h"
 #include "hashvec_handler.h"
+#include "profiler.h"
 
 #include <cassert>
 #include <chrono>
 #include <iostream>
 #include <omp.h>
 
+// Initialize static data members.
+int Profiler::call_depth_ = -1;
+time_point_t Profiler::logged_calliper_start_time_{};
+
 /**
- * @brief Constructor for StartCalliperValues struct.
+ * @brief Constructor for TracebackEntry struct.
+ * @param [in]  record_hash   The hash of the region name.
+ * @param [in]  record_index  The index of the region record.
+ * @param [in]  region_start_time  The clock measurement just before leaving the
+ *                                 start calliper.
+ * @param [in]  calliper_start_time The clock measurement on entry to the start
+ *                                  calliper.
  *
  */
 
-Profiler::StartCalliperValues::StartCalliperValues(
+Profiler::TracebackEntry::TracebackEntry(
+                                   size_t         record_hash,
+                                   record_index_t record_index,
                                    time_point_t region_start_time, 
                                    time_point_t calliper_start_time)
-  : region_start_time_(region_start_time)
+  : record_hash_        (record_hash)
+  , record_index_       (record_index)
+  , region_start_time_  (region_start_time)
   , calliper_start_time_(calliper_start_time)
   {}
 
@@ -47,7 +61,7 @@ Profiler::Profiler()
     thread_hashtables_.push_back(new_table);
 
     // Create a new list
-    std::vector<std::pair<size_t,StartCalliperValues>> new_list;
+    std::array<TracebackEntry, PROF_MAX_TRACEBACK_SIZE> new_list;
     thread_traceback_.push_back(new_list);
 
   }
@@ -59,18 +73,38 @@ Profiler::Profiler()
 }
 
 /**
- * @brief  Start timing a profiled code region.
+ * @brief   Start timing a profiled code region.
+ * @details Calls both part1 and part2 start routines in succession.
  * @param [in]  region_name   The code region name.
  * @returns     Unique hash for the code region being started.
- * @todo        Revisit profiling overhead measurement.  (#64)
  */
 
-size_t Profiler::start(std::string_view region_name)
+size_t Profiler::start(std::string_view const region_name)
 {
+  start_part1();
+  auto hash = start_part2(region_name);
+  return hash;
+}
 
-  // Note the time on entry to the profiler call.
-  time_point_t calliper_start_time = prof_gettime();
-  
+/**
+ * @brief  Start timing a profiled code region, part 1 of 2: make a 
+ *         threadprivate note of the time.
+ */
+
+void Profiler::start_part1()
+{
+  // Store the calliper start time, which is used in part2.
+  logged_calliper_start_time_ = prof_gettime();
+}
+
+/**
+ * @brief  Start timing a profiled code region, part 2 of 2.
+ * @param [in]  region_name   The code region name.
+ * @returns     Unique hash for the code region being started.
+ */
+
+size_t Profiler::start_part2(std::string_view const region_name)
+{
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
 #ifdef _OPENMP
@@ -86,13 +120,23 @@ size_t Profiler::start(std::string_view region_name)
   new_region_name += region_name;
   new_region_name += '@';
   new_region_name += std::to_string(tid);
-  size_t const hash = thread_hashtables_[tid].query_insert(new_region_name);
+
+  size_t hash;
+  record_index_t record_index;
+  thread_hashtables_[tid].query_insert(new_region_name, hash, record_index);
 
   // Store the calliper and region start times.
-  auto region_start_time = prof_gettime();
-  StartCalliperValues new_times = StartCalliperValues(region_start_time, calliper_start_time);
-  thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
-
+  ++call_depth_;
+  if (call_depth_ < PROF_MAX_TRACEBACK_SIZE){
+    auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
+    auto region_start_time = prof_gettime();
+    thread_traceback_[tid].at(call_depth_index) 
+       = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time_);
+  }
+  else {
+    std::cerr << "EMERGENCY STOP: Traceback array exhausted." << "\n";
+    exit (102);
+  }
   return hash;
 }
 
@@ -104,7 +148,6 @@ size_t Profiler::start(std::string_view region_name)
  *        calliper, and subtracting the measured region time. Hence larger
  *        absolute times are being measured, which are less likely to suffer
  *        fractional error from precision limitations of the clock.   
- * @todo  Revisit profiling overhead measurement. (#64)
  */
 
 void Profiler::stop(size_t const hash)
@@ -119,46 +162,67 @@ void Profiler::stop(size_t const hash)
   tid = static_cast<hashtable_iterator_t_>(omp_get_thread_num());
 #endif
 
-  // Checks - which hash is last on the traceback list?
-  size_t last_hash_on_list = thread_traceback_[tid].back().first;
+  // Check that we have called a start calliper before the stop calliper.
+  // If not, then the call depth would be -1.
+  if (call_depth_ < 0) {
+    std::cerr << "EMERGENCY STOP: stop called before start calliper." << "\n";
+    exit (101);
+  }
 
-  // Check that the hash is the one we expect. If it isn't, there is an error in
-  // the instrumentation.
+ // Get reference to the traceback entry.
+ auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
+ auto& traceback_entry = thread_traceback_[tid].at(call_depth_index);
+
+  // Check: which hash is last on the traceback list?
+  size_t last_hash_on_list = traceback_entry.record_hash_;
   if (hash != last_hash_on_list){
     std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
     exit (100);
   }
 
-  // Get start calliper values needed for subsequent computation.
-  StartCalliperValues& start_calliper_times = 
-    thread_traceback_[tid].back().second;
-
   // Compute the region time
-  auto region_duration = region_stop_time - start_calliper_times.region_start_time_;
+  auto region_duration = region_stop_time - traceback_entry.region_start_time_;
 
   // Do the hashtable update for the child region.
-  thread_hashtables_[tid].update(hash, region_duration);
+  thread_hashtables_[tid].update(traceback_entry.record_index_, region_duration);
 
   // Precompute times as far as possible. We just need the calliper stop time
   // later.
-  //   (t4-t1) = calliper time + region time 
+  //   (t4-t1) = calliper time + region duration
   //   (t3-t2) = region_duration
   //   calliper_time = (t4-t1) - (t3-t2)  = t4 - ( t3-t2 + t1)
-  auto temp_sum = start_calliper_times.calliper_start_time_ + region_duration;
+  auto temp_sum = traceback_entry.calliper_start_time_ + region_duration;
 
-  // Remove from the end of the list.
-  thread_traceback_[tid].pop_back();
+  // The sequence of code that follows is aimed at leaving only minimal and
+  // simple operations after the call to prof_gettime().
+  time_duration_t* parent_overhead_time_ptr   = nullptr;
+  time_duration_t* profiler_overhead_time_ptr = nullptr;
 
-  // Prepare to add timings to parent
-  if (! thread_traceback_[tid].empty()) {
-   size_t parent_hash = thread_traceback_[tid].back().first;
-   thread_hashtables_[tid].add_child_time(parent_hash, region_duration);
-
-   // Account for time spent in the profiler itself. 
-   auto calliper_stop_time = prof_gettime();
-   auto calliper_time = calliper_stop_time - temp_sum;
-   thread_hashtables_[tid].add_overhead_time(parent_hash, calliper_time);
+  // Acquire parent pointers
+  if (call_depth_ > 0){
+    auto parent_depth = static_cast<traceback_index_t>(call_depth_-1);
+    record_index_t parent_index = thread_traceback_[tid].at(parent_depth).record_index_;
+    thread_hashtables_[tid].add_child_time_to_parent(
+                              parent_index, region_duration,
+                              parent_overhead_time_ptr);
   }
+
+  // Increment profiler calls, and get a pointer to the total overhead time.
+  thread_hashtables_[tid].add_profiler_call(profiler_overhead_time_ptr);
+
+  // Decrement index to last entry in the traceback.
+  --call_depth_;
+
+  // Account for time spent in the profiler itself. 
+  auto calliper_stop_time = prof_gettime();
+  auto calliper_time = calliper_stop_time - temp_sum;
+
+  // Increment the overhead time specific to this region, incurred when calling
+  // direct children, and also the overall profiling overhead time.
+  // Being outside the stop calliper, these operations need to be as cheap
+  // as possible.
+  if(parent_overhead_time_ptr) { *parent_overhead_time_ptr += calliper_time; }
+  *profiler_overhead_time_ptr += calliper_time;
 }
 
 /**
@@ -312,3 +376,4 @@ unsigned long long int Profiler::get_prof_call_count(int const input_tid) const
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_prof_call_count();
 }
+

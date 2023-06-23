@@ -22,17 +22,19 @@
 /**
  * @brief  Structure to hold information for a particular region.
  *
+ * Bundles together any information pertinent to a specific profiled region.
+ *
  */
 
-struct HashEntry{
-  
+struct RegionRecord{
   public:
 
     // Constructor
-    HashEntry() = delete;
-    explicit HashEntry(std::string_view);
+    RegionRecord() = delete;
+    explicit RegionRecord(size_t const, std::string_view const);
 
     // Data members
+    size_t           region_hash_;
     std::string      region_name_;
     time_duration_t  total_walltime_;
     time_duration_t  total_raw_walltime_;
@@ -44,7 +46,10 @@ struct HashEntry{
 };
 
 // Define the hashvec type.
-using hashvec_t = std::vector<std::pair<size_t, HashEntry>>;
+using hashvec_t = std::vector<RegionRecord>;
+
+// Type definitions
+using record_index_t = std::vector<RegionRecord>::size_type;
 
 #endif
 
