@@ -1,7 +1,7 @@
 API
 ---
 
-The profiler's API consists of three primary functions; **start**, **stop**,
+Vernier's API consists of three primary functions; **start**, **stop**,
 and **write**. A timed region is defined by a start-stop pair.
 
 How calls to these functions are made differs slightly between C++ and Fortran,
@@ -10,20 +10,20 @@ but the core functionality is the same.
 C++
 ^^^
 
-.. doxygenfunction:: Profiler::start
-   :project: profiler
+.. doxygenfunction:: Vernier::start
+   :project: vernier
 
-.. doxygenfunction:: Profiler::stop
-   :project: profiler
+.. doxygenfunction:: Vernier::stop
+   :project: vernier
 
-.. doxygenfunction:: Profiler::write
-   :project: profiler
+.. doxygenfunction:: Vernier::write
+   :project: vernier
 
 Fortran
 ^^^^^^^
 
 .. doxygennamespace:: profiler_mod
-   :project: profiler
+   :project: vernier
    :content-only:
 
 .. doxygenfunction:: profiler_stop
@@ -45,6 +45,8 @@ Dos and don'ts
 
 Examples
 ^^^^^^^^
+.. TODO: Update the names of the Profiler class and "prof" object, and update
+         the instructions accordingly.
 
 **C++**:
 
@@ -78,5 +80,5 @@ Examples
    call profiler_write()
 
 Although their primary purpose is for system testing, the tests in
-``profiler/tests/system_tests`` also serve as more fleshed-out examples on how
-calls to profiler are made. 
+``Vernier/tests/system_tests`` also serve as more fleshed-out examples on how
+calls to Vernier are made. 

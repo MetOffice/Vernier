@@ -13,7 +13,7 @@ The tested compilers are:
 
 Requirements for building:
 
-* The compiler must use a C++17 standard.
+* C++17 compatible compiler.
 * CMake 3.13
 * MPICH 3.4.1
 * OpenMP 4.5 (if applicable)
@@ -25,7 +25,7 @@ For testing and documenation:
 * Doxygen 1.8.5
 * Sphinx 4.3.1
   
-  * docutils 0.16 (higher versions may render things such as bullet point lists incorrectly)
+  * docutils 0.16 (rendering issues are known to exist in newer versions!)
   
 * Breathe 4.34.0
 
@@ -37,12 +37,12 @@ For testing and documenation:
 Building & Options
 ------------------
 
-To get started, checkout the profiler repository:
+To get started, checkout the Vernier repository:
 
 .. code-block:: shell
 
-   git clone git@github.com:MetOffice/profiler.git
-   cd profiler
+   git clone git@github.com:MetOffice/Vernier.git
+   cd Vernier
 
 It's also recommended that a build directory is setup, as in-source builds are
 not supported. After this, CMake can then be used to perform a full build.
@@ -91,7 +91,7 @@ up a terminal wherein the user can change build options interactively.
       - Determines whether the libraries are linked statically (``OFF``) or 
         dynamically (``ON``).
 
-The table above pertains to options specific to the profiler project. An extensive
+The table above pertains to options specific to Vernier. An extensive
 list of CMake internal variables can be found 
 `here <https://cmake.org/cmake/help/v3.13/manual/cmake-variables.7.html>`_.
 
@@ -108,7 +108,7 @@ After navigating to your build directory:
    cmake ..
    make install
 
-**The default installation location is in** ``profiler/build`` **but this can be
+**The default installation location is in** ``Vernier/build`` **but this can be
 changed via the** ``-DCMAKE_INSTALL_PREFIX`` **CMake option**.
 
 The next page (the :ref:`user manual<settingup>`) describes how to link the
@@ -123,8 +123,8 @@ Additional Targets
      Runs all built unit tests. Only available when ``-DBUILD_TESTS`` is turned
      ON. Identical to running ``ctest``.
 
-   profiler
-     Builds just the main profiler target and its associated source code, no
+   vernier
+     Builds just the main project target and its associated source code, no
      tests or documentation.
 
    doxygendocs

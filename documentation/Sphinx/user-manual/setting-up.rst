@@ -3,7 +3,7 @@
 Setting Up
 ----------
 
-Instructions on how to install profler's libraries and public header
+Instructions on how to install Vernier's libraries and public header
 files can be found :ref:`here <installation>`. The ``lib`` directory contains
 libraries to be linked against, whereas the ``include`` directory contains any
 public header files (C++) or modules (Fortran) that need to be included to gain
@@ -20,10 +20,10 @@ Flags of interest when compiling manually:
 .. code-block:: shell
 
    # C++
-   mpicxx foo.cpp -I/path/to/include -Wl,-rpath=/path/to/lib -L/path/to/lib -lprofiler
+   mpicxx foo.cpp -I/path/to/include -Wl,-rpath=/path/to/lib -L/path/to/lib -lvernier
 
    # Fortran
-   mpifort bar.f90 -I/path/to/include -Wl,-rpath=/path/to/lib -L/path/to/lib -lprofiler_f -lprofiler_c -lprofiler
+   mpifort bar.f90 -I/path/to/include -Wl,-rpath=/path/to/lib -L/path/to/lib -lvernier_f -lvernier_c -lvernier
 
 It's also possible to use ``LD_LIBRARY_PATH`` instead of ``-Wl,-rpath=``:
 
@@ -31,21 +31,21 @@ It's also possible to use ``LD_LIBRARY_PATH`` instead of ``-Wl,-rpath=``:
 
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/lib
 
-Including profiler in a CMake project
+Including vernier in a CMake project
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The CMake lines below are always a necessary starting point in order to find
-the profiler package. This can be done anywhere in your project directory as
-long as profiler is found *before* linking/using.
+the Vernier package. This can be done anywhere in your project directory as
+long as Vernier is found *before* linking/using.
 
 .. code-block:: cmake
 
    # The find_package function needs to know where to go looking for the
-   # profiler package
+   # vernier package
    set(CMAKE_PREFIX_PATH /path/to/lib)
 
-   # Find profiler
-   find_package(profiler CONFIG)
+   # Find vernier
+   find_package(vernier CONFIG)
 
 .. note::
 
@@ -53,25 +53,25 @@ long as profiler is found *before* linking/using.
 
    .. code-block:: cmake
 
-      set(profiler_DIR /path/to/lib/cmake/profiler)
+      set(vernier_DIR /path/to/lib/cmake/vernier)
 
-   (*The key difference being that the full path to* ``profilerConfig.cmake`` *is
+   (*The key difference being that the full path to* ``vernierConfig.cmake`` *is
    mandatory, whereas it is sufficient to just point to the* ``lib`` *directory
    when using* ``CMAKE_PREFIX_PATH``).
 
-The subsequent steps for linking to the profiler libraries and adding include
+The subsequent steps for linking to the Vernier libraries and adding include
 dependencies may look something like:
 
 .. code-block:: cmake
 
-   # Link profiler libraries 
+   # Link vernier libraries 
    target_link_libraries(foo PUBLIC
-           profiler::profiler_f  # Only required for Fortran
-           profiler::profiler_c  # Only required for Fortran
-           profiler::profiler
+           vernier::vernier_f  # Only required for Fortran
+           vernier::vernier_c  # Only required for Fortran
+           vernier::vernier
            )
 
-   # Include profiler headers 
+   # Include vernier headers 
    target_include_directories(foo PUBLIC
            /path/to/include
            )
@@ -104,6 +104,6 @@ Environment Variables
 
    ``PROF_OUTPUT_FILENAME``
 
-     Sets the output filename, which is "profiler-output" by default. profler
+     Sets the output filename, which is "vernier-output" by default. Vernier
      will append the MPI rank onto the end of this name by default, resulting
-     in a file called "profiler-output-0" for the first MPI rank, for example.
+     in a file called "vernier-output-0" for the first MPI rank, for example.

@@ -1,7 +1,7 @@
 Interpreting Output
 -------------------
 
-By default profiler will write information out into one file per MPI rank.
+By default Vernier will write information out into one file per MPI rank.
 Single file output is not currently supported but is achievable via
 post-processing techniques.
 
@@ -9,7 +9,7 @@ Each file contains a table of the all the declared regions and their
 associated walltimes.
 
 The :ref:`environment variables <env-varibles>` section at the end of the
-setting up guide outlines environment variables relevant to profiler's output.
+setting up guide outlines environment variables relevant to Vernier's output.
 To reiterate, the two output format options are **threads** and **drhook**.
 
 **Example "threads" output:**

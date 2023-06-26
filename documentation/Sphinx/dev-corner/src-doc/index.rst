@@ -1,7 +1,7 @@
 Source Code Documentation
 =========================
 
-The code itself lives in the `profiler GitHub repository <https://github.com/MetOffice/profiler>`_.
+The code itself lives in the `Vernier GitHub repository <https://github.com/MetOffice/Vernier>`_.
 
 **C++**
 

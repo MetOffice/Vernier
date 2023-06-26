@@ -1,8 +1,8 @@
-Profiler Documentation
+Vernier Documentation
 ======================
 
-Profiler is a calliper-based profiling tool for scientific code on HPC platforms,
-primarily designed for use with the Unified Model and LFRic.
+Vernier is a calliper-based profiling tool for scientific code on HPC platforms,
+primarily designed for use within the various Met Office models and frameworks.
 
 .. toctree::
    :maxdepth: 2

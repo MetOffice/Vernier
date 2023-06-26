@@ -11,7 +11,7 @@ include(cmake/PreventInSourceBuilds.cmake)
 
 # Set project name and the languages required to build the project and a
 # project description. Also set the version of the library being built.
-project(profiler LANGUAGES CXX C Fortran
+project(vernier LANGUAGES CXX C Fortran
         DESCRIPTION "Met Office profiler"
         VERSION 0.1.0)
 
