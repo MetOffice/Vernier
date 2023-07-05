@@ -6,7 +6,7 @@
 
 /**
  * @file   vernier_c.cpp
- * @brief  C-language interfaces for Vernier. 
+ * @brief  C-language interfaces for Vernier.
  *
  * Neither Fortran or C can interface with C++ object constructs. Hence
  * C-language interfaces are needed to call Vernier from C and Fortran.
@@ -29,7 +29,7 @@ extern "C" {
 }
 
 /**
- * @brief  Start timing, part 1 of 2. 
+ * @brief  Start timing, part 1 of 2.
  */
 
 void c_vernier_start_part1()

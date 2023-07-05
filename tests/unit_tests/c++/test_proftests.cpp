@@ -17,7 +17,7 @@ using ::testing::KilledBySignal;
 
 
 //
-//  Tests and death tests related to profiler class members. 
+//  Tests and death tests related to profiler class members.
 //
 
 // Make sure the code exits when a hash mismatch happens.

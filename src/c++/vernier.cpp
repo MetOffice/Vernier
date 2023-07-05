@@ -87,7 +87,7 @@ size_t Vernier::start(std::string_view const region_name)
 }
 
 /**
- * @brief  Start timing a profiled code region, part 1 of 2: make a 
+ * @brief  Start timing a profiled code region, part 1 of 2: make a
  *         threadprivate note of the time.
  */
 
@@ -130,7 +130,7 @@ size_t Vernier::start_part2(std::string_view const region_name)
   if (call_depth_ < PROF_MAX_TRACEBACK_SIZE){
     auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
     auto region_start_time = vernier_gettime();
-    thread_traceback_[tid].at(call_depth_index) 
+    thread_traceback_[tid].at(call_depth_index)
        = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time_);
   }
   else {
@@ -147,7 +147,7 @@ size_t Vernier::start_part2(std::string_view const region_name)
  *        differencing the beginning of the start calliper from the end of the stop
  *        calliper, and subtracting the measured region time. Hence larger
  *        absolute times are being measured, which are less likely to suffer
- *        fractional error from precision limitations of the clock.   
+ *        fractional error from precision limitations of the clock.
  */
 
 void Vernier::stop(size_t const hash)
@@ -213,7 +213,7 @@ void Vernier::stop(size_t const hash)
   // Decrement index to last entry in the traceback.
   --call_depth_;
 
-  // Account for time spent in the profiler itself. 
+  // Account for time spent in the profiler itself.
   auto calliper_stop_time = vernier_gettime();
   auto calliper_time = calliper_stop_time - temp_sum;
 
@@ -376,4 +376,3 @@ unsigned long long int Vernier::get_prof_call_count(int const input_tid) const
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_prof_call_count();
 }
-

@@ -50,7 +50,7 @@ void HashTable::query_insert(std::string_view const region_name,
   {
     record_index = search->second;
   }
-  
+
   // If not, create new entry.
   else
   {
@@ -84,11 +84,11 @@ void HashTable::update(record_index_t const record_index, time_duration_t const 
 /**
  * @brief  Add in time spent calling child regions. Also retuns a pointer
  *         to the overhead time so that it can be incremented downstream,
- *         outside this function, with minimal additional overhead. 
+ *         outside this function, with minimal additional overhead.
  * @param [in]  record_index   The index corresponding to the region record.
  * @param [in]  time_delta     The time spent in the child region.
- * @param [out] overhead_time_ptr  Pointer to the profiling overhead time 
- *                                 incurred by calling children of this region. 
+ * @param [out] overhead_time_ptr  Pointer to the profiling overhead time
+ *                                 incurred by calling children of this region.
  */
 
 void HashTable::add_child_time_to_parent(
@@ -106,9 +106,9 @@ void HashTable::add_child_time_to_parent(
  *        a pointer to the total profiling overhead time so that it can be
  *        incremented downstream, outside this function, with minimal
  *        additional overhead.
- * @param [out] overhead_time_ptr  Pointer to the total profiling overhead time 
+ * @param [out] overhead_time_ptr  Pointer to the total profiling overhead time
  *                                 incurred by calling every set of profiler
- *                                 calls. 
+ *                                 calls.
  */
 
 void HashTable::add_profiler_call(time_duration_t*& overhead_time_ptr) {
@@ -191,7 +191,7 @@ std::vector<size_t> HashTable::list_keys()
  * @brief  Appends table_ onto the end of an input hashvec. 
  * @param[inout] hashvec_handler  HashVecHandler object containing the
  *                                hashvec to amend.
- * 
+ *
  */
 
 void HashTable::append_to(HashVecHandler& hashvec_handler)
@@ -211,7 +211,7 @@ void HashTable::append_to(HashVecHandler& hashvec_handler)
 
   // Sync-up the lookup table and hashvec.
   sync_lookup();
-  
+
   // Append hashvec to that passed through the argument list.
   hashvec_handler.append(hashvec_);
 }
