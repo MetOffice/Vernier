@@ -7,7 +7,7 @@
 !> @file    profiler_mod.F90
 !> @brief   Provides Fortran profiler bindings.
 
-module profiler_mod
+module vernier_mod
   use, intrinsic :: iso_c_binding, only: c_char, c_long, c_double, c_null_char
   implicit none
   private
@@ -26,10 +26,10 @@ module profiler_mod
   ! Public interfaces / subroutines
   !-----------------------------------------------------------------------------
 
-  public :: profiler_start
-  public :: profiler_stop
-  public :: profiler_write
-  public :: profiler_get_total_walltime
+  public :: vernier_start
+  public :: vernier_stop
+  public :: vernier_write
+  public :: vernier_get_total_walltime
 
   !-----------------------------------------------------------------------------
   ! Interfaces
@@ -37,29 +37,29 @@ module profiler_mod
 
   interface
 
-    subroutine interface_profiler_start(hash_out, region_name)         &
-               bind(C, name='c_profiler_start')
+    subroutine interface_vernier_start(hash_out, region_name)         &
+               bind(C, name='c_vernier_start')
       import :: c_char, pik
       character(kind=c_char, len=1), intent(in)  :: region_name(*)
       integer(kind=pik),             intent(out) :: hash_out
-    end subroutine interface_profiler_start
+    end subroutine interface_vernier_start
 
-    subroutine profiler_stop(hash_in) bind(C, name='c_profiler_stop')
+    subroutine vernier_stop(hash_in) bind(C, name='c_vernier_stop')
       import :: pik
       integer(kind=pik), intent(in) :: hash_in
-    end subroutine profiler_stop
+    end subroutine vernier_stop
 
-    subroutine profiler_write() bind(C, name='c_profiler_write')
+    subroutine vernier_write() bind(C, name='c_vernier_write')
         !No arguments to handle
-    end subroutine profiler_write
+    end subroutine vernier_write
 
-    function profiler_get_total_walltime(hash_in, thread_id) result(walltime) &
+    function vernier_get_total_walltime(hash_in, thread_id) result(walltime) &
              bind(C, name='c_get_total_walltime')
       import :: pik, prk
       integer(kind=pik), intent(in) :: hash_in
       integer(kind=pik), intent(in) :: thread_id
       real(kind=prk)                :: walltime
-    end function profiler_get_total_walltime
+    end function vernier_get_total_walltime
 
   end interface
 
@@ -73,7 +73,7 @@ module profiler_mod
     !> @param [in]  region_name   The region name.
     !> @note   Region names need not be null terminated on entry to this
     !>         routine.
-    subroutine profiler_start(hash_out, region_name)
+    subroutine vernier_start(hash_out, region_name)
       implicit none
 
       !Arguments
@@ -85,9 +85,9 @@ module profiler_mod
 
       call append_null_char(region_name, local_region_name, len_trim(region_name))
 
-      call interface_profiler_start(hash_out, local_region_name)
+      call interface_vernier_start(hash_out, local_region_name)
 
-    end subroutine profiler_start
+    end subroutine vernier_start
 
     !> @brief  Adds a null character to the end of a string.
     !> @param [in]  strlen      Length of the unterminated string.
@@ -107,5 +107,5 @@ module profiler_mod
 
     end subroutine append_null_char
 
-end module profiler_mod
+end module vernier_mod
 

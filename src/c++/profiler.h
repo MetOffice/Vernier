@@ -21,13 +21,13 @@
 #include "hashtable.h"
 
 /**
- * @brief  Top-level profiler class.
+ * @brief  Top-level Vernier class.
  *
  * Maintains separate hashtables for each thread, and keeps a breadcrumb trail
  * of profiled regions.
  */
 
-class Profiler
+class Vernier
 {
   private:
 
@@ -61,7 +61,7 @@ class Profiler
   public:
 
     // Constructors
-    Profiler();
+    Vernier();
 
     // Member functions
     size_t start(std::string_view);
@@ -81,6 +81,6 @@ class Profiler
 };
 
 // Declare global profiler
-inline Profiler prof;
+inline Vernier vernier;
 
 #endif

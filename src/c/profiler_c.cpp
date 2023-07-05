@@ -21,9 +21,9 @@
 #include <cstring>
 
 extern "C" {
-  void   c_profiler_start(long int&, char const*);
-  void   c_profiler_stop (long int const&);
-  void   c_profiler_write();
+  void   c_vernier_start(long int&, char const*);
+  void   c_vernier_stop (long int const&);
+  void   c_vernier_write();
   double c_get_total_walltime(long int const&, int const&);
 }
 
@@ -31,9 +31,9 @@ extern "C" {
  * @brief  Start timing a named region and return a unique handle.
  */
 
-void c_profiler_start(long int& hash_out, char const* name)
+void c_vernier_start(long int& hash_out, char const* name)
 {
-  size_t hash = prof.start( name );
+  size_t hash = vernier.start( name );
 
   // Ensure that the source and destination have the same size.
   static_assert(sizeof(hash) == sizeof(hash_out), "Hash/Out size mismatch.");
@@ -44,7 +44,7 @@ void c_profiler_start(long int& hash_out, char const* name)
  * @brief  Stop timing the region with the specified handle.
  */
 
-void c_profiler_stop(long int const& hash_in)
+void c_vernier_stop(long int const& hash_in)
 {
   size_t hash;
 
@@ -52,16 +52,16 @@ void c_profiler_stop(long int const& hash_in)
   static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
   std::memcpy(&hash, &hash_in, sizeof(hash));
 
-  prof.stop( hash );
+  vernier.stop( hash );
 }
 
 /**
  * @brief Write the profile itself.
  */
 
-void c_profiler_write()
+void c_vernier_write()
 {
-  prof.write();
+  vernier.write();
 }
 
 /**
