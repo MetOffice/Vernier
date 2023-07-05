@@ -6,22 +6,11 @@
 
 #include "hashtable.h"
 #include "hashvec_handler.h"
+
 #include <cassert>
+#include <iterator>
 
-/**
- * @brief  Constructs a new entry in the hash table.
- *
- */
-
-HashEntry::HashEntry(std::string_view region_name)
-      : region_name_(region_name)
-      , total_walltime_      (time_duration_t::zero())
-      , total_raw_walltime_  (time_duration_t::zero())
-      , self_walltime_       (time_duration_t::zero())
-      , child_walltime_      (time_duration_t::zero())
-      , overhead_walltime_   (time_duration_t::zero())
-      , call_count_(0)
-      {}
+#define PROF_HASHVEC_RESERVE_SIZE 1000
 
 /**
  * @brief Hashtable constructor
@@ -32,85 +21,118 @@ HashEntry::HashEntry(std::string_view region_name)
 HashTable::HashTable(int const tid)
   : tid_(tid)
 {
+  // Reserve enough places in hashvec_
+  hashvec_.reserve(PROF_HASHVEC_RESERVE_SIZE);
+
   // Set the name and hash of the profiler entry.
   std::string const profiler_name = "__profiler__@" + std::to_string(tid);
-  profiler_hash_ = hash_function_(profiler_name);
 
   // Insert special entry for the profiler overhead time.
-  assert (table_.count(profiler_hash_) == 0);
-  table_.emplace(profiler_hash_, HashEntry(profiler_name));
-  assert (table_.count(profiler_hash_) > 0);
+  query_insert(profiler_name, profiler_hash_, profiler_index_);
 }
 
 /**
  * @brief  Inserts a new entry into the hashtable.
+ * @param [in]  region_name  The name of the region.
+ * @param [out] hash          Hash of the region name.
+ * @param [out] record_index  Array index of the region record.
  *
  */
 
-size_t HashTable::query_insert(std::string_view region_name) noexcept
+void HashTable::query_insert(std::string_view const region_name,
+                             size_t& hash,
+                             record_index_t& record_index) noexcept
 {
-  size_t hash = hash_function_(region_name);
+  hash = hash_function_(region_name);
 
-  if (table_.count(hash) == 0){
-    table_.emplace(hash,HashEntry(region_name));
-    assert (table_.count(hash) > 0);
+  // Does the entry exist already?
+  if (auto search = lookup_table_.find(hash); search != lookup_table_.end())
+  {
+    record_index = search->second;
   }
-
-  return hash;
+  
+  // If not, create new entry.
+  else
+  {
+    hashvec_.emplace_back(hash, region_name);
+    record_index = hashvec_.size()-1;
+    lookup_table_.emplace(hash, record_index);
+    assert (lookup_table_.count(hash) > 0);
+  }
 }
 
 /**
  * @brief  Updates the total walltime and call count for the specified region. 
- * @param [in] hash  The hash corresponding to the profiled region.
+ * @param [in] record_index  The index in hashvec_ corresponding to the
+ *                           profiled region.
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(size_t hash, time_duration_t time_delta)
+void HashTable::update(record_index_t const record_index, time_duration_t const time_delta)
 {
-  // Assertions
-  assert (table_.size() > 0);
-  assert (table_.count(hash) > 0);
+
+  auto& record = hashvec_[record_index];
 
   // Increment the walltime for this hash entry.
-  auto& entry = table_.at(hash);
-  entry.total_walltime_ += time_delta;
+  record.total_walltime_ += time_delta;
 
   // Update the number of times this region has been called
-  entry.call_count_++;
+  ++record.call_count_;
 
-  // Also increment the number of calliper-pairs called.
-  auto& profiler_entry = table_.at(profiler_hash_);
-  profiler_entry.call_count_++;
 }
 
 /**
- * @brief  Add child region time to parent.
- * @param [in] hash        The hash of the child region to update.
- * @param [in] time_delta  The time spent in the child region.
+ * @brief  Add in time spent calling child regions. Also retuns a pointer
+ *         to the overhead time so that it can be incremented downstream,
+ *         outside this function, with minimal additional overhead. 
+ * @param [in]  record_index   The index corresponding to the region record.
+ * @param [in]  time_delta     The time spent in the child region.
+ * @param [out] overhead_time_ptr  Pointer to the profiling overhead time 
+ *                                 incurred by calling children of this region. 
  */
 
-void HashTable::add_child_time(size_t const hash, time_duration_t time_delta)
+void HashTable::add_child_time_to_parent(
+                    record_index_t  const parent_index,
+                    time_duration_t const child_walltime,
+                    time_duration_t*& overhead_time_ptr)
 {
-  // Assertions
-  assert (table_.size() > 0);
-  assert (table_.count(hash) > 0);
-
-  // Increment the walltime for this hash entry
-  auto& entry = table_.at(hash);
-  entry.child_walltime_ += time_delta;
+  auto& record = hashvec_[parent_index];
+  record.child_walltime_ += child_walltime;
+  overhead_time_ptr = &record.overhead_walltime_;
 }
 
 /**
- * @brief  Add profiling overhead time, incurred when calling a child, to the
- *         parent region.
- * @param [in] hash           The hash of the child region to update.
- * @param [in] calliper_time  The profiling overhead time.
+ * @brief Increment the number of calls to the profiler callipers. Also returns
+ *        a pointer to the total profiling overhead time so that it can be
+ *        incremented downstream, outside this function, with minimal
+ *        additional overhead.
+ * @param [out] overhead_time_ptr  Pointer to the total profiling overhead time 
+ *                                 incurred by calling every set of profiler
+ *                                 calls. 
  */
 
-void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_time) 
+void HashTable::add_profiler_call(time_duration_t*& overhead_time_ptr) {
+  auto& record = hashvec_[profiler_index_];
+  ++record.call_count_;
+  overhead_time_ptr = &record.total_walltime_;
+}
+
+/**
+ * @brief  Sorts entries in the vector of region records according to self time
+ *         and updates the hashtable with the new indices.
+ */
+
+void HashTable::sort_records()
 {
-  auto& entry = table_.at(hash);
-  entry.overhead_walltime_ += calliper_time;
+
+  // Sort the entries according to self walltime.
+  std::sort(begin(hashvec_), end(hashvec_),
+      [](auto a, auto b) { return a.self_walltime_ > b.self_walltime_;});
+
+  // Need to re-store the indices in the lookup table, since they will have all
+  // moved around as a result of the above sort.
+  sync_lookup();
+
 }
 
 /**
@@ -119,53 +141,34 @@ void HashTable::add_overhead_time(size_t const hash, time_duration_t calliper_ti
  * @details Times computed are: the region self time and the total time minus
  *          directly incurred profiling overhead costs.
  *
- * @param [in] hash   The hash of the region to compute.
+ * @param [in] record  The region record to compute.
  */
 
-void HashTable::prepare_computed_times(size_t const hash)
+void HashTable::prepare_computed_times(RegionRecord& record)
 {
-  auto& entry = table_.at(hash);
 
   // Self time
-  entry.self_walltime_ = entry.total_walltime_
-                       - entry.child_walltime_
-                       - entry.overhead_walltime_;
+  record.self_walltime_ = record.total_walltime_
+                        - record.child_walltime_
+                        - record.overhead_walltime_;
 
   // Total walltime with overheads attributed to the parent removed.
-  entry.total_raw_walltime_ = entry.total_walltime_
-                            - entry.overhead_walltime_;
+  record.total_raw_walltime_ = record.total_walltime_
+                             - record.overhead_walltime_;
 }
 
 /**
  * @brief  Evaluates times derived from other times measured, looping over all
- *         code regions; includes updating the special profiling overhead entry.
+ *         code regions.
  */
 
- void HashTable::prepare_computed_times_all()
- {
+void HashTable::prepare_computed_times_all()
+{
 
-   auto total_overhead_time = time_duration_t::zero();
-
-   // Loop over entries in the hashtable. This would include the special
-   // profiler entry, but the HashEntry constructor will have ensured that all
-   // corresponding values are zero thus far.
-   for (auto& [hash, entry] : table_) {
-     prepare_computed_times(hash);
-     total_overhead_time += entry.overhead_walltime_;
-   }
-
-   // Check that the special profiler hash entries are all zero, even after the
-   // above loop.
-   assert(table_.at(profiler_hash_).self_walltime_      == time_duration_t::zero());
-   assert(table_.at(profiler_hash_).child_walltime_     == time_duration_t::zero());
-   assert(table_.at(profiler_hash_).total_walltime_     == time_duration_t::zero());
-   assert(table_.at(profiler_hash_).total_raw_walltime_ == time_duration_t::zero());
-
-   // Set values for the profiler entry specifically in the hashtable.
-   table_.at(profiler_hash_).self_walltime_      = total_overhead_time;
-   table_.at(profiler_hash_).child_walltime_     = time_duration_t::zero();
-   table_.at(profiler_hash_).total_walltime_     = total_overhead_time;
-   table_.at(profiler_hash_).total_raw_walltime_ = total_overhead_time;
+  // Loop over entries in the hashtable.
+  for (auto& [hash, index] : lookup_table_) {
+    prepare_computed_times(hash2record(hash));
+  }
 
 }
 
@@ -177,7 +180,7 @@ void HashTable::prepare_computed_times(size_t const hash)
 std::vector<size_t> HashTable::list_keys()
 {
   std::vector<size_t> keys;
-  for (auto const& key : table_)
+  for (auto const& key : lookup_table_)
   {
     keys.push_back(key.first);
   }
@@ -186,6 +189,8 @@ std::vector<size_t> HashTable::list_keys()
 
 /**
  * @brief  Appends table_ onto the end of an input hashvec. 
+ * @param[inout] hashvec_handler  HashVecHandler object containing the
+ *                                hashvec to amend.
  * 
  */
 
@@ -194,25 +199,73 @@ void HashTable::append_to(HashVecHandler& hashvec_handler)
   // Compute overhead and self times before appending
   prepare_computed_times_all();
 
-  // Remove __profiler__ entries with 0 calls
-  auto it = table_.find(profiler_hash_);
-  if (it != table_.end() && it->second.call_count_ == 0) { table_.erase(it); }
-  
-  // Create hashvec from the table data.
-  hashvec_t new_hashvec(table_.cbegin(), table_.cend());
+  // Loop over entries in the hashtable.
+  for (auto& [hash, index] : lookup_table_) {
+    prepare_computed_times(hash2record(hash));
+  }
 
-  // Append hashvec to argument. 
-  hashvec_handler.append(new_hashvec);
+  // Erase profiler entry if call count is zero.
+  if(hash2record(profiler_hash_).call_count_ == 0) {
+    erase_record(profiler_hash_);
+  }
+
+  // Sync-up the lookup table and hashvec.
+  sync_lookup();
+  
+  // Append hashvec to that passed through the argument list.
+  hashvec_handler.append(hashvec_);
+}
+
+/**
+ * @brief Erases record from the hashvec and lookup table.
+ * @param[in] hash   Hash of the record to erase.
+ *
+ */
+
+void HashTable::erase_record(size_t const hash)
+{
+
+  // Find the lookup table (hashtable) iterator.
+  auto iterator    = lookup_table_.find(hash);
+  auto const index = lookup_table_.at(hash);
+
+  // Get the hashvec iterator from the index
+  auto record_iterator = begin(hashvec_);
+  std::advance( record_iterator, index);
+
+  // Erase from both the hashvec and the lookup table.
+  hashvec_.erase(record_iterator);
+  lookup_table_.erase(iterator);
+
+}
+
+/**
+ * @brief Updates vector indices stored in the lookup table.
+ *
+ */
+
+void HashTable::sync_lookup()
+{
+  // Need to re-store the indices in the lookup table, since there will be a gap
+  // as a result of the erase().
+  for (auto it = begin(hashvec_); it != end(hashvec_); ++it) {
+    auto current_index = it - hashvec_.begin();
+    lookup_table_[it->region_hash_] =  static_cast<record_index_t>(current_index);
+  }
 }
 
 /**
  * @brief  Get the total (inclusive) time corresponding to the input hash.
+ * @param[in]  hash  Fetches the total wallclock time for the region
+ *                   with this hash.
  *
  */
 
 double HashTable::get_total_walltime(size_t const hash) const
 {
-  return table_.at(hash).total_walltime_.count();
+  auto& record = hash2record(hash);
+
+  return record.total_walltime_.count();
 }
 
 /**
@@ -225,8 +278,9 @@ double HashTable::get_total_walltime(size_t const hash) const
 
 double HashTable::get_total_raw_walltime(size_t const hash)
 {
-   prepare_computed_times(hash);
-   return table_.at(hash).total_raw_walltime_.count();
+  auto& record = hash2record(hash);
+   prepare_computed_times(record);
+   return record.total_raw_walltime_.count();
 }
 
 /**
@@ -237,7 +291,8 @@ double HashTable::get_total_raw_walltime(size_t const hash)
 
 double HashTable::get_overhead_walltime(size_t const hash) const
 {
-  return table_.at(hash).overhead_walltime_.count();
+  auto& record = hash2record(hash);
+  return record.overhead_walltime_.count();
 }
 
 /**
@@ -249,8 +304,9 @@ double HashTable::get_overhead_walltime(size_t const hash) const
 
 double HashTable::get_self_walltime(size_t const hash)
 {
-  prepare_computed_times(hash);
-  return table_.at(hash).self_walltime_.count();
+  auto& record = hash2record(hash);
+  prepare_computed_times(record);
+  return record.self_walltime_.count();
 }
 
 /**
@@ -262,7 +318,8 @@ double HashTable::get_self_walltime(size_t const hash)
 
 double HashTable::get_child_walltime(size_t const hash) const
 {
-  return table_.at(hash).child_walltime_.count();
+  auto& record = hash2record(hash);
+  return record.child_walltime_.count();
 }
 
 /**
@@ -272,7 +329,8 @@ double HashTable::get_child_walltime(size_t const hash) const
 
 std::string HashTable::get_region_name(size_t const hash) const
 {
-  return table_.at(hash).region_name_;
+  auto& record = hash2record(hash);
+  return record.region_name_;
 }
 
 /**
@@ -287,7 +345,8 @@ std::string HashTable::get_region_name(size_t const hash) const
 
 unsigned long long int HashTable::get_call_count(size_t const hash) const
 {
-    return table_.at(hash).call_count_;
+  auto& record = hash2record(hash);
+  return record.call_count_;
 }
 
 /**
@@ -300,6 +359,34 @@ unsigned long long int HashTable::get_call_count(size_t const hash) const
 
 unsigned long long int HashTable::get_prof_call_count() const
 {
-    return table_.at(profiler_hash_).call_count_;
+    auto& record = hash2record(profiler_hash_);
+    assert (lookup_table_.count(profiler_hash_) > 0);
+    return record.call_count_;
 }
+
+/**
+ * @brief   Gets a reference to a region record for a given hash.
+ * @param [in]  hash   The region
+ * @returns     Region record reference.
+ *
+ */
+
+RegionRecord& HashTable::hash2record(size_t const hash)
+{
+  return hashvec_[lookup_table_.at(hash)];
+}
+
+/**
+ * @brief   Gets a const reference to a region record for a given hash. Can be
+ *          called from const methods.
+ * @param [in]  hash   The region
+ * @returns     Region record reference.
+ *
+ */
+
+RegionRecord const& HashTable::hash2record(size_t const hash) const
+{
+  return hashvec_[lookup_table_.at(hash)];
+}
+
 
