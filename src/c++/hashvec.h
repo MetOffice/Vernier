@@ -56,7 +56,5 @@ using record_index_t = std::vector<RegionRecord>::size_type;
 
 } // End meto namespace
 
-} // End namespace meto
-
 #endif
 
