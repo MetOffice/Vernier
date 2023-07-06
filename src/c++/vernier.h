@@ -5,11 +5,11 @@
 \*----------------------------------------------------------------------------*/
 
 /**
- * @file   profiler.h
- * @brief  Top-level profiler class.
+ * @file   vernier.h
+ * @brief  Top-level Vernier class.
  *
  * Contains the top-level class, whose methods are called from client code. Also
- * declares a top-level, global, profiler object.
+ * declares a top-level, global, vernier object.
  *
  */
 

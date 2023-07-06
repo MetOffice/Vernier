@@ -14,7 +14,7 @@ include(CMakePackageConfigHelpers)
 # Add files source files to library. This is STATIC by default and SHARED when
 # the BUILD_SHARED_LIBS option is turned ON.
 add_library(${CMAKE_PROJECT_NAME}
-        profiler.h         profiler.cpp
+        vernier.h          vernier.cpp
         hashtable.h        hashtable.cpp
         hashvec_handler.h  hashvec_handler.cpp
         writer/writer.h    writer/writer.cpp
@@ -24,7 +24,7 @@ add_library(${CMAKE_PROJECT_NAME}
         prof_gettime.h     prof_gettime.cpp
         )
 
-set(PUBLIC_HEADER_FILES profiler.h hashtable.h hashvec.h prof_gettime.h)
+set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h prof_gettime.h)
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
