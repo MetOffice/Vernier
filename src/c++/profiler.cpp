@@ -30,8 +30,8 @@ meto::time_point_t meto::Profiler::logged_calliper_start_time_{};
 meto::Profiler::TracebackEntry::TracebackEntry(
                                    size_t         record_hash,
                                    record_index_t record_index,
-                                   meto::time_point_t region_start_time, 
-                                   meto::time_point_t calliper_start_time)
+                                   time_point_t region_start_time, 
+                                   time_point_t calliper_start_time)
   : record_hash_        (record_hash)
   , record_index_       (record_index)
   , region_start_time_  (region_start_time)
@@ -94,7 +94,7 @@ size_t meto::Profiler::start(std::string_view const region_name)
 void meto::Profiler::start_part1()
 {
   // Store the calliper start time, which is used in part2.
-  logged_calliper_start_time_ = meto::prof_gettime();
+  logged_calliper_start_time_ = prof_gettime();
 }
 
 /**
@@ -129,7 +129,7 @@ size_t meto::Profiler::start_part2(std::string_view const region_name)
   ++call_depth_;
   if (call_depth_ < PROF_MAX_TRACEBACK_SIZE){
     auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
-    auto region_start_time = meto::prof_gettime();
+    auto region_start_time = prof_gettime();
     thread_traceback_[tid].at(call_depth_index) 
        = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time_);
   }
@@ -154,7 +154,7 @@ void meto::Profiler::stop(size_t const hash)
 {
 
   // Log the region stop time.
-  auto region_stop_time = meto::prof_gettime();
+  auto region_stop_time = prof_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -194,7 +194,7 @@ void meto::Profiler::stop(size_t const hash)
   auto temp_sum = traceback_entry.calliper_start_time_ + region_duration;
 
   // The sequence of code that follows is aimed at leaving only minimal and
-  // simple operations after the call to meto::prof_gettime().
+  // simple operations after the call to prof_gettime().
   meto::time_duration_t* parent_overhead_time_ptr   = nullptr;
   meto::time_duration_t* profiler_overhead_time_ptr = nullptr;
 
@@ -214,7 +214,7 @@ void meto::Profiler::stop(size_t const hash)
   --call_depth_;
 
   // Account for time spent in the profiler itself. 
-  auto calliper_stop_time = meto::prof_gettime();
+  auto calliper_stop_time = prof_gettime();
   auto calliper_time = calliper_stop_time - temp_sum;
 
   // Increment the overhead time specific to this region, incurred when calling
