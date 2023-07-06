@@ -79,6 +79,6 @@ double c_get_total_walltime(long int const& hash_in, int const& thread_id)
   static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
   std::memcpy(&hash, &hash_in, sizeof(hash));
 
-  return prof.get_total_walltime(hash, thread_id);
+  return vernier.get_total_walltime(hash, thread_id);
 }
 
