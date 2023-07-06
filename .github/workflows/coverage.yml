@@ -73,11 +73,11 @@ jobs:
       run: ctest 
 
     - name: Run Gcov 
-      run: gcov --demangled-names --human-readable ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir/*.gcno
+      run: gcov --demangled-names --human-readable ${{github.workspace}}/build/src/c++/CMakeFiles/vernier.dir/*.gcno
 
     - name: Inital Lcov Run
       shell: bash -l {0}
-      run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/profiler.dir --output-file basecoverage.info
+      run: lcov --capture --directory ${{github.workspace}}/build/src/c++/CMakeFiles/vernier.dir --output-file basecoverage.info
 
     - name: Extract Relevant Paths
       # Ignore all the STL header files from the initial lcov .info file
