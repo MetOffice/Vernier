@@ -113,8 +113,10 @@ class Profiler
     void friend c_profiler_start_part2(long int& hash_out, char const* name);
 };
 
+} // End namespace meto
+
 // Declare global profiler
-inline Profiler prof;
+inline meto::Profiler prof; // TODO: Should this be inside & Does inline meaning change when in namespace?
 
 } // End meto namespce
 
