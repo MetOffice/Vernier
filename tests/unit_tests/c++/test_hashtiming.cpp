@@ -23,35 +23,35 @@
 TEST(HashEntryTest, TimingsTest) {
 
   // Start main profiler region and chrono timing
-  const auto& prof_main = prof.start("QuicheLorraine");
+  const auto& prof_main = meto::prof.start("QuicheLorraine");
   const auto chrono_main_start = std::chrono::steady_clock::now();
 
   sleep(1);
 
   // Start a sub-region and chrono timing
-  const auto& prof_sub = prof.start("SalmonQuiche");
+  const auto& prof_sub = meto::prof.start("SalmonQuiche");
   const auto chrono_sub_start = std::chrono::steady_clock::now();
 
   sleep(1);
 
   // Stop profiler sub-region and respective chrono time
   const auto chrono_sub_end = std::chrono::steady_clock::now();
-  prof.stop(prof_sub);
+  meto::prof.stop(prof_sub);
 
   // Stop profiler main region and respective chrono time
   const auto chrono_main_end = std::chrono::steady_clock::now();
-  prof.stop(prof_main);
+  meto::prof.stop(prof_main);
 
   {
     SCOPED_TRACE("Self walltime calculation failed");
 
     // Grab the total, child and self wallclock times
-    const double& total_raw = prof.get_total_raw_walltime(prof_main,0);
-    const double& total     = prof.get_total_walltime    (prof_main,0);
-    const double& child     = prof.get_child_walltime    (prof_main,0);
-    const double& self      = prof.get_self_walltime     (prof_main,0);
-    const double& overhead  = prof.get_overhead_walltime (prof_main,0);
-    std::string   region    = prof.get_region_name       (prof_main,0);
+    const double& total_raw = meto::prof.get_total_raw_walltime(prof_main,0);
+    const double& total     = meto::prof.get_total_walltime    (prof_main,0);
+    const double& child     = meto::prof.get_child_walltime    (prof_main,0);
+    const double& self      = meto::prof.get_self_walltime     (prof_main,0);
+    const double& overhead  = meto::prof.get_overhead_walltime (prof_main,0);
+    std::string   region    = meto::prof.get_region_name       (prof_main,0);
   
     // Test that total
     EXPECT_EQ(total_raw,total-overhead) 
@@ -83,7 +83,7 @@ TEST(HashEntryTest, TimingsTest) {
     const double time_tolerance = 0.0005;
 
     // Expect profiler & chrono times to be within tolerance
-    EXPECT_NEAR( prof.get_total_walltime(prof_main,0), main_in_s, time_tolerance );
-    EXPECT_NEAR( prof.get_total_walltime(prof_sub,0) , sub_in_s , time_tolerance );
+    EXPECT_NEAR( meto::prof.get_total_walltime(prof_main,0), main_in_s, time_tolerance );
+    EXPECT_NEAR( meto::prof.get_total_walltime(prof_sub,0) , sub_in_s , time_tolerance );
   }
 }
