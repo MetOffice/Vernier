@@ -100,7 +100,7 @@ list of CMake internal variables can be found
 Installation
 ------------
 
-The "install" target will install profiler's public header files and libraries.
+The "install" target will install Vernier's public header files and libraries.
 After navigating to your build directory:
 
 .. code-block:: shell
