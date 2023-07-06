@@ -38,11 +38,11 @@ class Formatter {
   private:
 
     // Format method
-    void (Formatter::*format_)(std::ofstream&, meto::hashvec_t);
+    void (Formatter::*format_)(std::ofstream&, hashvec_t);
 
     // Individual formatter functions
-    void  threads(std::ofstream& os, meto::hashvec_t);
-    void  drhook (std::ofstream& os, meto::hashvec_t);
+    void  threads(std::ofstream& os, hashvec_t);
+    void  drhook (std::ofstream& os, hashvec_t);
 
   public:
 
@@ -50,7 +50,7 @@ class Formatter {
     explicit Formatter();
 
     // Execute the format method
-    void execute_format(std::ofstream& os, meto::hashvec_t);
+    void execute_format(std::ofstream& os, hashvec_t);
    
 };
 
