@@ -40,8 +40,8 @@ meto::HashTable::HashTable(int const tid)
  */
 
 void meto::HashTable::query_insert(std::string_view const region_name,
-                             size_t& hash,
-                             record_index_t& record_index) noexcept
+                                   size_t& hash,
+                                   record_index_t& record_index) noexcept
 {
   hash = hash_function_(region_name);
 

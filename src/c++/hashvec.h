@@ -29,7 +29,7 @@ namespace meto
  *
  */
 
-struct RegionRecord{
+struct RegionRecord {
   public:
 
     // Constructor

@@ -114,7 +114,7 @@ class Profiler
 };
 
 // Declare global profiler
-inline Profiler prof; // TODO: Should this be inside & Does inline meaning change when in namespace?
+inline Profiler prof;
 
 } // End meto namespce
 

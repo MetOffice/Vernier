@@ -23,4 +23,3 @@ meto::RegionRecord::RegionRecord(size_t const region_hash,
 , overhead_walltime_   (meto::time_duration_t::zero())
 , call_count_(0)
 {}
-
