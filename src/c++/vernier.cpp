@@ -30,8 +30,8 @@ time_point_t Vernier::logged_calliper_start_time_{};
 Vernier::TracebackEntry::TracebackEntry(
                                    size_t         record_hash,
                                    record_index_t record_index,
-                                   time_point_t region_start_time, 
-                                   time_point_t calliper_start_time)
+                                   meto::time_point_t region_start_time,
+                                   meto::time_point_t calliper_start_time)
   : record_hash_        (record_hash)
   , record_index_       (record_index)
   , region_start_time_  (region_start_time)

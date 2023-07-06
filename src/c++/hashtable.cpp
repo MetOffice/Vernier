@@ -18,7 +18,7 @@
  *
  */
 
-HashTable::HashTable(int const tid)
+meto::HashTable::HashTable(int const tid)
   : tid_(tid)
 {
   // Reserve enough places in hashvec_
@@ -39,7 +39,7 @@ HashTable::HashTable(int const tid)
  *
  */
 
-void HashTable::query_insert(std::string_view const region_name,
+void meto::HashTable::query_insert(std::string_view const region_name,
                              size_t& hash,
                              record_index_t& record_index) noexcept
 {
@@ -68,7 +68,7 @@ void HashTable::query_insert(std::string_view const region_name,
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(record_index_t const record_index, time_duration_t const time_delta)
+void meto::HashTable::update(record_index_t const record_index, meto::time_duration_t const time_delta)
 {
 
   auto& record = hashvec_[record_index];
@@ -91,10 +91,10 @@ void HashTable::update(record_index_t const record_index, time_duration_t const 
  *                                 incurred by calling children of this region.
  */
 
-void HashTable::add_child_time_to_parent(
+void meto::HashTable::add_child_time_to_parent(
                     record_index_t  const parent_index,
-                    time_duration_t const child_walltime,
-                    time_duration_t*& overhead_time_ptr)
+                    meto::time_duration_t const child_walltime,
+                    meto::time_duration_t*& overhead_time_ptr)
 {
   auto& record = hashvec_[parent_index];
   record.child_walltime_ += child_walltime;
@@ -111,7 +111,7 @@ void HashTable::add_child_time_to_parent(
  *                                 calls.
  */
 
-void HashTable::add_profiler_call(time_duration_t*& overhead_time_ptr) {
+void meto::HashTable::add_profiler_call(meto::time_duration_t*& overhead_time_ptr) {
   auto& record = hashvec_[profiler_index_];
   ++record.call_count_;
   overhead_time_ptr = &record.total_walltime_;
@@ -122,7 +122,7 @@ void HashTable::add_profiler_call(time_duration_t*& overhead_time_ptr) {
  *         and updates the hashtable with the new indices.
  */
 
-void HashTable::sort_records()
+void meto::HashTable::sort_records()
 {
 
   // Sort the entries according to self walltime.
@@ -144,7 +144,7 @@ void HashTable::sort_records()
  * @param [in] record  The region record to compute.
  */
 
-void HashTable::prepare_computed_times(RegionRecord& record)
+void meto::HashTable::prepare_computed_times(RegionRecord& record)
 {
 
   // Self time
@@ -162,7 +162,7 @@ void HashTable::prepare_computed_times(RegionRecord& record)
  *         code regions.
  */
 
-void HashTable::prepare_computed_times_all()
+void meto::HashTable::prepare_computed_times_all()
 {
 
   // Loop over entries in the hashtable.
@@ -177,7 +177,7 @@ void HashTable::prepare_computed_times_all()
  *
  */
 
-std::vector<size_t> HashTable::list_keys()
+std::vector<size_t> meto::HashTable::list_keys()
 {
   std::vector<size_t> keys;
   for (auto const& key : lookup_table_)
@@ -194,7 +194,7 @@ std::vector<size_t> HashTable::list_keys()
  *
  */
 
-void HashTable::append_to(HashVecHandler& hashvec_handler)
+void meto::HashTable::append_to(HashVecHandler& hashvec_handler)
 {
   // Compute overhead and self times before appending
   prepare_computed_times_all();
@@ -222,7 +222,7 @@ void HashTable::append_to(HashVecHandler& hashvec_handler)
  *
  */
 
-void HashTable::erase_record(size_t const hash)
+void meto::HashTable::erase_record(size_t const hash)
 {
 
   // Find the lookup table (hashtable) iterator.
@@ -244,7 +244,7 @@ void HashTable::erase_record(size_t const hash)
  *
  */
 
-void HashTable::sync_lookup()
+void meto::HashTable::sync_lookup()
 {
   // Need to re-store the indices in the lookup table, since there will be a gap
   // as a result of the erase().
@@ -261,7 +261,7 @@ void HashTable::sync_lookup()
  *
  */
 
-double HashTable::get_total_walltime(size_t const hash) const
+double meto::HashTable::get_total_walltime(size_t const hash) const
 {
   auto& record = hash2record(hash);
 
@@ -276,7 +276,7 @@ double HashTable::get_total_walltime(size_t const hash) const
  *         `prepare_computed_times` is need to update its value. 
  */
 
-double HashTable::get_total_raw_walltime(size_t const hash)
+double meto::HashTable::get_total_raw_walltime(size_t const hash)
 {
   auto& record = hash2record(hash);
    prepare_computed_times(record);
@@ -289,7 +289,7 @@ double HashTable::get_total_raw_walltime(size_t const hash)
  * @param [in] hash  The hash corresponding to the region.
  */
 
-double HashTable::get_overhead_walltime(size_t const hash) const
+double meto::HashTable::get_overhead_walltime(size_t const hash) const
 {
   auto& record = hash2record(hash);
   return record.overhead_walltime_.count();
@@ -302,7 +302,7 @@ double HashTable::get_overhead_walltime(size_t const hash) const
  *         `prepare_computed_times` is need to update its value. 
  */
 
-double HashTable::get_self_walltime(size_t const hash)
+double meto::HashTable::get_self_walltime(size_t const hash)
 {
   auto& record = hash2record(hash);
   prepare_computed_times(record);
@@ -316,7 +316,7 @@ double HashTable::get_self_walltime(size_t const hash)
  *         `prepare_computed_times` is need to update its value. 
  */
 
-double HashTable::get_child_walltime(size_t const hash) const
+double meto::HashTable::get_child_walltime(size_t const hash) const
 {
   auto& record = hash2record(hash);
   return record.child_walltime_.count();
@@ -327,7 +327,7 @@ double HashTable::get_child_walltime(size_t const hash) const
  * @param [in] hash  The hash corresponding to the region.
  */
 
-std::string HashTable::get_region_name(size_t const hash) const
+std::string meto::HashTable::get_region_name(size_t const hash) const
 {
   auto& record = hash2record(hash);
   return record.region_name_;
@@ -343,7 +343,7 @@ std::string HashTable::get_region_name(size_t const hash) const
  *
  */
 
-unsigned long long int HashTable::get_call_count(size_t const hash) const
+unsigned long long int meto::HashTable::get_call_count(size_t const hash) const
 {
   auto& record = hash2record(hash);
   return record.call_count_;
@@ -357,7 +357,7 @@ unsigned long long int HashTable::get_call_count(size_t const hash) const
  *           
  */
 
-unsigned long long int HashTable::get_prof_call_count() const
+unsigned long long int meto::HashTable::get_prof_call_count() const
 {
     auto& record = hash2record(profiler_hash_);
     assert (lookup_table_.count(profiler_hash_) > 0);
@@ -371,7 +371,7 @@ unsigned long long int HashTable::get_prof_call_count() const
  *
  */
 
-RegionRecord& HashTable::hash2record(size_t const hash)
+meto::RegionRecord& meto::HashTable::hash2record(size_t const hash)
 {
   return hashvec_[lookup_table_.at(hash)];
 }
@@ -384,7 +384,7 @@ RegionRecord& HashTable::hash2record(size_t const hash)
  *
  */
 
-RegionRecord const& HashTable::hash2record(size_t const hash) const
+meto::RegionRecord const& meto::HashTable::hash2record(size_t const hash) const
 {
   return hashvec_[lookup_table_.at(hash)];
 }

@@ -21,6 +21,9 @@
 #include "writer/writer.h"
 #include "writer/multi.h"
 
+namespace meto
+{
+
 /**
  * @brief  HashVecHandler class
  * 
@@ -52,6 +55,8 @@ class HashVecHandler {
     void append(hashvec_t const&);
     
 };
+
+} // End meto namespace
 
 #endif
 

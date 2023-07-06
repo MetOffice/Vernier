@@ -26,6 +26,9 @@
 
 #define PROF_MAX_TRACEBACK_SIZE 1000
 
+namespace meto
+{
+
 // Forward declarations. The definitions of these functions will require access
 // to private methods.
 extern "C" {
@@ -112,5 +115,7 @@ class Vernier
 
 // Declare global profiler
 inline Vernier vernier;
+
+} // End meto namespce
 
 #endif
