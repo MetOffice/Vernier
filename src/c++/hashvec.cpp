@@ -13,14 +13,14 @@
  */
 
 meto::RegionRecord::RegionRecord(size_t const region_hash, 
-                           std::string_view const region_name) 
+                                 std::string_view const region_name) 
 : region_hash_(region_hash)
 , region_name_(region_name)
-, total_walltime_      (meto::time_duration_t::zero())
-, total_raw_walltime_  (meto::time_duration_t::zero())
-, self_walltime_       (meto::time_duration_t::zero())
-, child_walltime_      (meto::time_duration_t::zero())
-, overhead_walltime_   (meto::time_duration_t::zero())
+, total_walltime_      (time_duration_t::zero())
+, total_raw_walltime_  (time_duration_t::zero())
+, self_walltime_       (time_duration_t::zero())
+, child_walltime_      (time_duration_t::zero())
+, overhead_walltime_   (time_duration_t::zero())
 , call_count_(0)
 {}
 

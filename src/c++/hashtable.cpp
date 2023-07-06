@@ -68,7 +68,7 @@ void meto::HashTable::query_insert(std::string_view const region_name,
  * @param [in] time_delta  The time increment to add.
  */
 
-void meto::HashTable::update(record_index_t const record_index, meto::time_duration_t const time_delta)
+void meto::HashTable::update(record_index_t const record_index, time_duration_t const time_delta)
 {
 
   auto& record = hashvec_[record_index];
@@ -93,8 +93,8 @@ void meto::HashTable::update(record_index_t const record_index, meto::time_durat
 
 void meto::HashTable::add_child_time_to_parent(
                     record_index_t  const parent_index,
-                    meto::time_duration_t const child_walltime,
-                    meto::time_duration_t*& overhead_time_ptr)
+                    time_duration_t const child_walltime,
+                    time_duration_t*& overhead_time_ptr)
 {
   auto& record = hashvec_[parent_index];
   record.child_walltime_ += child_walltime;
@@ -111,7 +111,7 @@ void meto::HashTable::add_child_time_to_parent(
  *                                 calls.
  */
 
-void meto::HashTable::add_profiler_call(meto::time_duration_t*& overhead_time_ptr) {
+void meto::HashTable::add_profiler_call(time_duration_t*& overhead_time_ptr) {
   auto& record = hashvec_[profiler_index_];
   ++record.call_count_;
   overhead_time_ptr = &record.total_walltime_;
