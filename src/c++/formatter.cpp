@@ -158,7 +158,7 @@ void meto::Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
   // Declare any variables external to RegionRecord
   int             region_number = 0;
   double          percent_time;
-  meto::time_duration_t cumul_walltime = meto::time_duration_t::zero();
+  time_duration_t cumul_walltime = time_duration_t::zero();
   double          self_per_call;
   double          total_per_call;
   
