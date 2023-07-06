@@ -195,8 +195,8 @@ void meto::Profiler::stop(size_t const hash)
 
   // The sequence of code that follows is aimed at leaving only minimal and
   // simple operations after the call to prof_gettime().
-  meto::time_duration_t* parent_overhead_time_ptr   = nullptr;
-  meto::time_duration_t* profiler_overhead_time_ptr = nullptr;
+  time_duration_t* parent_overhead_time_ptr   = nullptr;
+  time_duration_t* profiler_overhead_time_ptr = nullptr;
 
   // Acquire parent pointers
   if (call_depth_ > 0){
