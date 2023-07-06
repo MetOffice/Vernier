@@ -34,7 +34,7 @@ extern "C" {
 
 void meto::c_profiler_start_part1()
 {
-  meto::prof.start_part1();
+  prof.start_part1();
 }
 
 /**
@@ -45,7 +45,7 @@ void meto::c_profiler_start_part1()
 
 void meto::c_profiler_start_part2(long int& hash_out, char const* name)
 {
-  size_t hash = meto::prof.start_part2( name );
+  size_t hash = prof.start_part2( name );
 
   // Ensure that the source and destination have the same size.
   static_assert(sizeof(hash) == sizeof(hash_out), "Hash/Out size mismatch.");
