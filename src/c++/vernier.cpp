@@ -69,7 +69,7 @@ size_t Vernier::start(std::string_view region_name)
 {
 
   // Note the time on entry to the profiler call.
-  time_point_t calliper_start_time = prof_gettime();
+  time_point_t calliper_start_time = vernier_gettime();
   
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -89,7 +89,7 @@ size_t Vernier::start(std::string_view region_name)
   size_t const hash = thread_hashtables_[tid].query_insert(new_region_name);
 
   // Store the calliper and region start times.
-  auto region_start_time = prof_gettime();
+  auto region_start_time = vernier_gettime();
   StartCalliperValues new_times = StartCalliperValues(region_start_time, calliper_start_time);
   thread_traceback_[tid].push_back(std::make_pair(hash, new_times));
 
@@ -111,7 +111,7 @@ void Vernier::stop(size_t const hash)
 {
 
   // Log the region stop time.
-  auto region_stop_time = prof_gettime();
+  auto region_stop_time = vernier_gettime();
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -155,7 +155,7 @@ void Vernier::stop(size_t const hash)
    thread_hashtables_[tid].add_child_time(parent_hash, region_duration);
 
    // Account for time spent in the profiler itself. 
-   auto calliper_stop_time = prof_gettime();
+   auto calliper_stop_time = vernier_gettime();
    auto calliper_time = calliper_stop_time - temp_sum;
    thread_hashtables_[tid].add_overhead_time(parent_hash, calliper_time);
   }

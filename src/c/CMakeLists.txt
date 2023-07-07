@@ -11,7 +11,7 @@ add_library(${CMAKE_PROJECT_NAME}_c
         vernier_c.cpp)
 
 # Link library to and external libs (also use project warnings and options).
-target_link_libraries(${CMAKE_PROJECT_NAME}_c PRIVATE profiler)
+target_link_libraries(${CMAKE_PROJECT_NAME}_c PRIVATE vernier)
 
 set_project_warnings(${CMAKE_PROJECT_NAME}_c)
 

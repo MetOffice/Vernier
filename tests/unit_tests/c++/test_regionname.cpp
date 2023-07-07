@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include <chrono>
-#include <profiler.h>
 #include <gtest/gtest.h>
 #include <chrono>
 

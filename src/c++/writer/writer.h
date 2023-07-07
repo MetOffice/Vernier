@@ -37,7 +37,7 @@ class Writer {
 
     // MPI handling
     int my_rank_;
-    MPI_Comm prof_comm_;
+    MPI_Comm vernier_comm_;
 
   public:
 

@@ -4,7 +4,6 @@
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
-#include <profiler.h>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <omp.h>

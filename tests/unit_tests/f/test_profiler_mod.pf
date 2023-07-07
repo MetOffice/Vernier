@@ -74,7 +74,7 @@ contains
       real(kind=prk) :: profiler_wallclock_time
 
       actual_time = t2 - t1
-      profiler_wallclock_time = profiler_get_total_walltime(prof_main, 0_pik)
+      profiler_wallclock_time = vernier_get_total_walltime(prof_main, 0_pik)
 
       @assertEqual(actual_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
     end block assertions

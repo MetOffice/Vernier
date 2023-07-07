@@ -22,7 +22,7 @@ TEST(HashEntryTest,CallCountTest)
   int num_threads = 1;
 
   // Start parallel region
-#pragma omp parallel default(none) shared(prof_sub_shared, prof, num_threads)
+#pragma omp parallel default(none) shared(prof_sub_shared, vernier, num_threads)
   {
     // Get total number of threads, only need to calculate on a single thread
     // since value won't change.
