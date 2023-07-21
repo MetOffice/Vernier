@@ -2,7 +2,6 @@
 
 [![Build](https://github.com/MetOffice/profiler/actions/workflows/build.yml/badge.svg)](https://github.com/MetOffice/profiler/actions/workflows/build.yml)
 [![Docs](https://github.com/MetOffice/profiler/actions/workflows/documentation.yml/badge.svg)](https://github.com/MetOffice/profiler/actions/workflows/documentation.yml)
-[![Coverage](https://img.shields.io/badge/coverage-52.6%25-red)](${WORKFLOW_URL})
 
 Profiler for scientific code on HPC platforms.
 
