@@ -16,6 +16,9 @@ env:
   HTML-ARTIFACT:  html-artifact
   BADGE-ARTIFACT: badge-artifact
 
+ignore:
+  - "**/*.yml"
+
 defaults:
   run:
     shell: bash
@@ -94,7 +97,6 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           verbose: true
-          ignore: "**/*.yml"
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
