@@ -30,6 +30,11 @@ jobs:
         with:
           python-version: '3.7'
 
+      - name: Install mpich
+        run: |
+          sudo apt update
+          sudo apt install -y mpich
+
       - name: Change default g++ version
         # Set the default g++ and gcov versions to be 10 to avoid a mismatch
         # between the g++ version that the code is built with and the gcov
