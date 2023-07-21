@@ -16,9 +16,6 @@ env:
   HTML-ARTIFACT:  html-artifact
   BADGE-ARTIFACT: badge-artifact
 
-ignore:
-  - "**/*.yml"
-
 defaults:
   run:
     shell: bash
