@@ -8,6 +8,7 @@ module test_profiler_mod
 
   use profiler_mod
   use omp_lib
+  use mpi_f08
 
 contains
 
@@ -25,6 +26,12 @@ contains
 
     ! Handle declarations
     integer(kind=pik) :: prof_main
+
+    ! Error handler
+    integer :: ierr
+
+    ! Initialise MPI
+    call mpi_init(ierr)
 
     ! Start timing: noddy way, and using Profiler.
     call profiler_start(prof_main, 'FULL')
@@ -63,9 +70,6 @@ contains
     t2 = omp_get_wtime();
     call profiler_stop(prof_main)
 
-    ! Write the profile
-    call profiler_write()
-
     assertions: block
       real(kind=prk) :: profiler_wallclock_time
 
@@ -74,6 +78,10 @@ contains
 
       @assertEqual(actual_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
     end block assertions
+
+    call profiler_write()
+
+    call mpi_finalize(ierr)
 
   end subroutine test_profiler
 

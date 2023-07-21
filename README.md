@@ -20,6 +20,11 @@ The code has been tested with the following compilers:
 - GCC versions: 9.3.0, 10.2.0
 - Clang versions: 12.0 
 
+### Libraries 
+
+- OpenMP 4.5 
+- MPICH 3.3.2
+
 ### Testing Framework and Documentation
 
 The testing framework is GoogleTest (1.11.0).  
