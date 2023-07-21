@@ -157,7 +157,7 @@ jobs:
 
       - name: Determine overall line coverage
         # Line coverage percentage is grabbed from the downloaded txt file and
-        # put into an environment variable
+        # put into an environment variable.
         env:
           # Criterion for high and medium level line coverage, these values
           # determine the colour of the README coverage badge.
