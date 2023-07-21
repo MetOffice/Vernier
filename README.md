@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/MetOffice/profiler/actions/workflows/build.yml/badge.svg)](https://github.com/MetOffice/profiler/actions/workflows/build.yml)
 [![Docs](https://github.com/MetOffice/profiler/actions/workflows/documentation.yml/badge.svg)](https://github.com/MetOffice/profiler/actions/workflows/documentation.yml)
+[![Coverage](https://img.shields.io/badge/coverage-97.3%25-success)](${WORKFLOW_URL})
 
 Profiler for scientific code on HPC platforms.
 
@@ -51,3 +52,10 @@ the generated files can be found in `<build>/html`.
 
 To build only the Doxygen docs use `make doxygen-docs`. On installation the
 HTML pages are copied to `<installation_root>/share/docs`.
+
+#### Unit Test Coverage
+
+The unit test coverage is generated using `gcovr` which wraps `gcov` with additional
+functionality, such as multiple output format options.
+
+A detailed coverage report can be found [here](https://metoffice.github.io/profiler/coverage/).
