@@ -74,4 +74,3 @@ jobs:
         OMP_NUM_THREADS: 4
       working-directory: ${{github.workspace}}/build
       run: ctest -VV -C ${{env.BUILD_TYPE}}
-

@@ -88,17 +88,8 @@ jobs:
             --cobertura -o gcovr/coverage.xml \
             "${ROOT_DIR}/build/src/c++/CMakeFiles/profiler.dir/"
           conda deactivate
-          mv gcovr/coverage.xml ..
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
-        with:
-          verbose: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Remove coverage report
-        working-directory: ${{ github.workspace }}
-        run: rm -rf gcovr
-
-    
