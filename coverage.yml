@@ -1,0 +1,95 @@
+name: Update test coverage
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ] 
+    paths:
+      - 'src/**.h'
+      - 'src/**.cpp'
+      - 'tests/unit_tests/**'
+      - '.github/workflows/coverage.yml'
+
+env:
+  # Workflow-wide environment variables for the names of the three uploaded
+  # artifacts at the end of the 'build' job.
+  HTML-ARTIFACT:  html-artifact
+  BADGE-ARTIFACT: badge-artifact
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.7'
+
+      - name: Install mpich
+        run: |
+          sudo apt update
+          sudo apt install -y mpich
+
+      - name: Change default g++ version
+        # Set the default g++ and gcov versions to be 10 to avoid a mismatch
+        # between the g++ version that the code is built with and the gcov
+        # version that gcovr uses.
+        run: |
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 10 \
+            --slave /usr/bin/gcov gcov /usr/bin/gcov-9
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 20 \
+            --slave /usr/bin/gcov gcov /usr/bin/gcov-10
+          sudo update-alternatives --set c++ /usr/bin/g++
+          g++ --version
+          gcov --version
+
+      - name: Configure CMake
+        # Key thing here is the "--coverage" CXX flag, which generates the 
+        # .gcno files required by gcov. It bundles together '-fprofile-arcs 
+        # -ftest-coverage' (when compiling) with '-lgcov' (when linking).
+        run: >
+          cmake -B ${{ github.workspace }}/build
+          -DCMAKE_CXX_FLAGS="-O0 --coverage"
+          -DBUILD_TESTS=ON
+          -DBUILD_FORTRAN_TESTS=OFF
+          -DINCLUDE_GTEST=ON
+          -DWARNINGS_AS_ERRORS=ON
+          -DUSE_SANITIZERS=OFF
+          -DENABLE_DOXYGEN=OFF 
+          -DBUILD_SHARED_LIBS=ON
+
+      - name: Build
+        run: cmake --build ${{ github.workspace }}/build 
+
+      - name: Run unit tests
+        working-directory: ${{ github.workspace }}/build/
+        run: ctest
+
+      - name: Install and run gcovr
+        # A conda virtual environment is activated in order to install and run
+        # gcovr. Gcovr calls gcov and will generate a handful of .html files in
+        # the "gcovr" directory that eventually get uploaded to GitHub pages.
+        working-directory: ${{ github.workspace }}/build/
+        env:
+          ROOT_DIR: ${{ github.workspace }}
+        run: |
+          source $(conda info --base)/etc/profile.d/conda.sh
+          conda create -q -y -n gcovr-env gcovr -c conda-forge --override-channels
+          conda activate gcovr-env
+          conda clean --all -y
+          mkdir gcovr
+          gcovr --root "${ROOT_DIR}/" \
+            --filter "${ROOT_DIR}/src/c++" \
+            --cobertura -o gcovr/coverage.xml \
+            "${ROOT_DIR}/build/src/c++/CMakeFiles/profiler.dir/"
+          conda deactivate
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
