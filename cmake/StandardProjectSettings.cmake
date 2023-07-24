@@ -65,7 +65,7 @@ endif()
 # Documentation related options. The option to disable Doxygen and Sphinx only
 # appear if BUILD_DOCS is turned ON.
 include(CMakeDependentOption)
-option(BUILD_DOCS "Enable documentation generation" ON)
+option(BUILD_DOCS "Enable documentation generation" OFF)
 if(BUILD_DOCS)
   message(STATUS "Documentation generation enabled")
 endif()

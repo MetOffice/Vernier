@@ -8,7 +8,7 @@ post-processing techniques.
 Each file contains a table of the all the declared regions and their
 associated walltimes.
 
-The :ref:`environment variables <env-varibles>` section at the end of the
+The :ref:`environment variables <env-variables>` section at the end of the
 setting up guide outlines environment variables relevant to Vernier's output.
 To reiterate, the two output format options are **threads** and **drhook**.
 
@@ -32,7 +32,7 @@ To reiterate, the two output format options are **threads** and **drhook**.
   calls to elsewhere.
    * The "Total (raw)" column is the total time spent in a code region when the
      overhead from Vernier is taken into account. In the example above this
-     overhead is only noticable with the overarching main program. 
+     overhead is only noticable with the overarching main program.
 
 **Example "drhook" output:**
 

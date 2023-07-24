@@ -117,23 +117,23 @@ installed libraries to your program.
 Additional Targets
 ------------------
 
-Additional targets that can be built from the command line using `make`.
+Additional targets that can be built from the command line using ``make``.
 
 .. glossary::
 
-   `test`
+   ``test``
      Runs all built unit tests. Only available when ``-DBUILD_TESTS`` is turned
      ON. Identical to running ``ctest``.
 
-   `vernier`
+   ``vernier``
      Builds just the main project target and its associated source code, no
      tests or documentation.
 
-   `doxygendocs`
+   ``doxygendocs``
      Uses Doxygen to generate source code documentation based on comment blocks
      in the code. The generated files are put into a ``doxygen`` subdirectory.
 
-   `sphinxdocs`
+   ``sphinxdocs``
      Uses Sphinx to build the written documentation. This target builds the 
      Doxygen documentation first. The generated files are put into a 
      ``sphinx`` subdirectory.
