@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'profiler'
+project = 'vernier'
 copyright = '2023 British Crown (Met Office)'
 author = ''
 
@@ -59,7 +59,7 @@ html_theme_options = {
     'includehidden': True,
     'titles_only': False
 }
-github_url = 'https://github.com/MetOffice/profiler'
+github_url = 'https://github.com/MetOffice/Vernier'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -70,10 +70,10 @@ html_permalinks = False
 
 # -- Breathe ------------------------------------------------------------------
 
-# Tell breathe about the profiler project, and where to find the associated XML
-# files (the path is relative to the location of this conf.py file).
+# Tell Breathe about the Vernier project, and where to find the associated XML
+# files (the path is relative to the location of this 'conf.py' file).
 breathe_projects = {
-    'profiler': '../../build/doxygen/xml'
+    'vernier': '../../build/doxygen/xml'
 }
 
-breathe_default_project = 'profiler'
+breathe_default_project = 'vernier'

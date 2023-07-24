@@ -6,7 +6,7 @@ Testing
 Unit Tests
 ----------
 
-The C++ and Fortran unit tests utilise the GoogleTest and pFUnit frameworks 
+The C++ and Fortran unit tests utilise the GoogleTest and pFUnit frameworks, 
 respectively. 
 
 Running
@@ -18,14 +18,14 @@ Running
    cd build
    cmake ..
    make 
-   # either 'make test' or 'ctest'
+   # Either 'make test' or 'ctest'.
    make test
 
 Coverage
 ^^^^^^^^
 
 The unit test code coverage is generated using `gcovr <https://gcvor.com/en/stable/>`_,
-which wraps the GCC tool "gcov" with additional functionality. A detailed 
+which wraps the GCC tool `gcov` with additional functionality. A detailed 
 coverage report can be found `here <https://metoffice.github.io/vernier/coverage>`_.
 
 System Tests
@@ -52,7 +52,7 @@ want to run ``system_test.cpp`` or ``system_test.f90``.
 
 .. note::
     
-   Both examples assume you're currently in the build directory - if not, the paths to
+   Both examples assume you are currently in the build directory - if not, the paths to
    the libraries, headers, and system tests themselves ought to be altered accordingly.
 
 C++:

@@ -20,5 +20,5 @@ Information about the development process can be found
 Code Review Guidance
 --------------------
 
-Guidlines for requesting and performing a code review are
+Guidelines for requesting and performing a code review are
 `here <https://github.com/MetOffice/Vernier/wiki/CodeReview>`_.

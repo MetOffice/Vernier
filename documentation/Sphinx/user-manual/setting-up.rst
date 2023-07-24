@@ -12,7 +12,7 @@ access to the API.
 The ``-DBUILD_SHARED_LIBS`` CMake option is used to choose whether the libraries
 are built statically or dynamically.
 
-Manually linking to installed libraries
+Manually Linking to Installed Libraries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Flags of interest when compiling manually:
@@ -25,13 +25,13 @@ Flags of interest when compiling manually:
    # Fortran
    mpifort bar.f90 -I/path/to/include -Wl,-rpath=/path/to/lib -L/path/to/lib -lvernier_f -lvernier_c -lvernier
 
-It's also possible to use ``LD_LIBRARY_PATH`` instead of ``-Wl,-rpath=``:
+It is also possible to use ``LD_LIBRARY_PATH`` instead of ``-Wl,-rpath=``:
 
 .. code-block:: shell
 
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/lib
 
-Including vernier in a CMake project
+Including Vernier in a CMake Project
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The CMake lines below are always a necessary starting point in order to find
@@ -40,11 +40,11 @@ long as Vernier is found *before* linking/using.
 
 .. code-block:: cmake
 
-   # The find_package function needs to know where to go looking for the
-   # vernier package
+   # The 'find_package' function needs to know where to go looking for the
+   # Vernier package
    set(CMAKE_PREFIX_PATH /path/to/lib)
 
-   # Find vernier
+   # Find Vernier
    find_package(vernier CONFIG)
 
 .. note::
@@ -64,14 +64,14 @@ dependencies may look something like:
 
 .. code-block:: cmake
 
-   # Link vernier libraries 
+   # Link Vernier libraries 
    target_link_libraries(foo PUBLIC
            vernier::vernier_f  # Only required for Fortran
            vernier::vernier_c  # Only required for Fortran
            vernier::vernier
            )
 
-   # Include vernier headers 
+   # Include Vernier headers 
    target_include_directories(foo PUBLIC
            /path/to/include
            )
@@ -106,4 +106,4 @@ Environment Variables
 
      Sets the output filename, which is "vernier-output" by default. Vernier
      will append the MPI rank onto the end of this name by default, resulting
-     in a file called "vernier-output-0" for the first MPI rank, for example.
+     in a file called `vernier-output-0` for the first MPI rank, for example.

@@ -12,7 +12,7 @@ include(cmake/PreventInSourceBuilds.cmake)
 # Set project name and the languages required to build the project and a
 # project description. Also set the version of the library being built.
 project(vernier LANGUAGES CXX C Fortran
-        DESCRIPTION "Met Office profiler"
+        DESCRIPTION "Met Office Vernier profiler"
         VERSION 0.1.0)
 
 # OpenMP required
@@ -21,7 +21,7 @@ find_package(OpenMP 2.5 REQUIRED)
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)
 
-# Instructions only relevant if current project is profiler
+# Instructions only relevant if current project is Vernier
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
         # Include general project setting files.

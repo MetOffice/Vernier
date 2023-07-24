@@ -1,11 +1,11 @@
 # ------------------------------------------------------------------------------
-#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  (c) Crown copyright 2023 Met Office. All rights reserved.
 #  The file LICENCE, distributed with this code, contains details of the terms
 #  under which the code may be used.
 # ------------------------------------------------------------------------------
-# Package configuration file used by the configure_package_config_file command
+# Package configuration file used by the 'configure_package_config_file' command
 # in the root CMakeLists.txt file. This allows downstreams to use imported
-# targets (i.e. find_package()).
+# targets (i.e. 'find_package()').
 
 @PACKAGE_INIT@
-include( "${CMAKE_CURRENT_LIST_DIR}/profilerTargets.cmake" )
+include( "${CMAKE_CURRENT_LIST_DIR}/vernierTargets.cmake" )
