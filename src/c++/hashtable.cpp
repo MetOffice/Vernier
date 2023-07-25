@@ -40,6 +40,8 @@ HashTable::HashTable(int const tid)
  * 
  * @param [in] region_name  The code region name.
  * @param [in] tid          The thread ID
+ *
+ * @returns  Returns a hash based on the input arguments.  
  * 
  * @note The integer thread ID is not converted to a string before it is
  *       appended to the hash string.  This is a performance measure.
