@@ -10,11 +10,10 @@
 #include <cassert>
 #include <cstring>
 #include <iterator>
-#include <cstddef>
+#include <cstring>
 
 #define PROF_HASHVEC_RESERVE_SIZE 1000
 #define PROF_STRING_BUFFER_LENGTH 100
-
 
 /**
  * @brief Hashtable constructor

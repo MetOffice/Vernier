@@ -164,9 +164,9 @@ void Profiler::stop(size_t const hash)
     exit (101);
   }
 
- // Get reference to the traceback entry.
- auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
- auto& traceback_entry = thread_traceback_[tid].at(call_depth_index);
+  // Get reference to the traceback entry.
+  auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
+  auto& traceback_entry = thread_traceback_[tid].at(call_depth_index);
 
   // Check: which hash is last on the traceback list?
   size_t last_hash_on_list = traceback_entry.record_hash_;
