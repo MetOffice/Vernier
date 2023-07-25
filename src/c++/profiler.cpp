@@ -118,6 +118,7 @@ size_t Profiler::start_part2(std::string_view const region_name)
   size_t hash;
   record_index_t record_index;
   thread_hashtables_[tid].query_insert(region_name, tid_int, hash, record_index);
+
   // Store the calliper and region start times.
   ++call_depth_;
   if (call_depth_ < PROF_MAX_TRACEBACK_SIZE){

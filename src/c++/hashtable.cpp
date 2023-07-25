@@ -8,13 +8,11 @@
 #include "hashvec_handler.h"
 
 #include <cassert>
-#include <cstring>
 #include <iterator>
-#include <cstddef>
+#include <cstring>
 
 #define PROF_HASHVEC_RESERVE_SIZE 1000
 #define PROF_STRING_BUFFER_LENGTH 100
-
 
 /**
  * @brief Hashtable constructor
@@ -101,6 +99,7 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
 
   return hash_function_(std::string_view(new_chars.data(), 
         static_cast<std::string_view::size_type>(new_chars_size))); 
+
 }
 
 /**
@@ -116,7 +115,6 @@ void HashTable::query_insert(std::string_view const region_name,
                              size_t& hash,
                              record_index_t& record_index) noexcept
 {
-
   // Compute the hash
   hash = compute_hash(region_name, tid);
 

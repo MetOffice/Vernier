@@ -42,12 +42,6 @@ TEST(HashTableTest,HashFunctionTest) {
     //  - query_insert'ing Penne or Rigatoni just returns the hash
     //  - the regions have different hashes
     //  - the regions have the hashes returned by hash_function_ which uses std::hash
-    //std::string rigatoni_str = "Rigatoni@";
-    //std::cout << "MJG ==> str len is: " << rigatoni_str.length() << "<<<==="  << std::endl;
-    //rigatoni_str += tid_bytes;
-    //std::cout << "MJG ==> string is: " << rigatoni_str << "<<<==="  << std::endl;
-    //std::cout << "MJG ==> length2 is: " << rigatoni_str.length() << "<<<==="  << std::endl;
-    std::cout << "MJG ==> tid len is: " << tid_bytes.length() << "<<<==="  << std::endl;
     EXPECT_EQ(prof.start("Rigatoni"), std::hash<std::string_view>{}("Rigatoni@" + tid_bytes));
     EXPECT_EQ(prof.start("Penne"),    std::hash<std::string_view>{}("Penne@" + tid_bytes));
   }
