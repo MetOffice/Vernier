@@ -103,6 +103,7 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
 /**
  * @brief  Inserts a new entry into the hashtable.
  * @param [in]  region_name  The name of the region.
+ * @param [in]  tid          The thread ID.
  * @param [out] hash          Hash of the region name.
  * @param [out] record_index  Array index of the region record.
  *

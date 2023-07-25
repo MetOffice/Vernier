@@ -110,7 +110,7 @@ size_t Profiler::start_part2(std::string_view const region_name)
 #ifdef _OPENMP
   tid = static_cast<hashtable_iterator_t_>(omp_get_thread_num());
 #endif
-  int tid_int = static_cast<int>(tid);
+  auto tid_int = static_cast<int>(tid);
 
   assert (tid <= thread_hashtables_.size());
   assert (tid <= thread_traceback_.size());

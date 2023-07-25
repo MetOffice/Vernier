@@ -10,6 +10,7 @@
  * @brief  Constructs a new region record.
  * @param [in]  region_hash  Hash of the region name.
  * @param [in]  region_name  The region name.
+ * @param [in]  tid          The thread id.
  */
 
 RegionRecord::RegionRecord(size_t const region_hash, 
