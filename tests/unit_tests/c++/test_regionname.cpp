@@ -8,7 +8,7 @@
 #include <chrono>
 #include <profiler.h>
 #include <gtest/gtest.h>
-#include <string_view>
+#include <string>
 
 #include "profiler.h"
 
