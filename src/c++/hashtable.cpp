@@ -65,8 +65,8 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
   std::array<char, 1> constexpr delimiter = {'@'};
 
   // Extra bytes to accommodate the thread ID. 
-  int constexpr num_extra_bytes = sizeof(tid)
-                                + sizeof(delimiter);
+  unsigned int constexpr num_extra_bytes = sizeof(tid)
+                                         + sizeof(delimiter);
 
   // Avoid dynamic memory allocation for performance reasons. Instead, fix the
   // size of the buffer and perform a runtime check that we're not exceeding it.
@@ -93,8 +93,13 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
   std::memcpy(&(*new_chars_iterator), tid_bytes.data(), tid_bytes.size());
   std::advance(new_chars_iterator, tid_bytes.size());
 
-  [[maybe_unused]] auto const expected_size = region_name.length() + num_extra_bytes;
+  // Compute the length of the character array based on the current position of
+  // the iterator.
   auto new_chars_size = std::distance(new_chars.begin(), new_chars_iterator); 
+
+  // Check that the character string is the length which were expecting.
+  [[maybe_unused]] auto const expected_size =  
+           static_cast<unsigned int>(region_name.length()) + num_extra_bytes;
   assert (new_chars_size == expected_size);
 
   return hash_function_(std::string_view(new_chars.data(), 
