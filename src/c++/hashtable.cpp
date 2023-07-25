@@ -62,13 +62,8 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
   [[maybe_unused]] int const* tid_back = reinterpret_cast<int const*>(tid_bytes.data());
   assert (*tid_back == tid);
 
-  // Store special characters in an array container, so that we have STL syntax
-  // available to us later.
-  std::array<char, 1> constexpr delimiter = {'@'};
-
   // Extra bytes to accommodate the thread ID. 
-  unsigned int constexpr num_extra_bytes = sizeof(tid)
-                                         + sizeof(delimiter);
+  unsigned int constexpr num_extra_bytes = sizeof(tid);
 
   // Avoid dynamic memory allocation for performance reasons. Instead, fix the
   // size of the buffer and perform a runtime check that we're not exceeding it.
@@ -86,10 +81,6 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
   // Copy the region name into the char buffer.
   std::copy(region_name.begin(), region_name.end(), new_chars_iterator);
   std::advance(new_chars_iterator, region_name.size());
-
-  // Add delimiter
-  std::copy(delimiter.begin(), delimiter.end(), new_chars_iterator);
-  std::advance(new_chars_iterator, delimiter.size());
 
   // Add thread ID (physical representation)
   std::memcpy(&(*new_chars_iterator), tid_bytes.data(), tid_bytes.size());

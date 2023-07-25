@@ -53,7 +53,7 @@ TEST(RegionNameTest,NamesMatchTest) {
     SCOPED_TRACE("Problem with the profiler region name");
 
     // Get profiler region name out from the profiler and test
-    auto const prof_self_handle = std::hash<std::string_view>{}("__profiler__@" + tid_bytes);
+    auto const prof_self_handle = std::hash<std::string_view>{}("__profiler__" + tid_bytes);
     std::string profilerRegionName = prof.get_decorated_region_name(prof_self_handle, tid);
     EXPECT_EQ("__profiler__@" + tid_str, profilerRegionName);
   }

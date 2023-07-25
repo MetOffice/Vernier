@@ -42,8 +42,8 @@ TEST(HashTableTest,HashFunctionTest) {
     //  - query_insert'ing Penne or Rigatoni just returns the hash
     //  - the regions have different hashes
     //  - the regions have the hashes returned by hash_function_ which uses std::hash
-    EXPECT_EQ(prof.start("Rigatoni"), std::hash<std::string_view>{}("Rigatoni@" + tid_bytes));
-    EXPECT_EQ(prof.start("Penne"),    std::hash<std::string_view>{}("Penne@" + tid_bytes));
+    EXPECT_EQ(prof.start("Rigatoni"), std::hash<std::string_view>{}("Rigatoni" + tid_bytes));
+    EXPECT_EQ(prof.start("Penne"),    std::hash<std::string_view>{}("Penne" + tid_bytes));
   }
 
 }
@@ -57,7 +57,7 @@ TEST(HashTableTest,HashFunctionTest) {
 TEST(HashTableTest,UpdateTimesTest) {
 
   // Create new hash
-  size_t prof_pie = std::hash<std::string>{}("Pie@" + tid_bytes);
+  size_t prof_pie = std::hash<std::string>{}("Pie" + tid_bytes);
 
   // Trying to find a time before .start() will throw an exception
   EXPECT_THROW(prof.get_total_walltime(prof_pie, 0), std::out_of_range);
