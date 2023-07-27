@@ -16,13 +16,12 @@
 using ::testing::ExitedWithCode;
 using ::testing::KilledBySignal;
 
+
 //
-//  Tests and death tests more related to profiler class members. WriteTest
-//  checks 'hashvec' in profiler.write() is correctly ordered. One death test
-//  makes sure the code breaks when a hash mismatch happens, and the other tests
-//  for a segfault when stopping before anything else.
+//  Tests and death tests related to profiler class members. 
 //
 
+// Make sure the code exits when a hash mismatch happens.
 TEST(ProfilerDeathTest,WrongHashTest) {
 
   EXPECT_EXIT({
@@ -44,6 +43,7 @@ TEST(ProfilerDeathTest,WrongHashTest) {
 
 }
 
+// Tests for a segfault when stopping before anything else.
 TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
   EXPECT_DEATH({
@@ -54,5 +54,18 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
     prof.stop(prof_main);
 
   }, "" );
+
+}
+
+// The traceback array is not a growable vector. Check that the code exits
+// when available array elements are exhaused.
+TEST(ProfilerDeathTest, TooManyTracebackEntries) {
+
+  EXPECT_EXIT({
+    const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;
+    for (int i=0; i<beyond_maximum; ++i){
+      [[maybe_unused]] auto prof_handle = prof.start("TracebackEntry");
+    }
+  }, ExitedWithCode(102), "EMERGENCY STOP: Traceback array exhausted.");
 
 }

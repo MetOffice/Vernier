@@ -9,7 +9,7 @@
  *  @brief  Handles entries for each timed region.
  *
  *  In order to store region timings, one struct and one class are defined. The
- *  struct (HashEntry) collects together information pertinent to a single
+ *  struct (RegionRecord) collects together information pertinent to a single
  *  profiled region, such as its name, total time and self time.
  *
  *  The HashTable class contains a hashtable to hold the hash entries (see
@@ -24,37 +24,24 @@
 #define PROFILER_HASHTABLE_H
 
 #include <unordered_map>
-#include <vector>
-#include <string>
-#include <string_view>
-#include <chrono>
 
+#include "hashvec.h"
 #include "prof_gettime.h"
 
+// Forward declarations
+class HashVecHandler;
 
 /**
- * @brief  Structure to hold information for a particular routine.
+ * @brief  Defines a null hash function. 
  *
- * Bundles together any information pertinent to a specific profiled region.
+ * Having already hashed region names, we won't need to hash the hashtable keys.
  *
  */
 
-struct HashEntry{
-  public:
-
-    // Constructor
-    HashEntry() = delete;
-    explicit HashEntry(std::string_view);
-
-    // Data members
-    std::string      region_name_;
-    time_duration_t  total_walltime_;
-    time_duration_t  total_raw_walltime_;
-    time_duration_t  self_walltime_;
-    time_duration_t  child_walltime_;
-    time_duration_t  overhead_walltime_;
-    unsigned long long int call_count_;
-
+struct NullHashFunction {
+  std::size_t operator()(std::size_t const& key) const {
+      return key;
+  }
 };
 
 /**
@@ -72,13 +59,25 @@ class HashTable{
     // Members
     int tid_;
     size_t profiler_hash_;
-    std::unordered_map<size_t,HashEntry> table_;
+    record_index_t profiler_index_;
+    
+    // Hash function
     std::hash<std::string_view> hash_function_;
-    std::vector<std::pair<size_t, HashEntry>> hashvec;
+    
+    // Hashtable containing locations of region records. 
+    std::unordered_map<size_t, record_index_t, NullHashFunction> lookup_table_;
+
+    // Vector of region records.
+    hashvec_t hashvec_;
 
     // Private member functions
-    void prepare_computed_times(size_t const);
+    void prepare_computed_times(RegionRecord&);
     void prepare_computed_times_all();
+    void sort_records();
+    void erase_record(size_t const);
+    void sync_lookup();
+    RegionRecord&  hash2record(size_t const);
+    RegionRecord const&  hash2record(size_t const) const;
 
   public:
 
@@ -87,14 +86,17 @@ class HashTable{
     HashTable(int);
 
     // Prototypes
-    size_t query_insert(std::string_view) noexcept;
-    void update(size_t, time_duration_t);
-    void write();
+    void query_insert(std::string_view const, size_t&, record_index_t&) noexcept;
+    void update(record_index_t const, time_duration_t const);
 
     // Member functions
     std::vector<size_t> list_keys();
-    void add_child_time   (size_t const, time_duration_t);
-    void add_overhead_time(size_t const, time_duration_t);
+
+    void add_child_time_to_parent(record_index_t const, time_duration_t const, time_duration_t*&);
+    void add_profiler_call(time_duration_t*&);
+
+    void compute_self_times();
+    void append_to(HashVecHandler&);
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;
@@ -106,5 +108,6 @@ class HashTable{
     unsigned long long int get_call_count(size_t const hash) const;
     unsigned long long int get_prof_call_count() const;
 };
+
 #endif
 

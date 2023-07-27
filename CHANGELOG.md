@@ -30,4 +30,9 @@
 04/10/2022 PR #63 for #62: Add copyright statements to all files. \
 27/10/2022 PR #67 for #50: Account separately for time spent inside the profiler. \
 13/12/2022 PR #75 for #73: Enable CMake option for static and dynamic linking (dynamic by default). \
-16/12/2022 PR #69 for #45: Add unit test coverage.
+16/12/2022 PR #69 for #45: Add unit test coverage. \
+18/04/2023 PR #74 for #72: Add multiple output format options. \
+04/05/2023 PR #87 for #85: Fix failing workflows. \
+23/06/2023 PR #77 for #64: Better overhead measurement. \
+21/07/2023 PR #81 for #80: Upgrade coverage workflow. \
+21/07/2023 PR #98 for #96: Fix failing coverage workflow.
