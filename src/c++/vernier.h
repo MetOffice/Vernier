@@ -29,8 +29,8 @@
 // Forward declarations. The definitions of these functions will require access
 // to private methods.
 extern "C" {
-  void c_profiler_start_part1();
-  void c_profiler_start_part2(long int& hash_out, char const* name);
+  void c_vernier_start_part1();
+  void c_vernier_start_part2(long int& hash_out, char const* name);
 }
 
 /**
@@ -106,8 +106,8 @@ class Vernier
     unsigned long long int get_prof_call_count(int const input_tid) const;
 
     // Grant these functions access to private methods.
-    void friend c_profiler_start_part1();
-    void friend c_profiler_start_part2(long int& hash_out, char const* name);
+    void friend c_vernier_start_part1();
+    void friend c_vernier_start_part2(long int& hash_out, char const* name);
 };
 
 // Declare global profiler

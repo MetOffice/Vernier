@@ -71,7 +71,7 @@ contains
     call vernier_stop(prof_main)
 
     assertions: block
-      real(kind=prk) :: profiler_wallclock_time
+      real(kind=vrk) :: profiler_wallclock_time
 
       actual_time = t2 - t1
       profiler_wallclock_time = vernier_get_total_walltime(prof_main, 0_vik)

@@ -49,7 +49,7 @@ TEST(RegionNameTest,NamesMatchTest) {
 
     // Get profiler region name out from the profiler and test
     auto const prof_self_handle = std::hash<std::string_view>{}("__profiler__@0");
-    std::string profilerRegionName = prof.get_region_name(prof_self_handle,0);
+    std::string profilerRegionName = vernier.get_region_name(prof_self_handle,0);
     EXPECT_EQ("__profiler__@0", profilerRegionName);
   }
 

@@ -60,10 +60,10 @@ module vernier_mod
 
     function vernier_get_total_walltime(hash_in, thread_id) result(walltime) &
              bind(C, name='c_get_total_walltime')
-      import :: vik, prk
+      import :: vik, vrk
       integer(kind=vik), intent(in) :: hash_in
       integer(kind=vik), intent(in) :: thread_id
-      real(kind=prk)                :: walltime
+      real(kind=vrk)                :: walltime
     end function vernier_get_total_walltime
 
   end interface
