@@ -20,7 +20,7 @@ add_library(${CMAKE_PROJECT_NAME}
         writer/writer.h    writer/writer.cpp
         writer/multi.h     writer/multi.cpp
         formatter.h        formatter.cpp
-        hashvec.h
+        hashvec.h          hashvec.cpp
         vernier_gettime.h  vernier_gettime.cpp
         )
 
@@ -49,4 +49,3 @@ install(TARGETS ${CMAKE_PROJECT_NAME} EXPORT "${CMAKE_PROJECT_NAME}Targets"
         NAMELINK_COMPONENT  "${CMAKE_PROJECT_NAME}_Development"
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-

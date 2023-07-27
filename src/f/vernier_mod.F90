@@ -37,12 +37,17 @@ module vernier_mod
 
   interface
 
-    subroutine interface_vernier_start(hash_out, region_name)         &
-               bind(C, name='c_vernier_start')
+    subroutine interface_vernier_start_part1()  &
+               bind(C, name='c_vernier_start_part1')
+        !No arguments to handle
+    end subroutine interface_vernier_start_part1
+
+    subroutine interface_vernier_start_part2(hash_out, region_name) &
+               bind(C, name='c_vernier_start_part2')
       import :: c_char, pik
       character(kind=c_char, len=1), intent(in)  :: region_name(*)
       integer(kind=pik),             intent(out) :: hash_out
-    end subroutine interface_vernier_start
+    end subroutine interface_vernier_start_part2
 
     subroutine vernier_stop(hash_in) bind(C, name='c_vernier_stop')
       import :: pik
@@ -83,9 +88,11 @@ module vernier_mod
       !Local variables
       character(len=len_trim(region_name)+1) :: local_region_name
 
+      call interface_vernier_start_part1()
+
       call append_null_char(region_name, local_region_name, len_trim(region_name))
 
-      call interface_vernier_start(hash_out, local_region_name)
+      call interface_vernier_start_part2(hash_out, local_region_name)
 
     end subroutine vernier_start
 

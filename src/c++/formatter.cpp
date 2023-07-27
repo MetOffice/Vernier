@@ -84,13 +84,13 @@ void Formatter::threads(std::ofstream& os, hashvec_t hashvec)
   os << std::setfill(' ');
 
   // Data entries
-  for (auto& [hash, entry] : hashvec) {
+  for (auto const& record : hashvec) {
       os
-        << std::setw(40) << std::left  << entry.region_name_                << " "
-        << std::setw(15) << std::right << entry.self_walltime_.count()      << " "
-        << std::setw(15) << std::right << entry.total_raw_walltime_.count() << " "
-        << std::setw(15) << std::right << entry.total_walltime_.count()     << " "
-        << std::setw(10) << std::right << entry.call_count_                 << "\n";
+        << std::setw(40) << std::left  << record.region_name_                << " "
+        << std::setw(15) << std::right << record.self_walltime_.count()      << " "
+        << std::setw(15) << std::right << record.total_raw_walltime_.count() << " "
+        << std::setw(15) << std::right << record.total_walltime_.count()     << " "
+        << std::setw(10) << std::right << record.call_count_                 << "\n";
   }
 
 }
@@ -151,11 +151,11 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
   ( 
       std::begin(hashvec), std::end(hashvec),
       [] (auto a, auto b) {
-      return a.second.total_walltime_ < b.second.total_walltime_; 
+      return a.total_walltime_ < b.total_walltime_; 
       } 
-  )->second.total_walltime_.count(); 
+  )->total_walltime_.count(); 
 
-  // Declare any variables external to HashEntry
+  // Declare any variables external to RegionRecord
   int             region_number = 0;
   double          percent_time;
   time_duration_t cumul_walltime = time_duration_t::zero();
@@ -168,14 +168,14 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
 
   os << std::fixed << std::showpoint << std::setprecision(3);
 
-  for (auto const& [hash, entry] : hashvec) {
+  for (auto const& record : hashvec) {
 
-    // Calculate non-HashEntry data
+    // Calculate non-RegionRecord data
     region_number++;
-    percent_time    = 100.0 * ( entry.self_walltime_.count() / top_walltime );
-    cumul_walltime += entry.self_walltime_;
-    self_per_call   = 1000.0 * ( entry.self_walltime_.count()  / static_cast<double>(entry.call_count_) );
-    total_per_call  = 1000.0 * ( entry.total_walltime_.count() / static_cast<double>(entry.call_count_) );
+    percent_time    = 100.0 * ( record.self_walltime_.count() / top_walltime );
+    cumul_walltime += record.self_walltime_;
+    self_per_call   = 1000.0 * ( record.self_walltime_.count()  / static_cast<double>(record.call_count_) );
+    total_per_call  = 1000.0 * ( record.total_walltime_.count() / static_cast<double>(record.call_count_) );
 
     // Write everything out 
     os
@@ -183,13 +183,14 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
       << std::setw(3)  << std::left  << region_number
       << std::setw(7)  << std::right << percent_time
       << std::setw(13) << std::right << cumul_walltime.count()
-      << std::setw(13) << std::right << entry.self_walltime_.count()
-      << std::setw(13) << std::right << entry.total_walltime_.count()
-      << std::setw(15) << std::right << entry.call_count_
+      << std::setw(13) << std::right << record.self_walltime_.count()
+      << std::setw(13) << std::right << record.total_walltime_.count()
+      << std::setw(15) << std::right << record.call_count_
       << std::setw(12) << std::right << self_per_call
-      << std::setw(12) << std::right << total_per_call      << "    "   
-                                     << entry.region_name_  << "\n";
-
+      << std::setw(12) << std::right << total_per_call       << "    "
+                                     << record.region_name_  << "\n";
   }
 
 }
+
+

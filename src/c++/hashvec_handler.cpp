@@ -55,7 +55,7 @@ void HashVecHandler::sort()
     (
         begin(hashvec_), end(hashvec_),
         [] (auto a, auto b) { 
-            return a.second.self_walltime_ > b.second.self_walltime_; 
+            return a.self_walltime_ > b.self_walltime_; 
         }
     );
 }

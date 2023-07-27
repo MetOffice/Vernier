@@ -5,7 +5,7 @@
 \*----------------------------------------------------------------------------*/
 
 /**
- * @file   profiler_c.cpp
+ * @file   vernier_c.cpp
  * @brief  C-language interfaces for the profiler. 
  *
  * Neither Fortran or C can interface with C++ object constructs. Hence
@@ -21,19 +21,31 @@
 #include <cstring>
 
 extern "C" {
-  void   c_vernier_start(long int&, char const*);
+  void   c_vernier_start_part1();
+  void   c_vernier_start_part2(long int&, char const*);
   void   c_vernier_stop (long int const&);
   void   c_vernier_write();
   double c_get_total_walltime(long int const&, int const&);
 }
 
 /**
- * @brief  Start timing a named region and return a unique handle.
+ * @brief  Start timing, part 1 of 2. 
  */
 
-void c_vernier_start(long int& hash_out, char const* name)
+void c_vernier_start_part1()
 {
-  size_t hash = vernier.start( name );
+  vernier.start_part1();
+}
+
+/**
+ * @brief  Start timing, part 2 of 2. a named region and return a unique handle.
+ * @param [in]   name      The region name, null terminated.
+ * @param [out]  hash_out  The returned unique hash for this region.
+ */
+
+void c_vernier_start_part2(long int& hash_out, char const* name)
+{
+  size_t hash = vernier.start_part2( name );
 
   // Ensure that the source and destination have the same size.
   static_assert(sizeof(hash) == sizeof(hash_out), "Hash/Out size mismatch.");
