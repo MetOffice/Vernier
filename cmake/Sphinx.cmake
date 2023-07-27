@@ -8,7 +8,7 @@ if(ENABLE_SPHINX)
     set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
     
     # Find Sphinx
-    find_package(Sphinx REQUIRED)
+    find_package(Sphinx)
     if(SPHINX_FOUND)
         # Sphinx options
         set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/documentation/Sphinx)
@@ -22,6 +22,8 @@ if(ENABLE_SPHINX)
                           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                           COMMENT "Generating docs with Sphinx"
                           VERBATIM)
+    else()
+        message(FATAL_ERROR "ENABLE_SHPINX enabled but Sphinx not found.")
     endif()
 else()
     if(BUILD_DOCS)
