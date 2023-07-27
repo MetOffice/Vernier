@@ -6,11 +6,10 @@
 
 #include <iostream>
 #include <chrono>
-#include <profiler.h>
 #include <gtest/gtest.h>
 #include <chrono>
 
-#include "profiler.h"
+#include "vernier.h"
 
 //
 //  Tests focused on the "region name" of a particular section.
@@ -21,27 +20,27 @@
 TEST(RegionNameTest,NamesMatchTest) {
 
   //Start main region with name "Cappucino"
-  const auto& prof_cappucino = prof.start("Cappucino");
+  const auto& prof_cappucino = vernier.start("Cappucino");
 
   {
     SCOPED_TRACE("Problem with sub-region name");
 
     // Start timing a sub-region with name "Latte"
     std::string myString = "Latte";
-    const auto& prof_latte = prof.start(myString);
+    const auto& prof_latte = vernier.start(myString);
 
     // Get subregion name out from profiler and check it is what we expect
-    std::string subregionName = prof.get_region_name(prof_latte,0);
+    std::string subregionName = vernier.get_region_name(prof_latte,0);
     EXPECT_EQ("Latte@0", subregionName);
 
-    prof.stop(prof_latte);
+    vernier.stop(prof_latte);
   }
 
   {
     SCOPED_TRACE("Problem with main region name");
 
     // Get main region name out from profiler and test
-    std::string regionName = prof.get_region_name(prof_cappucino,0);
+    std::string regionName = vernier.get_region_name(prof_cappucino,0);
     EXPECT_EQ("Cappucino@0", regionName);
   }
 
@@ -54,7 +53,7 @@ TEST(RegionNameTest,NamesMatchTest) {
     EXPECT_EQ("__profiler__@0", profilerRegionName);
   }
 
-  prof.stop(prof_cappucino);
+  vernier.stop(prof_cappucino);
 
 }
 
@@ -68,7 +67,7 @@ TEST(RegionNameTest,NamesMatchTest) {
 TEST(RegionNameTest,InvalidsTest) {
 
   // Long name
-  const auto& A = prof.hashtable_query_insert("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz");
+  const auto& A = vernier.hashtable_query_insert("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz");
 
   // Nothing / blank space
 

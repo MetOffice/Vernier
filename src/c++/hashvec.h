@@ -17,7 +17,7 @@
 #include <string_view>
 #include <vector>
 
-#include "prof_gettime.h"
+#include "vernier_gettime.h"
 
 /**
  * @brief  Structure to hold information for a particular region.
