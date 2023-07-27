@@ -25,7 +25,7 @@ contains
     real(kind=dp) :: t1, t2, actual_time
 
     ! Handle declarations
-    integer(kind=pik) :: prof_main
+    integer(kind=vik) :: prof_main
 
     ! Error handler
     integer :: ierr
@@ -39,7 +39,7 @@ contains
 
     ! Time a region
     block
-      integer(kind=pik) :: prof_sub
+      integer(kind=vik) :: prof_sub
       call vernier_start(prof_sub, 'MAIN_SUB')
       call sleep(1);
       call vernier_stop(prof_sub)
@@ -48,8 +48,8 @@ contains
     ! Time nested regions on many threads.
     !$OMP PARALLEL
     block
-      integer(kind=pik) :: prof_sub
-      integer(kind=pik) :: prof_sub2
+      integer(kind=vik) :: prof_sub
+      integer(kind=vik) :: prof_sub2
       call vernier_start(prof_sub, "MAIN_SUB")
       call sleep(1);
 
@@ -74,7 +74,7 @@ contains
       real(kind=prk) :: profiler_wallclock_time
 
       actual_time = t2 - t1
-      profiler_wallclock_time = vernier_get_total_walltime(prof_main, 0_pik)
+      profiler_wallclock_time = vernier_get_total_walltime(prof_main, 0_vik)
 
       @assertEqual(actual_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
     end block assertions

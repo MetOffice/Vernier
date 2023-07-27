@@ -17,10 +17,10 @@ module vernier_mod
   !-----------------------------------------------------------------------------
 
   !> The integer kind for region hashes.
-  integer, public, parameter :: pik = c_long
+  integer, public, parameter :: vik = c_long
 
   !> The real kind for region timings.
-  integer, public, parameter :: prk = c_double
+  integer, public, parameter :: vrk = c_double
   
   !-----------------------------------------------------------------------------
   ! Public interfaces / subroutines
@@ -44,14 +44,14 @@ module vernier_mod
 
     subroutine interface_vernier_start_part2(hash_out, region_name) &
                bind(C, name='c_vernier_start_part2')
-      import :: c_char, pik
+      import :: c_char, vik
       character(kind=c_char, len=1), intent(in)  :: region_name(*)
-      integer(kind=pik),             intent(out) :: hash_out
+      integer(kind=vik),             intent(out) :: hash_out
     end subroutine interface_vernier_start_part2
 
     subroutine vernier_stop(hash_in) bind(C, name='c_vernier_stop')
-      import :: pik
-      integer(kind=pik), intent(in) :: hash_in
+      import :: vik
+      integer(kind=vik), intent(in) :: hash_in
     end subroutine vernier_stop
 
     subroutine vernier_write() bind(C, name='c_vernier_write')
@@ -60,9 +60,9 @@ module vernier_mod
 
     function vernier_get_total_walltime(hash_in, thread_id) result(walltime) &
              bind(C, name='c_get_total_walltime')
-      import :: pik, prk
-      integer(kind=pik), intent(in) :: hash_in
-      integer(kind=pik), intent(in) :: thread_id
+      import :: vik, prk
+      integer(kind=vik), intent(in) :: hash_in
+      integer(kind=vik), intent(in) :: thread_id
       real(kind=prk)                :: walltime
     end function vernier_get_total_walltime
 
@@ -83,7 +83,7 @@ module vernier_mod
 
       !Arguments
       character(len=*),  intent(in)  :: region_name
-      integer(kind=pik), intent(out) :: hash_out
+      integer(kind=vik), intent(out) :: hash_out
 
       !Local variables
       character(len=len_trim(region_name)+1) :: local_region_name
