@@ -16,15 +16,15 @@ using ::testing::Gt;
 
 //
 //  Testing that the hashing function works as expected (we don't want
-//  collisions), and that walltimes are being updated by profiler.stop().
-//  The desired behaviour of calling get_total_walltime before profiler.stop()
+//  collisions), and that walltimes are being updated by vernier.stop().
+//  The desired behaviour of calling get_total_walltime before vernier.stop()
 //  is a bit fuzzy at the time of writing, but currently a test is done to make
 //  sure it returns the MDI of 0.0
 //
 
 TEST(HashTableTest,HashFunctionTest) {
 
-  // Create new hashes via HashTable::query_insert, which is used in Profiler::start
+  // Create new hashes via HashTable::query_insert, which is used in Vernier::start
   const auto& prof_rigatoni = vernier.start("Rigatoni");
   const auto& prof_penne    = vernier.start("Penne");
   vernier.stop(prof_penne);
@@ -69,7 +69,7 @@ TEST(HashTableTest,UpdateTimesTest) {
   //Stop timing
   vernier.stop(prof_pie);
 
-  // Time t2 declared after first profiler.stop()
+  // Time t2 declared after first vernier.stop()
   double const t2 = vernier.get_total_walltime(prof_pie, 0);
 
   // Start and stop same region again
@@ -77,7 +77,7 @@ TEST(HashTableTest,UpdateTimesTest) {
   sleep(1);
   vernier.stop(prof_pie);
 
-  // Time t3 declared after second profiler.stop()
+  // Time t3 declared after second vernier.stop()
   double const t3 = vernier.get_total_walltime(prof_pie, 0);
 
   // Expected behaviour: t1 return the MDI and t3 > t2 > 0

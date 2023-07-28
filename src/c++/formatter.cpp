@@ -34,7 +34,7 @@ Formatter::Formatter()
   }
   else
   {
-    std::string error_msg = "Invalid profiler output format choice. Expected 'threads' or 'drhook'. Currently set to '"
+    std::string error_msg = "Invalid Vernier output format choice. Expected 'threads' or 'drhook'. Currently set to '"
                             + format
                             + "'.";
     throw std::runtime_error( error_msg );

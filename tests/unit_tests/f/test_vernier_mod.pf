@@ -3,8 +3,8 @@
 ! The file LICENCE, distributed with this code, contains details of the terms
 ! under which the code may be used.
 !-------------------------------------------------------------------------------
-module test_profiler_mod
-  @suite(name='test_profiler_mod_suite')
+module test_vernier_mod
+  @suite(name='test_vernier_mod_suite')
 
   use vernier_mod
   use omp_lib
@@ -13,7 +13,7 @@ module test_profiler_mod
 contains
 
   @test
-  subroutine test_profiler()
+  subroutine test_vernier()
 
     use pFUnit
 
@@ -83,6 +83,6 @@ contains
 
     call mpi_finalize(ierr)
 
-  end subroutine test_profiler
+  end subroutine test_vernier
 
-end module test_profiler_mod
+end module test_vernier_mod

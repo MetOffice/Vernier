@@ -228,7 +228,7 @@ void Vernier::stop(size_t const hash)
 /**
  * @brief  Write profile information to file.
  *
- * @note  The default output file seedname is  "profiler-output". There also
+ * @note  The default output file seedname is  "vernier-output". There also
  *        exists the option to set a custom name via an environment variable.
  *
  */

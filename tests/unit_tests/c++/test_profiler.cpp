@@ -12,7 +12,7 @@
 
 TEST(SystemTests, TimingTest)
 {
-  // Start timing: noddy way, and using Profiler.
+  // Start timing: noddy way, and using Vernier.
   auto prof_main = vernier.start("MAIN");
   double t1 = omp_get_wtime();
 

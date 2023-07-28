@@ -48,9 +48,9 @@ TEST(RegionNameTest,NamesMatchTest) {
     SCOPED_TRACE("Problem with the profiler region name");
 
     // Get profiler region name out from the profiler and test
-    auto const prof_self_handle = std::hash<std::string_view>{}("__profiler__@0");
+    auto const prof_self_handle = std::hash<std::string_view>{}("__vernier__@0");
     std::string profilerRegionName = vernier.get_region_name(prof_self_handle,0);
-    EXPECT_EQ("__profiler__@0", profilerRegionName);
+    EXPECT_EQ("__vernier__@0", profilerRegionName);
   }
 
   vernier.stop(prof_cappucino);

@@ -4,8 +4,8 @@
 ! under which the code may be used.
 !-------------------------------------------------------------------------------
 
-!> @file    profiler_mod.F90
-!> @brief   Provides Fortran profiler bindings.
+!> @file    vernier_mod.F90
+!> @brief   Provides Fortran Vernier bindings.
 
 module vernier_mod
   use, intrinsic :: iso_c_binding, only: c_char, c_long, c_double, c_null_char

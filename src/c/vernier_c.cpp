@@ -6,10 +6,10 @@
 
 /**
  * @file   vernier_c.cpp
- * @brief  C-language interfaces for the profiler. 
+ * @brief  C-language interfaces for Vernier. 
  *
  * Neither Fortran or C can interface with C++ object constructs. Hence
- * C-language interfaces are needed to call the profiler from C and Fortran.
+ * C-language interfaces are needed to call Vernier from C and Fortran.
  *
  * Since Fortran is pass by reference, arguments are received as references (&).
  *
