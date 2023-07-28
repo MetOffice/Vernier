@@ -53,9 +53,6 @@ jobs:
 
       - name: Update Doxygen Pages
         run: |
-          ls -al ${{github.workspace}}
-          ls -al ${{github.workspace}}/build
-          ls -al ${{github.workspace}}/build/sphinx
           mkdir -p ${{github.workspace}}/docs/documentation
           cp -rf ${{github.workspace}}/build/sphinx/* ${{github.workspace}}/docs/documentation/.
           git config --global user.name 'github-actions[bot]'

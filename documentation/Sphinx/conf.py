@@ -14,7 +14,6 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'vernier'
@@ -38,7 +37,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = ''
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -73,7 +72,7 @@ html_permalinks = False
 # Tell Breathe about the Vernier project, and where to find the associated XML
 # files (the path is relative to the location of this 'conf.py' file).
 breathe_projects = {
-    'vernier': '../../build/doxygen/xml'
+    'vernier': '../../build/doxygen/xml',
 }
 
 breathe_default_project = 'vernier'

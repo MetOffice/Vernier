@@ -10,20 +10,14 @@ but the core functionality is the same.
 C++
 ^^^
 
-.. doxygenfunction:: Profiler::start
+.. doxygenclass:: Profiler
    :project: vernier
-
-.. doxygenfunction:: Profiler::stop
-   :project: vernier
-
-.. doxygenfunction:: Profiler::write
-   :project: vernier
+   :members: start, stop, write
 
 Fortran
 ^^^^^^^
 
 .. doxygennamespace:: profiler_mod
-   :project: vernier
    :content-only:
 
 .. doxygenfunction:: profiler_stop
