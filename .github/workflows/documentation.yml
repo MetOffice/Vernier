@@ -33,7 +33,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt -y install doxygen graphviz
-          sudo apt -y install python3-sphinx sphinx_rtd_theme
+          sudo apt -y install python3-sphinx python3-sphinx-rtd-theme
           sudo apt -y install breathe
           sudo apt -y install mpich
       
