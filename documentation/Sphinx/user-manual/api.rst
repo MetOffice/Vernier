@@ -10,13 +10,13 @@ but the core functionality is the same.
 C++
 ^^^
 
-.. doxygenfunction:: Vernier::start
+.. doxygenfunction:: Profiler::start
    :project: vernier
 
-.. doxygenfunction:: Vernier::stop
+.. doxygenfunction:: Profiler::stop
    :project: vernier
 
-.. doxygenfunction:: Vernier::write
+.. doxygenfunction:: Profiler::write
    :project: vernier
 
 Fortran

@@ -30,9 +30,9 @@ To reiterate, the two output format options are **threads** and **drhook**.
   to other regions).
 * Total: Total time spent between the two callipers for this region including
   calls to elsewhere.
-   * The "Total (raw)" column is the total time spent in a code region when the
-     overhead from Vernier is taken into account. In the example above this
-     overhead is only noticable with the overarching main program.
+* The "Total (raw)" column is the total time spent in a code region when the
+  overhead from Vernier is taken into account. In the example above this
+  overhead is only noticable with the overarching main program.
 
 **Example "drhook" output:**
 

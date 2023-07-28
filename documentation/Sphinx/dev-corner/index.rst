@@ -15,10 +15,10 @@ Development Process
 -------------------
 
 Information about the development process can be found 
-`here <https://github.com/MetOffice/Vernier/wiki/DevelopmentTesting>`_.
+`here <https://github.com/MetOffice/Vernier/wiki/DevelopmentTesting>`__.
 
 Code Review Guidance
 --------------------
 
 Guidelines for requesting and performing a code review are
-`here <https://github.com/MetOffice/Vernier/wiki/CodeReview>`_.
+`here <https://github.com/MetOffice/Vernier/wiki/CodeReview>`__.
