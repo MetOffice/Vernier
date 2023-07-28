@@ -49,15 +49,13 @@ jobs:
       - name: Build
         # Build your program with the given configuration
         continue-on-error: true
-        run: |
-          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs
-          ls -al ${{github.workspace}}
-          echo "build:"
-          ls -al ${{github.workspace}}/build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs
 
       - name: Update Doxygen Pages
         run: |
+          ls -al ${{github.workspace}}
           ls -al ${{github.workspace}}/build
+          ls -al ${{github.workspace}}/build/sphinx
           mkdir -p ${{github.workspace}}/docs/documentation
           cp -rf ${{github.workspace}}/build/sphinx/* ${{github.workspace}}/docs/documentation/.
           git config --global user.name 'github-actions[bot]'
