@@ -11,14 +11,13 @@ C++
 ^^^
 
 .. doxygenclass:: Profiler
-   :project: vernier
    :members: start, stop, write
 
 Fortran
 ^^^^^^^
-
-.. doxygennamespace:: profiler_mod
-   :content-only:
+.. Note: The following function is currently defined manually to avoid errors
+         caused by Breathe expecting C++ syntax.
+.. cpp:function:: subroutine profiler_mod::profiler_start::profiler_start(hash_out, region_name)
 
 .. doxygenfunction:: profiler_stop
 

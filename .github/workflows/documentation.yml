@@ -46,23 +46,25 @@ jobs:
             -DCMAKE_CXX_COMPILER=${{ env.CXX_COMPILER }} \
             -DBUILD_TESTS=OFF
 
-      - name: Build and Update Pages
+      - name: Build
         # Build your program with the given configuration
         continue-on-error: true
-        run: >
-          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs 2>/dev/null && \
-          mkdir -p ${{github.workspace}}/docs/documentation && \
-          cp -rf ${{github.workspace}}/build/sphinx/* ${{github.workspace}}/docs/documentation/. && \
-          git config --global user.name 'github-actions[bot]' && \
-          git config --global user.email 'github-actions[bot]' && \
-          git remote update && \
-          git add --force docs/documentation && \
-          git stash && \
-          git checkout gh-pages && \
-          git rm -r --ignore-unmatch docs/documentation/ && \
-          rm -rf docs/documentation/ && \
-          git stash pop && \
-          git reset && \
-          git add --force docs/documentation && \
-          git commit --allow-empty -m "Update Doxygen documentation" && \
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs 2>/dev/null
+
+      - name: Update Doxygen Pages
+        run: |
+          mkdir -p ${{github.workspace}}/docs/documentation
+          cp -rf ${{github.workspace}}/build/sphinx/* ${{github.workspace}}/docs/documentation/.
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]'
+          git remote update
+          git add --force docs/documentation
+          git stash
+          git checkout gh-pages
+          git rm -r --ignore-unmatch docs/documentation/
+          rm -rf docs/documentation/
+          git stash pop
+          git rese
+          git add --force docs/documentation
+          git commit --allow-empty -m "Update Doxygen documentation"
           git push

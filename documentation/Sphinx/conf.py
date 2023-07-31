@@ -72,7 +72,7 @@ html_permalinks = False
 # Tell Breathe about the Vernier project, and where to find the associated XML
 # files (the path is relative to the location of this 'conf.py' file).
 breathe_projects = {
-    'vernier': '../../build/doxygen/xml',
+    'vernier': '../../build/doxygen/xml'
 }
 
 breathe_default_project = 'vernier'
