@@ -49,7 +49,7 @@ jobs:
       - name: Build
         # Build your program with the given configuration
         continue-on-error: true
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs 2>/dev/null
 
       - name: Update Doxygen Pages
         run: |
