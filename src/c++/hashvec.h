@@ -10,8 +10,8 @@
  *          hash vector.
  */
 
-#ifndef PROFILER_HASHVEC_H
-#define PROFILER_HASHVEC_H
+#ifndef VERNIER_HASHVEC_H
+#define VERNIER_HASHVEC_H
 
 #include <string>
 #include <string_view>

@@ -13,8 +13,8 @@
  *
  */
 
-#ifndef PROFILER_H
-#define PROFILER_H
+#ifndef VERNIER_H
+#define VERNIER_H
 
 #include <iterator>
 #include <vector>

@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef PROFILER_HASHVEC_HANDLER_H
-#define PROFILER_HASHVEC_HANDLER_H
+#ifndef VERNIER_HASHVEC_HANDLER_H
+#define VERNIER_HASHVEC_HANDLER_H
 
 #include <algorithm>
 #include <memory>
