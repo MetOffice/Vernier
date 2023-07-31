@@ -35,4 +35,5 @@
 04/05/2023 PR #87 for #85: Fix failing workflows. \
 23/06/2023 PR #77 for #64: Better overhead measurement. \
 21/07/2023 PR #81 for #80: Upgrade coverage workflow. \
-21/07/2023 PR #98 for #96: Fix failing coverage workflow.
+21/07/2023 PR #98 for #96: Fix failing coverage workflow. \
+31/07/2023 PR #95 for #94: Update API with new name.
