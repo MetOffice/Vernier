@@ -8,4 +8,4 @@
 # targets (i.e. find_package()).
 
 @PACKAGE_INIT@
-include( "${CMAKE_CURRENT_LIST_DIR}/profilerTargets.cmake" )
+include( "${CMAKE_CURRENT_LIST_DIR}/vernierTargets.cmake" )

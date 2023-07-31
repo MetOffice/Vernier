@@ -5,16 +5,16 @@
 \*----------------------------------------------------------------------------*/
 
 /**
- * @file   profiler.h
- * @brief  Top-level profiler class.
+ * @file   vernier.h
+ * @brief  Top-level Vernier class.
  *
  * Contains the top-level class, whose methods are called from client code. Also
- * declares a top-level, global, profiler object.
+ * declares a top-level, global, vernier object.
  *
  */
 
-#ifndef PROFILER_H
-#define PROFILER_H
+#ifndef VERNIER_H
+#define VERNIER_H
 
 #include <iterator>
 #include <vector>
@@ -29,18 +29,18 @@
 // Forward declarations. The definitions of these functions will require access
 // to private methods.
 extern "C" {
-  void c_profiler_start_part1();
-  void c_profiler_start_part2(long int& hash_out, char const* name);
+  void c_vernier_start_part1();
+  void c_vernier_start_part2(long int& hash_out, char const* name);
 }
 
 /**
- * @brief  Top-level profiler class.
+ * @brief  Top-level Vernier class.
  *
  * Maintains separate hashtables for each thread, and keeps a breadcrumb trail
  * of profiled regions.
  */
 
-class Profiler
+class Vernier
 {
   private:
 
@@ -88,7 +88,7 @@ class Profiler
   public:
 
     // Constructors
-    Profiler();
+    Vernier();
 
     // Member functions
     size_t start(std::string_view const);
@@ -106,11 +106,11 @@ class Profiler
     unsigned long long int get_prof_call_count(int const input_tid) const;
 
     // Grant these functions access to private methods.
-    void friend c_profiler_start_part1();
-    void friend c_profiler_start_part2(long int& hash_out, char const* name);
+    void friend c_vernier_start_part1();
+    void friend c_vernier_start_part2(long int& hash_out, char const* name);
 };
 
 // Declare global profiler
-inline Profiler prof;
+inline Vernier vernier;
 
 #endif

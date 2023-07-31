@@ -1,12 +1,11 @@
-# profiler
+# Vernier
 
-[![Build](https://github.com/MetOffice/profiler/actions/workflows/build.yml/badge.svg)](https://github.com/MetOffice/profiler/actions/workflows/build.yml)
-[![Docs](https://github.com/MetOffice/profiler/actions/workflows/documentation.yml/badge.svg)](https://github.com/MetOffice/profiler/actions/workflows/documentation.yml)
-[![Coverage](https://img.shields.io/badge/coverage-97.3%25-success)](${WORKFLOW_URL})
+[![Build](https://github.com/MetOffice/Vernier/actions/workflows/build.yml/badge.svg)](https://github.com/MetOffice/Vernier/actions/workflows/build.yml)
+[![Docs](https://github.com/MetOffice/Vernier/actions/workflows/documentation.yml/badge.svg)](https://github.com/MetOffice/Vernier/actions/workflows/documentation.yml)
 
 Profiler for scientific code on HPC platforms.
 
-Documentation for the project can be found [here](https://metoffice.github.io/profiler).
+Documentation for the project can be found [here](https://metoffice.github.io/Vernier).
 
 ### Requirements
 
@@ -32,7 +31,7 @@ Source code documentation is generated using Doxygen (minimum 1.8.5).
 
 ### Building profiler
 
-CMake build options are available [here](https://metoffice.github.io/profiler/#Options).
+CMake build options are available [here](https://metoffice.github.io/Vernier/#Options).
 
 **To build:**
 

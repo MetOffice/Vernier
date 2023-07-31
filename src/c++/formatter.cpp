@@ -21,7 +21,7 @@ Formatter::Formatter()
 
   std::string format = "drhook"; 
 
-  char const* env_format = std::getenv("PROF_OUTPUT_FORMAT");
+  char const* env_format = std::getenv("VERNIER_OUTPUT_FORMAT");
   if(env_format){ format = env_format; }
 
   if ( format == "threads") 
@@ -34,7 +34,7 @@ Formatter::Formatter()
   }
   else
   {
-    std::string error_msg = "Invalid profiler output format choice. Expected 'threads' or 'drhook'. Currently set to '"
+    std::string error_msg = "Invalid Vernier output format choice. Expected 'threads' or 'drhook'. Currently set to '"
                             + format
                             + "'.";
     throw std::runtime_error( error_msg );

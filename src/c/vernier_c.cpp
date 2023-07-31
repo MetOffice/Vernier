@@ -5,26 +5,26 @@
 \*----------------------------------------------------------------------------*/
 
 /**
- * @file   profiler_c.cpp
- * @brief  C-language interfaces for the profiler. 
+ * @file   vernier_c.cpp
+ * @brief  C-language interfaces for Vernier. 
  *
  * Neither Fortran or C can interface with C++ object constructs. Hence
- * C-language interfaces are needed to call the profiler from C and Fortran.
+ * C-language interfaces are needed to call Vernier from C and Fortran.
  *
  * Since Fortran is pass by reference, arguments are received as references (&).
  *
  */
 
-#include "profiler.h"
+#include "vernier.h"
 
 #include <iostream>
 #include <cstring>
 
 extern "C" {
-  void   c_profiler_start_part1();
-  void   c_profiler_start_part2(long int&, char const*);
-  void   c_profiler_stop (long int const&);
-  void   c_profiler_write();
+  void   c_vernier_start_part1();
+  void   c_vernier_start_part2(long int&, char const*);
+  void   c_vernier_stop (long int const&);
+  void   c_vernier_write();
   double c_get_total_walltime(long int const&, int const&);
 }
 
@@ -32,9 +32,9 @@ extern "C" {
  * @brief  Start timing, part 1 of 2. 
  */
 
-void c_profiler_start_part1()
+void c_vernier_start_part1()
 {
-  prof.start_part1();
+  vernier.start_part1();
 }
 
 /**
@@ -43,9 +43,9 @@ void c_profiler_start_part1()
  * @param [out]  hash_out  The returned unique hash for this region.
  */
 
-void c_profiler_start_part2(long int& hash_out, char const* name)
+void c_vernier_start_part2(long int& hash_out, char const* name)
 {
-  size_t hash = prof.start_part2( name );
+  size_t hash = vernier.start_part2( name );
 
   // Ensure that the source and destination have the same size.
   static_assert(sizeof(hash) == sizeof(hash_out), "Hash/Out size mismatch.");
@@ -56,7 +56,7 @@ void c_profiler_start_part2(long int& hash_out, char const* name)
  * @brief  Stop timing the region with the specified handle.
  */
 
-void c_profiler_stop(long int const& hash_in)
+void c_vernier_stop(long int const& hash_in)
 {
   size_t hash;
 
@@ -64,16 +64,16 @@ void c_profiler_stop(long int const& hash_in)
   static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
   std::memcpy(&hash, &hash_in, sizeof(hash));
 
-  prof.stop( hash );
+  vernier.stop( hash );
 }
 
 /**
  * @brief Write the profile itself.
  */
 
-void c_profiler_write()
+void c_vernier_write()
 {
-  prof.write();
+  vernier.write();
 }
 
 /**
@@ -91,6 +91,6 @@ double c_get_total_walltime(long int const& hash_in, int const& thread_id)
   static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
   std::memcpy(&hash, &hash_in, sizeof(hash));
 
-  return prof.get_total_walltime(hash, thread_id);
+  return vernier.get_total_walltime(hash, thread_id);
 }
 
