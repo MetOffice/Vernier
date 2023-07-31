@@ -51,6 +51,7 @@ module profiler_mod
 
     subroutine profiler_stop(hash_in) bind(C, name='c_profiler_stop')
       import :: pik
+      !> The hash of the region being stopped.
       integer(kind=pik), intent(in) :: hash_in
     end subroutine profiler_stop
 

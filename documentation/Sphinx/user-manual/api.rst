@@ -1,0 +1,77 @@
+API
+---
+
+Vernier's API consists of three primary functions; **start**, **stop**,
+and **write**. A timed region is defined by a start-stop pair.
+
+How calls to these functions are made differs slightly between C++ and Fortran,
+but the core functionality is the same. 
+
+C++
+^^^
+
+.. doxygenclass:: Profiler
+   :members: start, stop, write
+
+Fortran
+^^^^^^^
+.. Note: The following function is currently defined manually to avoid errors
+         caused by Breathe expecting C++ syntax.
+.. cpp:function:: subroutine profiler_mod::profiler_start::profiler_start(hash_out, region_name)
+
+.. doxygenfunction:: profiler_stop
+
+.. doxygenfunction:: profiler_write
+
+Dos and don'ts
+^^^^^^^^^^^^^^
+
+**Do**:
+
+* Initialise MPI before profiling.
+* Nest timed regions nicely (no overlap).
+
+**Don't**:
+
+* Use a singular hash (or "handle") for all regions.
+* Have a stop calliper after any ``return`` statements.
+
+Examples
+^^^^^^^^
+.. TODO: Update the names of the Profiler class and "prof" object, and update
+         the instructions accordingly.
+
+**C++**:
+
+.. code-block:: cpp
+ 
+   #include "profiler.h"
+
+   // Start
+   auto prof_handle = prof.start("Main region");
+
+   // Stop
+   prof.stop(prof_handle);
+
+   // Write
+   prof.write();
+
+**Fortran**:
+
+.. code-block:: f90
+
+   use profiler_mod
+   integer (kind=pik) :: prof_handle
+
+   ! Start
+   call profiler_start(prof_handle, "Main region")
+
+   ! Stop
+   call profiler_stop(prof_handle)
+
+   ! Write
+   call profiler_write()
+
+Although their primary purpose is for system testing, the tests in
+``Vernier/tests/system_tests`` also serve as more fleshed-out examples on how
+calls to Vernier are made. 
