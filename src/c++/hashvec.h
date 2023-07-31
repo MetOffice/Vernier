@@ -19,6 +19,9 @@
 
 #include "prof_gettime.h"
 
+namespace meto
+{
+
 /**
  * @brief  Structure to hold information for a particular region.
  *
@@ -26,7 +29,7 @@
  *
  */
 
-struct RegionRecord{
+struct RegionRecord {
   public:
 
     // Constructor
@@ -50,6 +53,8 @@ using hashvec_t = std::vector<RegionRecord>;
 
 // Type definitions
 using record_index_t = std::vector<RegionRecord>::size_type;
+
+} // End meto namespace
 
 #endif
 

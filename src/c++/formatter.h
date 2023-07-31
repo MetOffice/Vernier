@@ -23,6 +23,9 @@
 
 #include "hashvec.h"
 
+namespace meto
+{
+
 /**
  * @brief  Formatter class. Methods write profile data.
  * @note   Different formats are coded in different class methods. A function
@@ -50,6 +53,8 @@ class Formatter {
     void execute_format(std::ofstream& os, hashvec_t);
    
 };
+
+} // End meto namespace
 
 #endif
 

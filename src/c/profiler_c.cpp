@@ -32,7 +32,7 @@ extern "C" {
  * @brief  Start timing, part 1 of 2. 
  */
 
-void c_profiler_start_part1()
+void meto::c_profiler_start_part1()
 {
   prof.start_part1();
 }
@@ -43,7 +43,7 @@ void c_profiler_start_part1()
  * @param [out]  hash_out  The returned unique hash for this region.
  */
 
-void c_profiler_start_part2(long int& hash_out, char const* name)
+void meto::c_profiler_start_part2(long int& hash_out, char const* name)
 {
   size_t hash = prof.start_part2( name );
 
@@ -64,7 +64,7 @@ void c_profiler_stop(long int const& hash_in)
   static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
   std::memcpy(&hash, &hash_in, sizeof(hash));
 
-  prof.stop( hash );
+  meto::prof.stop( hash );
 }
 
 /**
@@ -73,7 +73,7 @@ void c_profiler_stop(long int const& hash_in)
 
 void c_profiler_write()
 {
-  prof.write();
+  meto::prof.write();
 }
 
 /**
@@ -91,6 +91,6 @@ double c_get_total_walltime(long int const& hash_in, int const& thread_id)
   static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
   std::memcpy(&hash, &hash_in, sizeof(hash));
 
-  return prof.get_total_walltime(hash, thread_id);
+  return meto::prof.get_total_walltime(hash, thread_id);
 }
 

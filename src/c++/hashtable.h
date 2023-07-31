@@ -28,6 +28,9 @@
 #include "hashvec.h"
 #include "prof_gettime.h"
 
+namespace meto
+{
+
 // Forward declarations
 class HashVecHandler;
 
@@ -108,6 +111,8 @@ class HashTable{
     unsigned long long int get_call_count(size_t const hash) const;
     unsigned long long int get_prof_call_count() const;
 };
+
+} // End meto namespace
 
 #endif
 

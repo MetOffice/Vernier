@@ -21,27 +21,27 @@
 TEST(RegionNameTest,NamesMatchTest) {
 
   //Start main region with name "Cappucino"
-  const auto& prof_cappucino = prof.start("Cappucino");
+  const auto& prof_cappucino = meto::prof.start("Cappucino");
 
   {
     SCOPED_TRACE("Problem with sub-region name");
 
     // Start timing a sub-region with name "Latte"
     std::string myString = "Latte";
-    const auto& prof_latte = prof.start(myString);
+    const auto& prof_latte = meto::prof.start(myString);
 
     // Get subregion name out from profiler and check it is what we expect
-    std::string subregionName = prof.get_region_name(prof_latte,0);
+    std::string subregionName = meto::prof.get_region_name(prof_latte,0);
     EXPECT_EQ("Latte@0", subregionName);
 
-    prof.stop(prof_latte);
+    meto::prof.stop(prof_latte);
   }
 
   {
     SCOPED_TRACE("Problem with main region name");
 
     // Get main region name out from profiler and test
-    std::string regionName = prof.get_region_name(prof_cappucino,0);
+    std::string regionName = meto::prof.get_region_name(prof_cappucino,0);
     EXPECT_EQ("Cappucino@0", regionName);
   }
 
@@ -50,11 +50,11 @@ TEST(RegionNameTest,NamesMatchTest) {
 
     // Get profiler region name out from the profiler and test
     auto const prof_self_handle = std::hash<std::string_view>{}("__profiler__@0");
-    std::string profilerRegionName = prof.get_region_name(prof_self_handle,0);
+    std::string profilerRegionName = meto::prof.get_region_name(prof_self_handle,0);
     EXPECT_EQ("__profiler__@0", profilerRegionName);
   }
 
-  prof.stop(prof_cappucino);
+  meto::prof.stop(prof_cappucino);
 
 }
 
@@ -68,7 +68,7 @@ TEST(RegionNameTest,NamesMatchTest) {
 TEST(RegionNameTest,InvalidsTest) {
 
   // Long name
-  const auto& A = prof.hashtable_query_insert("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz");
+  const auto& A = meto::prof.hashtable_query_insert("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz");
 
   // Nothing / blank space
 
