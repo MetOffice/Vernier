@@ -3,17 +3,17 @@
 ! The file LICENCE, distributed with this code, contains details of the terms
 ! under which the code may be used.
 !-------------------------------------------------------------------------------
-module test_profiler_mod
-  @suite(name='test_profiler_mod_suite')
+module test_vernier_mod
+  @suite(name='test_vernier_mod_suite')
 
-  use profiler_mod
+  use vernier_mod
   use omp_lib
   use mpi_f08
 
 contains
 
   @test
-  subroutine test_profiler()
+  subroutine test_vernier()
 
     use pFUnit
 
@@ -25,7 +25,7 @@ contains
     real(kind=dp) :: t1, t2, actual_time
 
     ! Handle declarations
-    integer(kind=pik) :: prof_main
+    integer(kind=vik) :: prof_main
 
     ! Error handler
     integer :: ierr
@@ -34,32 +34,32 @@ contains
     call mpi_init(ierr)
 
     ! Start timing: noddy way, and using Profiler.
-    call profiler_start(prof_main, 'FULL')
+    call vernier_start(prof_main, 'FULL')
     t1 = omp_get_wtime()
 
     ! Time a region
     block
-      integer(kind=pik) :: prof_sub
-      call profiler_start(prof_sub, 'MAIN_SUB')
+      integer(kind=vik) :: prof_sub
+      call vernier_start(prof_sub, 'MAIN_SUB')
       call sleep(1);
-      call profiler_stop(prof_sub)
+      call vernier_stop(prof_sub)
     end block
 
     ! Time nested regions on many threads.
     !$OMP PARALLEL
     block
-      integer(kind=pik) :: prof_sub
-      integer(kind=pik) :: prof_sub2
-      call profiler_start(prof_sub, "MAIN_SUB")
+      integer(kind=vik) :: prof_sub
+      integer(kind=vik) :: prof_sub2
+      call vernier_start(prof_sub, "MAIN_SUB")
       call sleep(1);
 
       ! Time nested region
-      call profiler_start(prof_sub2, "MAIN_SUB2")
+      call vernier_start(prof_sub2, "MAIN_SUB2")
       call sleep(1);
-      call profiler_stop(prof_sub2)
+      call vernier_stop(prof_sub2)
 
       ! Outer region end.
-      call profiler_stop(prof_sub)
+      call vernier_stop(prof_sub)
     end block
     !$OMP END PARALLEL
 
@@ -68,21 +68,21 @@ contains
 
     ! End of profiling; record t2 immediately before.
     t2 = omp_get_wtime();
-    call profiler_stop(prof_main)
+    call vernier_stop(prof_main)
 
     assertions: block
-      real(kind=prk) :: profiler_wallclock_time
+      real(kind=vrk) :: profiler_wallclock_time
 
       actual_time = t2 - t1
-      profiler_wallclock_time = profiler_get_total_walltime(prof_main, 0_pik)
+      profiler_wallclock_time = vernier_get_total_walltime(prof_main, 0_vik)
 
       @assertEqual(actual_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
     end block assertions
 
-    call profiler_write()
+    call vernier_write()
 
     call mpi_finalize(ierr)
 
-  end subroutine test_profiler
+  end subroutine test_vernier
 
-end module test_profiler_mod
+end module test_vernier_mod

@@ -25,7 +25,7 @@ HashTable::HashTable(int const tid)
   hashvec_.reserve(PROF_HASHVEC_RESERVE_SIZE);
 
   // Set the name and hash of the profiler entry.
-  std::string const profiler_name = "__profiler__@" + std::to_string(tid);
+  std::string const profiler_name = "__vernier__@" + std::to_string(tid);
 
   // Insert special entry for the profiler overhead time.
   query_insert(profiler_name, profiler_hash_, profiler_index_);

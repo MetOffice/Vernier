@@ -20,13 +20,13 @@
  *
  */
 
-#ifndef PROFILER_HASHTABLE_H
-#define PROFILER_HASHTABLE_H
+#ifndef VERNIER_HASHTABLE_H
+#define VERNIER_HASHTABLE_H
 
 #include <unordered_map>
 
 #include "hashvec.h"
-#include "prof_gettime.h"
+#include "vernier_gettime.h"
 
 // Forward declarations
 class HashVecHandler;

@@ -33,11 +33,11 @@ class Writer {
     Formatter formatter_;
 
     // Default filename 
-    std::string output_filename_ = "profiler-output";
+    std::string output_filename_ = "vernier-output";
 
     // MPI handling
     int my_rank_;
-    MPI_Comm prof_comm_;
+    MPI_Comm vernier_comm_;
 
   public:
 

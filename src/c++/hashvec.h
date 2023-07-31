@@ -10,14 +10,14 @@
  *          hash vector.
  */
 
-#ifndef PROFILER_HASHVEC_H
-#define PROFILER_HASHVEC_H
+#ifndef VERNIER_HASHVEC_H
+#define VERNIER_HASHVEC_H
 
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "prof_gettime.h"
+#include "vernier_gettime.h"
 
 /**
  * @brief  Structure to hold information for a particular region.
