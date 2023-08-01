@@ -13,7 +13,7 @@
  * @param[in] os  Output stream to write to
  */
 
-void Multi::open_files(std::ofstream& os)
+void meto::Multi::open_files(std::ofstream& os)
 {
 
   // Append the MPI rank to the output filename.
@@ -31,7 +31,7 @@ void Multi::open_files(std::ofstream& os)
  * @param[in] hashvec  The vector containing all necessary data
  */
 
-void Multi::write(std::ofstream& os, hashvec_t hashvec) 
+void meto::Multi::write(std::ofstream& os, hashvec_t hashvec) 
 {
   open_files(os);
   formatter_.execute_format(os, hashvec);

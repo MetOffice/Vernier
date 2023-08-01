@@ -13,7 +13,7 @@
 TEST(HashEntryTest,CallCountTest)
 {
   // Start main region
-  auto prof_main = vernier.start("MainRegion");
+  auto prof_main = meto::vernier.start("MainRegion");
 
   // Declare a shared sub-region hash. Initialise num_threads so that the
   // compiler knows the 'for' loop inside the parallel region will definitely
@@ -22,7 +22,7 @@ TEST(HashEntryTest,CallCountTest)
   int num_threads = 1;
 
   // Start parallel region
-#pragma omp parallel default(none) shared(prof_sub_shared, vernier, num_threads)
+#pragma omp parallel default(none) shared(prof_sub_shared, meto::vernier, num_threads)
   {
     // Get total number of threads, only need to calculate on a single thread
     // since value won't change.
@@ -45,8 +45,8 @@ TEST(HashEntryTest,CallCountTest)
     // The highest thread ID will have the fewest calls: just 1.
     for (int i = 0; i < num_threads-thread_id; ++i)
     {
-      prof_sub_private = vernier.start("SubRegion");
-      vernier.stop(prof_sub_private);
+      prof_sub_private = meto::vernier.start("SubRegion");
+      meto::vernier.stop(prof_sub_private);
     }
 
     // Give prof_sub_shared a value for later use in EXPECT's
@@ -57,7 +57,7 @@ TEST(HashEntryTest,CallCountTest)
   }
 
   // Stop main region
-  vernier.stop(prof_main);
+  meto::vernier.stop(prof_main);
 
   // Check call_count_ is the number expected on all threads. On most threads,
   // the profiler calliper call count should match this number, except on thread
@@ -65,10 +65,10 @@ TEST(HashEntryTest,CallCountTest)
   for (int thread = 0; thread < num_threads; ++thread)
   {
     size_t hash = prof_sub_shared[static_cast<size_t>(thread)];
-    EXPECT_EQ(vernier.get_call_count(hash,thread), num_threads-thread);
+    EXPECT_EQ(meto::vernier.get_call_count(hash,thread), num_threads-thread);
 
     int incr = (thread==0) ? 1 : 0;
-    EXPECT_EQ(vernier.get_prof_call_count(thread), num_threads-thread+incr);
+    EXPECT_EQ(meto::vernier.get_prof_call_count(thread), num_threads-thread+incr);
   }
 
 }

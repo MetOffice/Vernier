@@ -12,7 +12,7 @@
  *
  */
 
-Writer::Writer()
+meto::Writer::Writer()
 {
   // Pick up environment variable filename if it exists. If it's not set, a
   // suitable default is set in the data member declaration. 

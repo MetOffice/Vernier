@@ -16,6 +16,9 @@
 
 #include "writer.h"
 
+namespace meto
+{
+
 /**
  * @brief   Multiple-file output strategy
  * @details Creates one file per MPI rank.
@@ -35,5 +38,7 @@ class Multi : public Writer {
     void write(std::ofstream& os, hashvec_t) override;
 
 };
+
+} // End meto namespace
 
 #endif
