@@ -22,9 +22,6 @@
 namespace meto
 {
 
-namespace meto
-{
-
 /**
  * @brief  Structure to hold information for a particular region.
  *

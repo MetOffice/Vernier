@@ -116,8 +116,5 @@ class Vernier
 // Declare global profiler
 inline Vernier vernier;
 
-} // End meto namespce
-
-} // End meto namespce
-
+} // End meto namespace
 #endif

@@ -28,7 +28,4 @@ using time_point_t    = std::chrono::time_point<std::chrono::steady_clock, time_
 time_point_t vernier_gettime();
 
 } // End meto namespace
-
-} // End meto namespace
-
 #endif
