@@ -9,6 +9,13 @@ on:
       - 'src/**.cpp'
       - 'tests/unit_tests/**'
       - '.github/workflows/coverage.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**.h'
+      - 'src/**.cpp'
+      - 'tests/unit_tests/**'
+      - '.github/workflows/coverage.yml'
 
 env:
   # Workflow-wide environment variables for the names of the three uploaded
@@ -78,7 +85,7 @@ jobs:
         env:
           ROOT_DIR: ${{ github.workspace }}
         run: |
-          source $(conda info --base)/etc/profile.d/conda.sh
+          source $(conda info --base)/etc/vernier.d/conda.sh
           conda create -q -y -n gcovr-env gcovr -c conda-forge --override-channels
           conda activate gcovr-env
           conda clean --all -y
@@ -86,7 +93,7 @@ jobs:
           gcovr --root "${ROOT_DIR}/" \
             --filter "${ROOT_DIR}/src/c++" \
             --html --html-details -o gcovr/index.html --print-summary \
-            "${ROOT_DIR}/build/src/c++/CMakeFiles/profiler.dir/" \
+            "${ROOT_DIR}/build/src/c++/CMakeFiles/vernier.dir/" \
             > ./brief-summary.txt
           conda deactivate
 
@@ -183,7 +190,7 @@ jobs:
 
       - name: Update coverage badge in README
         env:
-          WORKFLOW_URL: https://github.com/MetOffice/profiler/actions/workflows/coverage.yml
+          WORKFLOW_URL: https://github.com/MetOffice/Vernier/actions/workflows/coverage.yml
           BADGE_URL: '[![Coverage](https://img.shields.io/badge/coverage-${{ env.PERCENT }}%25-${{ env.COLOUR }})](${WORKFLOW_URL})'
         run: |
           git reset
