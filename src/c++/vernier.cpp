@@ -13,8 +13,8 @@
 #include <omp.h>
 
 // Initialize static data members.
-int Vernier::call_depth_ = -1;
-time_point_t Vernier::logged_calliper_start_time_{};
+int meto::Vernier::call_depth_ = -1;
+meto::time_point_t meto::Vernier::logged_calliper_start_time_{};
 
 /**
  * @brief Constructor for TracebackEntry struct.
@@ -27,9 +27,9 @@ time_point_t Vernier::logged_calliper_start_time_{};
  *
  */
 
-Vernier::TracebackEntry::TracebackEntry(
+meto::Vernier::TracebackEntry::TracebackEntry(
                                    size_t         record_hash,
-                                   record_index_t record_index,
+                                   meto::record_index_t record_index,
                                    meto::time_point_t region_start_time,
                                    meto::time_point_t calliper_start_time)
   : record_hash_        (record_hash)
@@ -43,7 +43,7 @@ Vernier::TracebackEntry::TracebackEntry(
  *
  */
 
-Vernier::Vernier()
+meto::Vernier::Vernier()
 {
 
   // Set the maximum number of threads.
@@ -79,7 +79,7 @@ Vernier::Vernier()
  * @returns     Unique hash for the code region being started.
  */
 
-size_t Vernier::start(std::string_view const region_name)
+size_t meto::Vernier::start(std::string_view const region_name)
 {
   start_part1();
   auto hash = start_part2(region_name);
@@ -91,7 +91,7 @@ size_t Vernier::start(std::string_view const region_name)
  *         threadprivate note of the time.
  */
 
-void Vernier::start_part1()
+void meto::Vernier::start_part1()
 {
   // Store the calliper start time, which is used in part2.
   logged_calliper_start_time_ = vernier_gettime();
@@ -103,7 +103,7 @@ void Vernier::start_part1()
  * @returns     Unique hash for the code region being started.
  */
 
-size_t Vernier::start_part2(std::string_view const region_name)
+size_t meto::Vernier::start_part2(std::string_view const region_name)
 {
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -150,7 +150,7 @@ size_t Vernier::start_part2(std::string_view const region_name)
  *        fractional error from precision limitations of the clock.
  */
 
-void Vernier::stop(size_t const hash)
+void meto::Vernier::stop(size_t const hash)
 {
 
   // Log the region stop time.
@@ -233,7 +233,7 @@ void Vernier::stop(size_t const hash)
  *
  */
 
-void Vernier::write()
+void meto::Vernier::write()
 {
   // Create hashvec handler object and feed in data from thread_hashtables_
   HashVecHandler output_data;
@@ -256,7 +256,7 @@ void Vernier::write()
  *
  */
 
-double Vernier::get_total_walltime(size_t const hash, int const thread_id)
+double meto::Vernier::get_total_walltime(size_t const hash, int const thread_id)
 {
   auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_total_walltime(hash);
@@ -271,7 +271,7 @@ double Vernier::get_total_walltime(size_t const hash, int const thread_id)
  *
  */
 
-double Vernier::get_total_raw_walltime(size_t const hash, int const thread_id)
+double meto::Vernier::get_total_raw_walltime(size_t const hash, int const thread_id)
 {
   auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_total_raw_walltime(hash);
@@ -286,7 +286,7 @@ double Vernier::get_total_raw_walltime(size_t const hash, int const thread_id)
  *
  */
 
-double Vernier::get_overhead_walltime(size_t const hash, int const thread_id)
+double meto::Vernier::get_overhead_walltime(size_t const hash, int const thread_id)
 {
   auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_overhead_walltime(hash);
@@ -301,7 +301,7 @@ double Vernier::get_overhead_walltime(size_t const hash, int const thread_id)
  *
  */
 
-double Vernier::get_self_walltime(size_t const hash, int const input_tid)
+double meto::Vernier::get_self_walltime(size_t const hash, int const input_tid)
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_self_walltime(hash);
@@ -319,7 +319,7 @@ double Vernier::get_self_walltime(size_t const hash, int const input_tid)
  *
  */
 
-double Vernier::get_child_walltime(size_t const hash, int const input_tid) const
+double meto::Vernier::get_child_walltime(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_child_walltime(hash);
@@ -337,7 +337,7 @@ double Vernier::get_child_walltime(size_t const hash, int const input_tid) const
  *
  */
 
-std::string Vernier::get_region_name(size_t const hash, int const input_tid) const
+std::string meto::Vernier::get_region_name(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_region_name(hash);
@@ -355,7 +355,7 @@ std::string Vernier::get_region_name(size_t const hash, int const input_tid) con
  *
  */
 
-unsigned long long int Vernier::get_call_count(size_t const hash, int const input_tid) const
+unsigned long long int meto::Vernier::get_call_count(size_t const hash, int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_call_count(hash);
@@ -371,7 +371,7 @@ unsigned long long int Vernier::get_call_count(size_t const hash, int const inpu
  *
  */
 
-unsigned long long int Vernier::get_prof_call_count(int const input_tid) const
+unsigned long long int meto::Vernier::get_prof_call_count(int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_prof_call_count();

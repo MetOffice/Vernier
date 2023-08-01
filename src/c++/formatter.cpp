@@ -192,5 +192,3 @@ void meto::Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
   }
 
 }
-
-

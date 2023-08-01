@@ -29,6 +29,4 @@ time_point_t vernier_gettime();
 
 } // End meto namespace
 
-} // End namespace meto
-
 #endif
