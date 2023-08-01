@@ -31,6 +31,9 @@
 namespace meto
 {
 
+namespace meto
+{
+
 // Forward declarations
 class HashVecHandler;
 

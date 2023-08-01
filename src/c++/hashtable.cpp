@@ -40,8 +40,8 @@ meto::HashTable::HashTable(int const tid)
  */
 
 void meto::HashTable::query_insert(std::string_view const region_name,
-                             size_t& hash,
-                             record_index_t& record_index) noexcept
+                                   size_t& hash,
+                                   record_index_t& record_index) noexcept
 {
   hash = hash_function_(region_name);
 
@@ -50,7 +50,7 @@ void meto::HashTable::query_insert(std::string_view const region_name,
   {
     record_index = search->second;
   }
-
+  
   // If not, create new entry.
   else
   {
@@ -191,7 +191,7 @@ std::vector<size_t> meto::HashTable::list_keys()
  * @brief  Appends table_ onto the end of an input hashvec. 
  * @param[inout] hashvec_handler  HashVecHandler object containing the
  *                                hashvec to amend.
- *
+ * 
  */
 
 void meto::HashTable::append_to(HashVecHandler& hashvec_handler)
@@ -211,7 +211,7 @@ void meto::HashTable::append_to(HashVecHandler& hashvec_handler)
 
   // Sync-up the lookup table and hashvec.
   sync_lookup();
-
+  
   // Append hashvec to that passed through the argument list.
   hashvec_handler.append(hashvec_);
 }

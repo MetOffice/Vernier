@@ -118,4 +118,6 @@ inline Vernier vernier;
 
 } // End meto namespce
 
+} // End meto namespce
+
 #endif
