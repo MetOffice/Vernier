@@ -85,7 +85,7 @@ jobs:
         env:
           ROOT_DIR: ${{ github.workspace }}
         run: |
-          source $(conda info --base)/etc/Vernier.d/conda.sh
+          source $(conda info --base)/etc/profile.d/conda.sh
           conda create -q -y -n gcovr-env gcovr -c conda-forge --override-channels
           conda activate gcovr-env
           conda clean --all -y
