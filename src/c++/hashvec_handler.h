@@ -18,6 +18,7 @@
 #include <memory>
 
 #include "hashvec.h"
+#include "mpi_context.h"
 #include "writer/writer.h"
 #include "writer/multi.h"
 
@@ -47,7 +48,7 @@ class HashVecHandler {
   public:
 
     // Constructor
-    HashVecHandler();
+    HashVecHandler(MPIContext);
 
     // Member functions
     void sort();

@@ -22,6 +22,7 @@
 #include <array>
 #include <omp.h>
 
+#include "mpi_context.h"
 #include "hashtable.h"
 
 #define PROF_MAX_TRACEBACK_SIZE 1000
@@ -69,6 +70,9 @@ class Vernier
 
     // Data members
     int max_threads_;
+
+    // MPI Context
+    MPIContext mpi_context_;
 
     // Static, threadprivate data members
     static time_point_t logged_calliper_start_time_;

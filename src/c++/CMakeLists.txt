@@ -22,6 +22,7 @@ add_library(${CMAKE_PROJECT_NAME}
         formatter.h        formatter.cpp
         hashvec.h          hashvec.cpp
         vernier_gettime.h  vernier_gettime.cpp
+        mpi_context.h      mpi_context.cpp
         )
 
 set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h)

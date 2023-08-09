@@ -11,9 +11,10 @@
  * 
  */
 
-#ifndef MULTI_H
-#define MULTI_H
+#ifndef VERNIER_MULTI_H
+#define VERNIER_MULTI_H
 
+#include "../mpi_context.h"
 #include "writer.h"
 
 namespace meto
@@ -33,6 +34,9 @@ class Multi : public Writer {
     void open_files(std::ofstream& os);
 
   public:
+
+    // Constructor
+    Multi(MPIContext);
 
     // Implementation of pure virtual function.
     void write(std::ofstream& os, hashvec_t) override;

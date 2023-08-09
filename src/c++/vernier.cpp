@@ -52,6 +52,9 @@ meto::Vernier::Vernier()
   max_threads_ = omp_get_max_threads();
 #endif
 
+  // Set the MPI context
+  mpi_context_ = MPIContext();
+
   // Create vector of hash tables: one hashtable for each thread.
   for (int tid=0; tid<max_threads_; ++tid)
   {
@@ -236,7 +239,7 @@ void meto::Vernier::stop(size_t const hash)
 void meto::Vernier::write()
 {
   // Create hashvec handler object and feed in data from thread_hashtables_
-  HashVecHandler output_data;
+  HashVecHandler output_data(mpi_context_);
   for (auto& table : thread_hashtables_)
   {
     table.append_to(output_data);
