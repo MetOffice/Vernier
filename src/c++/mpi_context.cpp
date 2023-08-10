@@ -6,6 +6,7 @@
  */
 
 #include "mpi_context.h"
+#include <cassert>
 
 /**
  * @brief  Constructor for an MPI context.
@@ -20,6 +21,11 @@
 
 meto::MPIContext::MPIContext(MPI_Comm client_comm_handle)
 {
+
+  // Check that the storage is correctly null first.
+  assert(comm_handle_ == MPI_COMM_NULL);
+  assert(comm_rank_   == -1);
+  assert(comm_size_   == -1);
 
   int mpi_is_initialised;
   MPI_Initialized(&mpi_is_initialised);
@@ -39,6 +45,7 @@ meto::MPIContext::MPIContext(MPI_Comm client_comm_handle)
     comm_rank_   = 0;
     comm_size_   = 1;
   }
+
 }
 
 /**
@@ -59,7 +66,6 @@ meto::MPIContext::~MPIContext()
   comm_handle_ = MPI_COMM_NULL;
   comm_rank_ = -1;
   comm_size_ = -1;
-
 }
 
 /**
