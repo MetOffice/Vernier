@@ -6,17 +6,12 @@
 
 /**
  *  @file   mpi_context.h
- *  @brief  Handles entries for each timed region.
- *
- *  In order to store region timings, one struct and one class are defined. The
- *  struct (RegionRecord) collects together information pertinent to a single
- *  profiled region, such as its name, total time and self time.
- *
- *  The HashTable class contains a hashtable to hold the hash entries (see
- *  above). The hashing algorithm is bundled with it, so that it remains an
- *  internal implementation detail only.
- *
- *  An assortment of methods handle admin. tasks, such as adding new entries.
+ *  @brief  Defines an MPIContext class.
+ * 
+ *  In order to reduce the proliferation of MPI throughout the codebase, and to
+ *  ensure that required information - such as MPI rank - is available at
+ *  appropriate levels in the code, we define an MPIContext class which we know
+ *  contains any data/methods we might need.
  *
  */
 
@@ -38,13 +33,17 @@
 namespace meto
 {
 
+/**
+ * @brief  Provides a wrapper for MPI functionality.
+ */
+
     class MPIContext {
 
     private:
 
-      MPI_Comm comm_handle_;
-      int      comm_size_;
-      int      comm_rank_;
+      MPI_Comm comm_handle_ = MPI_COMM_NULL;
+      int      comm_size_   = -1;
+      int      comm_rank_   = -1;
      
     public:
 

@@ -7,7 +7,17 @@
 
 #include "mpi_context.h"
 
-// Constructor
+/**
+ * @brief  Constructor for an MPI context.
+ * @param [in] client_comm_handle  The MPI communicator handle passed down from
+ *                                 the client code.
+ * @details This constructor does not initialise MPI.
+ * @returns A new MPIContext object.
+ * @note   The client communicator handle defaults to MPI_COMM_NULL. If no actual
+ *         argument is supplied, and MPI is initialised, then Vernier
+ *         will use MPI_COMM_WORLD by default.
+ */
+
 meto::MPIContext::MPIContext(MPI_Comm client_comm_handle)
 {
 
@@ -31,26 +41,44 @@ meto::MPIContext::MPIContext(MPI_Comm client_comm_handle)
   }
 }
 
+/**
+ * @brief  Destructor for an MPI context.
+ * @note   Since the constructor duplicated an MPI communicator, creating a new
+ *         communicator handle in the process, this destructor needs to free that
+ *         communicator handle.
+ */
+
 meto::MPIContext::~MPIContext()
 {
 
   if (comm_handle_ != MPI_COMM_WORLD &&
       comm_handle_ != MPI_COMM_NULL){
         MPI_Comm_free(&comm_handle_);
-        comm_rank_ = 0;
-        comm_size_ = 1;
   }
+
+  comm_handle_ = MPI_COMM_NULL;
+  comm_rank_ = -1;
+  comm_size_ = -1;
 
 }
 
-// Get rank
+/**
+ * @brief Gets the MPI rank from an MPIContext object.
+ * @returns The MPI rank.
+ */
+
 int meto::MPIContext::get_rank()
 {
     return comm_rank_;
 }
 
-// Get size
+/**
+ * @brief Gets the size of the MPI communicator from an MPIContext object.
+ * @returns The MPI communicator size.
+ */
+
 int meto::MPIContext::get_size()
 {
     return comm_size_;
 }
+
