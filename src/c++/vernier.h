@@ -98,6 +98,7 @@ class Vernier
     Vernier();
 
     // Member functions
+    void   init(MPI_Comm);
     size_t start(std::string_view const);
     void   stop (size_t const);
     void   write();

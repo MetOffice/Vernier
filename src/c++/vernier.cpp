@@ -52,9 +52,6 @@ meto::Vernier::Vernier()
   max_threads_ = omp_get_max_threads();
 #endif
 
-  // Set the MPI context
-  mpi_context_ = MPIContext();
-
   // Create vector of hash tables: one hashtable for each thread.
   for (int tid=0; tid<max_threads_; ++tid)
   {
@@ -73,6 +70,12 @@ meto::Vernier::Vernier()
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
   assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
 
+}
+
+// Inititialise
+void meto::Vernier::init(MPI_Comm client_comm_handle)
+{
+  mpi_context_ = MPIContext(client_comm_handle);
 }
 
 /**
