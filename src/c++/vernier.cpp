@@ -75,7 +75,15 @@ meto::Vernier::Vernier()
 // Inititialise
 void meto::Vernier::init(MPI_Comm client_comm_handle)
 {
-  mpi_context_ = MPIContext(client_comm_handle);
+  mpi_context_.init(client_comm_handle);
+}
+
+// Finalize
+void meto::Vernier::finalize()
+{
+  if(mpi_context_.is_initialized()){
+    mpi_context_.finalize();
+  }
 }
 
 /**
@@ -241,6 +249,13 @@ void meto::Vernier::stop(size_t const hash)
 
 void meto::Vernier::write()
 {
+
+  // If the MPI context is not already initialized, do it now. We'll need it.
+  // NB remove this in a future release.
+  if (!mpi_context_.is_initialized()){
+    mpi_context_.init();
+  }
+
   // Create hashvec handler object and feed in data from thread_hashtables_
   HashVecHandler output_data(mpi_context_);
   for (auto& table : thread_hashtables_)
@@ -251,8 +266,12 @@ void meto::Vernier::write()
   // Sort hashvec from high to low self walltimes then write
   output_data.sort();
   output_data.write();
-}
 
+  // Finished with the MPI context now, so finalise it.
+  // NB remove this in a future release.
+  mpi_context_.finalize();
+
+}
 
 /**
  * @brief  Get the total (inclusive) time taken by a region and everything below it.

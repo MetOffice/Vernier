@@ -41,15 +41,21 @@ namespace meto
 
     private:
 
-      MPI_Comm comm_handle_ = MPI_COMM_NULL;
-      int      comm_size_   = -1;
-      int      comm_rank_   = -1;
+      MPI_Comm comm_handle_;
+      int      comm_size_;
+      int      comm_rank_;
+      bool     initialized_;
      
     public:
 
         // Constructor
-        MPIContext(MPI_Comm client_comm_handle = MPI_COMM_NULL);
-        //~MPIContext();
+        MPIContext();
+
+        // Init and finalize
+        bool is_initialized();
+        void init(MPI_Comm client_comm_handle = MPI_COMM_NULL);
+        void finalize();
+        void reset();
 
         // Getters
         int get_size();

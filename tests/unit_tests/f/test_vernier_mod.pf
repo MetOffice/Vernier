@@ -35,9 +35,7 @@ contains
 
     ! Initialise MPI
     call mpi_init(ierr)
-    ! Dulicate MPI_COMM_WORLD into new communicator.
-    call mpi_comm_dup(MPI_COMM_WORLD, newcomm%mpi_val, ierr)
-    call vernier_init(newcomm%mpi_val)
+    call vernier_init(MPI_COMM_WORLD)
 
     ! Start timing: noddy way, and using Profiler.
     call vernier_start(prof_main, 'FULL')
@@ -87,6 +85,7 @@ contains
 
     call vernier_write()
 
+    call vernier_finalize()
     call mpi_comm_free(newcomm%mpi_val, ierr)
     call mpi_finalize(ierr)
 

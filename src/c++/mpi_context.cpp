@@ -10,16 +10,35 @@
 
 /**
  * @brief  Constructor for an MPI context.
- * @param [in] client_comm_handle  The MPI communicator handle passed down from
- *                                 the client code.
  * @details This constructor does not initialise MPI.
+ */
+
+meto::MPIContext::MPIContext()
+{
+  reset();
+}
+
+/**
+ * @brief  Resets data members to sensible null values.
+ * 
+ */
+
+void meto::MPIContext::reset()
+{
+    comm_handle_ = MPI_COMM_NULL;
+    comm_rank_   = -1;
+    comm_size_   = -1;
+    initialized_ = false;
+}
+
+ /**
  * @returns A new MPIContext object.
  * @note   The client communicator handle defaults to MPI_COMM_NULL. If no actual
  *         argument is supplied, and MPI is initialised, then Vernier
  *         will use MPI_COMM_WORLD by default.
  */
 
-meto::MPIContext::MPIContext(MPI_Comm client_comm_handle)
+void meto::MPIContext::init(MPI_Comm client_comm_handle)
 {
 
   // Check that the storage is correctly null first.
@@ -46,6 +65,14 @@ meto::MPIContext::MPIContext(MPI_Comm client_comm_handle)
     comm_size_   = 1;
   }
 
+  initialized_ = true;
+
+}
+
+bool meto::MPIContext::is_initialized()
+{
+  bool local_initialized = initialized_ && (comm_handle_ != MPI_COMM_NULL);
+  return local_initialized;
 }
 
 /**
@@ -55,19 +82,18 @@ meto::MPIContext::MPIContext(MPI_Comm client_comm_handle)
  *         communicator handle.
  */
 
-// meto::MPIContext::~MPIContext()
-// {
-// 
-//   if (comm_handle_ != MPI_COMM_WORLD &&
-//       comm_handle_ != MPI_COMM_NULL){
-//         MPI_Comm_free(&comm_handle_);
-//   }
-// 
-//   comm_handle_ = MPI_COMM_NULL;
-//   comm_rank_   = -1;
-//   comm_size_   = -1;
-// 
-// }
+void meto::MPIContext::finalize()
+{
+  assert (comm_handle_ != MPI_COMM_NULL);
+  assert (comm_handle_ != MPI_COMM_WORLD);
+
+  if (comm_handle_ != MPI_COMM_WORLD &&
+      comm_handle_ != MPI_COMM_NULL){
+        MPI_Comm_free(&comm_handle_);
+  }
+
+  reset();
+}
 
 /**
  * @brief Gets the MPI rank from an MPIContext object.

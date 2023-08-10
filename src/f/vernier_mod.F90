@@ -27,6 +27,7 @@ module vernier_mod
   !-----------------------------------------------------------------------------
 
   public :: vernier_init
+  public :: vernier_finalize
   public :: vernier_start
   public :: vernier_stop
   public :: vernier_write
@@ -42,6 +43,10 @@ module vernier_mod
                bind(C, name='c_vernier_init')
       integer, intent(in) :: client_comm_handle
     end subroutine vernier_init
+
+    subroutine vernier_finalize() bind(C, name='c_vernier_finalize')
+        !No arguments to handle
+    end subroutine vernier_finalize
 
     subroutine interface_vernier_start_part1()  &
                bind(C, name='c_vernier_start_part1')
