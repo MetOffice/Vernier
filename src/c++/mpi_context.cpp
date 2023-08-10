@@ -55,18 +55,19 @@ meto::MPIContext::MPIContext(MPI_Comm client_comm_handle)
  *         communicator handle.
  */
 
-meto::MPIContext::~MPIContext()
-{
-
-  if (comm_handle_ != MPI_COMM_WORLD &&
-      comm_handle_ != MPI_COMM_NULL){
-        MPI_Comm_free(&comm_handle_);
-  }
-
-  comm_handle_ = MPI_COMM_NULL;
-  comm_rank_ = -1;
-  comm_size_ = -1;
-}
+// meto::MPIContext::~MPIContext()
+// {
+// 
+//   if (comm_handle_ != MPI_COMM_WORLD &&
+//       comm_handle_ != MPI_COMM_NULL){
+//         MPI_Comm_free(&comm_handle_);
+//   }
+// 
+//   comm_handle_ = MPI_COMM_NULL;
+//   comm_rank_   = -1;
+//   comm_size_   = -1;
+// 
+// }
 
 /**
  * @brief Gets the MPI rank from an MPIContext object.

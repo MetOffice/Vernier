@@ -26,6 +26,7 @@ module vernier_mod
   ! Public interfaces / subroutines
   !-----------------------------------------------------------------------------
 
+  public :: vernier_init
   public :: vernier_start
   public :: vernier_stop
   public :: vernier_write
@@ -36,6 +37,11 @@ module vernier_mod
   !-----------------------------------------------------------------------------
 
   interface
+
+    subroutine vernier_init(client_comm_handle)  &
+               bind(C, name='c_vernier_init')
+      integer, intent(in) :: client_comm_handle
+    end subroutine vernier_init
 
     subroutine interface_vernier_start_part1()  &
                bind(C, name='c_vernier_start_part1')
@@ -59,7 +65,7 @@ module vernier_mod
     end subroutine vernier_write
 
     function vernier_get_total_walltime(hash_in, thread_id) result(walltime) &
-             bind(C, name='c_get_total_walltime')
+             bind(C, name='c_vernier_get_total_walltime')
       import :: vik, vrk
       integer(kind=vik), intent(in) :: hash_in
       integer(kind=vik), intent(in) :: thread_id

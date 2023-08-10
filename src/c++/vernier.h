@@ -21,6 +21,7 @@
 #include <string_view>
 #include <array>
 #include <omp.h>
+#include <mpi.h>
 
 #include "mpi_context.h"
 #include "hashtable.h"

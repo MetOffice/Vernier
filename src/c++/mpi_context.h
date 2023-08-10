@@ -49,7 +49,7 @@ namespace meto
 
         // Constructor
         MPIContext(MPI_Comm client_comm_handle = MPI_COMM_NULL);
-        ~MPIContext();
+        //~MPIContext();
 
         // Getters
         int get_size();

@@ -30,8 +30,14 @@ contains
     ! Error handler
     integer :: ierr
 
+    ! Local communicator handle
+    type(mpi_comm) :: newcomm
+
     ! Initialise MPI
     call mpi_init(ierr)
+    ! Dulicate MPI_COMM_WORLD into new communicator.
+    call mpi_comm_dup(MPI_COMM_WORLD, newcomm%mpi_val, ierr)
+    call vernier_init(newcomm%mpi_val)
 
     ! Start timing: noddy way, and using Profiler.
     call vernier_start(prof_main, 'FULL')
@@ -81,6 +87,7 @@ contains
 
     call vernier_write()
 
+    call mpi_comm_free(newcomm%mpi_val, ierr)
     call mpi_finalize(ierr)
 
   end subroutine test_vernier
