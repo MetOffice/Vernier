@@ -16,12 +16,12 @@
  *         PROF_OUTPUT_FORMAT.
  */
 
-Formatter::Formatter()
+meto::Formatter::Formatter()
 {
 
   std::string format = "drhook"; 
 
-  char const* env_format = std::getenv("PROF_OUTPUT_FORMAT");
+  char const* env_format = std::getenv("VERNIER_OUTPUT_FORMAT");
   if(env_format){ format = env_format; }
 
   if ( format == "threads") 
@@ -34,7 +34,7 @@ Formatter::Formatter()
   }
   else
   {
-    std::string error_msg = "Invalid profiler output format choice. Expected 'threads' or 'drhook'. Currently set to '"
+    std::string error_msg = "Invalid Vernier output format choice. Expected 'threads' or 'drhook'. Currently set to '"
                             + format
                             + "'.";
     throw std::runtime_error( error_msg );
@@ -48,7 +48,7 @@ Formatter::Formatter()
  * @param[in] hashvec  Vector of data that the format method will operate on
  */
 
-void Formatter::execute_format(std::ofstream& os, hashvec_t hashvec) 
+void meto::Formatter::execute_format(std::ofstream& os, hashvec_t hashvec) 
 {
     (this->*format_)(os, hashvec);
 }
@@ -60,7 +60,7 @@ void Formatter::execute_format(std::ofstream& os, hashvec_t hashvec)
  * @param[in] hashvec  Vector containing all the necessary data
  */
 
-void Formatter::threads(std::ofstream& os, hashvec_t hashvec)
+void meto::Formatter::threads(std::ofstream& os, hashvec_t hashvec)
 {
 
   std::string routine_at_thread = "Thread: All" /*+ std::to_string(tid_)*/;
@@ -103,7 +103,7 @@ void Formatter::threads(std::ofstream& os, hashvec_t hashvec)
  * @param[in] hashvec  Vector containing all the necessary data
  */
 
-void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
+void meto::Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
 {
 
   int num_threads = 1;
@@ -192,5 +192,3 @@ void Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
   }
 
 }
-
-

@@ -5,7 +5,7 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "prof_gettime.h"
+#include "vernier_gettime.h"
 
 /**
  * @brief Returns the current time.
@@ -13,7 +13,7 @@
  * @returns The present time point.
  */
 
-time_point_t prof_gettime()
+meto::time_point_t meto::vernier_gettime()
 {
   return std::chrono::steady_clock::now();
 }

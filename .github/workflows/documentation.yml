@@ -1,4 +1,4 @@
-name: Update docs
+name: Deploy Docs
 
 on:
   workflow_dispatch:

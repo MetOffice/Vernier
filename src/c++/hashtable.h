@@ -20,19 +20,22 @@
  *
  */
 
-#ifndef PROFILER_HASHTABLE_H
-#define PROFILER_HASHTABLE_H
+#ifndef VERNIER_HASHTABLE_H
+#define VERNIER_HASHTABLE_H
 
 #include <unordered_map>
 
 #include "hashvec.h"
-#include "prof_gettime.h"
+#include "vernier_gettime.h"
+
+namespace meto
+{
 
 // Forward declarations
 class HashVecHandler;
 
 /**
- * @brief  Defines a null hash function. 
+ * @brief  Defines a null hash function.
  *
  * Having already hashed region names, we won't need to hash the hashtable keys.
  *
@@ -60,11 +63,11 @@ class HashTable{
     int tid_;
     size_t profiler_hash_;
     record_index_t profiler_index_;
-    
+
     // Hash function
     std::hash<std::string_view> hash_function_;
-    
-    // Hashtable containing locations of region records. 
+
+    // Hashtable containing locations of region records.
     std::unordered_map<size_t, record_index_t, NullHashFunction> lookup_table_;
 
     // Vector of region records.
@@ -109,6 +112,8 @@ class HashTable{
     unsigned long long int get_call_count(size_t const hash) const;
     unsigned long long int get_prof_call_count() const;
 };
+
+} // End meto namespace
 
 #endif
 

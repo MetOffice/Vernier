@@ -10,14 +10,17 @@
  *          hash vector.
  */
 
-#ifndef PROFILER_HASHVEC_H
-#define PROFILER_HASHVEC_H
+#ifndef VERNIER_HASHVEC_H
+#define VERNIER_HASHVEC_H
 
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "prof_gettime.h"
+#include "vernier_gettime.h"
+
+namespace meto
+{
 
 /**
  * @brief  Structure to hold information for a particular region.
@@ -26,7 +29,7 @@
  *
  */
 
-struct RegionRecord{
+struct RegionRecord {
   public:
 
     // Constructor
@@ -51,6 +54,8 @@ using hashvec_t = std::vector<RegionRecord>;
 
 // Type definitions
 using record_index_t = std::vector<RegionRecord>::size_type;
+
+} // End meto namespace
 
 #endif
 

@@ -8,12 +8,12 @@ include(CMakePackageConfigHelpers)
 
 # Add files source files to library.
 add_library(${CMAKE_PROJECT_NAME}_c 
-        profiler_c.cpp)
+        vernier_c.cpp)
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME}_c PRIVATE
-                        OpenMP::OpenMP_CXX
-                        profiler
+                      OpenMP::OpenMP_CXX
+                      ${CMAKE_PROJECT_NAME}
                      )
 
 set_project_warnings(${CMAKE_PROJECT_NAME}_c)

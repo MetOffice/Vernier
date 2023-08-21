@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef PROFILER_HASHVEC_HANDLER_H
-#define PROFILER_HASHVEC_HANDLER_H
+#ifndef VERNIER_HASHVEC_HANDLER_H
+#define VERNIER_HASHVEC_HANDLER_H
 
 #include <algorithm>
 #include <memory>
@@ -20,6 +20,9 @@
 #include "hashvec.h"
 #include "writer/writer.h"
 #include "writer/multi.h"
+
+namespace meto
+{
 
 /**
  * @brief  HashVecHandler class
@@ -52,6 +55,8 @@ class HashVecHandler {
     void append(hashvec_t const&);
     
 };
+
+} // End meto namespace
 
 #endif
 

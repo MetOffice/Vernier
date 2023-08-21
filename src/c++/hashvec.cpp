@@ -13,9 +13,9 @@
  * @param [in]  tid          The thread id.
  */
 
-RegionRecord::RegionRecord(size_t const region_hash, 
-                           std::string_view const region_name, 
-                           int tid)
+meto::RegionRecord::RegionRecord(size_t const region_hash,
+                                 std::string_view const region_name,
+                                 int tid)
 : region_hash_(region_hash)
 , region_name_(region_name)
 , total_walltime_      (time_duration_t::zero())
