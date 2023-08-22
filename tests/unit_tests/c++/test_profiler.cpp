@@ -7,11 +7,15 @@
 #include <gtest/gtest.h>
 #include <omp.h>
 #include <unistd.h>
+#include <mpi.h>
 
 #include "vernier.h"
 
 TEST(SystemTests, TimingTest)
 {
+
+  meto::vernier.init(MPI_COMM_NULL);
+
   // Start timing: noddy way, and using Vernier.
   auto prof_main = meto::vernier.start("MAIN");
   double t1 = omp_get_wtime();
@@ -56,5 +60,6 @@ TEST(SystemTests, TimingTest)
   std::cout << "\n" << "Profiler timing: " << prof_time  << "\n\n";
   EXPECT_NEAR(prof_time, actual_time, time_tolerance);
 
+  meto::vernier.finalize();
 
 }

@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <omp.h>
+#include <mpi.h>
 
 #include "vernier.h"
 
@@ -23,6 +24,8 @@ using ::testing::Gt;
 //
 
 TEST(HashTableTest,HashFunctionTest) {
+
+  meto::vernier.init(MPI_COMM_NULL);
 
   // Create new hashes via HashTable::query_insert, which is used in Vernier::start
   const auto& prof_rigatoni = meto::vernier.start("Rigatoni");
@@ -41,6 +44,7 @@ TEST(HashTableTest,HashFunctionTest) {
     EXPECT_EQ(meto::vernier.start("Penne"),    std::hash<std::string_view>{}("Penne@0"));
   }
 
+  meto::vernier.finalize();
 }
 
 /**
@@ -50,6 +54,8 @@ TEST(HashTableTest,HashFunctionTest) {
  */
 
 TEST(HashTableTest,UpdateTimesTest) {
+
+  meto::vernier.init(MPI_COMM_NULL);
 
   // Create new hash
   size_t prof_pie = std::hash<std::string_view>{}("Pie@0");
@@ -93,4 +99,6 @@ TEST(HashTableTest,UpdateTimesTest) {
     EXPECT_GT(t2, 0.0);
     EXPECT_GT(t3, t2 );
   }
+
+  meto::vernier.finalize();
 }

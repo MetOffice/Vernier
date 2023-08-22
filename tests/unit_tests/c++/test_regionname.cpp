@@ -7,7 +7,7 @@
 #include <iostream>
 #include <chrono>
 #include <gtest/gtest.h>
-#include <chrono>
+#include <mpi.h>
 
 #include "vernier.h"
 
@@ -18,6 +18,8 @@
 //
 
 TEST(RegionNameTest,NamesMatchTest) {
+
+  meto::vernier.init(MPI_COMM_NULL);
 
   //Start main region with name "Cappucino"
   const auto& prof_cappucino = meto::vernier.start("Cappucino");
@@ -55,6 +57,7 @@ TEST(RegionNameTest,NamesMatchTest) {
 
   meto::vernier.stop(prof_cappucino);
 
+  meto::vernier.finalize();
 }
 
 /**

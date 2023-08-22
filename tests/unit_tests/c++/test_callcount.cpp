@@ -6,12 +6,16 @@
 
 #include <gtest/gtest.h>
 #include <omp.h>
+#include <mpi.h>
 #include <vector>
 
 #include "vernier.h"
 
 TEST(HashEntryTest,CallCountTest)
 {
+
+  meto::vernier.init(MPI_COMM_NULL);
+
   // Start main region
   auto prof_main = meto::vernier.start("MainRegion");
 
@@ -71,4 +75,5 @@ TEST(HashEntryTest,CallCountTest)
     EXPECT_EQ(meto::vernier.get_prof_call_count(thread), num_threads-thread+incr);
   }
 
+  meto::vernier.finalize();
 }
