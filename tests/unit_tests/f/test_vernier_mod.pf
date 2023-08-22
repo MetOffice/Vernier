@@ -8,18 +8,53 @@ module test_vernier_mod
 
   use vernier_mod
   use omp_lib
-  use mpi_f08
+  use mpi
+  use pfunit
+
+  integer, parameter :: dp = 8
+
+  @TestCase
+  type, extends(MPITestCase), public :: test_vernier_type
+    private
+  contains
+    procedure :: setup
+    procedure :: teardown
+    procedure :: test_vernier_timings
+  end type test_vernier_type
 
 contains
 
-  @test
-  subroutine test_vernier()
+  !-----------------------------------------------------------------------------
+  ! Setup routine
+  !-----------------------------------------------------------------------------
 
-    use pFUnit
+  subroutine setup(this)
+    implicit none
+    
+    class(test_vernier_type), intent(inout) :: this
 
+  end subroutine setup
+
+  !-----------------------------------------------------------------------------
+  ! Teardown routine
+  !-----------------------------------------------------------------------------
+
+  subroutine teardown(this)
+    implicit none
+    
+    class(test_vernier_type), intent(inout) :: this
+
+  end subroutine teardown
+
+  !-----------------------------------------------------------------------------
+  ! Test Vernier timings
+  !-----------------------------------------------------------------------------
+
+  @test(npes=[2])
+  subroutine test_vernier_timings(this)
     implicit none
 
-    integer, parameter :: dp = 8
+    class(test_vernier_type), intent(inout) :: this
 
     ! Timer declarations
     real(kind=dp) :: t1, t2, actual_time
@@ -30,12 +65,8 @@ contains
     ! Error handler
     integer :: ierr
 
-    ! Local communicator handle
-    type(mpi_comm) :: newcomm
-
-    ! Initialise MPI
-    call mpi_init(ierr)
-    call vernier_init(MPI_COMM_WORLD)
+    ! Initialise Vernier
+    call vernier_init(this%getMpiCommunicator())
 
     ! Start timing: noddy way, and using Profiler.
     call vernier_start(prof_main, 'FULL')
@@ -83,12 +114,11 @@ contains
       @assertEqual(actual_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
     end block assertions
 
+    ! Write profile and finalize.
     call vernier_write()
 
     call vernier_finalize()
-    call mpi_comm_free(newcomm%mpi_val, ierr)
-    call mpi_finalize(ierr)
 
-  end subroutine test_vernier
+  end subroutine test_vernier_timings
 
 end module test_vernier_mod
