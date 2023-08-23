@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 #include <omp.h>
 
-#include "profiler.h"
+#include "vernier.h"
 
 int const max_depth = 3;
 int const sleep_seconds = 1;
@@ -42,7 +42,7 @@ void first_function(Timings& timings)
   static int recursion_depth = 1;
 #pragma omp threadprivate(recursion_depth)
 
-  auto prof_handle = prof.start("first_function");
+  auto prof_handle = meto::vernier.start("first_function");
 
   sleep(sleep_seconds);
   ++recursion_depth;
@@ -52,10 +52,10 @@ void first_function(Timings& timings)
     second_function(timings);
   }
 
-  prof.stop(prof_handle);
+  meto::vernier.stop(prof_handle);
 
   int const tid = omp_get_thread_num();
-  timings.first_function_total_time = prof.get_total_walltime(prof_handle, tid);
+  timings.first_function_total_time = meto::vernier.get_total_walltime(prof_handle, tid);
 
 }
 
@@ -68,7 +68,7 @@ void second_function(Timings& timings)
   static int recursion_depth = 1;
 #pragma omp threadprivate(recursion_depth)
 
-  auto prof_handle = prof.start("second_function");
+  auto prof_handle = meto::vernier.start("second_function");
 
   sleep(sleep_seconds);
   ++recursion_depth;
@@ -78,10 +78,10 @@ void second_function(Timings& timings)
     first_function(timings);
   }
 
-  prof.stop(prof_handle);
+  meto::vernier.stop(prof_handle);
 
   int const tid = omp_get_thread_num();
-  timings.second_function_total_time = prof.get_total_walltime(prof_handle, tid);
+  timings.second_function_total_time = meto::vernier.get_total_walltime(prof_handle, tid);
 }
 
 // -------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ void second_function(Timings& timings)
 
 TEST(RecursionTest,IndirectRecursion)
 {
-  auto prof_handle = prof.start("test_recursion");
+  auto prof_handle = meto::vernier.start("test_recursion");
 
   // Test indepedently on each thread.
 #pragma omp parallel
@@ -98,7 +98,7 @@ TEST(RecursionTest,IndirectRecursion)
     Timings timings;
     double t1 = omp_get_wtime();
 
-    auto prof_handle_threaded = prof.start("test_recursion:threads");
+    auto prof_handle_threaded = meto::vernier.start("test_recursion:threads");
     first_function(timings);
 
     double t2 = omp_get_wtime();
@@ -109,11 +109,9 @@ TEST(RecursionTest,IndirectRecursion)
     EXPECT_NEAR(timings.first_function_total_time,  overall_time, time_tolerance);
     EXPECT_NEAR(timings.second_function_total_time, timings.first_function_total_time - sleep_seconds, time_tolerance);
 
-    prof.stop(prof_handle_threaded);
+    meto::vernier.stop(prof_handle_threaded);
   }
 
-  prof.stop(prof_handle);
+  meto::vernier.stop(prof_handle);
 }
-
-
 

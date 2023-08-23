@@ -11,6 +11,7 @@
 #include <cstring>
 #include <iterator>
 #include <cstring>
+#include <cstddef>
 
 #define PROF_HASHVEC_RESERVE_SIZE 1000
 #define PROF_STRING_BUFFER_LENGTH 100
@@ -21,14 +22,14 @@
  *
  */
 
-HashTable::HashTable(int const tid)
+meto::HashTable::HashTable(int const tid)
   : tid_(tid)
 {
   // Reserve enough places in hashvec_
   hashvec_.reserve(PROF_HASHVEC_RESERVE_SIZE);
 
   // Set the name and hash of the profiler entry.
-  std::string const profiler_name = "__profiler__";
+  std::string const profiler_name = "__vernier__";
 
   // Insert special entry for the profiler overhead time.
   query_insert(profiler_name, tid, profiler_hash_, profiler_index_);
@@ -41,6 +42,8 @@ HashTable::HashTable(int const tid)
  * 
  * @param [in] region_name  The code region name.
  * @param [in] tid          The thread ID
+ *
+ * @returns  Returns a hash based on the input arguments.  
  * 
  * @note The integer thread ID is not converted to a string before it is
  *       appended to the hash string.  This is a performance measure.
@@ -51,7 +54,7 @@ HashTable::HashTable(int const tid)
  * 
  */
 
-size_t HashTable::compute_hash(std::string_view region_name, int tid)
+size_t meto::HashTable::compute_hash(std::string_view region_name, int tid)
 {
 
   // Get the bit-pattern of the thread ID.
@@ -61,13 +64,8 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
   [[maybe_unused]] int const* tid_back = reinterpret_cast<int const*>(tid_bytes.data());
   assert (*tid_back == tid);
 
-  // Store special characters in an array container, so that we have STL syntax
-  // available to us later.
-  std::array<char, 1> constexpr delimiter = {'@'};
-
   // Extra bytes to accommodate the thread ID. 
-  int constexpr num_extra_bytes = sizeof(tid)
-                                + sizeof(delimiter);
+  unsigned int constexpr num_extra_bytes = sizeof(tid);
 
   // Avoid dynamic memory allocation for performance reasons. Instead, fix the
   // size of the buffer and perform a runtime check that we're not exceeding it.
@@ -86,36 +84,38 @@ size_t HashTable::compute_hash(std::string_view region_name, int tid)
   std::copy(region_name.begin(), region_name.end(), new_chars_iterator);
   std::advance(new_chars_iterator, region_name.size());
 
-  // Add delimiter
-  std::copy(delimiter.begin(), delimiter.end(), new_chars_iterator);
-  std::advance(new_chars_iterator, delimiter.size());
-
   // Add thread ID (physical representation)
   std::memcpy(&(*new_chars_iterator), tid_bytes.data(), tid_bytes.size());
   std::advance(new_chars_iterator, tid_bytes.size());
 
-  [[maybe_unused]] auto const expected_size = region_name.length() + num_extra_bytes;
+  // Compute the length of the character array based on the current position of
+  // the iterator.
   auto new_chars_size = std::distance(new_chars.begin(), new_chars_iterator); 
+
+  // Check that the character string is the length which were expecting.
+  [[maybe_unused]] auto const expected_size =  
+           static_cast<unsigned int>(region_name.length()) + num_extra_bytes;
   assert (new_chars_size == expected_size);
 
   return hash_function_(std::string_view(new_chars.data(), 
         static_cast<std::string_view::size_type>(new_chars_size))); 
+
 }
 
 /**
  * @brief  Inserts a new entry into the hashtable.
  * @param [in]  region_name  The name of the region.
+ * @param [in]  tid          The thread ID.
  * @param [out] hash          Hash of the region name.
  * @param [out] record_index  Array index of the region record.
  *
  */
 
-void HashTable::query_insert(std::string_view const region_name,
-                             int tid,
-                             size_t& hash,
-                             record_index_t& record_index) noexcept
+void meto::HashTable::query_insert(std::string_view const region_name,
+                                   int tid,
+                                   size_t& hash,
+                                   record_index_t& record_index) noexcept
 {
-
   // Compute the hash
   hash = compute_hash(region_name, tid);
 
@@ -143,8 +143,8 @@ void HashTable::query_insert(std::string_view const region_name,
  * @param [in] time_delta  The time increment to add.
  */
 
-void HashTable::update(record_index_t const record_index, 
-                       time_duration_t const time_delta)
+void meto::HashTable::update(record_index_t const record_index,
+                             time_duration_t const time_delta)
 {
 
   auto& record = hashvec_[record_index];
@@ -163,13 +163,13 @@ void HashTable::update(record_index_t const record_index,
 
 }
 
-void HashTable::increment_recursion_level(record_index_t const record_index)
+void meto::HashTable::increment_recursion_level(record_index_t const record_index)
 {
   auto& record = hashvec_[record_index];
   ++record.recursion_level_;
 }
 
-void HashTable::decrement_recursion_level(record_index_t const record_index)
+void meto::HashTable::decrement_recursion_level(record_index_t const record_index)
 {
   auto& record = hashvec_[record_index];
   --record.recursion_level_;
@@ -178,14 +178,14 @@ void HashTable::decrement_recursion_level(record_index_t const record_index)
 /**
  * @brief  Add in time spent calling child regions. Also retuns a pointer
  *         to the overhead time so that it can be incremented downstream,
- *         outside this function, with minimal additional overhead. 
+ *         outside this function, with minimal additional overhead.
  * @param [in]  record_index   The index corresponding to the region record.
  * @param [in]  time_delta     The time spent in the child region.
- * @param [out] overhead_time_ptr  Pointer to the profiling overhead time 
- *                                 incurred by calling children of this region. 
+ * @param [out] overhead_time_ptr  Pointer to the profiling overhead time
+ *                                 incurred by calling children of this region.
  */
 
-void HashTable::add_child_time_to_parent(
+void meto::HashTable::add_child_time_to_parent(
                     record_index_t  const parent_index,
                     time_duration_t const child_walltime,
                     time_duration_t*& overhead_time_ptr)
@@ -200,12 +200,12 @@ void HashTable::add_child_time_to_parent(
  *        a pointer to the total profiling overhead time so that it can be
  *        incremented downstream, outside this function, with minimal
  *        additional overhead.
- * @param [out] overhead_time_ptr  Pointer to the total profiling overhead time 
+ * @param [out] overhead_time_ptr  Pointer to the total profiling overhead time
  *                                 incurred by calling every set of profiler
- *                                 calls. 
+ *                                 calls.
  */
 
-void HashTable::add_profiler_call(time_duration_t*& overhead_time_ptr) {
+void meto::HashTable::add_profiler_call(time_duration_t*& overhead_time_ptr) {
   auto& record = hashvec_[profiler_index_];
   ++record.call_count_;
   overhead_time_ptr = &record.total_walltime_;
@@ -216,7 +216,7 @@ void HashTable::add_profiler_call(time_duration_t*& overhead_time_ptr) {
  *         and updates the hashtable with the new indices.
  */
 
-void HashTable::sort_records()
+void meto::HashTable::sort_records()
 {
 
   // Sort the entries according to self walltime.
@@ -238,7 +238,7 @@ void HashTable::sort_records()
  * @param [inout] record  The region record to compute.
  */
 
-void HashTable::prepare_computed_times(RegionRecord& record)
+void meto::HashTable::prepare_computed_times(RegionRecord& record)
 {
 
   // Self time
@@ -257,7 +257,7 @@ void HashTable::prepare_computed_times(RegionRecord& record)
  *         code regions.
  */
 
-void HashTable::prepare_computed_times_all()
+void meto::HashTable::prepare_computed_times_all()
 {
 
   // Loop over entries in the hashtable.
@@ -272,7 +272,7 @@ void HashTable::prepare_computed_times_all()
  *
  */
 
-std::vector<size_t> HashTable::list_keys()
+std::vector<size_t> meto::HashTable::list_keys()
 {
   std::vector<size_t> keys;
   for (auto const& key : lookup_table_)
@@ -289,7 +289,7 @@ std::vector<size_t> HashTable::list_keys()
  * 
  */
 
-void HashTable::append_to(HashVecHandler& hashvec_handler)
+void meto::HashTable::append_to(HashVecHandler& hashvec_handler)
 {
   // Compute overhead and self times before appending
   prepare_computed_times_all();
@@ -317,7 +317,7 @@ void HashTable::append_to(HashVecHandler& hashvec_handler)
  *
  */
 
-void HashTable::erase_record(size_t const hash)
+void meto::HashTable::erase_record(size_t const hash)
 {
 
   // Find the lookup table (hashtable) iterator.
@@ -339,7 +339,7 @@ void HashTable::erase_record(size_t const hash)
  *
  */
 
-void HashTable::sync_lookup()
+void meto::HashTable::sync_lookup()
 {
   // Need to re-store the indices in the lookup table, since there will be a gap
   // as a result of the erase().
@@ -356,7 +356,7 @@ void HashTable::sync_lookup()
  *
  */
 
-double HashTable::get_total_walltime(size_t const hash) const
+double meto::HashTable::get_total_walltime(size_t const hash) const
 {
   auto& record = hash2record(hash);
 
@@ -371,7 +371,7 @@ double HashTable::get_total_walltime(size_t const hash) const
  *         `prepare_computed_times` is need to update its value. 
  */
 
-double HashTable::get_total_raw_walltime(size_t const hash)
+double meto::HashTable::get_total_raw_walltime(size_t const hash)
 {
   auto& record = hash2record(hash);
    prepare_computed_times(record);
@@ -384,7 +384,7 @@ double HashTable::get_total_raw_walltime(size_t const hash)
  * @param [in] hash  The hash corresponding to the region.
  */
 
-double HashTable::get_overhead_walltime(size_t const hash) const
+double meto::HashTable::get_overhead_walltime(size_t const hash) const
 {
   auto& record = hash2record(hash);
   return record.overhead_walltime_.count();
@@ -397,7 +397,7 @@ double HashTable::get_overhead_walltime(size_t const hash) const
  *         `prepare_computed_times` is need to update its value. 
  */
 
-double HashTable::get_self_walltime(size_t const hash)
+double meto::HashTable::get_self_walltime(size_t const hash)
 {
   auto& record = hash2record(hash);
   prepare_computed_times(record);
@@ -411,7 +411,7 @@ double HashTable::get_self_walltime(size_t const hash)
  *         `prepare_computed_times` is need to update its value. 
  */
 
-double HashTable::get_child_walltime(size_t const hash) const
+double meto::HashTable::get_child_walltime(size_t const hash) const
 {
   auto& record = hash2record(hash);
   return record.child_walltime_.count();
@@ -422,7 +422,7 @@ double HashTable::get_child_walltime(size_t const hash) const
  * @param [in] hash  The hash corresponding to the region.
  */
 
-std::string HashTable::get_decorated_region_name(size_t const hash) const
+std::string meto::HashTable::get_decorated_region_name(size_t const hash) const
 {
   auto& record = hash2record(hash);
   return record.decorated_region_name_;
@@ -438,7 +438,7 @@ std::string HashTable::get_decorated_region_name(size_t const hash) const
  *
  */
 
-unsigned long long int HashTable::get_call_count(size_t const hash) const
+unsigned long long int meto::HashTable::get_call_count(size_t const hash) const
 {
   auto& record = hash2record(hash);
   return record.call_count_;
@@ -452,7 +452,7 @@ unsigned long long int HashTable::get_call_count(size_t const hash) const
  *           
  */
 
-unsigned long long int HashTable::get_prof_call_count() const
+unsigned long long int meto::HashTable::get_prof_call_count() const
 {
     auto& record = hash2record(profiler_hash_);
     assert (lookup_table_.count(profiler_hash_) > 0);
@@ -466,7 +466,7 @@ unsigned long long int HashTable::get_prof_call_count() const
  *
  */
 
-RegionRecord& HashTable::hash2record(size_t const hash)
+meto::RegionRecord& meto::HashTable::hash2record(size_t const hash)
 {
   return hashvec_[lookup_table_.at(hash)];
 }
@@ -479,7 +479,7 @@ RegionRecord& HashTable::hash2record(size_t const hash)
  *
  */
 
-RegionRecord const& HashTable::hash2record(size_t const hash) const
+meto::RegionRecord const& meto::HashTable::hash2record(size_t const hash) const
 {
   return hashvec_[lookup_table_.at(hash)];
 }

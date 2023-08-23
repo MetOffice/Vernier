@@ -12,14 +12,14 @@
  *
  */
 
-Writer::Writer()
+meto::Writer::Writer()
 {
   // Pick up environment variable filename if it exists. If it's not set, a
   // suitable default is set in the data member declaration. 
-  const char* env_output_filename = std::getenv("PROF_OUTPUT_FILENAME");
+  const char* env_output_filename = std::getenv("VERNIER_OUTPUT_FILENAME");
   if (env_output_filename) {output_filename_ = env_output_filename;}
 
   // MPI handling
-  MPI_Comm_dup(MPI_COMM_WORLD, &prof_comm_);
-  MPI_Comm_rank(prof_comm_, &my_rank_);
+  MPI_Comm_dup(MPI_COMM_WORLD, &vernier_comm_);
+  MPI_Comm_rank(vernier_comm_, &my_rank_);
 }

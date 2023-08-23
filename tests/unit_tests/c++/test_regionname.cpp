@@ -6,11 +6,10 @@
 
 #include <iostream>
 #include <chrono>
-#include <profiler.h>
 #include <gtest/gtest.h>
-#include <string_view>
+#include <string>
 
-#include "profiler.h"
+#include "vernier.h"
 
 //
 //  Tests focused on the "region name" of a particular section.
@@ -25,27 +24,27 @@ std::string tid_bytes(reinterpret_cast<char const*>(&tid), sizeof(tid));
 TEST(RegionNameTest,NamesMatchTest) {
 
   //Start main region with name "Cappucino"
-  const auto& prof_cappucino = prof.start("Cappucino");
+  const auto& prof_cappucino = meto::vernier.start("Cappucino");
 
   {
     SCOPED_TRACE("Problem with sub-region name");
 
     // Start timing a sub-region with name "Latte"
     std::string myString = "Latte";
-    const auto& prof_latte = prof.start(myString);
+    const auto& prof_latte = meto::vernier.start(myString);
 
     // Get subregion name out from profiler and check it is what we expect
-    std::string subregionName = prof.get_decorated_region_name(prof_latte, tid);
+    std::string subregionName = meto::vernier.get_decorated_region_name(prof_latte, tid);
     EXPECT_EQ("Latte@" + tid_str, subregionName);
 
-    prof.stop(prof_latte);
+    meto::vernier.stop(prof_latte);
   }
 
   {
     SCOPED_TRACE("Problem with main region name");
 
     // Get main region name out from profiler and test
-    std::string regionName = prof.get_decorated_region_name(prof_cappucino, tid);
+    std::string regionName = meto::vernier.get_decorated_region_name(prof_cappucino, tid);
     EXPECT_EQ("Cappucino@" + tid_str, regionName);
   }
 
@@ -53,12 +52,12 @@ TEST(RegionNameTest,NamesMatchTest) {
     SCOPED_TRACE("Problem with the profiler region name");
 
     // Get profiler region name out from the profiler and test
-    auto const prof_self_handle = std::hash<std::string_view>{}("__profiler__@" + tid_bytes);
-    std::string profilerRegionName = prof.get_decorated_region_name(prof_self_handle, tid);
-    EXPECT_EQ("__profiler__@" + tid_str, profilerRegionName);
+    auto const prof_self_handle = std::hash<std::string_view>{}("__vernier__" + tid_bytes);
+    std::string profilerRegionName = meto::vernier.get_decorated_region_name(prof_self_handle, tid);
+    EXPECT_EQ("__vernier__@" + tid_str, profilerRegionName);
   }
 
-  prof.stop(prof_cappucino);
+  meto::vernier.stop(prof_cappucino);
 
 }
 
@@ -72,7 +71,7 @@ TEST(RegionNameTest,NamesMatchTest) {
 TEST(RegionNameTest,InvalidsTest) {
 
   // Long name
-  const auto& A = prof.hashtable_query_insert("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz");
+  const auto& A = vernier.hashtable_query_insert("AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz");
 
   // Nothing / blank space
 

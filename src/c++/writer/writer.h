@@ -18,6 +18,9 @@
 
 #include "../formatter.h"
 
+namespace meto
+{
+
 /**
  * @brief   Abstract Writer strategy class.
  * @details Specific implementations of this class override the 'write' function
@@ -33,11 +36,11 @@ class Writer {
     Formatter formatter_;
 
     // Default filename 
-    std::string output_filename_ = "profiler-output";
+    std::string output_filename_ = "vernier-output";
 
     // MPI handling
     int my_rank_;
-    MPI_Comm prof_comm_;
+    MPI_Comm vernier_comm_;
 
   public:
 
@@ -48,5 +51,7 @@ class Writer {
     virtual void write(std::ofstream& os, hashvec_t) = 0;
 
 };
+
+} // End meto namespace
 
 #endif
