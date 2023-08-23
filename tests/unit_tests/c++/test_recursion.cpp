@@ -9,8 +9,8 @@
 
 #include "vernier.h"
 
-int const    max_depth = 3;
-int const    sleep_seconds = 1;
+int const max_depth = 3;
+int const sleep_seconds = 1;
 
 // The time tolerance can be reasonably loose. If the total times were incorrect
 // as a result of mis-handled recursion, they would be too large by multiples of
