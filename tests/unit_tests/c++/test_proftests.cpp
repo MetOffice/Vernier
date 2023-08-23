@@ -57,7 +57,17 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
     meto::vernier.stop(prof_main);
 
   }, "" );
+}
 
+// Check that uninitialised MPI is caught in the write functionality.
+TEST(ProfilerDeathTest, CatchUninitializedMpiInWrite) {
+
+  // MPI context not initialised because init() has not been called yet.
+  EXPECT_THROW(meto::vernier.write(), std::runtime_error);
+
+  // MPI context not initialised because init() called with null communicator.
+  meto::vernier.init(MPI_COMM_NULL);
+  EXPECT_THROW(meto::vernier.write(), std::runtime_error);
 }
 
 // The traceback array is not a growable vector. Check that the code exits

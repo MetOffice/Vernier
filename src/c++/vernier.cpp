@@ -250,10 +250,9 @@ void meto::Vernier::stop(size_t const hash)
 void meto::Vernier::write()
 {
 
-  // If the MPI context is not already initialized, do it now. We'll need it.
-  // NB remove this in a future release.
+  // Check that the MPI context is initialised. We'll need it in a moment.
   if (!mpi_context_.is_initialized()){
-    mpi_context_.init();
+    throw std::runtime_error("Vernier::write MPI context not initialized.");
   }
 
   // Create hashvec handler object and feed in data from thread_hashtables_
@@ -266,10 +265,6 @@ void meto::Vernier::write()
   // Sort hashvec from high to low self walltimes then write
   output_data.sort();
   output_data.write();
-
-  // Finished with the MPI context now, so finalise it.
-  // NB remove this in a future release.
-  mpi_context_.finalize();
 
 }
 
