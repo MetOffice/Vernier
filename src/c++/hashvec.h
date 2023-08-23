@@ -47,7 +47,7 @@ struct RegionRecord {
     time_duration_t  child_walltime_;
     time_duration_t  overhead_walltime_;
     unsigned long long int call_count_;
-    int              recursion_level_;
+    unsigned int     recursion_level_;
 
 };
 
