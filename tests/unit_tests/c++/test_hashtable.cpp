@@ -14,6 +14,10 @@ using ::testing::AllOf;
 using ::testing::An;
 using ::testing::Gt;
 
+int const tid = 0;
+std::string tid_str(std::to_string(tid));
+std::string tid_bytes(reinterpret_cast<char const*>(&tid), sizeof(tid));
+
 //
 //  Testing that the hashing function works as expected (we don't want
 //  collisions), and that walltimes are being updated by vernier.stop().
@@ -37,8 +41,8 @@ TEST(HashTableTest,HashFunctionTest) {
     //  - query_insert'ing Penne or Rigatoni just returns the hash
     //  - the regions have different hashes
     //  - the regions have the hashes returned by hash_function_ which uses std::hash
-    EXPECT_EQ(meto::vernier.start("Rigatoni"), std::hash<std::string_view>{}("Rigatoni@0"));
-    EXPECT_EQ(meto::vernier.start("Penne"),    std::hash<std::string_view>{}("Penne@0"));
+    EXPECT_EQ(meto::vernier.start("Rigatoni"), std::hash<std::string_view>{}("Rigatoni" + tid_bytes));
+    EXPECT_EQ(meto::vernier.start("Penne"),    std::hash<std::string_view>{}("Penne" + tid_bytes));
   }
 
 }
@@ -52,7 +56,7 @@ TEST(HashTableTest,HashFunctionTest) {
 TEST(HashTableTest,UpdateTimesTest) {
 
   // Create new hash
-  size_t prof_pie = std::hash<std::string_view>{}("Pie@0");
+  size_t prof_pie = std::hash<std::string>{}("Pie" + tid_bytes);
 
   // Trying to find a time before .start() will throw an exception
   EXPECT_THROW(meto::vernier.get_total_walltime(prof_pie, 0), std::out_of_range);
