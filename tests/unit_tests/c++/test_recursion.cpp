@@ -15,23 +15,19 @@ int const sleep_seconds = 1;
 // The time tolerance can be reasonably loose. If the total times were incorrect
 // as a result of mis-handled recursion, they would be too large by multiples of
 // sleep_seconds.
-double const time_tolerance = 0.01;
+double const time_tolerance = 0.001;
 
 // ------------------------------------------------------------------------------
-//  File scope variables
+//  Structs
 // ------------------------------------------------------------------------------
 
 // Structure To hold timings from the various recursive functions.
 struct Timings
 {
-  static double zeroth_function_total_time;
-  static double first_function_total_time;
-  static double second_function_total_time;
+  double zeroth_function_total_time_ = 0.0;
+  double first_function_total_time_  = 0.0;
+  double second_function_total_time_ = 0.0;
 };
-
-double Timings::zeroth_function_total_time = 0.0;
-double Timings::first_function_total_time  = 0.0;
-double Timings::second_function_total_time = 0.0;
 
 // ------------------------------------------------------------------------------
 //  Forward declarations
@@ -65,7 +61,7 @@ void zeroth_function(Timings& timings)
 
   // Update the total walltime so far spent in this function.
   int const tid = omp_get_thread_num();
-  timings.zeroth_function_total_time = meto::vernier.get_total_walltime(prof_handle, tid);
+  timings.zeroth_function_total_time_ = meto::vernier.get_total_walltime(prof_handle, tid);
 
 }
 
@@ -91,9 +87,10 @@ void first_function(Timings& timings)
 
   meto::vernier.stop(prof_handle);
 
-  // Update the total walltime so far spent in this function.
+  // Update the total walltime so far spent in this function. Do here while we
+  // have access to the prof_handle.
   int const tid = omp_get_thread_num();
-  timings.first_function_total_time = meto::vernier.get_total_walltime(prof_handle, tid);
+  timings.first_function_total_time_ = meto::vernier.get_total_walltime(prof_handle, tid);
 
 }
 
@@ -118,8 +115,10 @@ void second_function(Timings& timings)
 
   meto::vernier.stop(prof_handle);
 
+  // Update the total walltime so far spent in this function. Do here while we
+  // have access to the prof_handle.
   int const tid = omp_get_thread_num();
-  timings.second_function_total_time = meto::vernier.get_total_walltime(prof_handle, tid);
+  timings.second_function_total_time_ = meto::vernier.get_total_walltime(prof_handle, tid);
 }
 
 // -------------------------------------------------------------------------------
@@ -137,10 +136,10 @@ TEST(RecursionTest,DirectRecursion)
   // Test independently on each thread.
 #pragma omp parallel
   {
+    auto prof_handle_threaded = meto::vernier.start("test_recursion:threads");
+
     Timings timings;
     double t1 = omp_get_wtime();
-
-    auto prof_handle_threaded = meto::vernier.start("test_recursion:threads");
 
     // Function calls itself
     zeroth_function(timings);
@@ -148,8 +147,8 @@ TEST(RecursionTest,DirectRecursion)
     double t2 = omp_get_wtime();
     double overall_time = t2-t1;
 
-    EXPECT_LE  (timings.zeroth_function_total_time,  overall_time);
-    EXPECT_NEAR(timings.zeroth_function_total_time,  overall_time, time_tolerance);
+    EXPECT_LE  (timings.zeroth_function_total_time_,  overall_time);
+    EXPECT_NEAR(timings.zeroth_function_total_time_,  overall_time, time_tolerance);
 
     meto::vernier.stop(prof_handle_threaded);
   }
@@ -168,20 +167,20 @@ TEST(RecursionTest,IndirectRecursion)
   // Test independently on each thread.
 #pragma omp parallel
   {
+    auto prof_handle_threaded = meto::vernier.start("test_recursion:threads");
+
     Timings timings;
     double t1 = omp_get_wtime();
-
-    auto prof_handle_threaded = meto::vernier.start("test_recursion:threads");
 
     // Function calls a second function
     first_function(timings);
 
     double t2 = omp_get_wtime();
     double overall_time = t2-t1;
-    
-    EXPECT_LE  (timings.first_function_total_time,  overall_time);
-    EXPECT_NEAR(timings.first_function_total_time,  overall_time, time_tolerance);
-    EXPECT_NEAR(timings.second_function_total_time, timings.first_function_total_time - sleep_seconds, time_tolerance);
+      
+    EXPECT_LE  (timings.first_function_total_time_,  overall_time);
+    EXPECT_NEAR(timings.first_function_total_time_,  overall_time, time_tolerance);
+    EXPECT_NEAR(timings.second_function_total_time_, timings.first_function_total_time_ - sleep_seconds, time_tolerance);
 
     meto::vernier.stop(prof_handle_threaded);
   }
