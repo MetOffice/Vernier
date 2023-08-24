@@ -51,6 +51,7 @@ module vernier_mod
 
     subroutine vernier_stop(hash_in) bind(C, name='c_vernier_stop')
       import :: vik
+      !> The hash of the region being stopped.
       integer(kind=vik), intent(in) :: hash_in
     end subroutine vernier_stop
 

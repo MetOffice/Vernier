@@ -172,3 +172,6 @@ _deps
 
 ### Build directory
 build/
+
+# Doxygen error log
+documentation/Sphinx/doxylog
