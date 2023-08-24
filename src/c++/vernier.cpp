@@ -110,20 +110,14 @@ size_t meto::Vernier::start_part2(std::string_view const region_name)
 #ifdef _OPENMP
   tid = static_cast<hashtable_iterator_t_>(omp_get_thread_num());
 #endif
+  auto tid_int = static_cast<int>(tid);
 
   assert (tid <= thread_hashtables_.size());
   assert (tid <= thread_traceback_.size());
 
-  // Insert this region into the thread's hash table.
-  std::string new_region_name;
-  new_region_name.reserve(region_name.size()+5);
-  new_region_name += region_name;
-  new_region_name += '@';
-  new_region_name += std::to_string(tid);
-
   size_t hash;
   record_index_t record_index;
-  thread_hashtables_[tid].query_insert(new_region_name, hash, record_index);
+  thread_hashtables_[tid].query_insert(region_name, tid_int, hash, record_index);
 
   // Store the calliper and region start times.
   ++call_depth_;
@@ -337,10 +331,11 @@ double meto::Vernier::get_child_walltime(size_t const hash, int const input_tid)
  *
  */
 
-std::string meto::Vernier::get_region_name(size_t const hash, int const input_tid) const
+std::string meto::Vernier::get_decorated_region_name(size_t const hash,
+                                                     int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
-  return thread_hashtables_[tid].get_region_name(hash);
+  return thread_hashtables_[tid].get_decorated_region_name(hash);
 }
 
 /**
