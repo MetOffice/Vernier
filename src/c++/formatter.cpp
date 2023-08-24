@@ -187,8 +187,8 @@ void meto::Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
       << std::setw(13) << std::right << record.total_raw_walltime_.count()
       << std::setw(15) << std::right << record.call_count_
       << std::setw(12) << std::right << self_per_call
-      << std::setw(12) << std::right << total_per_call       << "    "
-                                     << record.region_name_  << "\n";
+      << std::setw(12) << std::right << total_per_call                 << "    "
+                                     << record.decorated_region_name_  << "\n";
   }
 
 }
