@@ -8,6 +8,7 @@
 #include "hashvec_handler.h"
 
 #include <cassert>
+#include <cstring>
 #include <iterator>
 #include <cstring>
 #include <cstddef>
@@ -148,12 +149,40 @@ void meto::HashTable::update(record_index_t const record_index,
 
   auto& record = hashvec_[record_index];
 
-  // Increment the walltime for this hash entry.
-  record.total_walltime_ += time_delta;
+  // Increment the walltime for this hash entry. If this region has been called
+  // recursively, directly or indirectly, the time goes into a different bucket.
+  if (record.recursion_level_ > 0){
+    record.recursion_total_walltime_ += time_delta;
+  }
+  else{
+    record.total_walltime_ += time_delta;
+  }
 
   // Update the number of times this region has been called
   ++record.call_count_;
 
+}
+
+/**
+ * @brief  Increments by 1 the recursion level in a region record.
+ * @param [in] record_index  The index corresponding to the region record.
+ */
+
+void meto::HashTable::increment_recursion_level(record_index_t const record_index)
+{
+  auto& record = hashvec_[record_index];
+  ++record.recursion_level_;
+}
+
+/**
+ * @brief  Decrements by 1 the recursion level in a region record.  
+ * @param [in] record_index  The index corresponding to the region record.
+ */
+
+void meto::HashTable::decrement_recursion_level(record_index_t const record_index)
+{
+  auto& record = hashvec_[record_index];
+  --record.recursion_level_;
 }
 
 /**
@@ -216,7 +245,7 @@ void meto::HashTable::sort_records()
  * @details Times computed are: the region self time and the total time minus
  *          directly incurred profiling overhead costs.
  *
- * @param [in] record  The region record to compute.
+ * @param [inout] record  The region record to compute.
  */
 
 void meto::HashTable::prepare_computed_times(RegionRecord& record)
@@ -224,6 +253,7 @@ void meto::HashTable::prepare_computed_times(RegionRecord& record)
 
   // Self time
   record.self_walltime_ = record.total_walltime_
+                        + record.recursion_total_walltime_
                         - record.child_walltime_
                         - record.overhead_walltime_;
 
