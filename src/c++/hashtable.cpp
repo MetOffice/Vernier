@@ -163,11 +163,21 @@ void meto::HashTable::update(record_index_t const record_index,
 
 }
 
+/**
+ * @brief  Increments by 1 the recursion level in a region record.
+ * @param [in] record_index  The index corresponding to the region record.
+ */
+
 void meto::HashTable::increment_recursion_level(record_index_t const record_index)
 {
   auto& record = hashvec_[record_index];
   ++record.recursion_level_;
 }
+
+/**
+ * @brief  Decrements by 1 the recursion level in a region record.  
+ * @param [in] record_index  The index corresponding to the region record.
+ */
 
 void meto::HashTable::decrement_recursion_level(record_index_t const record_index)
 {
