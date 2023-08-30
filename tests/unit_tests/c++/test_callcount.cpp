@@ -14,7 +14,7 @@
 TEST(HashEntryTest,CallCountTest)
 {
 
-  meto::vernier.init(MPI_COMM_NULL);
+  meto::vernier.init(MPI_COMM_WORLD);
 
   // Start main region
   auto prof_main = meto::vernier.start("MainRegion");

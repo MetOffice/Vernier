@@ -14,7 +14,7 @@
 TEST(SystemTests, TimingTest)
 {
 
-  meto::vernier.init(MPI_COMM_NULL);
+  meto::vernier.init(MPI_COMM_WORLD);
 
   // Start timing: noddy way, and using Vernier.
   auto prof_main = meto::vernier.start("MAIN");

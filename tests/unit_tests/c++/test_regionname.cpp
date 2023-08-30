@@ -19,7 +19,7 @@
 
 TEST(RegionNameTest,NamesMatchTest) {
 
-  meto::vernier.init(MPI_COMM_NULL);
+  meto::vernier.init(MPI_COMM_WORLD);
 
   //Start main region with name "Cappucino"
   const auto& prof_cappucino = meto::vernier.start("Cappucino");

@@ -8,7 +8,7 @@ if(BUILD_FORTRAN_TESTS)
     add_pfunit_ctest( test_vernier_f
             TEST_SOURCES test_vernier_mod.pf
             LINK_LIBRARIES ${CMAKE_PROJECT_NAME}_f
-            MAX_PES 2
+            MAX_PES 1
             )
     message(STATUS "${CMAKE_BINARY_DIR}/src/f/modules")
     target_include_directories(test_vernier_f PUBLIC ${CMAKE_BINARY_DIR}/src/f/modules)

@@ -39,11 +39,11 @@ meto::Vernier::TracebackEntry::TracebackEntry(
   {}
 
 /**
- * @brief Constructor
- *
- */
-
-meto::Vernier::Vernier()
+ * @brief  Initialise Vernier object.
+ * @param [in]  client_comm_handle  MPI communicator handle that Vernier will
+ *                                  duplicate and use the duplicate.
+ */ 
+void meto::Vernier::init(MPI_Comm client_comm_handle)
 {
 
   // Set the maximum number of threads.
@@ -66,24 +66,34 @@ meto::Vernier::Vernier()
 
   }
 
+  // Initialise MPI context
+  mpi_context_.init(client_comm_handle);
+
   // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
   assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
+  assert ( mpi_context_.is_initialized() );
 
 }
 
-// Inititialise
-void meto::Vernier::init(MPI_Comm client_comm_handle)
-{
-  mpi_context_.init(client_comm_handle);
-}
-
-// Finalize
+/**
+ * @brief  Finalize Vernier object.
+ * @note   Clears hashtable and traceback information; frees duplicate
+ *         MPI communicator.
+ */ 
 void meto::Vernier::finalize()
 {
   if(mpi_context_.is_initialized()){
     mpi_context_.finalize();
   }
+
+  // Empty the traceback and hashtable
+  thread_hashtables_.clear();
+  thread_traceback_.clear();
+
+  // Assertions
+  assert ( static_cast<int> (thread_hashtables_.size()) == 0);
+  assert ( static_cast<int> (thread_traceback_.size() ) == 0);
 }
 
 /**

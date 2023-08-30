@@ -21,7 +21,7 @@
 
 TEST(HashEntryTest, TimingsTest) {
 
-  meto::vernier.init(MPI_COMM_NULL);
+  meto::vernier.init(MPI_COMM_WORLD);
 
   // Start main profiler region and chrono timing
   const auto& prof_main = meto::vernier.start("QuicheLorraine");

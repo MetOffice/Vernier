@@ -95,8 +95,8 @@ class Vernier
 
   public:
 
-    // Constructors
-    Vernier();
+    // Default constructor needed for `inline` global Vernier object.
+    Vernier() = default;
 
     // Member functions
     void   init(MPI_Comm);

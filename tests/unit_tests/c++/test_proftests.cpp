@@ -24,7 +24,7 @@ using ::testing::KilledBySignal;
 // Make sure the code exits when a hash mismatch happens.
 TEST(ProfilerDeathTest,WrongHashTest) {
 
-  meto::vernier.init(MPI_COMM_NULL);
+  meto::vernier.init(MPI_COMM_WORLD);
 
   EXPECT_EXIT({
 
@@ -59,29 +59,27 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
   }, "" );
 }
 
+// MPI is initialised, but the passed communicator handle is
+// MPI_COMM_NULL.
+TEST(ProfilerDeathTest, NullCommunicatorPassed) {
+  [[maybe_unused]] int ierr;
+  EXPECT_THROW(meto::vernier.init(MPI_COMM_NULL), std::runtime_error);
+  meto::vernier.finalize();
+}
+
 // Check that uninitialised MPI is caught in the write functionality.
 TEST(ProfilerDeathTest, CatchUninitializedMpiInWrite) {
 
-  // MPI context not initialised because init() has not been called yet.
+  // No init() called yet, so MPI context not initialised.
   EXPECT_THROW(meto::vernier.write(), std::runtime_error);
 
-  // MPI context not initialised because init() called with null communicator.
-  meto::vernier.init(MPI_COMM_NULL);
-  EXPECT_THROW(meto::vernier.write(), std::runtime_error);
-
-  // If MPI is initialised, then the passed communicator handle must not be
-  // null.
-  [[maybe_unused]] int ierr;
-  ierr = MPI_Init(NULL, NULL);
-  EXPECT_THROW(meto::vernier.init(MPI_COMM_NULL), std::runtime_error);
-  ierr = MPI_Finalize();
 }
 
 // The traceback array is not a growable vector. Check that the code exits
 // when available array elements are exhausted.
 TEST(ProfilerDeathTest, TooManyTracebackEntries) {
 
-  meto::vernier.init(MPI_COMM_NULL);
+  meto::vernier.init(MPI_COMM_WORLD);
 
   EXPECT_EXIT({
     const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;

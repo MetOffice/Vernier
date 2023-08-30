@@ -62,13 +62,16 @@ void meto::MPIContext::init(MPI_Comm client_comm_handle)
     MPI_Comm_size(comm_handle_, &comm_size_);
   }
   else {
-    comm_handle_ = MPI_COMM_NULL;
-    comm_rank_   = 0;
-    comm_size_   = 1;
+      throw std::runtime_error("MPIContext::init. MPI not initialized.");
   }
 
   initialized_ = true;
-  assert (comm_handle_ != MPI_COMM_NULL);
+
+  // Assertions
+  assert(comm_handle_ != MPI_COMM_NULL);
+  assert(comm_handle_ != MPI_COMM_WORLD);
+  assert(comm_rank_ >= 0);
+  assert(comm_size_ >= 0);
 }
 
 /**
@@ -79,7 +82,7 @@ void meto::MPIContext::init(MPI_Comm client_comm_handle)
 bool meto::MPIContext::is_initialized()
 {
   // Returning local_initialized ought to be sufficient. Belt and braces.
-  bool local_initialized = initialized_ && (comm_handle_ != MPI_COMM_NULL);
+  bool local_initialized = initialized_;
   return local_initialized;
 }
 
@@ -92,9 +95,6 @@ bool meto::MPIContext::is_initialized()
 
 void meto::MPIContext::finalize()
 {
-  assert (comm_handle_ != MPI_COMM_NULL);
-  assert (comm_handle_ != MPI_COMM_WORLD);
-
   if (comm_handle_ != MPI_COMM_WORLD &&
       comm_handle_ != MPI_COMM_NULL){
         MPI_Comm_free(&comm_handle_);

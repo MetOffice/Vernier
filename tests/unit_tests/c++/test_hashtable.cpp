@@ -25,7 +25,7 @@ using ::testing::Gt;
 
 TEST(HashTableTest,HashFunctionTest) {
 
-  meto::vernier.init(MPI_COMM_NULL);
+  meto::vernier.init(MPI_COMM_WORLD);
 
   // Create new hashes via HashTable::query_insert, which is used in Vernier::start
   const auto& prof_rigatoni = meto::vernier.start("Rigatoni");
@@ -55,7 +55,7 @@ TEST(HashTableTest,HashFunctionTest) {
 
 TEST(HashTableTest,UpdateTimesTest) {
 
-  meto::vernier.init(MPI_COMM_NULL);
+  meto::vernier.init(MPI_COMM_WORLD);
 
   // Create new hash
   size_t prof_pie = std::hash<std::string_view>{}("Pie@0");

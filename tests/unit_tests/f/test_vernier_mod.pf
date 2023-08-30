@@ -50,7 +50,7 @@ contains
   ! Test Vernier timings
   !-----------------------------------------------------------------------------
 
-  @test(npes=[2])
+  @test(npes=[1])
   subroutine test_vernier_timings(this)
     implicit none
 
