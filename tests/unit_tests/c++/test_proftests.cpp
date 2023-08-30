@@ -68,10 +68,17 @@ TEST(ProfilerDeathTest, CatchUninitializedMpiInWrite) {
   // MPI context not initialised because init() called with null communicator.
   meto::vernier.init(MPI_COMM_NULL);
   EXPECT_THROW(meto::vernier.write(), std::runtime_error);
+
+  // If MPI is initialised, then the passed communicator handle must not be
+  // null.
+  [[maybe_unused]] int ierr;
+  ierr = MPI_Init(NULL, NULL);
+  EXPECT_THROW(meto::vernier.init(MPI_COMM_NULL), std::runtime_error);
+  ierr = MPI_Finalize();
 }
 
 // The traceback array is not a growable vector. Check that the code exits
-// when available array elements are exhaused.
+// when available array elements are exhausted.
 TEST(ProfilerDeathTest, TooManyTracebackEntries) {
 
   meto::vernier.init(MPI_COMM_NULL);

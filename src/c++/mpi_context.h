@@ -53,7 +53,7 @@ namespace meto
 
         // Init and finalize
         bool is_initialized();
-        void init(MPI_Comm client_comm_handle = MPI_COMM_NULL);
+        void init(MPI_Comm);
         void finalize();
         void reset();
 

@@ -8,6 +8,8 @@
 #include "mpi_context.h"
 #include <cassert>
 
+#include <stdexcept>
+
 /**
  * @brief  Constructor for an MPI context.
  * @details This constructor does not initialise MPI.
@@ -31,11 +33,10 @@ void meto::MPIContext::reset()
     initialized_ = false;
 }
 
- /**
- * @returns A new MPIContext object.
- * @note   The client communicator handle defaults to MPI_COMM_NULL. If no actual
- *         argument is supplied, and MPI is initialised, then Vernier
- *         will use MPI_COMM_WORLD by default.
+/**
+ * @brief  Initialise a Vernier MPI context.
+ * @param [in] comm_client_handle  The communicator to duplicate.
+ * @note  Duplicates the input MPI communicator.
  */
 
 void meto::MPIContext::init(MPI_Comm client_comm_handle)
@@ -50,12 +51,13 @@ void meto::MPIContext::init(MPI_Comm client_comm_handle)
   MPI_Initialized(&mpi_is_initialised);
 
   if (mpi_is_initialised) {
-    if (client_comm_handle != MPI_COMM_NULL) {
-      MPI_Comm_dup(client_comm_handle, &comm_handle_);
+
+    // If MPI is initialised, then the passed communicator should not be null.
+    if (client_comm_handle == MPI_COMM_NULL) {
+      throw std::runtime_error("MPIContext::init. MPI initialized, but null communicator passed.");
     }
-    else {
-      MPI_Comm_dup(MPI_COMM_WORLD, &comm_handle_);
-    }
+
+    MPI_Comm_dup(client_comm_handle, &comm_handle_);
     MPI_Comm_rank(comm_handle_, &comm_rank_);
     MPI_Comm_size(comm_handle_, &comm_size_);
   }
@@ -66,17 +68,23 @@ void meto::MPIContext::init(MPI_Comm client_comm_handle)
   }
 
   initialized_ = true;
-
+  assert (comm_handle_ != MPI_COMM_NULL);
 }
+
+/**
+ * @brief  Returns true if the Vernier MPI context is initialised.
+ * @returns  Boolean initialisation status.
+ */
 
 bool meto::MPIContext::is_initialized()
 {
+  // Returning local_initialized ought to be sufficient. Belt and braces.
   bool local_initialized = initialized_ && (comm_handle_ != MPI_COMM_NULL);
   return local_initialized;
 }
 
 /**
- * @brief  Destructor for an MPI context.
+ * @brief  Finaliser for a Vernier MPI context.
  * @note   Since the constructor duplicated an MPI communicator, creating a new
  *         communicator handle in the process, this destructor needs to free that
  *         communicator handle.
