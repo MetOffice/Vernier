@@ -34,17 +34,20 @@ struct RegionRecord {
 
     // Constructor
     RegionRecord() = delete;
-    explicit RegionRecord(size_t const, std::string_view const);
+    explicit RegionRecord(size_t const, std::string_view const, int);
 
     // Data members
     size_t           region_hash_;
     std::string      region_name_;
+    std::string      decorated_region_name_;
     time_duration_t  total_walltime_;
+    time_duration_t  recursion_total_walltime_;
     time_duration_t  total_raw_walltime_;
     time_duration_t  self_walltime_;
     time_duration_t  child_walltime_;
     time_duration_t  overhead_walltime_;
     unsigned long long int call_count_;
+    unsigned int     recursion_level_;
 
 };
 

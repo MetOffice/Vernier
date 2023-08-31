@@ -134,20 +134,15 @@ size_t meto::Vernier::start_part2(std::string_view const region_name)
 #ifdef _OPENMP
   tid = static_cast<hashtable_iterator_t_>(omp_get_thread_num());
 #endif
+  auto tid_int = static_cast<int>(tid);
 
   assert (tid <= thread_hashtables_.size());
   assert (tid <= thread_traceback_.size());
 
-  // Insert this region into the thread's hash table.
-  std::string new_region_name;
-  new_region_name.reserve(region_name.size()+5);
-  new_region_name += region_name;
-  new_region_name += '@';
-  new_region_name += std::to_string(tid);
-
   size_t hash;
   record_index_t record_index;
-  thread_hashtables_[tid].query_insert(new_region_name, hash, record_index);
+  thread_hashtables_[tid].query_insert(region_name, tid_int, hash, record_index);
+  thread_hashtables_[tid].increment_recursion_level(record_index);
 
   // Store the calliper and region start times.
   ++call_depth_;
@@ -193,9 +188,9 @@ void meto::Vernier::stop(size_t const hash)
     exit (101);
   }
 
- // Get reference to the traceback entry.
- auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
- auto& traceback_entry = thread_traceback_[tid].at(call_depth_index);
+  // Get reference to the traceback entry.
+  auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
+  auto& traceback_entry = thread_traceback_[tid].at(call_depth_index);
 
   // Check: which hash is last on the traceback list?
   size_t last_hash_on_list = traceback_entry.record_hash_;
@@ -208,6 +203,7 @@ void meto::Vernier::stop(size_t const hash)
   auto region_duration = region_stop_time - traceback_entry.region_start_time_;
 
   // Do the hashtable update for the child region.
+  thread_hashtables_[tid].decrement_recursion_level(traceback_entry.record_index_);
   thread_hashtables_[tid].update(traceback_entry.record_index_, region_duration);
 
   // Precompute times as far as possible. We just need the calliper stop time
@@ -367,10 +363,11 @@ double meto::Vernier::get_child_walltime(size_t const hash, int const input_tid)
  *
  */
 
-std::string meto::Vernier::get_region_name(size_t const hash, int const input_tid) const
+std::string meto::Vernier::get_decorated_region_name(size_t const hash,
+                                                     int const input_tid) const
 {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
-  return thread_hashtables_[tid].get_region_name(hash);
+  return thread_hashtables_[tid].get_decorated_region_name(hash);
 }
 
 /**
