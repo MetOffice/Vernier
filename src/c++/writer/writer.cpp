@@ -13,7 +13,7 @@
  *
  */
 
-meto::Writer::Writer(MPIContext mpi_context)
+meto::Writer::Writer(MPIContext const& mpi_context)
 {
   // Pick up environment variable filename if it exists. If it's not set, a
   // suitable default is set in the data member declaration. 

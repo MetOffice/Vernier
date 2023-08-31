@@ -103,7 +103,7 @@ class Vernier
     Vernier() = default;
 
     // Member functions
-    void   init(MPI_Comm);
+    void   init(MPI_Comm const&);
     void   finalize();
     size_t start(std::string_view const);
     void   stop (size_t const);

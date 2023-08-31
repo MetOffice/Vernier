@@ -42,7 +42,7 @@ class Writer {
 
   public:
 
-    explicit Writer(MPIContext);
+    explicit Writer(MPIContext const&);
     virtual ~Writer() = default;
 
     // Pure virtual write method

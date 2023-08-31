@@ -36,7 +36,7 @@ class Multi : public Writer {
   public:
 
     // Constructor
-    Multi(MPIContext);
+    Multi(MPIContext const&);
 
     // Implementation of pure virtual function.
     void write(std::ofstream& os, hashvec_t) override;

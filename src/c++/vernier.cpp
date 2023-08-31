@@ -43,7 +43,7 @@ meto::Vernier::TracebackEntry::TracebackEntry(
  * @param [in]  client_comm_handle  MPI communicator handle that Vernier will
  *                                  duplicate and use the duplicate.
  */ 
-void meto::Vernier::init(MPI_Comm client_comm_handle)
+void meto::Vernier::init(MPI_Comm const& client_comm_handle)
 {
 
   // Set the maximum number of threads.
@@ -101,6 +101,7 @@ void meto::Vernier::finalize()
   // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == 0);
   assert ( static_cast<int> (thread_traceback_.size() ) == 0);
+  assert ( !mpi_context_.is_initialized() );
   assert ( !initialized_ );
 }
 

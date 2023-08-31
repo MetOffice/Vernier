@@ -13,7 +13,7 @@
  * @param[in] mpi_context  The MPI context the writer will use.
  */
 
-meto::Multi::Multi(MPIContext mpi_context):
+meto::Multi::Multi(MPIContext const& mpi_context):
   meto::Multi::Writer(mpi_context) {}
 
 /**

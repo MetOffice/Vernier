@@ -48,7 +48,7 @@ class HashVecHandler {
   public:
 
     // Constructor
-    HashVecHandler(MPIContext);
+    HashVecHandler(MPIContext const&);
 
     // Member functions
     void sort();

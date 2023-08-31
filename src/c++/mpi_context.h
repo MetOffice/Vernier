@@ -15,12 +15,6 @@
  *
  */
 
-/**
- * @file   mpi_context.h
- * @brief  Defines an MPI context class, reducing the code-bases requirement for
- *         MPI calls.
- */
-
 #ifndef VERNIER_MPI_CONTEXT_H
 #define VERNIER_MPI_CONTEXT_H
 
@@ -41,10 +35,10 @@ namespace meto
 
     private:
 
-      MPI_Comm comm_handle_;
-      int      comm_size_;
-      int      comm_rank_;
-      bool     initialized_;
+        MPI_Comm comm_handle_;
+        int      comm_size_;
+        int      comm_rank_;
+        bool     initialized_;
      
     public:
 

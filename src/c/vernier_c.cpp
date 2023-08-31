@@ -22,7 +22,7 @@
 #include <mpi.h>
 
 extern "C" {
-  void   c_vernier_init(MPI_Fint& client_comm_handle);
+  void   c_vernier_init(MPI_Fint const& client_comm_handle);
   void   c_vernier_finalize();
   void   c_vernier_start_part1();
   void   c_vernier_start_part2(long int&, char const*);
@@ -37,7 +37,7 @@ extern "C" {
  * @param [in] The Fortran communicator handle.
  */
 
-void c_vernier_init(MPI_Fint& client_comm_handle)
+void c_vernier_init(MPI_Fint const& client_comm_handle)
 {
   MPI_Comm local_handle = MPI_Comm_f2c(client_comm_handle);
   meto::vernier.init(local_handle);

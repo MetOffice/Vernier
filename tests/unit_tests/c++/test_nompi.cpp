@@ -10,8 +10,8 @@
 
 #include "vernier.h"
 
-// Make sure the code exits when a hash mismatch happens.
-TEST(TestSerial,MpiNotInitialised) {
+// Attempt to initialise Vernier without MPI being initialized.
+TEST(TestNoMPI, MpiNotInitialised) {
 
   [[maybe_unused]] int ierr;
   EXPECT_THROW(meto::vernier.init(MPI_COMM_NULL), std::runtime_error);

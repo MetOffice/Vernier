@@ -16,7 +16,7 @@
  *
  */
 
-meto::HashVecHandler::HashVecHandler(MPIContext mpi_context) 
+meto::HashVecHandler::HashVecHandler(MPIContext const& mpi_context) 
 {
 
     // Default the IO mode to one file per MPI rank.
@@ -29,7 +29,7 @@ meto::HashVecHandler::HashVecHandler(MPIContext mpi_context)
     // Allocate writer to be of required type.
     if (io_mode == "multi")
     {
-      writer_strategy_ = std::make_unique<Multi>(mpi_context);
+        writer_strategy_ = std::make_unique<Multi>(mpi_context);
     }
     else throw std::runtime_error("Invalid IO mode choice");
 }
