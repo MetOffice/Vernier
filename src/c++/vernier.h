@@ -69,6 +69,10 @@ class Vernier
         time_point_t   calliper_start_time_;
     };
 
+    // Default initialisation flag.  No explicit constructor, and pointless
+    // to set this in the init() method.
+    bool initialized_ = false;
+
     // Data members
     int max_threads_;
 

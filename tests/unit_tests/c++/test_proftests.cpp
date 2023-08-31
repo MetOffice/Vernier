@@ -59,6 +59,11 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
   }, "" );
 }
 
+// Vernier is not initialised before first start() call.
+TEST(ProfilerDeathTest, StartBeforeInit) {
+  EXPECT_THROW(meto::vernier.start("MAIN"), std::runtime_error);
+}
+
 // MPI is initialised, but the passed communicator handle is
 // MPI_COMM_NULL.
 TEST(ProfilerDeathTest, NullCommunicatorPassed) {
@@ -68,7 +73,7 @@ TEST(ProfilerDeathTest, NullCommunicatorPassed) {
 }
 
 // Check that uninitialised MPI is caught in the write functionality.
-TEST(ProfilerDeathTest, CatchUninitializedMpiInWrite) {
+TEST(ProfilerDeathTest, VernierUninitialisedInWrite) {
 
   // No init() called yet, so MPI context not initialised.
   EXPECT_THROW(meto::vernier.write(), std::runtime_error);

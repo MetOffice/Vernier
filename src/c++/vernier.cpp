@@ -69,10 +69,14 @@ void meto::Vernier::init(MPI_Comm client_comm_handle)
   // Initialise MPI context
   mpi_context_.init(client_comm_handle);
 
+  // Set Vernier initialised.
+  initialized_ = true;
+
   // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
   assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
   assert ( mpi_context_.is_initialized() );
+  assert ( initialized_ );
 
 }
 
@@ -91,9 +95,13 @@ void meto::Vernier::finalize()
   thread_hashtables_.clear();
   thread_traceback_.clear();
 
+  // Set Vernier not initialised.
+  initialized_ = false;
+
   // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == 0);
   assert ( static_cast<int> (thread_traceback_.size() ) == 0);
+  assert ( !initialized_ );
 }
 
 /**
@@ -117,6 +125,12 @@ size_t meto::Vernier::start(std::string_view const region_name)
 
 void meto::Vernier::start_part1()
 {
+
+  // Check that Vernier has been initialised
+  if (!initialized_) {
+    throw std::runtime_error("Vernier::start_part1. Vernier not initialised.");
+  }
+
   // Store the calliper start time, which is used in part2.
   logged_calliper_start_time_ = vernier_gettime();
 }
@@ -257,8 +271,8 @@ void meto::Vernier::write()
 {
 
   // Check that the MPI context is initialised. We'll need it in a moment.
-  if (!mpi_context_.is_initialized()){
-    throw std::runtime_error("Vernier::write MPI context not initialized.");
+  if (!initialized_){
+    throw std::runtime_error("Vernier::write. Vernier not initialised.");
   }
 
   // Create hashvec handler object and feed in data from thread_hashtables_
