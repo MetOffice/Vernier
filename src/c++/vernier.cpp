@@ -271,7 +271,6 @@ void meto::Vernier::stop(size_t const hash)
 void meto::Vernier::write()
 {
 
-  // Check that the MPI context is initialised. We'll need it in a moment.
   if (!initialized_){
     throw std::runtime_error("Vernier::write. Vernier not initialised.");
   }
@@ -286,7 +285,6 @@ void meto::Vernier::write()
   // Sort hashvec from high to low self walltimes then write
   output_data.sort();
   output_data.write();
-
 }
 
 /**
