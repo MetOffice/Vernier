@@ -257,7 +257,7 @@ void meto::HashTable::prepare_computed_times(RegionRecord& record)
                         - record.child_walltime_
                         - record.overhead_walltime_;
 
-  // Total walltime with overheads attributed to the parent removed.
+  // Total walltime with overheads accrued by child routine calls removed.
   record.total_raw_walltime_ = record.total_walltime_
                              - record.overhead_walltime_;
 }
