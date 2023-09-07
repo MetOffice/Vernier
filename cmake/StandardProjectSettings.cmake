@@ -61,3 +61,13 @@ if(NOT BUILD_SHARED_LIBS)
   message(STATUS "Building static libraries")
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
+
+# Documentation related options. The option to disable Doxygen and Sphinx only
+# appear if BUILD_DOCS is turned ON.
+include(CMakeDependentOption)
+option(BUILD_DOCS "Enable documentation generation" ON)
+if(BUILD_DOCS)
+  message(STATUS "Documentation generation enabled")
+endif()
+cmake_dependent_option(ENABLE_DOXYGEN "Enable Doxygen" ON "BUILD_DOCS" OFF)
+cmake_dependent_option(ENABLE_SPHINX  "Enable Sphinx"  ON "BUILD_DOCS" OFF)
