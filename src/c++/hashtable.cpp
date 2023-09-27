@@ -257,9 +257,6 @@ void meto::HashTable::prepare_computed_times(RegionRecord& record)
                         - record.child_walltime_
                         - record.overhead_walltime_;
 
-  // Total walltime with overheads accrued by child routine calls removed.
-  record.total_raw_walltime_ = record.total_walltime_
-                             - record.overhead_walltime_;
 }
 
 /**
@@ -371,21 +368,6 @@ double meto::HashTable::get_total_walltime(size_t const hash) const
   auto& record = hash2record(hash);
 
   return record.total_walltime_.count();
-}
-
-/**
- * @brief  Get the total time of the specified region, minus profiling overheads
- *         incurred by calling direct children.
- * @param [in] hash  The hash corresponding to the region.
- * @note   This time is derived from other measured times, therefore a to
- *         `prepare_computed_times` is need to update its value. 
- */
-
-double meto::HashTable::get_total_raw_walltime(size_t const hash)
-{
-  auto& record = hash2record(hash);
-   prepare_computed_times(record);
-   return record.total_raw_walltime_.count();
 }
 
 /**
