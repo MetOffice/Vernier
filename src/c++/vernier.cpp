@@ -172,7 +172,7 @@ void meto::Vernier::stop(size_t const hash)
   size_t last_hash_on_list = traceback_entry.record_hash_;
   if (hash != last_hash_on_list){
     std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
-    std::cerr << "Expected hash: " << last_hash_on_list << " Received hash: " << hash << "\n";
+    std::cerr << "Expected calliper: " << thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) << " Received calliper: " << thread_hashtables_[tid].get_decorated_region_name(hash) << "\n";
     exit (100);
   }
 
