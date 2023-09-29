@@ -44,7 +44,6 @@ function(add_nompi_unit_test test_name cpp_file)
             OpenMP::OpenMP_CXX
             GTest::gtest_main
             GTest::gmock_main
-            MPI::MPI_CXX
             ${CMAKE_PROJECT_NAME})
     set_project_warnings(${test_name})
     target_include_directories(${test_name} PRIVATE
