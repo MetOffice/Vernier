@@ -1,3 +1,7 @@
+[comment]: <> ((c) Crown copyright 2022 Met Office. All rights reserved.)
+[comment]: <> (The file LICENCE, distributed with this code, contains details of the terms)
+[comment]: <> (under which the code may be used.)
+
 # Vernier
 
 [![Build](https://github.com/MetOffice/Vernier/actions/workflows/build.yml/badge.svg)](https://github.com/MetOffice/Vernier/actions/workflows/build.yml)
