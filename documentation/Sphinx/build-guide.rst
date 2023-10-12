@@ -8,7 +8,7 @@ Requirements
 
 The tested compilers are:
 
-* GCC 9.3.0, 10.2.0
+* GCC 10.2.0, 11.2.0
 * Clang 12.0
 
 Requirements for building:

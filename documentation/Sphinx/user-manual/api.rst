@@ -71,7 +71,3 @@ Examples
 
    ! Write
    call vernier_write()
-
-Although their primary purpose is for system testing, the tests in
-``Vernier/tests/system_tests`` also serve as more fleshed-out examples on how
-calls to Vernier are made. 

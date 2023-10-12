@@ -64,7 +64,7 @@ jobs:
           git rm -r --ignore-unmatch docs/documentation/
           rm -rf docs/documentation/
           git stash pop
-          git rese
+          git reset
           git add --force docs/documentation
           git commit --allow-empty -m "Update Doxygen documentation"
           git push
