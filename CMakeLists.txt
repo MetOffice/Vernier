@@ -16,7 +16,7 @@ project(vernier LANGUAGES CXX C Fortran
         VERSION 0.1.0)
 
 # OpenMP required
-find_package(OpenMP 2.5 REQUIRED)
+#find_package(OpenMP 2.5 REQUIRED)
 
 # MPI required
 find_package(MPI REQUIRED)

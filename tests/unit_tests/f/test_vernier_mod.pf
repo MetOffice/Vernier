@@ -7,7 +7,7 @@ module test_vernier_mod
   @suite(name='test_vernier_mod_suite')
 
   use vernier_mod
-  use omp_lib
+  !$ use omp_lib
   use mpi_f08
 
 contains
@@ -35,7 +35,8 @@ contains
 
     ! Start timing: noddy way, and using Profiler.
     call vernier_start(prof_main, 'FULL')
-    t1 = omp_get_wtime()
+    t1 = 0
+    !$ t1 = omp_get_wtime()
 
     ! Time a region
     block
@@ -67,7 +68,8 @@ contains
     call sleep(2);
 
     ! End of profiling; record t2 immediately before.
-    t2 = omp_get_wtime();
+    t2 = 1
+    !$ t2 = omp_get_wtime();
     call vernier_stop(prof_main)
 
     assertions: block

@@ -5,7 +5,9 @@
 \*----------------------------------------------------------------------------*/
 
 #include <gtest/gtest.h>
-#include <omp.h>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 #include <unistd.h>
 
 #include "vernier.h"
@@ -14,7 +16,10 @@ TEST(SystemTests, TimingTest)
 {
   // Start timing: noddy way, and using Vernier.
   auto prof_main = meto::vernier.start("MAIN");
-  double t1 = omp_get_wtime();
+  double t1 = 0;
+  #ifdef _OPENMP  
+    t1 = omp_get_wtime();
+  #endif
 
   // Time a region
   {
@@ -42,7 +47,10 @@ TEST(SystemTests, TimingTest)
   sleep(2);
 
   // End of profiling; record t2 immediately before.
-  double t2 = omp_get_wtime();
+  double t2 = 1;
+  #ifdef _OPENMP
+    t2 = omp_get_wtime();
+  #endif
   meto::vernier.stop(prof_main);
 
   // Check that the total time measured by the profiler is within some tolerance
