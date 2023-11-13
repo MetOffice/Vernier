@@ -32,6 +32,9 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         OpenMP::OpenMP_CXX
         MPI::MPI_CXX)
 
+# Set library C++ standard
+target_compile_features(${CMAKE_PROJECT_NAME} PUBLIC cxx_std_17)
+
 set_project_warnings(${CMAKE_PROJECT_NAME})
 
 # Set the properties of the library including, the version and language. Also
