@@ -10,7 +10,7 @@
 #include "vernier.h"
 
 // Attempt to initialise Vernier without MPI being initialized.
-TEST(TestNoMPI, MpiNotInitialised) {
+TEST(TestMPINotInit, MpiNotInitialised) {
 
   [[maybe_unused]] int ierr;
   EXPECT_THROW(meto::vernier.init(), std::runtime_error);

@@ -38,7 +38,7 @@ add_unit_test(test_recursion test_recursion.cpp)
 #
 
 # Function to simplify adding unit-tests
-function(add_nompi_unit_test test_name cpp_file)
+function(add_mpi_not_init_unit_test test_name cpp_file)
     add_executable(${test_name} ${cpp_file})
     target_link_libraries(${test_name}
             OpenMP::OpenMP_CXX
@@ -51,5 +51,5 @@ function(add_nompi_unit_test test_name cpp_file)
     gtest_discover_tests(${test_name})
 endfunction()
 
-add_nompi_unit_test(test_nompi test_nompi.cpp)
+add_mpi_not_init_unit_test(test_mpi_not_init test_mpi_not_init.cpp)
 
