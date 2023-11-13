@@ -8,7 +8,6 @@
 #include <chrono>
 #include <gtest/gtest.h>
 #include <string>
-#include <mpi.h>
 
 #include "vernier.h"
 
@@ -24,7 +23,7 @@ std::string tid_bytes(reinterpret_cast<char const*>(&tid), sizeof(tid));
 
 TEST(RegionNameTest,NamesMatchTest) {
 
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
 
   //Start main region with name "Cappucino"
   const auto& prof_cappucino = meto::vernier.start("Cappucino");

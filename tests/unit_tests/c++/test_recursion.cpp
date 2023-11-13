@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 #include <omp.h>
-#include <mpi.h>
 
 #include "vernier.h"
 
@@ -132,7 +131,7 @@ void second_function(Timings& timings)
 TEST(RecursionTest,DirectRecursion)
 {
 
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
   auto prof_handle = meto::vernier.start("test_recursion");
 
   // Test independently on each thread.
@@ -165,7 +164,7 @@ TEST(RecursionTest,DirectRecursion)
 
 TEST(RecursionTest,IndirectRecursion)
 {
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
   auto prof_handle = meto::vernier.start("test_recursion");
 
   // Test independently on each thread.

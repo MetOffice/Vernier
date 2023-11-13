@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <mpi.h>
 
 #include "vernier.h"
 
@@ -14,7 +13,7 @@
 TEST(TestNoMPI, MpiNotInitialised) {
 
   [[maybe_unused]] int ierr;
-  EXPECT_THROW(meto::vernier.init(MPI_COMM_NULL), std::runtime_error);
+  EXPECT_THROW(meto::vernier.init(), std::runtime_error);
   meto::vernier.finalize();
 
 }

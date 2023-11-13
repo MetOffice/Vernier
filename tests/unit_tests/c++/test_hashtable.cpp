@@ -7,7 +7,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <omp.h>
-#include <mpi.h>
 
 #include "vernier.h"
 
@@ -29,7 +28,7 @@ std::string tid_bytes(reinterpret_cast<char const*>(&tid), sizeof(tid));
 
 TEST(HashTableTest,HashFunctionTest) {
 
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
 
   // Create new hashes via HashTable::query_insert, which is used in Vernier::start
   const auto& prof_rigatoni = meto::vernier.start("Rigatoni");
@@ -59,7 +58,7 @@ TEST(HashTableTest,HashFunctionTest) {
 
 TEST(HashTableTest,UpdateTimesTest) {
 
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
 
   // Create new hash
   size_t prof_pie = std::hash<std::string>{}("Pie" + tid_bytes);

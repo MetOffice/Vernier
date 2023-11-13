@@ -9,7 +9,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <chrono>
-#include <mpi.h>
 
 #include "vernier.h"
 
@@ -24,7 +23,7 @@ using ::testing::KilledBySignal;
 // Make sure the code exits when a hash mismatch happens.
 TEST(ProfilerDeathTest,WrongHashTest) {
 
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
 
   EXPECT_EXIT({
 
@@ -84,7 +83,7 @@ TEST(ProfilerDeathTest, VernierUninitialisedInWrite) {
 // when available array elements are exhausted.
 TEST(ProfilerDeathTest, TooManyTracebackEntries) {
 
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
 
   EXPECT_EXIT({
     const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;

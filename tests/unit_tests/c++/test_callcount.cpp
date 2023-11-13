@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 #include <omp.h>
-#include <mpi.h>
 #include <vector>
 
 #include "vernier.h"
@@ -14,7 +13,7 @@
 TEST(HashEntryTest,CallCountTest)
 {
 
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
 
   // Start main region
   auto prof_main = meto::vernier.start("MainRegion");

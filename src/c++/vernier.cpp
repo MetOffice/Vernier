@@ -42,8 +42,9 @@ meto::Vernier::TracebackEntry::TracebackEntry(
  * @brief  Initialise Vernier object.
  * @param [in]  client_comm_handle  MPI communicator handle that Vernier will
  *                                  duplicate and use the duplicate.
+ *                                  Defaults to MPI_COMM_WORLD.
  */ 
-void meto::Vernier::init(MPI_Comm const& client_comm_handle)
+void meto::Vernier::init(MPI_Comm const client_comm_handle)
 {
 
   // Set the maximum number of threads.

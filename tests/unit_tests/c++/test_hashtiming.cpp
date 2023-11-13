@@ -7,7 +7,6 @@
 #include <iostream>
 #include <chrono>
 #include <gtest/gtest.h>
-#include <mpi.h>
 
 #include "vernier.h"
 
@@ -21,7 +20,7 @@
 
 TEST(HashEntryTest, TimingsTest) {
 
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
 
   // Start main profiler region and chrono timing
   const auto& prof_main = meto::vernier.start("QuicheLorraine");

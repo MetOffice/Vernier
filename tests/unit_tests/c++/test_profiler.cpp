@@ -7,14 +7,13 @@
 #include <gtest/gtest.h>
 #include <omp.h>
 #include <unistd.h>
-#include <mpi.h>
 
 #include "vernier.h"
 
 TEST(SystemTests, TimingTest)
 {
 
-  meto::vernier.init(MPI_COMM_WORLD);
+  meto::vernier.init();
 
   // Start timing: noddy way, and using Vernier.
   auto prof_main = meto::vernier.start("MAIN");
