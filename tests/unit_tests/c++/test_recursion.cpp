@@ -11,6 +11,7 @@
 #endif
 
 #include "vernier.h"
+#include "vernier_get_wtime.h"
 
 int const max_depth = 3;
 int const sleep_seconds = 1;
@@ -150,18 +151,12 @@ TEST(RecursionTest,DirectRecursion)
     auto prof_handle_threaded = meto::vernier.start("test_recursion:threads");
 
     Timings timings;
-    double t1 = 0;
-    #ifdef _OPENMP
-      t1 = omp_get_wtime();
-    #endif
+    double t1 = meto::vernier_get_wtime();
 
     // Function calls itself
     zeroth_function(timings);
 
-    double t2 = 1;
-    #ifdef _OPENMP
-      t2 = omp_get_wtime();
-    #endif
+    double t2 = meto::vernier_get_wtime();
     double overall_time = t2-t1;
 
     EXPECT_LE  (timings.zeroth_function_total_time_,  overall_time);
@@ -187,18 +182,12 @@ TEST(RecursionTest,IndirectRecursion)
     auto prof_handle_threaded = meto::vernier.start("test_recursion:threads");
 
     Timings timings;
-    double t1 = 0;
-    #ifdef _OPENMP
-      t1 = omp_get_wtime();
-    #endif
+    double t1 = meto::vernier_get_wtime();
 
     // Function calls a second function
     first_function(timings);
 
-    double t2 = 1;
-    #ifdef _OPENMP
-      t2 = omp_get_wtime();
-    #endif
+    double t2 = meto::vernier_get_wtime();
 
     double overall_time = t2-t1;
       

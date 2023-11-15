@@ -12,7 +12,13 @@
  * 
  */
 
-#ifndef VERNIER_GET_WTIME__H
+#ifndef VERNIER_GET_WTIME_H
 #define VERNIER_GET_WTIME_H
+
+namespace meto
+{
+    // Function prototypes
+    double vernier_get_wtime();
+}
 
 #endif

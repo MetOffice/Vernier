@@ -25,7 +25,7 @@ add_library(${CMAKE_PROJECT_NAME}
         vernier_get_wtime.h  vernier_get_wtime.cpp
         )
 
-set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h)
+set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h vernier_get_wtime.h)
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

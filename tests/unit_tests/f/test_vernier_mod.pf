@@ -35,8 +35,7 @@ contains
 
     ! Start timing: noddy way, and using Profiler.
     call vernier_start(prof_main, 'FULL')
-    t1 = 0
-    !$ t1 = omp_get_wtime()
+    t1 = vernier_get_wtime()
 
     ! Time a region
     block
@@ -68,8 +67,7 @@ contains
     call sleep(2);
 
     ! End of profiling; record t2 immediately before.
-    t2 = 1
-    !$ t2 = omp_get_wtime();
+    t2 = vernier_get_wtime()
     call vernier_stop(prof_main)
 
     assertions: block
