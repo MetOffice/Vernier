@@ -18,9 +18,14 @@ project(vernier LANGUAGES CXX C Fortran
 # OpenMP required
 find_package(OpenMP 2.5 REQUIRED)
 
-# MPI required
-# find_package(MPI REQUIRED)
-# include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+# MPI required?
+option(ENABLE_MPI "Enable MPI" ON)
+
+if (ENABLE_MPI)
+  find_package(MPI REQUIRED)
+  include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+  add_compile_definitions(USE_MPI)
+endif ()
 
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)

@@ -5,25 +5,28 @@
 # ------------------------------------------------------------------------------
 
 #
+# Add MPI to parallel libraries if required.
+#
+
+set (PLIBS OpenMP::OpenMP_CXX)
+
+if (ENABLE_MPI)
+  list(APPEND PLIBS MPI::MPI_CXX)
+endif ()
+
+#
 # MPI initialised.
 #
 
 # Function to simplify adding unit-tests
 function(add_unit_test test_name cpp_file)
     add_executable(${test_name} ${cpp_file} mpi_main.cpp)
-
-    set(LIBS ${test_name} 
-             ${CMAKE_PROJECT_NAME}
-             OpenMP::OpenMP_CXX 
-             GTest::gtest_main
-             GTest::gmock_main
-             )
-
-    if (ENABLE_MPI)
-      list(APPEND LIBS MPI::MPI_CXX)
-    endif()
-
-    target_link_libraries(${LIBS})
+    target_link_libraries(${test_name}
+            ${PLIBS}
+            GTest::gtest_main
+            GTest::gmock_main
+            ${CMAKE_PROJECT_NAME}
+            )
     set_project_warnings(${test_name})
     target_include_directories(${test_name} PRIVATE
             ${PROJECT_SOURCE_DIR}/src/c++)
@@ -47,20 +50,12 @@ add_unit_test(test_recursion test_recursion.cpp)
 # Function to simplify adding unit-tests
 function(add_mpi_not_init_unit_test test_name cpp_file)
     add_executable(${test_name} ${cpp_file})
-
-    set(LIBS ${test_name} 
-             ${CMAKE_PROJECT_NAME}
-             OpenMP::OpenMP_CXX 
-             GTest::gtest_main
-             GTest::gmock_main
-             )
-
-    if (ENABLE_MPI)
-      list(APPEND LIBS MPI::MPI_CXX)
-    endif()
-
-    target_link_libraries(${LIBS})
-
+    target_link_libraries(${test_name}
+            ${PLIBS}
+            GTest::gtest_main
+            GTest::gmock_main
+            ${CMAKE_PROJECT_NAME}
+            )
     set_project_warnings(${test_name})
     target_include_directories(${test_name} PRIVATE
             ${PROJECT_SOURCE_DIR}/src/c++)
