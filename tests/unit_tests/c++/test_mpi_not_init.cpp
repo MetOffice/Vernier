@@ -12,9 +12,14 @@
 // Attempt to initialise Vernier without MPI being initialized.
 TEST(TestMPINotInit, MpiNotInitialised) {
 
-  [[maybe_unused]] int ierr;
-  EXPECT_THROW(meto::vernier.init(), std::runtime_error);
-  meto::vernier.finalize();
+  #ifdef USE_MPI
+    [[maybe_unused]] int ierr;
+    EXPECT_THROW(meto::vernier.init(), std::runtime_error);
+    meto::vernier.finalize();
+  #else
+    meto::vernier.init();
+    meto::vernier.finalize();
+  #endif
 
 }
 

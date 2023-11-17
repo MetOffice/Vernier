@@ -23,14 +23,19 @@ add_library(${CMAKE_PROJECT_NAME}
         hashvec.h          hashvec.cpp
         vernier_gettime.h  vernier_gettime.cpp
         mpi_context.h      mpi_context.cpp
+        vernier_mpi.h      vernier_mpi.cpp
         )
 
-set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h)
+set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h vernier_mpi.h)
 
 # Link library to and external libs (also use project warnings and options).
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-        OpenMP::OpenMP_CXX
-        MPI::MPI_CXX)
+set (LIBS OpenMP::OpenMP_CXX)
+
+if (ENABLE_MPI)
+  list(APPEND LIBS MPI::MPI_CXX)
+endif ()
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${LIBS})
 
 # Set library C++ standard
 target_compile_features(${CMAKE_PROJECT_NAME} PUBLIC cxx_std_17)

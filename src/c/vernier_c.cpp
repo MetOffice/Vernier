@@ -16,10 +16,10 @@
  */
 
 #include "vernier.h"
+#include "vernier_mpi.h"
 
 #include <iostream>
 #include <cstring>
-#include <mpi.h>
 
 extern "C" {
   void   c_vernier_init(MPI_Fint const& client_comm_handle);

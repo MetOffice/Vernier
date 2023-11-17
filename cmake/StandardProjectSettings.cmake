@@ -31,6 +31,16 @@ endif ()
 # Generate compile_commands.json to make it easier to work with Clang-based tools.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Enable full MPI support
+
+option(ENABLE_MPI "Enable MPI" ON)
+
+if (ENABLE_MPI)
+  find_package(MPI REQUIRED)
+  include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+  add_compile_definitions(USE_MPI)
+endif ()
+
 # Interprocedural optimisation is useful for improving program performance through
 # analysis of the entire program rather than just single program units.
 option(ENABLE_IPO "Enable Interprocedural Optimization, aka Link Time Optimization (LTO)" OFF)
@@ -71,3 +81,4 @@ if(BUILD_DOCS)
 endif()
 cmake_dependent_option(ENABLE_DOXYGEN "Enable Doxygen" ON "BUILD_DOCS" OFF)
 cmake_dependent_option(ENABLE_SPHINX  "Enable Sphinx"  ON "BUILD_DOCS" OFF)
+

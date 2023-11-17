@@ -10,7 +10,9 @@ add_library(${CMAKE_PROJECT_NAME}_f SHARED "vernier_mod.F90")
 target_link_libraries(${CMAKE_PROJECT_NAME}_f PUBLIC 
                       ${CMAKE_PROJECT_NAME}_c
                       OpenMP::OpenMP_Fortran
-                      MPI::MPI_Fortran)
+                      )
+
+#                      MPI::MPI_Fortran)
 
 include(FortranCInterface)
 FortranCInterface_VERIFY()
