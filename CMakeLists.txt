@@ -16,7 +16,7 @@ project(vernier LANGUAGES CXX C Fortran
         VERSION 0.1.0)
 
 # OpenMP required
-#find_package(OpenMP 2.5 REQUIRED)
+find_package(OpenMP 2.5 REQUIRED)
 
 # MPI required
 find_package(MPI REQUIRED)
@@ -43,6 +43,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         if(ENABLE_SPHINX)
                 add_dependencies(sphinxdocs doxygendocs)
         endif()
+
+        # Include option to build with OpenMP
+        include(cmake/RunWithout.cmake)
 
 endif()
 
