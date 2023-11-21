@@ -12,7 +12,7 @@ add_library(${CMAKE_PROJECT_NAME}_c
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME}_c PRIVATE
-                      ${LIBS}
+                      ${OPENMP}
                       ${CMAKE_PROJECT_NAME}
                      )
 

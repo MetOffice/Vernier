@@ -44,7 +44,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
                 add_dependencies(sphinxdocs doxygendocs)
         endif()
 
-        # Include option to build with OpenMP
+        # Include option to build with/without OpenMP
         include(cmake/RunWithout.cmake)
 
 endif()

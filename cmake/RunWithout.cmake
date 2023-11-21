@@ -9,8 +9,8 @@
 # Optional argument to build with OpenMP.
 option(BUILD_OPENMP "Build with OpenMP" ON)
 
-set(LIBS ${CMAKE_DL_LIBS})
+set(OPENPMP ${CMAKE_DL_LIBS})
 
 if(BUILD_OPENMP)
-    list(APPEND LIBS OpenMP::OpenMP_CXX OpenMP::OpenMP_Fortran)
+    list(APPEND OPENMP OpenMP::OpenMP_CXX OpenMP::OpenMP_Fortran)
 endif()

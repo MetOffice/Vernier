@@ -9,7 +9,7 @@ set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/modules)
 add_library(${CMAKE_PROJECT_NAME}_f SHARED "vernier_mod.F90")
 target_link_libraries(${CMAKE_PROJECT_NAME}_f PUBLIC 
                       ${CMAKE_PROJECT_NAME}_c
-                      ${LIBS}
+                      ${OPENMP}
                       MPI::MPI_Fortran)
 
 include(FortranCInterface)

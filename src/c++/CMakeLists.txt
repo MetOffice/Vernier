@@ -29,7 +29,7 @@ set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h vernie
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-        ${LIBS}
+        ${OPENMP}
         MPI::MPI_CXX)
 
 # Set library C++ standard
