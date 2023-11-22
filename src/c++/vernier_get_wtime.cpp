@@ -11,7 +11,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
-#define BILLION 1000000000l
+#define BILLION  1000000000L
 
 /**
  * @brief Returns the current time.
@@ -28,6 +28,6 @@ double meto::vernier_get_wtime()
         std::runtime_error("clock gettime");
         exit(EXIT_FAILURE);
     }
-    time = (point.tv_sec) + (double)point.tv_nsec/(double)BILLION;
+    time = static_cast<double>(point.tv_sec) + static_cast<double>(point.tv_nsec)/BILLION;
     return time;
 }
