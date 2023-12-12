@@ -22,9 +22,10 @@ add_library(${CMAKE_PROJECT_NAME}
         formatter.h        formatter.cpp
         hashvec.h          hashvec.cpp
         vernier_gettime.h  vernier_gettime.cpp
+        exceptions.h       exceptions.cpp 
         )
 
-set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h)
+set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h exceptions.h)
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE

@@ -1,0 +1,34 @@
+/* -----------------------------------------------------------------------------
+*  (c) Crown copyright 2021 Met Office. All rights reserved.
+*  The file LICENCE, distributed with this code, contains details of the terms
+*  under which the code may be used.
+* -----------------------------------------------------------------------------
+*/
+
+#include "exceptions.h"
+#include <mpi.h>
+#include <string>
+#include <iostream>
+
+/**
+ * @brief Exceptions class that extends std::exceptions.
+ *
+ * @returns An error.
+ */
+
+meto::exception::exception (std::string customException)
+{
+    MPI_Comm comm = MPI_COMM_WORLD;
+    MPI_Init(NULL, NULL);
+    MPI_Abort(comm, 0);
+    MPI_Finalize();
+    this->error = customException;
+}
+
+std::string meto::exception::what () 
+{
+    return this->error;
+}
+
+//Create a function that atkes in correct things for why the run failed, plus anything needed for MPI_ABORT command too
+//Take in MPI_COMM argument as parameter and also take in reason why the run failed

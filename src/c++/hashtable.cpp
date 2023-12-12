@@ -6,6 +6,7 @@
 
 #include "hashtable.h"
 #include "hashvec_handler.h"
+#include "exceptions.h"
 
 #include <cassert>
 #include <cstring>
@@ -72,10 +73,16 @@ size_t meto::HashTable::compute_hash(std::string_view region_name, int tid)
   std::array<char, PROF_STRING_BUFFER_LENGTH>  new_chars;
   new_chars.fill('\0');
 
-  if (region_name.length() + num_extra_bytes > new_chars.size()) {
+  try {
+    if (region_name.length() + num_extra_bytes > new_chars.size()) {
     std::string error_msg = "Internal error: character buffer exhausted.";
-    throw std::runtime_error(error_msg);
+    throw exception(error_msg);
   }
+  }
+  catch (exception &ex) {
+        std::cerr <<  ex.what() << std::endl;
+  }
+  
 
   // Get iterator to the start of the string buffer.
   auto new_chars_iterator = new_chars.begin();

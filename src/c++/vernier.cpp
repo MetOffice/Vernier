@@ -6,6 +6,7 @@
 
 #include "hashvec_handler.h"
 #include "vernier.h"
+#include "exceptions.h"
 
 #include <cassert>
 #include <chrono>
@@ -122,15 +123,22 @@ size_t meto::Vernier::start_part2(std::string_view const region_name)
 
   // Store the calliper and region start times.
   ++call_depth_;
-  if (call_depth_ < PROF_MAX_TRACEBACK_SIZE){
+  try {
+    if (call_depth_ < PROF_MAX_TRACEBACK_SIZE){
     auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
     auto region_start_time = vernier_gettime();
     thread_traceback_[tid].at(call_depth_index)
        = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time_);
   }
   else {
-    std::cerr << "EMERGENCY STOP: Traceback array exhausted." << "\n";
-    exit (102);
+    //std::cerr << "EMERGENCY STOP: Traceback array exhausted." << "\n";
+    //exit (102);
+    throw exception ("EMERGENCY STOP: Traceback array exhausted.");
+  }
+  }
+  catch (exception &ex) {
+    std::cerr <<  ex.what() << std::endl;
+    return EXIT_FAILURE;
   }
   return hash;
 }
@@ -159,10 +167,18 @@ void meto::Vernier::stop(size_t const hash)
 
   // Check that we have called a start calliper before the stop calliper.
   // If not, then the call depth would be -1.
-  if (call_depth_ < 0) {
-    std::cerr << "EMERGENCY STOP: stop called before start calliper." << "\n";
-    exit (101);
+  try {
+    if (call_depth_ < 0) {
+    //std::cerr << "EMERGENCY STOP: stop called before start calliper." << "\n";
+    //exit (101);
+    throw exception("EMERGENCY STOP: stop called before start calliper.");
   }
+  }
+  catch (exception &ex) {
+    std::cerr <<  ex.what() << std::endl;
+    //return EXIT_FAILURE;
+  }
+  
 
   // Get reference to the traceback entry.
   auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
@@ -170,10 +186,18 @@ void meto::Vernier::stop(size_t const hash)
 
   // Check: which hash is last on the traceback list?
   size_t last_hash_on_list = traceback_entry.record_hash_;
+  try {
   if (hash != last_hash_on_list){
-    std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
-    std::cerr << "Expected calliper: " << thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) << " Received calliper: " << thread_hashtables_[tid].get_decorated_region_name(hash) << "\n";
-    exit (100);
+    //std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
+    //std::cerr << "Expected calliper: " << thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) << " Received calliper: " << thread_hashtables_[tid].get_decorated_region_name(hash) << "\n";
+    //exit (100);
+    std::string error_msg = "EMERGENCY STOP: hashes don't match. Expected calliper: " + thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) + " Received calliper: " + thread_hashtables_[tid].get_decorated_region_name(hash) + "\n";
+    throw exception(error_msg);
+  }
+  }
+  catch (exception &ex) {
+    std::cerr <<  ex.what() << std::endl;
+    //return EXIT_FAILURE;
   }
 
   // Compute the region time

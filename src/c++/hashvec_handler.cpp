@@ -6,6 +6,7 @@
  */
 
 #include "hashvec_handler.h"
+#include "exceptions.h"
 
 /**
  * @brief  HashVecHandler constructor
@@ -26,11 +27,19 @@ meto::HashVecHandler::HashVecHandler()
     if (env_io_mode) {  io_mode = env_io_mode; }
 
     // Allocate writer to be of required type.
-    if (io_mode == "multi")
+    try {
+        if (io_mode == "multi")
     {
         writer_strategy_ = std::make_unique<Multi>();
     }
-    else throw std::runtime_error("Invalid IO mode choice");
+    else
+    {
+        throw exception("Invalid IO mode choice");
+    } 
+    }
+    catch (exception &ex) {
+        std::cerr <<  ex.what() << std::endl;
+    }
 }
 
 /**
