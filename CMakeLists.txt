@@ -25,7 +25,9 @@ if (ENABLE_MPI)
   find_package(MPI REQUIRED)
   include_directories(SYSTEM ${MPI_INCLUDE_PATH})
   add_compile_definitions(USE_MPI)
-endif ()
+else()
+  message(STATUS "ENABLE_MPI disabled.")
+endif()
 
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)

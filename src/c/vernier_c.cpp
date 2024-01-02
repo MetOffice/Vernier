@@ -22,7 +22,8 @@
 #include <cstring>
 
 extern "C" {
-  void   c_vernier_init(MPI_Fint const& client_comm_handle);
+  void   c_vernier_init_default();
+  void   c_vernier_init_comm(MPI_Fint const& client_comm_handle);
   void   c_vernier_finalize();
   void   c_vernier_start_part1();
   void   c_vernier_start_part2(long int&, char const*);
@@ -32,18 +33,30 @@ extern "C" {
 }
 
 /**
- * @brief  Set a client-code-defined MPI communicator handle.
- * @details May be used to set other values in future, too.
+ * @brief  Initialise Vernier with default MPI communicator. 
+ * @details Default communicator is specified in the underlying C++ code.
+ */
+
+void c_vernier_init_default()
+{
+  meto::vernier.init();
+}
+
+/**
+ * @brief  Initialise Vernier, using the specified MPI communicator.
  * @param [in] The Fortran communicator handle.
  */
 
-void c_vernier_init(MPI_Fint const& client_comm_handle)
+void c_vernier_init_comm(MPI_Fint const& client_comm_handle)
 {
   MPI_Comm local_handle = MPI_Comm_f2c(client_comm_handle);
   meto::vernier.init(local_handle);
 }
 
-// Finalize
+/**
+ * @brief  Finalise Vernier.
+ */
+
 void c_vernier_finalize() 
 {
   meto::vernier.finalize();

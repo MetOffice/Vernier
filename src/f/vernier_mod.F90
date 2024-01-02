@@ -39,10 +39,15 @@ module vernier_mod
 
   interface
 
-    subroutine vernier_init(client_comm_handle)  &
-               bind(C, name='c_vernier_init')
+    subroutine vernier_init_default()  &
+               bind(C, name='c_vernier_init_default')
+      !No arguments to handle.
+    end subroutine vernier_init_default
+
+    subroutine vernier_init_comm(client_comm_handle)  &
+               bind(C, name='c_vernier_init_comm')
       integer, intent(in) :: client_comm_handle
-    end subroutine vernier_init
+    end subroutine vernier_init_comm
 
     subroutine vernier_finalize() bind(C, name='c_vernier_finalize')
         !No arguments to handle
@@ -79,6 +84,11 @@ module vernier_mod
     end function vernier_get_total_walltime
 
   end interface
+
+  interface vernier_init
+    procedure :: vernier_init_default
+    procedure :: vernier_init_comm
+  end interface vernier_init
 
   !-----------------------------------------------------------------------------
   ! Contained functions / subroutines

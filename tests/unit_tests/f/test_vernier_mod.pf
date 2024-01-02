@@ -20,6 +20,7 @@ module test_vernier_mod
     procedure :: setup
     procedure :: teardown
     procedure :: test_vernier_timings
+    procedure :: test_init_default_comm
   end type test_vernier_type
 
 contains
@@ -120,5 +121,32 @@ contains
     call vernier_finalize()
 
   end subroutine test_vernier_timings
+
+  !-----------------------------------------------------------------------------
+  ! Test initialisation without specified communicator, from Fortran code. Just
+  ! checking that the interfaces are present to allow this test to compile.
+  !-----------------------------------------------------------------------------
+
+  subroutine test_init_default_comm(this)
+    implicit none
+
+    class(test_vernier_type), intent(inout) :: this
+
+    ! Timer declarations
+    real(kind=dp) :: t1, t2, actual_time
+
+    ! Handle declarations
+    integer(kind=vik) :: prof_main
+
+    ! Error handler
+    integer :: ierr
+
+    ! Initialise Vernier
+    call vernier_init()
+
+    ! Finalize Vernier
+    call vernier_finalize() 
+
+  end subroutine test_init_default_comm
 
 end module test_vernier_mod
