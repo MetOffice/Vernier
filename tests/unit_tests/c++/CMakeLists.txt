@@ -14,9 +14,9 @@ if (ENABLE_MPI)
   list(APPEND PLIBS MPI::MPI_CXX)
 endif ()
 
-#
+# ------------------------------------------------------------------------------
 # MPI initialised.
-#
+# ------------------------------------------------------------------------------
 
 # Function to simplify adding unit-tests
 function(add_unit_test test_name cpp_file)
@@ -43,9 +43,9 @@ add_unit_test(test_proftests test_proftests.cpp)
 add_unit_test(test_callcount test_callcount.cpp)
 add_unit_test(test_recursion test_recursion.cpp)
 
-#
+# ------------------------------------------------------------------------------
 # Test behaviour when MPI is not initialised.
-#
+# ------------------------------------------------------------------------------
 
 # Function to simplify adding unit-tests
 function(add_mpi_not_init_unit_test test_name cpp_file)

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2023 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -30,31 +30,31 @@ namespace meto
  * @brief  Provides a wrapper for MPI functionality.
  */
 
-    class MPIContext {
+class MPIContext {
 
-    private:
+  private:
 
-        MPI_Comm comm_handle_;
-        int      comm_size_;
-        int      comm_rank_;
-        bool     initialized_;
-     
-    public:
+    MPI_Comm comm_handle_;
+    int      comm_size_;
+    int      comm_rank_;
+    bool     initialized_;
+   
+  public:
 
-        // Constructor
-        MPIContext();
+    // Constructor
+    MPIContext();
 
-        // Init and finalize
-        bool is_initialized();
-        void init(MPI_Comm);
-        void finalize();
-        void reset();
+    // Init and finalize
+    bool is_initialized();
+    void init(MPI_Comm);
+    void finalize();
+    void reset();
 
-        // Getters
-        int get_size();
-        int get_rank();
+    // Getters
+    int get_size();
+    int get_rank();
         
-    };
+};
 
 } // End meto namespace
 

@@ -71,4 +71,3 @@ if(BUILD_DOCS)
 endif()
 cmake_dependent_option(ENABLE_DOXYGEN "Enable Doxygen" ON "BUILD_DOCS" OFF)
 cmake_dependent_option(ENABLE_SPHINX  "Enable Sphinx"  ON "BUILD_DOCS" OFF)
-
