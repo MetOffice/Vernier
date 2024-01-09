@@ -29,6 +29,3 @@ std::string meto::exception::what ()
 {
     return this->error;
 }
-
-//Create a function that atkes in correct things for why the run failed, plus anything needed for MPI_ABORT command too
-//Take in MPI_COMM argument as parameter and also take in reason why the run failed

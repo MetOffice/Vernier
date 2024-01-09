@@ -11,9 +11,11 @@
 #include <chrono>
 
 #include "vernier.h"
+#include "exceptions.h"
 
 using ::testing::ExitedWithCode;
 using ::testing::KilledBySignal;
+//using ::testing::Test;
 
 
 //
@@ -23,36 +25,46 @@ using ::testing::KilledBySignal;
 // Make sure the code exits when a hash mismatch happens.
 TEST(ProfilerDeathTest,WrongHashTest) {
 
-  EXPECT_EXIT({
+  EXPECT_THROW({
+    try{
+      // Start main
+      const auto& prof_main = meto::vernier.start("Chocolate");
 
-    // Start main
-    const auto& prof_main = meto::vernier.start("Chocolate");
+      // A subregion
+      const auto& prof_sub = meto::vernier.start("Vanilla");
+      meto::vernier.stop(prof_sub);
 
-    // A subregion
-    const auto& prof_sub = meto::vernier.start("Vanilla");
-    meto::vernier.stop(prof_sub);
+      // Wrong hash in profiler.stop()
+      meto::vernier.stop(prof_sub);
 
-    // Wrong hash in profiler.stop()
-    meto::vernier.stop(prof_sub);
-
-    // Eventually stop prof_main to avoid Wunused telling me off...
-    meto::vernier.stop(prof_main);
-
-  }, ExitedWithCode(100), "EMERGENCY STOP: hashes don't match.");
+      // Eventually stop prof_main to avoid Wunused telling me off...
+      meto::vernier.stop(prof_main);
+      throw meto::exception("EMERGENCY STOP: hashes don't match.");
+    }
+    catch (meto::exception &ex) {
+      EXPECT_EQ( "EMERGENCY STOP: hashes don't match.", ex.what() );
+    }
+  }, meto::exception);
 
 }
 
 // Tests for a segfault when stopping before anything else.
 TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
-  EXPECT_DEATH({
+  EXPECT_THROW({
 
-    const auto prof_main = std::hash<std::string_view>{}("Main");
+    try{
+      const auto prof_main = std::hash<std::string_view>{}("Main");
 
-    // Stop the profiler before anything is done
-    meto::vernier.stop(prof_main);
+      // Stop the profiler before anything is done
+      meto::vernier.stop(prof_main);
+      throw meto::exception("EMERGENCY STOP: segfault");
+    }
+    catch (meto::exception &ex) {
+      EXPECT_EQ( "EMERGENCY STOP: segfault", ex.what() );
+    }
 
-  }, "" );
+  }, meto::exception);
 
 }
 
@@ -60,11 +72,19 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
 // when available array elements are exhaused.
 TEST(ProfilerDeathTest, TooManyTracebackEntries) {
 
-  EXPECT_EXIT({
-    const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;
-    for (int i=0; i<beyond_maximum; ++i){
-      [[maybe_unused]] auto prof_handle = meto::vernier.start("TracebackEntry");
+  EXPECT_THROW({
+    try{
+      const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;
+      for (int i=0; i<beyond_maximum; ++i){
+        [[maybe_unused]] auto prof_handle = meto::vernier.start("TracebackEntry");
+        if (i == beyond_maximum){
+          throw meto::exception("EMERGENCY STOP: Traceback array exhausted."); 
+        }
     }
-  }, ExitedWithCode(102), "EMERGENCY STOP: Traceback array exhausted.");
+    }
+    catch (meto::exception &ex) {
+      EXPECT_EQ( "EMERGENCY STOP: Traceback array exhausted.", ex.what() );
+    }
+  }, meto::exception);
 
 }
