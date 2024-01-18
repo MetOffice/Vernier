@@ -15,7 +15,7 @@
 
 using ::testing::ExitedWithCode;
 using ::testing::KilledBySignal;
-//using ::testing::Test;
+using ::testing::Test;
 
 
 //
@@ -25,7 +25,7 @@ using ::testing::KilledBySignal;
 // Make sure the code exits when a hash mismatch happens.
 TEST(ProfilerDeathTest,WrongHashTest) {
 
-  EXPECT_THROW({
+  ASSERT_THROW({
     try{
       // Start main
       const auto& prof_main = meto::vernier.start("Chocolate");
@@ -40,9 +40,11 @@ TEST(ProfilerDeathTest,WrongHashTest) {
       // Eventually stop prof_main to avoid Wunused telling me off...
       meto::vernier.stop(prof_main);
       throw meto::exception("EMERGENCY STOP: hashes don't match.");
+      FAIL() << "EXPECTED: EMERGENCY STOP: hashes don't match." << std::endl;
     }
     catch (meto::exception &ex) {
       EXPECT_EQ( "EMERGENCY STOP: hashes don't match.", ex.what() );
+      //throw;
     }
   }, meto::exception);
 
