@@ -7,6 +7,7 @@
 #include "hashtable.h"
 #include "hashvec_handler.h"
 
+#include <array>
 #include <cassert>
 #include <cstring>
 #include <iterator>
