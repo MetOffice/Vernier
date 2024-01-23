@@ -25,27 +25,19 @@ using ::testing::Test;
 // Make sure the code exits when a hash mismatch happens.
 TEST(ProfilerDeathTest,WrongHashTest) {
 
-  ASSERT_THROW({
-    try{
-      // Start main
-      const auto& prof_main = meto::vernier.start("Chocolate");
+  EXPECT_THROW({
+    // Start main
+    const auto& prof_main = meto::vernier.start("Chocolate");
 
-      // A subregion
-      const auto& prof_sub = meto::vernier.start("Vanilla");
-      meto::vernier.stop(prof_sub);
+    // A subregion
+    const auto& prof_sub = meto::vernier.start("Vanilla");
+    meto::vernier.stop(prof_sub);
 
-      // Wrong hash in profiler.stop()
-      meto::vernier.stop(prof_sub);
+    // Wrong hash in profiler.stop()
+    meto::vernier.stop(prof_sub);
 
-      // Eventually stop prof_main to avoid Wunused telling me off...
-      meto::vernier.stop(prof_main);
-      throw meto::exception("EMERGENCY STOP: hashes don't match.");
-      FAIL() << "EXPECTED: EMERGENCY STOP: hashes don't match." << std::endl;
-    }
-    catch (meto::exception &ex) {
-      EXPECT_EQ( "EMERGENCY STOP: hashes don't match.", ex.what() );
-      //throw;
-    }
+    // Eventually stop prof_main to avoid Wunused telling me off...
+    meto::vernier.stop(prof_main);
   }, meto::exception);
 
 }
@@ -54,18 +46,10 @@ TEST(ProfilerDeathTest,WrongHashTest) {
 TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
   EXPECT_THROW({
-
-    try{
       const auto prof_main = std::hash<std::string_view>{}("Main");
 
       // Stop the profiler before anything is done
       meto::vernier.stop(prof_main);
-      throw meto::exception("EMERGENCY STOP: segfault");
-    }
-    catch (meto::exception &ex) {
-      EXPECT_EQ( "EMERGENCY STOP: segfault", ex.what() );
-    }
-
   }, meto::exception);
 
 }
@@ -75,17 +59,9 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
 TEST(ProfilerDeathTest, TooManyTracebackEntries) {
 
   EXPECT_THROW({
-    try{
-      const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;
-      for (int i=0; i<beyond_maximum; ++i){
-        [[maybe_unused]] auto prof_handle = meto::vernier.start("TracebackEntry");
-        if (i == beyond_maximum){
-          throw meto::exception("EMERGENCY STOP: Traceback array exhausted."); 
-        }
-    }
-    }
-    catch (meto::exception &ex) {
-      EXPECT_EQ( "EMERGENCY STOP: Traceback array exhausted.", ex.what() );
+    const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;
+    for (int i=0; i<beyond_maximum; ++i){
+      [[maybe_unused]] auto prof_handle = meto::vernier.start("TracebackEntry");
     }
   }, meto::exception);
 
