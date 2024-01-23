@@ -8,6 +8,7 @@
 #include "hashvec_handler.h"
 #include "exceptions.h"
 
+#include <array>
 #include <cassert>
 #include <cstring>
 #include <iterator>
