@@ -16,7 +16,7 @@
  * @returns An error.
  */
 
-meto::exception::exception (std::string customException)
+meto::exception::exception (const std::string &customException)
 {
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Init(NULL, NULL);
@@ -25,7 +25,7 @@ meto::exception::exception (std::string customException)
     this->error = customException;
 }
 
-std::string meto::exception::what () 
+const char *meto::exception::what () 
 {
-    return this->error;
+    return (this->error).c_str();
 }

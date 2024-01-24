@@ -26,10 +26,11 @@ namespace meto
     {
     private:
     std::string error = "";
+    using std::exception::what;
 
     public:
-    explicit exception (std::string customException);
-    std::string what ();
+    explicit exception (const std::string &customException = "");
+    const char *what ();
     };  
 } // End meto namespace
 #endif

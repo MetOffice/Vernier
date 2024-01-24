@@ -13,11 +13,6 @@
 #include "vernier.h"
 #include "exceptions.h"
 
-using ::testing::ExitedWithCode;
-using ::testing::KilledBySignal;
-using ::testing::Test;
-
-
 //
 //  Tests and death tests related to profiler class members.
 //
@@ -38,6 +33,7 @@ TEST(ProfilerDeathTest,WrongHashTest) {
 
     // Eventually stop prof_main to avoid Wunused telling me off...
     meto::vernier.stop(prof_main);
+
   }, meto::exception);
 
 }
@@ -46,11 +42,12 @@ TEST(ProfilerDeathTest,WrongHashTest) {
 TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
   EXPECT_THROW({
-      const auto prof_main = std::hash<std::string_view>{}("Main");
+    const auto prof_main = std::hash<std::string_view>{}("Main");
 
-      // Stop the profiler before anything is done
-      meto::vernier.stop(prof_main);
-  }, meto::exception);
+    // Stop the profiler before anything is done
+    meto::vernier.stop(prof_main);
+
+  }, meto::exception );
 
 }
 
