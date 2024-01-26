@@ -16,6 +16,7 @@
  */
 
 #include "vernier.h"
+#include "vernier_get_wtime.h"
 
 #include <iostream>
 #include <cstring>
@@ -26,6 +27,7 @@ extern "C" {
   void   c_vernier_stop (long int const&);
   void   c_vernier_write();
   double c_get_total_walltime(long int const&, int const&);
+  double c_vernier_get_wtime();
 }
 
 /**
@@ -93,4 +95,14 @@ double c_get_total_walltime(long int const& hash_in, int const& thread_id)
 
   return meto::vernier.get_total_walltime(hash, thread_id);
 }
+
+/**
+ * @brief  Timing with clock_gettime().
+ */
+
+double c_vernier_get_wtime()
+{
+  return meto::vernier_get_wtime();
+}
+
 
