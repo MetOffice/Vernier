@@ -45,7 +45,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         endif()
 
         # Include option to build with/without OpenMP
-        include(cmake/RunWithout.cmake)
+        include(cmake/BuildOptions.cmake)
 
 endif()
 

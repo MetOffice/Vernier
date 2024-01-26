@@ -7,7 +7,7 @@
 
 /**
  * @file   vernier_get_wtime().h
- * @brief  
+ * @brief  vernier_get_wtime function which returns the current time
  *
  * 
  */
