@@ -20,7 +20,9 @@
 #include <vector>
 #include <string_view>
 #include <array>
-#include <omp.h>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 #include "hashtable.h"
 
