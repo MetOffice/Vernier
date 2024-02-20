@@ -23,7 +23,7 @@ author = ''
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here. 
-extensions = [ 'breathe' ]
+
 
 # Add any paths that contain templates here.
 templates_path = ['_templates']
@@ -57,12 +57,3 @@ html_static_path = []
 
 html_permalinks = False
 
-# -- Breathe ------------------------------------------------------------------
-
-# Tell Breathe about the Vernier project, and where to find the associated XML
-# files (the path is relative to the location of this 'conf.py' file).
-breathe_projects = {
-    'vernier': '../../build/doxygen/xml'
-}
-
-breathe_default_project = 'vernier'

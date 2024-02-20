@@ -17,7 +17,9 @@ Fortran
 ^^^^^^^
 .. Note: The following function is currently defined manually to avoid errors
          caused by Breathe expecting C++ syntax.
-.. cpp:function:: subroutine vernier_mod::vernier_start::vernier_start(hash_out, region_name)
+.. .. cpp:function:: subroutine vernier_mod::vernier_start::vernier_start(hash_out, region_name)
+
+.. doxygenfunction:: vernier_start
 
 .. doxygenfunction:: vernier_stop
 
