@@ -10,18 +10,20 @@ but the core functionality is the same.
 C++
 ^^^
 
-.. doxygenclass:: Vernier
+Vernier
    :members: start, stop, write
 
 Fortran
 ^^^^^^^
 .. Note: The following function is currently defined manually to avoid errors
          caused by Breathe expecting C++ syntax.
-.. cpp:function:: subroutine vernier_mod::vernier_start::vernier_start(hash_out, region_name)
+.. .. cpp:function:: subroutine vernier_mod::vernier_start::vernier_start(hash_out, region_name)
 
-.. doxygenfunction:: vernier_stop
+vernier_start
 
-.. doxygenfunction:: vernier_write
+vernier_stop
+
+vernier_write
 
 Dos and don'ts
 ^^^^^^^^^^^^^^

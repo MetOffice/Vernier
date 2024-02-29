@@ -34,12 +34,11 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install required tools
-        # Install doxygen, sphinx, breathe, rtd theme
+        # Install doxygen, sphinx, rtd theme
         run: |
           sudo apt update
           sudo apt -y install doxygen graphviz
           sudo apt -y install python3-sphinx python3-sphinx-rtd-theme
-          sudo apt -y install python3-breathe
           sudo apt -y install mpich
 
       - name: Configure CMake
