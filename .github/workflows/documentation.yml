@@ -50,6 +50,7 @@ jobs:
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
         # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
         run: |
+          conda init
           conda activate root
           cmake -B ${{ github.workspace }}/build \
             -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
@@ -60,13 +61,11 @@ jobs:
 
       - name: Build
         # Build your program with the given configuration
-        continue-on-error: true
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs 2>/dev/null
 
       - name: Update Doxygen Pages
         run: |
           mkdir -p ${{github.workspace}}/docs/documentation
-          ls ${{github.workspace}}/build
           cp -rf ${{github.workspace}}/build/sphinx/* ${{github.workspace}}/docs/documentation/.
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]'
