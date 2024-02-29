@@ -18,7 +18,9 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  CXX_COMPILER: /usr/bin/g++-10
+  CXX_COMPILER: /usr/bin/g++-11
+  C_COMPILER: /usr/bin/gcc-11
+  Fortran_COMPILER: /usr/bin/gfortran-11
 
 defaults:
   run:
@@ -29,16 +31,19 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: Install required tools
         # Install doxygen, sphinx, rtd theme
         run: |
+          $CONDA/bin/conda install -c conda-forge sphinx sphinx-rtd-theme
           sudo apt update
           sudo apt -y install doxygen graphviz
-          sudo apt -y install python3-sphinx python3-sphinx-rtd-theme
           sudo apt -y install mpich
 
       - name: Configure CMake
@@ -48,6 +53,8 @@ jobs:
           cmake -B ${{ github.workspace }}/build \
             -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
             -DCMAKE_CXX_COMPILER=${{ env.CXX_COMPILER }} \
+            -DCMAKE_C_COMPILER=${{ env.C_COMPILER }} \
+            -DCMAKE_Fortran_COMPILER=${{ env.Fortran_COMPILER }} \
             -DBUILD_TESTS=OFF
 
       - name: Build
