@@ -1,4 +1,4 @@
 vernier.h 
 ^^^^^^^^^
 
-.. doxygenfile:: vernier.h
+vernier.h
