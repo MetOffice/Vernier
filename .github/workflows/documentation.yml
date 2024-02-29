@@ -41,7 +41,7 @@ jobs:
       - name: Install required tools
         # Install doxygen, sphinx, rtd theme
         run: |
-          conda create --name vernier-dev --file ${{ github.workspace }}/etc/conda/vernier-env.lock
+          conda create --name vernier-env --file ${{ github.workspace }}/etc/conda/vernier-env.lock
           eval "$(conda shell.bash hook)"
           conda activate vernier-env
           sudo apt update
