@@ -42,6 +42,8 @@ jobs:
         # Install doxygen, sphinx, rtd theme
         run: |
           conda create --name vernier-dev --file ${{ github.workspace }}/etc/conda/vernier-env.lock
+          eval "$(conda shell.bash hook)"
+          conda activate vernier-env
           sudo apt update
           sudo apt -y install doxygen graphviz
           sudo apt -y install mpich
