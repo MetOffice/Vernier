@@ -10,7 +10,7 @@ but the core functionality is the same.
 C++
 ^^^
 
-.. doxygenclass:: Vernier
+Vernier
    :members: start, stop, write
 
 Fortran
@@ -19,11 +19,11 @@ Fortran
          caused by Breathe expecting C++ syntax.
 .. .. cpp:function:: subroutine vernier_mod::vernier_start::vernier_start(hash_out, region_name)
 
-.. doxygenfunction:: vernier_start
+vernier_start
 
-.. doxygenfunction:: vernier_stop
+vernier_stop
 
-.. doxygenfunction:: vernier_write
+vernier_write
 
 Dos and don'ts
 ^^^^^^^^^^^^^^
