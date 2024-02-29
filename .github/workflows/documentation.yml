@@ -8,7 +8,7 @@ name: Deploy Docs
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ fix_doc_workflow ]
     paths:
       - 'src/**.h'
       - 'src/**.cpp'
