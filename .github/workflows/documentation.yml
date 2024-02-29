@@ -8,7 +8,7 @@ name: Deploy Docs
 on:
   workflow_dispatch:
   push:
-    branches: [ fix_doc_workflow ]
+    branches: [ main ]
     paths:
       - 'src/**.h'
       - 'src/**.cpp'
@@ -42,8 +42,6 @@ jobs:
         # Install doxygen, sphinx, rtd theme
         run: |
           conda create --name vernier-env --file ${{ github.workspace }}/etc/conda/vernier-env.lock
-          eval "$(conda shell.bash hook)"
-          conda activate vernier-env
           sudo apt update
           sudo apt -y install doxygen graphviz
           sudo apt -y install mpich
