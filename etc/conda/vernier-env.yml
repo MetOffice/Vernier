@@ -1,4 +1,4 @@
-name: vernier-dev
+name: vernier-env
 
 channels:
   - conda-forge
