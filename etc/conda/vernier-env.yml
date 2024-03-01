@@ -1,0 +1,8 @@
+name: vernier-env
+
+channels:
+  - conda-forge
+
+dependencies:
+  - sphinx
+  - sphinx_rtd_theme
