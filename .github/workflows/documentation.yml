@@ -59,24 +59,20 @@ jobs:
             -DCMAKE_Fortran_COMPILER=${{ env.Fortran_COMPILER }} \
             -DBUILD_TESTS=OFF
 
-      - name: Build
+      - name: Build docs
         # Build your program with the given configuration
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs 2>/dev/null
 
-      - name: Update Doxygen Pages
+        # Update the permissions and upload and deploy page
+      - name: Update permissions
         run: |
-          mkdir -p ${{github.workspace}}/docs/documentation
-          cp -rf ${{github.workspace}}/build/sphinx/* ${{github.workspace}}/docs/documentation/.
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]'
-          git remote update
-          git add --force docs/documentation
-          git stash
-          git checkout gh-pages
-          git rm -r --ignore-unmatch docs/documentation/
-          rm -rf docs/documentation/
-          git stash pop
-          git reset
-          git add --force docs/documentation
-          git commit --allow-empty -m "Update Doxygen documentation"
-          git push
+          chmod -c -R +rX "${{github.workspace}}/build/sphinx/"
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages
+          path: ${{github.workspace}}/build/sphinx
+          retention-days: 1
+      - name: Deploy
+        uses: actions/deploy-pages@v3
+
