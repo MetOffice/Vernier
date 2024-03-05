@@ -69,20 +69,21 @@ jobs:
         # Build your program with the given configuration
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs 2>/dev/null
 
-        # Update the permissions and upload and deploy page
-      - name: Setup Pages
-        uses: actions/configure-pages@v4        
+        # Update the permissions and upload and deploy page     
       - name: Update permissions
         run: |
           chmod -c -R +rX "${{github.workspace}}/build/sphinx/"
       - name: Upload artifact
         id: upload
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           name: github-pages
           path: ${{github.workspace}}/build/sphinx
           retention-days: 1
+      - name: Setup Pages
+        id: configure
+        uses: actions/configure-pages@v4             
       - name: Deploy
         id: deployment
-        uses: actions/deploy-pages@v3
+        uses: actions/deploy-pages@v4
 
