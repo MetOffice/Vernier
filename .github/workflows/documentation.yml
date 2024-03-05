@@ -75,7 +75,7 @@ jobs:
           chmod -c -R +rX "${{github.workspace}}/build/sphinx/"
       - name: Upload artifact
         id: upload
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           name: github-pages
           path: ${{github.workspace}}/build/sphinx
