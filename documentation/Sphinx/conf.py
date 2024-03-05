@@ -22,7 +22,7 @@ author = ''
 
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here. 
+# Add any Sphinx extension module names here.
 
 
 # Add any paths that contain templates here.
