@@ -14,20 +14,6 @@ include(CMakePackageConfigHelpers)
 # Add files source files to library. This is STATIC by default and SHARED when
 # the BUILD_SHARED_LIBS option is turned ON.
 add_library(${CMAKE_PROJECT_NAME}
-<<<<<<< HEAD
-        vernier.h          vernier.cpp
-        hashtable.h        hashtable.cpp
-        hashvec_handler.h  hashvec_handler.cpp
-        writer/writer.h    writer/writer.cpp
-        writer/multi.h     writer/multi.cpp
-        formatter.h        formatter.cpp
-        hashvec.h          hashvec.cpp
-        vernier_gettime.h  vernier_gettime.cpp
-        exceptions.h       exceptions.cpp 
-        )
-
-set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h exceptions.h)
-=======
         vernier.h            vernier.cpp
         hashtable.h          hashtable.cpp
         hashvec_handler.h    hashvec_handler.cpp
@@ -37,10 +23,10 @@ set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h except
         hashvec.h            hashvec.cpp
         vernier_gettime.h    vernier_gettime.cpp
         vernier_get_wtime.h  vernier_get_wtime.cpp
+        exceptions.h         exceptions.cpp
         )
 
-set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h vernier_get_wtime.h)
->>>>>>> 147da2de94aaf272e0da55dc23db1e5489bb492d
+set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h vernier_get_wtime.h exceptions.h)
 
 # Link library to and external libs (also use project warnings and options).
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
