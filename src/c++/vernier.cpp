@@ -11,7 +11,9 @@
 #include <cassert>
 #include <chrono>
 #include <iostream>
-#include <omp.h>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 // Initialize static data members.
 int meto::Vernier::call_depth_ = -1;

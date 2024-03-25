@@ -27,7 +27,6 @@ For testing and documenation:
   
   * docutils 0.16 (rendering issues are known to exist in newer versions!)
   
-* Breathe 4.34.0
 
 .. note::
    

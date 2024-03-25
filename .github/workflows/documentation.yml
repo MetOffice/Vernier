@@ -18,7 +18,9 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  CXX_COMPILER: /usr/bin/g++-10
+  CXX_COMPILER: /usr/bin/g++-11
+  C_COMPILER: /usr/bin/gcc-11
+  Fortran_COMPILER: /usr/bin/gfortran-11
 
 defaults:
   run:
@@ -29,47 +31,59 @@ jobs:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
+    environment:
+      name: github-pages
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: Install required tools
-        # Install doxygen, sphinx, breathe, rtd theme
+        # Install doxygen, sphinx, rtd theme
         run: |
+          conda create --name vernier-env --file ${{ github.workspace }}/etc/conda/vernier-env.lock
           sudo apt update
           sudo apt -y install doxygen graphviz
-          sudo apt -y install python3-sphinx python3-sphinx-rtd-theme
-          sudo apt -y install python3-breathe
           sudo apt -y install mpich
 
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
         # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-        run: >
+        run: |
+          eval "$(conda shell.bash hook)"
+          conda activate vernier-env
           cmake -B ${{ github.workspace }}/build \
             -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
             -DCMAKE_CXX_COMPILER=${{ env.CXX_COMPILER }} \
+            -DCMAKE_C_COMPILER=${{ env.C_COMPILER }} \
+            -DCMAKE_Fortran_COMPILER=${{ env.Fortran_COMPILER }} \
             -DBUILD_TESTS=OFF
 
-      - name: Build
+      - name: Build docs
         # Build your program with the given configuration
-        continue-on-error: true
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target sphinxdocs 2>/dev/null
 
-      - name: Update Doxygen Pages
+        # Update the permissions and upload and deploy page     
+      - name: Update permissions
         run: |
-          mkdir -p ${{github.workspace}}/docs/documentation
-          cp -rf ${{github.workspace}}/build/sphinx/* ${{github.workspace}}/docs/documentation/.
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]'
-          git remote update
-          git add --force docs/documentation
-          git stash
-          git checkout gh-pages
-          git rm -r --ignore-unmatch docs/documentation/
-          rm -rf docs/documentation/
-          git stash pop
-          git reset
-          git add --force docs/documentation
-          git commit --allow-empty -m "Update Doxygen documentation"
-          git push
+          chmod -c -R +rX "${{github.workspace}}/build/sphinx/"
+      - name: Upload artifact
+        id: upload
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages
+          path: ${{github.workspace}}/build/sphinx
+          retention-days: 1
+      - name: Setup Pages
+        id: configure
+        uses: actions/configure-pages@v4             
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+
