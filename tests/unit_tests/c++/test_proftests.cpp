@@ -11,7 +11,10 @@
 #include <chrono>
 
 #include "vernier.h"
-#include "exceptions.h"
+#include "error_handler.h"
+
+using ::testing::ExitedWithCode;
+using ::testing::KilledBySignal;
 
 //
 //  Tests and death tests related to profiler class members.
@@ -20,7 +23,8 @@
 // Make sure the code exits when a hash mismatch happens.
 TEST(ProfilerDeathTest,WrongHashTest) {
 
-  EXPECT_THROW({
+  //EXPECT_EXIT({
+  EXPECT_DEATH({
     // Start main
     const auto& prof_main = meto::vernier.start("Chocolate");
 
@@ -34,20 +38,21 @@ TEST(ProfilerDeathTest,WrongHashTest) {
     // Eventually stop prof_main to avoid Wunused telling me off...
     meto::vernier.stop(prof_main);
 
-  }, meto::exception);
+  }, ""); 
+  //ExitedWithCode(100), "EMERGENCY STOP: hashes don't match.");
 
 }
 
 // Tests for a segfault when stopping before anything else.
 TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
-  EXPECT_THROW({
+  EXPECT_DEATH({
     const auto prof_main = std::hash<std::string_view>{}("Main");
 
     // Stop the profiler before anything is done
     meto::vernier.stop(prof_main);
 
-  }, meto::exception );
+  }, "" );
 
 }
 
@@ -55,11 +60,11 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
 // when available array elements are exhaused.
 TEST(ProfilerDeathTest, TooManyTracebackEntries) {
 
-  EXPECT_THROW({
+  EXPECT_DEATH({
     const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;
     for (int i=0; i<beyond_maximum; ++i){
       [[maybe_unused]] auto prof_handle = meto::vernier.start("TracebackEntry");
     }
-  }, meto::exception);
+  }, "");
 
 }

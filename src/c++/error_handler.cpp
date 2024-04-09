@@ -5,27 +5,25 @@
 * -----------------------------------------------------------------------------
 */
 
-#include "exceptions.h"
+#include "error_handler.h"
 #include <mpi.h>
 #include <string>
 #include <iostream>
 
 /**
- * @brief Exceptions class that extends std::exceptions.
+ * @brief Error handler class
  *
- * @returns An error.
+ * @returns Exit/aborts the code when an error is encountered and calls MPI_Abort/Finalize to deal with MPI code.
  */
 
-meto::exception::exception (const std::string &customException)
+meto::error_handler::error_handler (const std::string &customError, int errorCode)
 {
     MPI_Comm comm = MPI_COMM_WORLD;
-    MPI_Init(NULL, NULL);
-    MPI_Abort(comm, 0);
-    MPI_Finalize();
-    this->error = customException;
-}
+    
+    std::cerr << customError << "\n";
+    //exit (errorCode);
 
-const char *meto::exception::what () 
-{
-    return (this->error).c_str();
+    //MPI_Init(NULL, NULL);
+    MPI_Abort(comm, errorCode);
+    //MPI_Finalize();
 }

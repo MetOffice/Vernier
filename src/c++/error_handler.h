@@ -10,27 +10,25 @@
 #include <string>
 
 /**
- * @file   exceptions().h
- * @brief  
+ * @file   error_handler().h
+ * @brief  Header file for error_handler.cpp
  *
- * stuff
+ * 
  */
 
-#ifndef EXCEPTIONS_H
-#define EXCEPTIONS_H
+#ifndef ERROR_HANDLER_H
+#define ERROR_HANDLER_H
 
 namespace meto
 {
     //Class prototypes
-    class exception : public std::exception
+    class error_handler
     {
     private:
     std::string error = "";
-    using std::exception::what;
 
     public:
-    explicit exception (const std::string &customException = "");
-    const char *what ();
+    explicit error_handler (const std::string &customError= "", int errorCode= 0);
     };  
 } // End meto namespace
 #endif

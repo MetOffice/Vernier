@@ -6,7 +6,7 @@
 */
 
 #include "formatter.h"
-#include "exceptions.h"
+#include "error_handler.h"
 
 #include <iomanip>
 #include <algorithm>
@@ -26,7 +26,6 @@ meto::Formatter::Formatter()
   if(env_format){ format = env_format; }
 
 
-  try {
   if ( format == "threads") 
   {
       format_ = &Formatter::threads;
@@ -40,11 +39,7 @@ meto::Formatter::Formatter()
     std::string error_msg = "Invalid Vernier output format choice. Expected 'threads' or 'drhook'. Currently set to '"
                             + format
                             + "'.";
-    throw exception( error_msg );
-  }
-  }
-  catch (exception &ex) {
-        std::cerr <<  ex.what() << std::endl;
+    error_handler(error_msg, EXIT_FAILURE);
   }
 }
 
