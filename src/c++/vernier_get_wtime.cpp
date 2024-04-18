@@ -26,8 +26,6 @@ double meto::vernier_get_wtime()
     double time;
     if (clock_gettime( CLOCK_REALTIME, &point) == -1)
     {
-        //std::runtime_error("clock gettime");
-        //exit(EXIT_FAILURE);
         error_handler("clock gettime", EXIT_FAILURE);
     }
     time = static_cast<double>(point.tv_sec) + static_cast<double>(point.tv_nsec)/BILLION;

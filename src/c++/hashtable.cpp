@@ -77,7 +77,7 @@ size_t meto::HashTable::compute_hash(std::string_view region_name, int tid)
   if (region_name.length() + num_extra_bytes > new_chars.size()) {
     error_handler("Internal error: character buffer exhausted.", EXIT_FAILURE);
   }
-  
+
 
   // Get iterator to the start of the string buffer.
   auto new_chars_iterator = new_chars.begin();

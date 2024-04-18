@@ -23,12 +23,10 @@ meto::HashVecHandler::HashVecHandler()
     std::string io_mode = "multi";
 
     // Read environment variable.
-    // Read environment variable.
     char const* env_io_mode = std::getenv("VERNIER_OUTPUT_MODE");
     if (env_io_mode) {  io_mode = env_io_mode; }
 
     // Allocate writer to be of required type.
-
     if (io_mode == "multi")
     {
         writer_strategy_ = std::make_unique<Multi>();

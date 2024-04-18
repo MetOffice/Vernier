@@ -42,6 +42,7 @@ EXPECT_EXIT({
 
     MPI_Finalize();
   }, ExitedWithCode(100), "EMERGENCY STOP: hashes don't match.");
+  
 }
 
 // Tests for a segfault when stopping before anything else.

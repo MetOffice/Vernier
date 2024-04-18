@@ -25,7 +25,6 @@ meto::Formatter::Formatter()
   char const* env_format = std::getenv("VERNIER_OUTPUT_FORMAT");
   if(env_format){ format = env_format; }
 
-
   if ( format == "threads") 
   {
       format_ = &Formatter::threads;

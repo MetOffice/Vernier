@@ -164,7 +164,6 @@ void meto::Vernier::stop(size_t const hash)
   if (call_depth_ < 0) {
       error_handler("EMERGENCY STOP: stop called before start calliper.", 101);
   }
-  
 
   // Get reference to the traceback entry.
   auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
