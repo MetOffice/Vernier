@@ -6,24 +6,18 @@
 
 # -- Path setup --------------------------------------------------------------
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
 
 # -- Project information -----------------------------------------------------
 
-project = 'vernier'
-copyright = 'Crown Copyright 2023 Met Office. All rights reserved.'
+project = 'Vernier'
+copyright = '2023 Met Office. All rights reserved'
 author = ''
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here.
-
+extensions = ["sphinx_sitemap"]
 
 # Add any paths that contain templates here.
 templates_path = ['_templates']
@@ -32,28 +26,54 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 exclude_patterns = []
 
+language = "en"
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
+html_title = "Vernier"
+
+# Generate the sitemap info, this will need updating when we have versioned docs
+html_baseurl = os.environ.get("SPHINX_HTML_BASE_URL", "https://metoffice.github.io/Vernier")
+sitemap_locales = [None]
+sitemap_url_scheme = "{link}"
+
+# Hide the link which shows the rst markup
+html_show_sourcelink = False
+
 html_theme_options = {
-    'canonical_url': '',
-    'display_version': True,
-    'style_external_links': False,
-    'logo_only': False,
-
-    # Toc (table of contents) options
-    'collapse_navigation': False,
-    'sticky_navigation': True,
-    'navigation_depth': 3,
-    'includehidden': True,
-    'titles_only': False
+    "navigation_with_keys": True,
+    "use_edit_page_button": True,
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
+    "navbar_align": "content",
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/MetOffice/vernier",
+            "icon": "fa-brands fa-github"
+        }
+    ],
+    "secondary_sidebar_items": {
+        "**/*": ["page-toc", "edit-this-page"],
+        "index": [],
+    },
+    "footer_start": ["crown-copyright"],
+    "footer_center": ["sphinx-version"],
+    "footer_end": ["theme-version"]
 }
-github_url = 'https://github.com/MetOffice/Vernier'
 
-# Add any paths that contain custom static files here,
-# relative to this directory.
-html_static_path = []
+html_sidebars = {
+    "index": []
+}
+
+# Provides the Edit on GitHub link in the generated docs.
+html_context = {
+    "display_github": True,
+    "github_user": "MetOffice",
+    "github_repo": "vernier",
+    "github_version": "main",
+    "doc_path": "/documentation/Sphinx/"
+}
 
 html_permalinks = False
-
