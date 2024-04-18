@@ -24,8 +24,6 @@ namespace meto
     //Class prototypes
     class error_handler
     {
-    private:
-    std::string error = "";
 
     public:
     explicit error_handler (const std::string &customError= "", int errorCode= 0);

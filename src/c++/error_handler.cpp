@@ -13,17 +13,12 @@
 /**
  * @brief Error handler class
  *
- * @returns Exit/aborts the code when an error is encountered and calls MPI_Abort/Finalize to deal with MPI code.
+ * @returns Exits the code, via an MPI_Abort call, when an error is encountered.
  */
 
 meto::error_handler::error_handler (const std::string &customError, int errorCode)
 {
     MPI_Comm comm = MPI_COMM_WORLD;
-    
     std::cerr << customError << "\n";
-    //exit (errorCode);
-
-    //MPI_Init(NULL, NULL);
     MPI_Abort(comm, errorCode);
-    //MPI_Finalize();
 }
