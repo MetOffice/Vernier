@@ -111,6 +111,7 @@ flycheck_*.el
 
 # User-specific stuff
 .idea/
+.vscode/
 
 # CMake
 cmake-build-*/

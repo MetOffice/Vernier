@@ -1,0 +1,9 @@
+name: vernier-env
+
+channels:
+  - conda-forge
+
+dependencies:
+  - sphinx
+  - pydata-sphinx-theme
+  - sphinx-sitemap

@@ -17,7 +17,6 @@ if(ENABLE_SPHINX)
         # Custom sphinx target
         add_custom_target(sphinxdocs
                           COMMAND ${SPHINX_EXECUTABLE} -b html
-                                  -Dbreathe_projects.profler=${CMAKE_CURRENT_BINARY_DIR}/doxygen/xml
                                   ${SPHINX_SOURCE} ${SPHINX_BUILD}
                           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                           COMMENT "Generating docs with Sphinx"
