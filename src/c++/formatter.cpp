@@ -63,6 +63,14 @@ void meto::Formatter::execute_format(std::ofstream& os, hashvec_t hashvec)
 void meto::Formatter::threads(std::ofstream& os, hashvec_t hashvec)
 {
 
+  // Write key
+  os << "\n";
+  os << "region_name@thread_id" << "\n"
+     << "Self time : Time accrued by region itself. (Exclusive time.)" << "\n"
+     << "Total time: Time including cost of child routines and profiling overheads. (Inclusive time.)" << "\n"
+     << "Overhead  : Profiling overhead incurred through direct child routine calls only." << "\n"
+     << "Calls     : Number of times the region is called." << "\n";
+
   std::string routine_at_thread = "Thread: All" /*+ std::to_string(tid_)*/;
 
   // Write headings
