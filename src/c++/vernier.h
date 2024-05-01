@@ -102,7 +102,6 @@ class Vernier
 
     // Getters
     double                 get_total_walltime (size_t const, int const);
-    double                 get_total_raw_walltime (size_t const, int const);
     double                 get_overhead_walltime (size_t const, int const);
     double                 get_self_walltime(size_t const hash, int const input_tid);
     double                 get_child_walltime(size_t const hash, int const input_tid) const;
