@@ -46,26 +46,19 @@ TEST(HashEntryTest, TimingsTest) {
     SCOPED_TRACE("Self walltime calculation failed");
 
     // Grab the total, child and self wallclock times
-    const double& total_raw = meto::vernier.get_total_raw_walltime   (prof_main,0);
     const double& total     = meto::vernier.get_total_walltime       (prof_main,0);
     const double& child     = meto::vernier.get_child_walltime       (prof_main,0);
     const double& self      = meto::vernier.get_self_walltime        (prof_main,0);
     const double& overhead  = meto::vernier.get_overhead_walltime    (prof_main,0);
     std::string   region    = meto::vernier.get_decorated_region_name(prof_main,0);
-  
-    // Test that total
-    EXPECT_EQ(total_raw,total-overhead) 
-      << "   region: "  << region     << std::endl
-      << " overhead: "  << overhead   << std::endl
-      << "total_raw: "  << total_raw  << std::endl
-      << "    total: "  << total      << std::endl;
 
-    // Test that self_walltime = total_walltime - child_walltime
-    EXPECT_EQ(self,total_raw-child)
+    // Test that self_walltime = total_walltime - child_walltime - overheads
+    // NB: This test does not include recursive subroutine calls.
+    EXPECT_EQ(self,total-child-overhead)
       << "   region: "  << region     << std::endl
       << "     self: "  << self       << std::endl
       << "    child: "  << child      << std::endl
-      << "total_raw: "  << total_raw  << std::endl;
+      << " overhead: "  << overhead   << std::endl;
       ;
   }
 
