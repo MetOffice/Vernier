@@ -262,21 +262,6 @@ double meto::Vernier::get_total_walltime(size_t const hash, int const thread_id)
 }
 
 /**
- * @brief  Get the total (inclusive) time taken by a region, and everything below it,
- *         minus the profiling overheads for calls to direct child regions.
- *
- * @param[in] hash       The hash corresponding to the region of interest. 
- * @param[in] thread_id  The thread ID for which to return the walltime.
- *
- */
-
-double meto::Vernier::get_total_raw_walltime(size_t const hash, int const thread_id)
-{
-  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
-  return thread_hashtables_[tid].get_total_raw_walltime(hash);
-}
-
-/**
  * @brief  Get the profiling overhead time experienced by a region, 
  *         as incurred by calling child regions.
  *

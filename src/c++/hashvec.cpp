@@ -20,7 +20,6 @@ meto::RegionRecord::RegionRecord(size_t const region_hash,
 , region_name_(region_name)
 , total_walltime_           (time_duration_t::zero())
 , recursion_total_walltime_ (time_duration_t::zero())
-, total_raw_walltime_       (time_duration_t::zero())
 , self_walltime_            (time_duration_t::zero())
 , child_walltime_           (time_duration_t::zero())
 , overhead_walltime_        (time_duration_t::zero())

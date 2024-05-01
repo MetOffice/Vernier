@@ -104,7 +104,6 @@ class HashTable{
 
     // Getters
     double                 get_total_walltime(size_t const hash) const;
-    double                 get_total_raw_walltime(size_t const hash);
     double                 get_overhead_walltime(size_t const hash) const;
     double                 get_self_walltime(size_t const hash);
     double                 get_child_walltime(size_t const hash) const;
