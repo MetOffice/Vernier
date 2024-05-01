@@ -20,8 +20,11 @@
 #include <vector>
 #include <string_view>
 #include <array>
-#include <omp.h>
+
 #include <mpi.h>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 #include "mpi_context.h"
 #include "hashtable.h"

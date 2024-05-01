@@ -32,6 +32,7 @@ module vernier_mod
   public :: vernier_stop
   public :: vernier_write
   public :: vernier_get_total_walltime
+  public :: vernier_get_wtime 
 
   !-----------------------------------------------------------------------------
   ! Interfaces
@@ -77,6 +78,11 @@ module vernier_mod
       integer(kind=vik), intent(in) :: thread_id
       real(kind=vrk)                :: walltime
     end function vernier_get_total_walltime
+
+    function vernier_get_wtime() bind(C, name='c_vernier_get_wtime') result(wtime)
+      import :: vrk
+      real(kind=vrk) :: wtime
+    end function vernier_get_wtime
 
   end interface
 

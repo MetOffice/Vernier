@@ -5,7 +5,9 @@
 \*----------------------------------------------------------------------------*/
 
 #include <gtest/gtest.h>
-#include <omp.h>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 #include <vector>
 
 #include "vernier.h"
@@ -31,12 +33,17 @@ TEST(HashEntryTest,CallCountTest)
     // since value won't change.
 #pragma omp single
     {
+    #ifdef _OPENMP
       num_threads = omp_get_num_threads();
+    #endif 
       prof_sub_shared.resize(static_cast<size_t>(num_threads));
     }
 
     // Current thread ID
-    int thread_id = omp_get_thread_num();
+    int thread_id = 0;
+    #ifdef _OPENMP
+      thread_id = omp_get_thread_num();
+    #endif
 
     // Also initialise prof_sub_private. The compiler doesn't know how many
     // iterations of the subsequent 'for' loop there will be, and may flag

@@ -6,7 +6,9 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <omp.h>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 #include "vernier.h"
 

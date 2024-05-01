@@ -14,7 +14,7 @@ Vernier.
 Development Process
 -------------------
 
-Information about the development process can be found 
+Information about the development process can be found
 `here <https://github.com/MetOffice/Vernier/wiki/DevelopmentTesting>`__.
 
 Code Review Guidance
