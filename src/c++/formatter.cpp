@@ -71,12 +71,10 @@ void meto::Formatter::threads(std::ofstream& os, hashvec_t hashvec)
      << "Overhead  : Profiling overhead incurred through direct child routine calls only." << "\n"
      << "Calls     : Number of times the region is called." << "\n";
 
-  std::string routine_at_thread = "Thread: All" /*+ std::to_string(tid_)*/;
-
   // Write headings
   os << "\n";
   os
-      << std::setw(40) << std::left  << routine_at_thread  << " "
+      << std::setw(40) << std::left  << "Region"           << " "
       << std::setw(15) << std::right << "Self (s)"         << " "
       << std::setw(15) << std::right << "Total (s)"        << " "
       << std::setw(15) << std::right << "Overhead (s)"     << " "
@@ -94,7 +92,7 @@ void meto::Formatter::threads(std::ofstream& os, hashvec_t hashvec)
   // Data entries
   for (auto const& record : hashvec) {
       os
-        << std::setw(40) << std::left  << record.region_name_               << " "
+        << std::setw(40) << std::left  << record.decorated_region_name_     << " "
         << std::setw(15) << std::right << record.self_walltime_.count()     << " "
         << std::setw(15) << std::right << record.total_walltime_.count()    << " "
         << std::setw(15) << std::right << record.overhead_walltime_.count() << " "
