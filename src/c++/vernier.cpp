@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -46,6 +46,7 @@ meto::Vernier::TracebackEntry::TracebackEntry(
  *                                  duplicate and use the duplicate.
  *                                  Defaults to MPI_COMM_WORLD.
  */ 
+
 void meto::Vernier::init(MPI_Comm const client_comm_handle)
 {
 
@@ -88,6 +89,7 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle)
  * @note   Clears hashtable and traceback information; frees duplicate
  *         MPI communicator.
  */ 
+
 void meto::Vernier::finalize()
 {
   if(mpi_context_.is_initialized()){
