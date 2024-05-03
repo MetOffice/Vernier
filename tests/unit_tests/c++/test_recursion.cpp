@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2023 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -143,6 +143,8 @@ void second_function(Timings& timings)
 
 TEST(RecursionTest,DirectRecursion)
 {
+
+  meto::vernier.init();
   auto prof_handle = meto::vernier.start("test_recursion");
 
   // Test independently on each thread.
@@ -166,6 +168,7 @@ TEST(RecursionTest,DirectRecursion)
   }
 
   meto::vernier.stop(prof_handle);
+  meto::vernier.finalize();
 }
 
 //
@@ -174,6 +177,7 @@ TEST(RecursionTest,DirectRecursion)
 
 TEST(RecursionTest,IndirectRecursion)
 {
+  meto::vernier.init();
   auto prof_handle = meto::vernier.start("test_recursion");
 
   // Test independently on each thread.
@@ -199,5 +203,6 @@ TEST(RecursionTest,IndirectRecursion)
   }
 
   meto::vernier.stop(prof_handle);
+  meto::vernier.finalize();
 }
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -20,14 +20,38 @@
 
 #include <iostream>
 #include <cstring>
+#include <mpi.h>
 
 extern "C" {
+  void   c_vernier_init(MPI_Fint const& client_comm_handle);
+  void   c_vernier_finalize();
   void   c_vernier_start_part1();
   void   c_vernier_start_part2(long int&, char const*);
   void   c_vernier_stop (long int const&);
   void   c_vernier_write();
-  double c_get_total_walltime(long int const&, int const&);
+  double c_vernier_get_total_walltime(long int const&, int const&);
   double c_vernier_get_wtime();
+}
+
+/**
+ * @brief  Set a client-code-defined MPI communicator handle.
+ * @details May be used to set other values in future, too.
+ * @param [in] The Fortran communicator handle.
+ */
+
+void c_vernier_init(MPI_Fint const& client_comm_handle)
+{
+  MPI_Comm local_handle = MPI_Comm_f2c(client_comm_handle);
+  meto::vernier.init(local_handle);
+}
+
+/**
+ * @brief  Finalize Vernier.
+ */
+
+void c_vernier_finalize() 
+{
+  meto::vernier.finalize();
 }
 
 /**
@@ -85,7 +109,7 @@ void c_vernier_write()
  * @param[in] thread_id   Return the time for this thread ID.
  */
 
-double c_get_total_walltime(long int const& hash_in, int const& thread_id)
+double c_vernier_get_total_walltime(long int const& hash_in, int const& thread_id)
 {
   size_t hash;
 

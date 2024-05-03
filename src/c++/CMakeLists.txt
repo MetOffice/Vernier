@@ -1,6 +1,6 @@
 
 # ------------------------------------------------------------------------------
-#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  (c) Crown copyright 2024 Met Office. All rights reserved.
 #  The file LICENCE, distributed with this code, contains details of the terms
 #  under which the code may be used.
 # ------------------------------------------------------------------------------
@@ -14,15 +14,16 @@ include(CMakePackageConfigHelpers)
 # Add files source files to library. This is STATIC by default and SHARED when
 # the BUILD_SHARED_LIBS option is turned ON.
 add_library(${CMAKE_PROJECT_NAME}
-        vernier.h            vernier.cpp
-        hashtable.h          hashtable.cpp
-        hashvec_handler.h    hashvec_handler.cpp
-        writer/writer.h      writer/writer.cpp
-        writer/multi.h       writer/multi.cpp
-        formatter.h          formatter.cpp
-        hashvec.h            hashvec.cpp
-        vernier_gettime.h    vernier_gettime.cpp
-        vernier_get_wtime.h  vernier_get_wtime.cpp
+        vernier.h           vernier.cpp
+        hashtable.h         hashtable.cpp
+        hashvec_handler.h   hashvec_handler.cpp
+        writer/writer.h     writer/writer.cpp
+        writer/multi.h      writer/multi.cpp
+        formatter.h         formatter.cpp
+        hashvec.h           hashvec.cpp
+        vernier_gettime.h   vernier_gettime.cpp
+        vernier_get_wtime.h vernier_get_wtime.cpp
+        mpi_context.h       mpi_context.cpp
         )
 
 set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h vernier_get_wtime.h)

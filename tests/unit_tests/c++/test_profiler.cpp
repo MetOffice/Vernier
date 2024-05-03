@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -15,6 +15,9 @@
 
 TEST(SystemTests, TimingTest)
 {
+
+  meto::vernier.init();
+
   // Start timing: noddy way, and using Vernier.
   auto prof_main = meto::vernier.start("MAIN");
   double t1 = meto::vernier_get_wtime();   
@@ -59,5 +62,6 @@ TEST(SystemTests, TimingTest)
   std::cout << "\n" << "Profiler timing: " << prof_time  << "\n\n";
   EXPECT_NEAR(prof_time, actual_time, time_tolerance);
 
+  meto::vernier.finalize();
 
 }
