@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -22,6 +22,8 @@ std::string tid_str(std::to_string(tid));
 std::string tid_bytes(reinterpret_cast<char const*>(&tid), sizeof(tid));
 
 TEST(RegionNameTest,NamesMatchTest) {
+
+  meto::vernier.init();
 
   //Start main region with name "Cappucino"
   const auto& prof_cappucino = meto::vernier.start("Cappucino");
@@ -59,6 +61,7 @@ TEST(RegionNameTest,NamesMatchTest) {
 
   meto::vernier.stop(prof_cappucino);
 
+  meto::vernier.finalize();
 }
 
 /**

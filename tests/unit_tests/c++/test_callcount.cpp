@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -14,6 +14,9 @@
 
 TEST(HashEntryTest,CallCountTest)
 {
+
+  meto::vernier.init();
+
   // Start main region
   auto prof_main = meto::vernier.start("MainRegion");
 
@@ -78,4 +81,5 @@ TEST(HashEntryTest,CallCountTest)
     EXPECT_EQ(meto::vernier.get_prof_call_count(thread), num_threads-thread+incr);
   }
 
+  meto::vernier.finalize();
 }

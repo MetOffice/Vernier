@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -41,11 +41,13 @@ meto::Vernier::TracebackEntry::TracebackEntry(
   {}
 
 /**
- * @brief Constructor
- *
- */
+ * @brief  Initialise Vernier object.
+ * @param [in]  client_comm_handle  MPI communicator handle that Vernier will
+ *                                  duplicate and use the duplicate.
+ *                                  Defaults to MPI_COMM_WORLD.
+ */ 
 
-meto::Vernier::Vernier()
+void meto::Vernier::init(MPI_Comm const client_comm_handle)
 {
 
   // Set the maximum number of threads.
@@ -68,10 +70,44 @@ meto::Vernier::Vernier()
 
   }
 
+  // Initialise MPI context
+  mpi_context_.init(client_comm_handle);
+
+  // Set Vernier initialised.
+  initialized_ = true;
+
   // Assertions
   assert ( static_cast<int> (thread_hashtables_.size()) == max_threads_);
   assert ( static_cast<int> (thread_traceback_.size() ) == max_threads_);
+  assert ( mpi_context_.is_initialized() );
+  assert ( initialized_ );
 
+}
+
+/**
+ * @brief  Finalize Vernier object.
+ * @note   Clears hashtable and traceback information; frees duplicate
+ *         MPI communicator.
+ */ 
+
+void meto::Vernier::finalize()
+{
+  if(mpi_context_.is_initialized()){
+    mpi_context_.finalize();
+  }
+
+  // Empty the traceback and hashtable
+  thread_hashtables_.clear();
+  thread_traceback_.clear();
+
+  // Set Vernier not initialised.
+  initialized_ = false;
+
+  // Assertions
+  assert ( static_cast<int> (thread_hashtables_.size()) == 0);
+  assert ( static_cast<int> (thread_traceback_.size() ) == 0);
+  assert ( !mpi_context_.is_initialized() );
+  assert ( !initialized_ );
 }
 
 /**
@@ -95,6 +131,12 @@ size_t meto::Vernier::start(std::string_view const region_name)
 
 void meto::Vernier::start_part1()
 {
+
+  // Check that Vernier has been initialised
+  if (!initialized_) {
+    throw std::runtime_error("Vernier::start_part1. Vernier not initialised.");
+  }
+
   // Store the calliper start time, which is used in part2.
   logged_calliper_start_time_ = vernier_gettime();
 }
@@ -234,8 +276,13 @@ void meto::Vernier::stop(size_t const hash)
 
 void meto::Vernier::write()
 {
+
+  if (!initialized_){
+    throw std::runtime_error("Vernier::write. Vernier not initialised.");
+  }
+
   // Create hashvec handler object and feed in data from thread_hashtables_
-  HashVecHandler output_data;
+  HashVecHandler output_data(mpi_context_);
   for (auto& table : thread_hashtables_)
   {
     table.append_to(output_data);
@@ -245,7 +292,6 @@ void meto::Vernier::write()
   output_data.sort();
   output_data.write();
 }
-
 
 /**
  * @brief  Get the total (inclusive) time taken by a region and everything below it.

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -7,7 +7,6 @@
 #include <iostream>
 #include <chrono>
 #include <gtest/gtest.h>
-#include <chrono>
 
 #include "vernier.h"
 
@@ -20,6 +19,8 @@
 //
 
 TEST(HashEntryTest, TimingsTest) {
+
+  meto::vernier.init();
 
   // Start main profiler region and chrono timing
   const auto& prof_main = meto::vernier.start("QuicheLorraine");
@@ -78,4 +79,6 @@ TEST(HashEntryTest, TimingsTest) {
     EXPECT_NEAR( meto::vernier.get_total_walltime(prof_main,0), main_in_s, time_tolerance );
     EXPECT_NEAR( meto::vernier.get_total_walltime(prof_sub,0) , sub_in_s , time_tolerance );
   }
+
+  meto::vernier.finalize();
 }
