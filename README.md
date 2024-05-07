@@ -22,7 +22,7 @@ Documentation for the project can be found [here](https://metoffice.github.io/Ve
 ### Supported Compilers
 
 The code has been tested with the following compilers:
-- GCC versions: 9.3.0, 10.2.0
+- GCC versions: 10.2.0, 11.2.0
 - Clang versions: 12.0 
 
 ### Libraries 

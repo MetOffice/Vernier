@@ -1,4 +1,0 @@
-hashtable.h
-^^^^^^^^^^^
-
-hashtable.h

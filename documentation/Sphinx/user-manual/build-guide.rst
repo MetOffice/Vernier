@@ -40,7 +40,7 @@ To get started, checkout the Vernier repository:
 
 .. code-block:: shell
 
-   git clone git@github.com:MetOffice/Vernier.git
+   git clone https://github.com/MetOffice/Vernier.git
    cd Vernier
 
 It's also recommended that a build directory is setup, as in-source builds are
