@@ -1,5 +1,5 @@
 /* -----------------------------------------------------------------------------
- *  (c) Crown copyright 2021 Met Office. All rights reserved.
+ *  (c) Crown copyright 2024 Met Office. All rights reserved.
  *  The file LICENCE, distributed with this code, contains details of the terms
  *  under which the code may be used.
  * -----------------------------------------------------------------------------
@@ -18,6 +18,7 @@
 #include <memory>
 
 #include "hashvec.h"
+#include "mpi_context.h"
 #include "writer/writer.h"
 #include "writer/multi.h"
 
@@ -47,7 +48,7 @@ class HashVecHandler {
   public:
 
     // Constructor
-    HashVecHandler();
+    HashVecHandler(MPIContext const&);
 
     // Member functions
     void sort();

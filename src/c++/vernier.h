@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -20,10 +20,13 @@
 #include <vector>
 #include <string_view>
 #include <array>
+
+#include <mpi.h>
 #ifdef _OPENMP
   #include <omp.h>
 #endif
 
+#include "mpi_context.h"
 #include "hashtable.h"
 
 #define PROF_MAX_TRACEBACK_SIZE 1000
@@ -69,8 +72,15 @@ class Vernier
         time_point_t   calliper_start_time_;
     };
 
+    // Default initialisation flag.  No explicit constructor, and pointless
+    // to set this in the init() method.
+    bool initialized_ = false;
+
     // Data members
     int max_threads_;
+
+    // MPI Context
+    MPIContext mpi_context_;
 
     // Static, threadprivate data members
     static time_point_t logged_calliper_start_time_;
@@ -92,17 +102,18 @@ class Vernier
 
   public:
 
-    // Constructors
-    Vernier();
+    // Default constructor needed for `inline` global Vernier object.
+    Vernier() = default;
 
     // Member functions
+    void   init(MPI_Comm const client_comm_handle = MPI_COMM_WORLD);
+    void   finalize();
     size_t start(std::string_view const);
     void   stop (size_t const);
     void   write();
 
     // Getters
     double                 get_total_walltime (size_t const, int const);
-    double                 get_total_raw_walltime (size_t const, int const);
     double                 get_overhead_walltime (size_t const, int const);
     double                 get_self_walltime(size_t const hash, int const input_tid);
     double                 get_child_walltime(size_t const hash, int const input_tid) const;

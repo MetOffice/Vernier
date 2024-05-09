@@ -1,16 +1,22 @@
 # ------------------------------------------------------------------------------
-#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  (c) Crown copyright 2024 Met Office. All rights reserved.
 #  The file LICENCE, distributed with this code, contains details of the terms
 #  under which the code may be used.
 # ------------------------------------------------------------------------------
+
+#
+# MPI initialised.
+#
+
 # Function to simplify adding unit-tests
 function(add_unit_test test_name cpp_file)
-    add_executable(${test_name} ${cpp_file})
+    add_executable(${test_name} ${cpp_file} mpi_main.cpp)
     target_link_libraries(${test_name}
             MPI::MPI_CXX
             OpenMP::OpenMP_CXX
             GTest::gtest_main
             GTest::gmock_main
+            MPI::MPI_CXX
             ${CMAKE_PROJECT_NAME})
     set_project_warnings(${test_name})
     target_include_directories(${test_name} PRIVATE
@@ -27,3 +33,24 @@ add_unit_test(test_hashtable test_hashtable.cpp)
 add_unit_test(test_proftests test_proftests.cpp)
 add_unit_test(test_callcount test_callcount.cpp)
 add_unit_test(test_recursion test_recursion.cpp)
+
+#
+# Test behaviour when MPI is not initialised.
+#
+
+# Function to simplify adding unit-tests
+function(add_mpi_not_init_unit_test test_name cpp_file)
+    add_executable(${test_name} ${cpp_file})
+    target_link_libraries(${test_name}
+            OpenMP::OpenMP_CXX
+            GTest::gtest_main
+            GTest::gmock_main
+            ${CMAKE_PROJECT_NAME})
+    set_project_warnings(${test_name})
+    target_include_directories(${test_name} PRIVATE
+            ${PROJECT_SOURCE_DIR}/src/c++)
+    gtest_discover_tests(${test_name})
+endfunction()
+
+add_mpi_not_init_unit_test(test_mpi_not_init test_mpi_not_init.cpp)
+

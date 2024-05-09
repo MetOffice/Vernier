@@ -1,5 +1,5 @@
 /* -----------------------------------------------------------------------------
- *  (c) Crown copyright 2021 Met Office. All rights reserved.
+ *  (c) Crown copyright 2024 Met Office. All rights reserved.
  *  The file LICENCE, distributed with this code, contains details of the terms
  *  under which the code may be used.
  * -----------------------------------------------------------------------------
@@ -10,13 +10,14 @@
 
 /**
  * @brief  HashVecHandler constructor
+ * @param [in] mpi_context  The MPI context to use.
  *
  * @note  Allocates the writer strategy based on the PROF_IO_MODE environment
  *        variable. 
  *
  */
 
-meto::HashVecHandler::HashVecHandler() 
+meto::HashVecHandler::HashVecHandler(MPIContext const& mpi_context) 
 {
 
     // Default the IO mode to one file per MPI rank.
@@ -29,7 +30,7 @@ meto::HashVecHandler::HashVecHandler()
     // Allocate writer to be of required type.
     if (io_mode == "multi")
     {
-        writer_strategy_ = std::make_unique<Multi>();
+        writer_strategy_ = std::make_unique<Multi>(mpi_context);
     }
     else {
         error_handler("Invalid IO mode choice", EXIT_FAILURE);

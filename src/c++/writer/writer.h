@@ -1,5 +1,5 @@
 /* -----------------------------------------------------------------------------
- *  (c) Crown copyright 2021 Met Office. All rights reserved.
+ *  (c) Crown copyright 2024 Met Office. All rights reserved.
  *  The file LICENCE, distributed with this code, contains details of the terms
  *  under which the code may be used.
  * -----------------------------------------------------------------------------
@@ -11,11 +11,10 @@
  * 
  */
 
-#ifndef WRITER_H
-#define WRITER_H
+#ifndef VERNIER_WRITER_H
+#define VERNIER_WRITER_H
 
-#include <mpi.h>
-
+#include "../mpi_context.h"
 #include "../formatter.h"
 
 namespace meto
@@ -38,13 +37,12 @@ class Writer {
     // Default filename 
     std::string output_filename_ = "vernier-output";
 
-    // MPI handling
-    int my_rank_;
-    MPI_Comm vernier_comm_;
+    // MPI context
+    MPIContext mpi_context_;
 
   public:
 
-    explicit Writer();
+    explicit Writer(MPIContext const&);
     virtual ~Writer() = default;
 
     // Pure virtual write method

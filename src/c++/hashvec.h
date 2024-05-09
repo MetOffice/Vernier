@@ -42,7 +42,6 @@ struct RegionRecord {
     std::string      decorated_region_name_;
     time_duration_t  total_walltime_;
     time_duration_t  recursion_total_walltime_;
-    time_duration_t  total_raw_walltime_;
     time_duration_t  self_walltime_;
     time_duration_t  child_walltime_;
     time_duration_t  overhead_walltime_;

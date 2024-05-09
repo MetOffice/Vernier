@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -30,6 +30,8 @@ std::string tid_bytes(reinterpret_cast<char const*>(&tid), sizeof(tid));
 
 TEST(HashTableTest,HashFunctionTest) {
 
+  meto::vernier.init();
+
   // Create new hashes via HashTable::query_insert, which is used in Vernier::start
   const auto& prof_rigatoni = meto::vernier.start("Rigatoni");
   const auto& prof_penne    = meto::vernier.start("Penne");
@@ -47,6 +49,7 @@ TEST(HashTableTest,HashFunctionTest) {
     EXPECT_EQ(meto::vernier.start("Penne"),    std::hash<std::string_view>{}("Penne" + tid_bytes));
   }
 
+  meto::vernier.finalize();
 }
 
 /**
@@ -56,6 +59,8 @@ TEST(HashTableTest,HashFunctionTest) {
  */
 
 TEST(HashTableTest,UpdateTimesTest) {
+
+  meto::vernier.init();
 
   // Create new hash
   size_t prof_pie = std::hash<std::string>{}("Pie" + tid_bytes);
@@ -99,4 +104,6 @@ TEST(HashTableTest,UpdateTimesTest) {
     EXPECT_GT(t2, 0.0);
     EXPECT_GT(t3, t2 );
   }
+
+  meto::vernier.finalize();
 }

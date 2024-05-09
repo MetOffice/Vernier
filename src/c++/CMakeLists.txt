@@ -1,6 +1,6 @@
 
 # ------------------------------------------------------------------------------
-#  (c) Crown copyright 2022 Met Office. All rights reserved.
+#  (c) Crown copyright 2024 Met Office. All rights reserved.
 #  The file LICENCE, distributed with this code, contains details of the terms
 #  under which the code may be used.
 # ------------------------------------------------------------------------------
@@ -23,6 +23,7 @@ add_library(${CMAKE_PROJECT_NAME}
         hashvec.h            hashvec.cpp
         vernier_gettime.h    vernier_gettime.cpp
         vernier_get_wtime.h  vernier_get_wtime.cpp
+        mpi_context.h        mpi_context.cpp
         error_handler.h      error_handler.cpp
         )
 
