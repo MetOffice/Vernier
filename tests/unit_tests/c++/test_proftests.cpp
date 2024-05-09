@@ -28,7 +28,6 @@ TEST(ProfilerDeathTest,WrongHashTest) {
   meto::vernier.init();
 
   EXPECT_EXIT({
-    MPI_Init(NULL,NULL);
 
     // Start main
     const auto& prof_main = meto::vernier.start("Chocolate");
@@ -43,7 +42,6 @@ TEST(ProfilerDeathTest,WrongHashTest) {
     // Eventually stop prof_main to avoid Wunused telling me off...
     meto::vernier.stop(prof_main);
 
-    MPI_Finalize();
   }, ExitedWithCode(100), "EMERGENCY STOP: hashes don't match.");
 
   meto::vernier.finalize();
@@ -53,14 +51,12 @@ TEST(ProfilerDeathTest,WrongHashTest) {
 TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
   EXPECT_EXIT({
-    MPI_Init(NULL,NULL);
 
     const auto prof_main = std::hash<std::string_view>{}("Main");
 
     // Stop the profiler before anything is done
     meto::vernier.stop(prof_main);
 
-    MPI_Finalize();
   }, ExitedWithCode(101), "EMERGENCY STOP: stop called before start calliper.");
 }
 
@@ -92,14 +88,12 @@ TEST(ProfilerDeathTest, TooManyTracebackEntries) {
   meto::vernier.init();
 
   EXPECT_EXIT({
-    MPI_Init(NULL,NULL);
 
     const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;
     for (int i=0; i<beyond_maximum; ++i){
       [[maybe_unused]] auto prof_handle = meto::vernier.start("TracebackEntry");
     }
 
-    MPI_Finalize();
   }, ExitedWithCode(102), "EMERGENCY STOP: Traceback array exhausted.");
 
   meto::vernier.finalize();
@@ -108,12 +102,13 @@ TEST(ProfilerDeathTest, TooManyTracebackEntries) {
 //Tests the correct io mode is set. If not set correctly it will exit.
 TEST(ProfilerDeathTest, InvalidIOModeTest) {
   EXPECT_EXIT({
-    MPI_Init(NULL,NULL);
+
+    meto::MPIContext mpi_context;
+
     const char *invalidIOMode = "single";
     setenv("VERNIER_OUTPUT_MODE", invalidIOMode, 1);
 
-    meto::HashVecHandler();
+    meto::HashVecHandler object(mpi_context);
 
-    MPI_Finalize();
   }, ExitedWithCode(EXIT_FAILURE), "Invalid IO mode choice");
 }
