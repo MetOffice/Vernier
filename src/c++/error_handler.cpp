@@ -1,5 +1,5 @@
 /* -----------------------------------------------------------------------------
-*  (c) Crown copyright 2021 Met Office. All rights reserved.
+*  (c) Crown copyright 2024 Met Office. All rights reserved.
 *  The file LICENCE, distributed with this code, contains details of the terms
 *  under which the code may be used.
 * -----------------------------------------------------------------------------
@@ -13,7 +13,8 @@
 /**
  * @brief Error handler class
  *
- * @returns Exits the code, via an MPI_Abort call, when an error is encountered.
+ * @param [in] customError The error as a string
+ * @param [in] errorCode The code for the error
  */
 
 meto::error_handler::error_handler (const std::string &customError, int errorCode)

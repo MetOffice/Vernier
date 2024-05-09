@@ -13,6 +13,7 @@
 
 #include "vernier.h"
 #include "error_handler.h"
+#include "hashvec_handler.h"
 
 using ::testing::ExitedWithCode;
 using ::testing::KilledBySignal;
@@ -48,13 +49,16 @@ EXPECT_EXIT({
 // Tests for a segfault when stopping before anything else.
 TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
-  EXPECT_DEATH({
+  EXPECT_EXIT({
+    MPI_Init(NULL,NULL);
+
     const auto prof_main = std::hash<std::string_view>{}("Main");
 
     // Stop the profiler before anything is done
     meto::vernier.stop(prof_main);
 
-  }, "" );
+    MPI_Finalize();
+  }, ExitedWithCode(101), "EMERGENCY STOP: stop called before start calliper.");
 
 }
 
@@ -73,4 +77,17 @@ TEST(ProfilerDeathTest, TooManyTracebackEntries) {
     MPI_Finalize();
   }, ExitedWithCode(102), "EMERGENCY STOP: Traceback array exhausted.");
 
+}
+
+//Tests the correct io mode is set. If not set correctly it will exit.
+TEST(ProfilerDeathTest, InvalidIOModeTest) {
+  EXPECT_EXIT({
+    MPI_Init(NULL,NULL);
+    const char *invalidIOMode = "single";
+    setenv("VERNIER_OUTPUT_MODE", invalidIOMode, 1);
+
+    meto::HashVecHandler();
+
+    MPI_Finalize();
+  }, ExitedWithCode(EXIT_FAILURE), "Invalid IO mode choice");
 }
