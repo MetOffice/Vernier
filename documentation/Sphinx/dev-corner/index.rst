@@ -9,7 +9,6 @@ Vernier.
    :maxdepth: 1
 
    testing
-   src-doc/index
 
 Development Process
 -------------------

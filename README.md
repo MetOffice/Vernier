@@ -28,7 +28,7 @@ The code has been tested with the following compilers:
 ### Libraries 
 
 - OpenMP 4.5 
-- MPICH 3.3.2
+- MPICH 3.4.1
 
 ### Testing Framework and Documentation
 

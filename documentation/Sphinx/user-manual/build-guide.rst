@@ -23,7 +23,7 @@ For testing and documenation:
 * GoogleTest 1.11.0
 * pFUnit 4.4.1
 * Doxygen 1.8.5
-* Sphinx 4.3.1
+* Sphinx 7.2.6
   
   * docutils 0.16 (rendering issues are known to exist in newer versions!)
   
