@@ -1,4 +1,0 @@
-vernier.h 
-^^^^^^^^^
-
-vernier.h
