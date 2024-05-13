@@ -6,6 +6,7 @@
 
 #include "hashvec_handler.h"
 #include "vernier.h"
+#include "error_handler.h"
 
 #include <cassert>
 #include <chrono>
@@ -172,9 +173,8 @@ size_t meto::Vernier::start_part2(std::string_view const region_name)
     thread_traceback_[tid].at(call_depth_index)
        = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time_);
   }
-  else {
-    std::cerr << "EMERGENCY STOP: Traceback array exhausted." << "\n";
-    exit (102);
+  else {    
+    error_handler("EMERGENCY STOP: Traceback array exhausted.", 102);
   }
   return hash;
 }
@@ -204,8 +204,7 @@ void meto::Vernier::stop(size_t const hash)
   // Check that we have called a start calliper before the stop calliper.
   // If not, then the call depth would be -1.
   if (call_depth_ < 0) {
-    std::cerr << "EMERGENCY STOP: stop called before start calliper." << "\n";
-    exit (101);
+      error_handler("EMERGENCY STOP: stop called before start calliper.", 101);
   }
 
   // Get reference to the traceback entry.
@@ -215,9 +214,8 @@ void meto::Vernier::stop(size_t const hash)
   // Check: which hash is last on the traceback list?
   size_t last_hash_on_list = traceback_entry.record_hash_;
   if (hash != last_hash_on_list){
-    std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
-    std::cerr << "Expected calliper: " << thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) << " Received calliper: " << thread_hashtables_[tid].get_decorated_region_name(hash) << "\n";
-    exit (100);
+    std::string error_msg = "EMERGENCY STOP: hashes don't match. Expected calliper: " + thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) + " Received calliper: " + thread_hashtables_[tid].get_decorated_region_name(hash) + "\n";
+    error_handler(error_msg, 100);
   }
 
   // Compute the region time

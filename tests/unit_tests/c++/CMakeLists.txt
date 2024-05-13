@@ -12,6 +12,7 @@
 function(add_unit_test test_name cpp_file)
     add_executable(${test_name} ${cpp_file} mpi_main.cpp)
     target_link_libraries(${test_name}
+            MPI::MPI_CXX
             OpenMP::OpenMP_CXX
             GTest::gtest_main
             GTest::gmock_main

@@ -6,6 +6,7 @@
  */
 
 #include "hashvec_handler.h"
+#include "error_handler.h"
 
 /**
  * @brief  HashVecHandler constructor
@@ -31,7 +32,9 @@ meto::HashVecHandler::HashVecHandler(MPIContext const& mpi_context)
     {
         writer_strategy_ = std::make_unique<Multi>(mpi_context);
     }
-    else throw std::runtime_error("Invalid IO mode choice");
+    else {
+        error_handler("Invalid IO mode choice", EXIT_FAILURE);
+    }  
 }
 
 /**

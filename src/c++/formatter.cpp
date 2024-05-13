@@ -6,6 +6,7 @@
 */
 
 #include "formatter.h"
+#include "error_handler.h"
 
 #include <iomanip>
 #include <algorithm>
@@ -37,7 +38,7 @@ meto::Formatter::Formatter()
     std::string error_msg = "Invalid Vernier output format choice. Expected 'threads' or 'drhook'. Currently set to '"
                             + format
                             + "'.";
-    throw std::runtime_error( error_msg );
+    error_handler(error_msg, EXIT_FAILURE);
   }
 }
 
