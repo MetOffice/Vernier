@@ -1,11 +1,12 @@
 /* -----------------------------------------------------------------------------
- *  (c) Crown copyright 2021 Met Office. All rights reserved.
+ *  (c) Crown copyright 2024 Met Office. All rights reserved.
  *  The file LICENCE, distributed with this code, contains details of the terms
  *  under which the code may be used.
  * -----------------------------------------------------------------------------
  */
 
 #include "hashvec_handler.h"
+#include "error_handler.h"
 
 /**
  * @brief  HashVecHandler constructor
@@ -31,7 +32,9 @@ meto::HashVecHandler::HashVecHandler(MPIContext const& mpi_context)
     {
         writer_strategy_ = std::make_unique<Multi>(mpi_context);
     }
-    else throw std::runtime_error("Invalid IO mode choice");
+    else {
+        error_handler("Invalid IO mode choice", EXIT_FAILURE);
+    }  
 }
 
 /**

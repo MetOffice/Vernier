@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -11,10 +11,12 @@
 #include <chrono>
 
 #include "vernier.h"
+#include "vernier_mpi.h"
+#include "error_handler.h"
+#include "hashvec_handler.h"
 
 using ::testing::ExitedWithCode;
 using ::testing::KilledBySignal;
-
 
 //
 //  Tests and death tests related to profiler class members.
@@ -48,14 +50,14 @@ TEST(ProfilerDeathTest,WrongHashTest) {
 // Tests for a segfault when stopping before anything else.
 TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
-  EXPECT_DEATH({
+  EXPECT_EXIT({
 
     const auto prof_main = std::hash<std::string_view>{}("Main");
 
     // Stop the profiler before anything is done
     meto::vernier.stop(prof_main);
 
-  }, "" );
+  }, ExitedWithCode(101), "EMERGENCY STOP: stop called before start calliper.");
 }
 
 // Vernier is not initialised before first start() call.
@@ -86,11 +88,27 @@ TEST(ProfilerDeathTest, TooManyTracebackEntries) {
   meto::vernier.init();
 
   EXPECT_EXIT({
+
     const int beyond_maximum = PROF_MAX_TRACEBACK_SIZE+1;
     for (int i=0; i<beyond_maximum; ++i){
       [[maybe_unused]] auto prof_handle = meto::vernier.start("TracebackEntry");
     }
+
   }, ExitedWithCode(102), "EMERGENCY STOP: Traceback array exhausted.");
 
   meto::vernier.finalize();
+}
+
+//Tests the correct io mode is set. If not set correctly it will exit.
+TEST(ProfilerDeathTest, InvalidIOModeTest) {
+  EXPECT_EXIT({
+
+    meto::MPIContext mpi_context;
+
+    const char *invalidIOMode = "single";
+    setenv("VERNIER_OUTPUT_MODE", invalidIOMode, 1);
+
+    meto::HashVecHandler object(mpi_context);
+
+  }, ExitedWithCode(EXIT_FAILURE), "Invalid IO mode choice");
 }

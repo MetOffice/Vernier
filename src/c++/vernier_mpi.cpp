@@ -4,12 +4,16 @@
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
+#include <cstdlib>
+
 #include "vernier_mpi.h"
 
 #ifndef USE_MPI
 
 int MPI_Init([[maybe_unused]] int*, [[maybe_unused]] char***){return 0;}
 int MPI_Finalize(void){return 0;}
+
+int MPI_Abort([[maybe_unused]] MPI_Comm const comm, int const errcode) { std::exit (errcode); }
 
 int MPI_Comm_f2c(MPI_Fint comm) { return comm; }
 int MPI_Initialized(int* value) { *value=1; return 0; }

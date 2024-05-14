@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
@@ -20,7 +20,10 @@
 #include <vector>
 #include <string_view>
 #include <array>
-#include <omp.h>
+
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 #include "vernier_mpi.h"
 #include "mpi_context.h"
@@ -111,7 +114,6 @@ class Vernier
 
     // Getters
     double                 get_total_walltime (size_t const, int const);
-    double                 get_total_raw_walltime (size_t const, int const);
     double                 get_overhead_walltime (size_t const, int const);
     double                 get_self_walltime(size_t const hash, int const input_tid);
     double                 get_child_walltime(size_t const hash, int const input_tid) const;

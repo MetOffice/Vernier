@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------
-! (c) Crown copyright 2022 Met Office. All rights reserved.
+! (c) Crown copyright 2024 Met Office. All rights reserved.
 ! The file LICENCE, distributed with this code, contains details of the terms
 ! under which the code may be used.
 !-------------------------------------------------------------------------------
@@ -32,6 +32,7 @@ module vernier_mod
   public :: vernier_stop
   public :: vernier_write
   public :: vernier_get_total_walltime
+  public :: vernier_get_wtime 
 
   !-----------------------------------------------------------------------------
   ! Interfaces
@@ -39,15 +40,10 @@ module vernier_mod
 
   interface
 
-    subroutine vernier_init_default()  &
-               bind(C, name='c_vernier_init_default')
-      !No arguments to handle.
-    end subroutine vernier_init_default
-
-    subroutine vernier_init_comm(client_comm_handle)  &
-               bind(C, name='c_vernier_init_comm')
+    subroutine vernier_init(client_comm_handle)  &
+               bind(C, name='c_vernier_init')
       integer, intent(in) :: client_comm_handle
-    end subroutine vernier_init_comm
+    end subroutine vernier_init
 
     subroutine vernier_finalize() bind(C, name='c_vernier_finalize')
         !No arguments to handle
@@ -83,12 +79,12 @@ module vernier_mod
       real(kind=vrk)                :: walltime
     end function vernier_get_total_walltime
 
-  end interface
+    function vernier_get_wtime() bind(C, name='c_vernier_get_wtime') result(wtime)
+      import :: vrk
+      real(kind=vrk) :: wtime
+    end function vernier_get_wtime
 
-  interface vernier_init
-    procedure :: vernier_init_default
-    procedure :: vernier_init_comm
-  end interface vernier_init
+  end interface
 
   !-----------------------------------------------------------------------------
   ! Contained functions / subroutines

@@ -23,11 +23,10 @@ For testing and documenation:
 * GoogleTest 1.11.0
 * pFUnit 4.4.1
 * Doxygen 1.8.5
-* Sphinx 4.3.1
+* Sphinx 7.2.6
   
   * docutils 0.16 (rendering issues are known to exist in newer versions!)
   
-* Breathe 4.34.0
 
 .. note::
    
@@ -41,7 +40,7 @@ To get started, checkout the Vernier repository:
 
 .. code-block:: shell
 
-   git clone git@github.com:MetOffice/Vernier.git
+   git clone https://github.com/MetOffice/Vernier.git
    cd Vernier
 
 It's also recommended that a build directory is setup, as in-source builds are

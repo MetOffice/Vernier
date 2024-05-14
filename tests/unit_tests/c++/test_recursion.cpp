@@ -1,13 +1,17 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2023 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
 #include <gtest/gtest.h>
-#include <omp.h>
+
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 #include "vernier.h"
+#include "vernier_get_wtime.h"
 
 int const max_depth = 3;
 int const sleep_seconds = 1;
@@ -59,7 +63,10 @@ void zeroth_function(Timings& timings)
   meto::vernier.stop(prof_handle);
 
   // Update the total walltime so far spent in this function.
-  int const tid = omp_get_thread_num();
+  int tid = 0;   //const was here before -> int const tid = 0;
+  #ifdef _OPENMP
+    tid = omp_get_thread_num();
+  #endif
   timings.zeroth_function_total_time_ = meto::vernier.get_total_walltime(prof_handle, tid);
 
 }
@@ -88,7 +95,10 @@ void first_function(Timings& timings)
 
   // Update the total walltime so far spent in this function. Do here while we
   // have access to the prof_handle.
-  int const tid = omp_get_thread_num();
+  int tid = 0;   //const was here before -> int const tid = 0;
+  #ifdef _OPENMP
+    tid = omp_get_thread_num();
+  #endif
   timings.first_function_total_time_ = meto::vernier.get_total_walltime(prof_handle, tid);
 
 }
@@ -116,7 +126,10 @@ void second_function(Timings& timings)
 
   // Update the total walltime so far spent in this function. Do here while we
   // have access to the prof_handle.
-  int const tid = omp_get_thread_num();
+  int tid = 0;         //const was here before -> int const tid = 0;
+  #ifdef _OPENMP
+    tid = omp_get_thread_num();
+  #endif
   timings.second_function_total_time_ = meto::vernier.get_total_walltime(prof_handle, tid);
 }
 
@@ -140,12 +153,12 @@ TEST(RecursionTest,DirectRecursion)
     auto prof_handle_threaded = meto::vernier.start("test_recursion:threads");
 
     Timings timings;
-    double t1 = omp_get_wtime();
+    double t1 = meto::vernier_get_wtime();
 
     // Function calls itself
     zeroth_function(timings);
 
-    double t2 = omp_get_wtime();
+    double t2 = meto::vernier_get_wtime();
     double overall_time = t2-t1;
 
     EXPECT_LE  (timings.zeroth_function_total_time_,  overall_time);
@@ -173,12 +186,13 @@ TEST(RecursionTest,IndirectRecursion)
     auto prof_handle_threaded = meto::vernier.start("test_recursion:threads");
 
     Timings timings;
-    double t1 = omp_get_wtime();
+    double t1 = meto::vernier_get_wtime();
 
     // Function calls a second function
     first_function(timings);
 
-    double t2 = omp_get_wtime();
+    double t2 = meto::vernier_get_wtime();
+
     double overall_time = t2-t1;
       
     EXPECT_LE  (timings.first_function_total_time_,  overall_time);

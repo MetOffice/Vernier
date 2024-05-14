@@ -19,6 +19,8 @@
   int MPI_Finalize(void);
   int MPI_Initialized(int* value); 
 
+  int MPI_Abort([[maybe_unused]] MPI_Comm const comm, int const errcode);
+
   int MPI_Comm_f2c(MPI_Fint);
 
   int MPI_Comm_free([[maybe_unused]] MPI_Comm* comm);

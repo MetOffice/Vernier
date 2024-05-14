@@ -1,16 +1,19 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2022 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
 #include "hashvec_handler.h"
 #include "vernier.h"
+#include "error_handler.h"
 
 #include <cassert>
 #include <chrono>
 #include <iostream>
-#include <omp.h>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 // Initialize static data members.
 int meto::Vernier::call_depth_ = -1;
@@ -44,6 +47,7 @@ meto::Vernier::TracebackEntry::TracebackEntry(
  *                                  duplicate and use the duplicate.
  *                                  Defaults to MPI_COMM_WORLD.
  */ 
+
 void meto::Vernier::init(MPI_Comm const client_comm_handle)
 {
 
@@ -86,6 +90,7 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle)
  * @note   Clears hashtable and traceback information; frees duplicate
  *         MPI communicator.
  */ 
+
 void meto::Vernier::finalize()
 {
   if(mpi_context_.is_initialized()){
@@ -168,9 +173,8 @@ size_t meto::Vernier::start_part2(std::string_view const region_name)
     thread_traceback_[tid].at(call_depth_index)
        = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time_);
   }
-  else {
-    std::cerr << "EMERGENCY STOP: Traceback array exhausted." << "\n";
-    exit (102);
+  else {    
+    error_handler("EMERGENCY STOP: Traceback array exhausted.", 102);
   }
   return hash;
 }
@@ -200,8 +204,7 @@ void meto::Vernier::stop(size_t const hash)
   // Check that we have called a start calliper before the stop calliper.
   // If not, then the call depth would be -1.
   if (call_depth_ < 0) {
-    std::cerr << "EMERGENCY STOP: stop called before start calliper." << "\n";
-    exit (101);
+      error_handler("EMERGENCY STOP: stop called before start calliper.", 101);
   }
 
   // Get reference to the traceback entry.
@@ -211,9 +214,8 @@ void meto::Vernier::stop(size_t const hash)
   // Check: which hash is last on the traceback list?
   size_t last_hash_on_list = traceback_entry.record_hash_;
   if (hash != last_hash_on_list){
-    std::cerr << "EMERGENCY STOP: hashes don't match." << "\n";
-    std::cerr << "Expected calliper: " << thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) << " Received calliper: " << thread_hashtables_[tid].get_decorated_region_name(hash) << "\n";
-    exit (100);
+    std::string error_msg = "EMERGENCY STOP: hashes don't match. Expected calliper: " + thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) + " Received calliper: " + thread_hashtables_[tid].get_decorated_region_name(hash) + "\n";
+    error_handler(error_msg, 100);
   }
 
   // Compute the region time
@@ -301,21 +303,6 @@ double meto::Vernier::get_total_walltime(size_t const hash, int const thread_id)
 {
   auto tid = static_cast<hashtable_iterator_t_>(thread_id);
   return thread_hashtables_[tid].get_total_walltime(hash);
-}
-
-/**
- * @brief  Get the total (inclusive) time taken by a region, and everything below it,
- *         minus the profiling overheads for calls to direct child regions.
- *
- * @param[in] hash       The hash corresponding to the region of interest. 
- * @param[in] thread_id  The thread ID for which to return the walltime.
- *
- */
-
-double meto::Vernier::get_total_raw_walltime(size_t const hash, int const thread_id)
-{
-  auto tid = static_cast<hashtable_iterator_t_>(thread_id);
-  return thread_hashtables_[tid].get_total_raw_walltime(hash);
 }
 
 /**

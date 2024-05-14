@@ -6,6 +6,7 @@
 */
 
 #include "formatter.h"
+#include "error_handler.h"
 
 #include <iomanip>
 #include <algorithm>
@@ -37,7 +38,7 @@ meto::Formatter::Formatter()
     std::string error_msg = "Invalid Vernier output format choice. Expected 'threads' or 'drhook'. Currently set to '"
                             + format
                             + "'.";
-    throw std::runtime_error( error_msg );
+    error_handler(error_msg, EXIT_FAILURE);
   }
 }
 
@@ -63,15 +64,21 @@ void meto::Formatter::execute_format(std::ofstream& os, hashvec_t hashvec)
 void meto::Formatter::threads(std::ofstream& os, hashvec_t hashvec)
 {
 
-  std::string routine_at_thread = "Thread: All" /*+ std::to_string(tid_)*/;
+  // Write key
+  os << "\n";
+  os << "region_name@thread_id" << "\n"
+     << "Self time : Time accrued by region itself. (Exclusive time.)" << "\n"
+     << "Total time: Time including cost of child routines and profiling overheads. (Inclusive time.)" << "\n"
+     << "Overhead  : Profiling overhead incurred through direct child routine calls only." << "\n"
+     << "Calls     : Number of times the region is called." << "\n";
 
   // Write headings
   os << "\n";
   os
-      << std::setw(40) << std::left  << routine_at_thread  << " "
+      << std::setw(40) << std::left  << "Region"           << " "
       << std::setw(15) << std::right << "Self (s)"         << " "
-      << std::setw(15) << std::right << "Total (raw) (s)"  << " "
       << std::setw(15) << std::right << "Total (s)"        << " "
+      << std::setw(15) << std::right << "Overhead (s)"     << " "
       << std::setw(10) << std::right << "Calls"            << "\n";
 
   os << std::setfill('-');
@@ -86,11 +93,11 @@ void meto::Formatter::threads(std::ofstream& os, hashvec_t hashvec)
   // Data entries
   for (auto const& record : hashvec) {
       os
-        << std::setw(40) << std::left  << record.region_name_                << " "
-        << std::setw(15) << std::right << record.self_walltime_.count()      << " "
-        << std::setw(15) << std::right << record.total_raw_walltime_.count() << " "
-        << std::setw(15) << std::right << record.total_walltime_.count()     << " "
-        << std::setw(10) << std::right << record.call_count_                 << "\n";
+        << std::setw(40) << std::left  << record.decorated_region_name_     << " "
+        << std::setw(15) << std::right << record.self_walltime_.count()     << " "
+        << std::setw(15) << std::right << record.total_walltime_.count()    << " "
+        << std::setw(15) << std::right << record.overhead_walltime_.count() << " "
+        << std::setw(10) << std::right << record.call_count_                << "\n";
   }
 
 }
@@ -184,7 +191,7 @@ void meto::Formatter::drhook(std::ofstream& os, hashvec_t hashvec)
       << std::setw(7)  << std::right << percent_time
       << std::setw(13) << std::right << cumul_walltime.count()
       << std::setw(13) << std::right << record.self_walltime_.count()
-      << std::setw(13) << std::right << record.total_raw_walltime_.count()
+      << std::setw(13) << std::right << record.total_walltime_.count()
       << std::setw(15) << std::right << record.call_count_
       << std::setw(12) << std::right << self_per_call
       << std::setw(12) << std::right << total_per_call                 << "    "
