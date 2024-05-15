@@ -41,7 +41,7 @@ TEST(ProfilerDeathTest,WrongHashTest) {
     // Eventually stop prof_main to avoid Wunused telling me off...
     meto::vernier.stop(prof_main);
 
-  }, ExitedWithCode(100), "EMERGENCY STOP: hashes don't match.");
+  }, ExitedWithCode(EXIT_FAILURE), "EMERGENCY STOP: hashes don't match.");
 
   meto::vernier.finalize();
 }
@@ -56,7 +56,7 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
     // Stop the profiler before anything is done
     meto::vernier.stop(prof_main);
 
-  }, ExitedWithCode(101), "EMERGENCY STOP: stop called before start calliper.");
+  }, ExitedWithCode(EXIT_FAILURE), "EMERGENCY STOP: stop called before start calliper.");
 }
 
 // Vernier is not initialised before first start() call.
@@ -108,7 +108,7 @@ TEST(ProfilerDeathTest, TooManyTracebackEntries) {
       [[maybe_unused]] auto prof_handle = meto::vernier.start("TracebackEntry");
     }
 
-  }, ExitedWithCode(102), "EMERGENCY STOP: Traceback array exhausted.");
+  }, ExitedWithCode(EXIT_FAILURE), "EMERGENCY STOP: Traceback array exhausted.");
 
   meto::vernier.finalize();
 }
