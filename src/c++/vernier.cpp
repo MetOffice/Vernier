@@ -135,7 +135,7 @@ void meto::Vernier::start_part1()
 
   // Check that Vernier has been initialised
   if (!initialized_) {
-    throw std::runtime_error("Vernier::start_part1. Vernier not initialised.");
+    meto::error_handler("Vernier::start_part1. Vernier not initialised.", EXIT_FAILURE);
   }
 
   // Store the calliper start time, which is used in part2.
@@ -276,7 +276,7 @@ void meto::Vernier::write()
 {
 
   if (!initialized_){
-    throw std::runtime_error("Vernier::write. Vernier not initialised.");
+    meto::error_handler("Vernier::write. Vernier not initialised.", EXIT_FAILURE);
   }
 
   // Create hashvec handler object and feed in data from thread_hashtables_

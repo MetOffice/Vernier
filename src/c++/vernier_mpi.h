@@ -1,8 +1,17 @@
 /*----------------------------------------------------------------------------*\
- (c) Crown copyright 2023 Met Office. All rights reserved.
+ (c) Crown copyright 2024 Met Office. All rights reserved.
  The file LICENCE, distributed with this code, contains details of the terms
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
+
+/**
+ * @file   vernier_mpi.h
+ * @brief  Dummy MPI stubs for Vernier.
+ *
+ * Provides stubs for MPI calls used by Vernier. Allow Vernier to be used
+ * with non-MPI client codes.
+ *
+ */
 
 #ifndef VERNIER_MPI_H
 #define VERNIER_MPI_H
@@ -12,6 +21,7 @@
 #else
   #define MPI_COMM_NULL  0
   #define MPI_COMM_WORLD 1
+  #define MPI_SUCCESS    0
   using MPI_Comm = int;
   using MPI_Fint = int;
 

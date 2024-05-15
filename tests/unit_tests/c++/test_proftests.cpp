@@ -16,7 +16,6 @@
 #include "hashvec_handler.h"
 
 using ::testing::ExitedWithCode;
-using ::testing::KilledBySignal;
 
 //
 //  Tests and death tests related to profiler class members.
@@ -62,14 +61,25 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
 
 // Vernier is not initialised before first start() call.
 TEST(ProfilerDeathTest, StartBeforeInit) {
-  EXPECT_THROW(meto::vernier.start("MAIN"), std::runtime_error);
+
+  EXPECT_EXIT({
+    meto::vernier.start("MAIN");
+  }, 
+  ExitedWithCode(EXIT_FAILURE), 
+  "Vernier::start_part1. Vernier not initialised.");
 }
 
 // MPI is initialised, but the passed communicator handle is
 // MPI_COMM_NULL.
 TEST(ProfilerDeathTest, NullCommunicatorPassed) {
   [[maybe_unused]] int ierr;
-  EXPECT_THROW(meto::vernier.init(MPI_COMM_NULL), std::runtime_error);
+
+  EXPECT_EXIT({
+    meto::vernier.init(MPI_COMM_NULL);
+  },
+  ExitedWithCode(EXIT_FAILURE),
+  "MPIContext::init. MPI initialized, but null communicator passed.");
+
   meto::vernier.finalize();
 }
 
@@ -77,8 +87,12 @@ TEST(ProfilerDeathTest, NullCommunicatorPassed) {
 TEST(ProfilerDeathTest, VernierUninitialisedInWrite) {
 
   // No init() called yet, so MPI context not initialised.
-  EXPECT_THROW(meto::vernier.write(), std::runtime_error);
-
+  
+  EXPECT_EXIT({
+    meto::vernier.write();
+  },
+  ExitedWithCode(EXIT_FAILURE),
+  "Vernier::write. Vernier not initialised.");
 }
 
 // The traceback array is not a growable vector. Check that the code exits
