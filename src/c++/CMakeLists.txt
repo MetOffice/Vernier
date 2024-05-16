@@ -28,7 +28,8 @@ add_library(${CMAKE_PROJECT_NAME}
         error_handler.h     error_handler.cpp
         )
 
-set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h vernier_mpi.h error_handler.h)
+set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h
+          vernier_get_wtime.h vernier_mpi.h mpi_context.h error_handler.h)
 
 # Link library to and external libs (also use project warnings and options).
 set (LIBS OpenMP::OpenMP_CXX)
