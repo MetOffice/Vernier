@@ -83,11 +83,13 @@ int MPI_Comm_free([[maybe_unused]] MPI_Comm* comm)
  * @param [in]  comm     MPI communicator handle.
  * @param [out] newcomm  MPI communicator handle.
  * @returns MPI success code.
+ * @note  Adds 1 to the input communicator handle so that
+ *        input and output handles are not the same.
  */
 
 int MPI_Comm_dup (MPI_Comm const comm, MPI_Comm* newcomm)
 {
-  *newcomm = comm; 
+  *newcomm = comm + 1; 
   return MPI_SUCCESS;
 }
 
