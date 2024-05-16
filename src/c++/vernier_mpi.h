@@ -25,19 +25,19 @@
   using MPI_Comm = int;
   using MPI_Fint = int;
 
-  int MPI_Init([[maybe_unused]] int*, [[maybe_unused]] char***);
+  int MPI_Init([[maybe_unused]] int* const, [[maybe_unused]] char*** const);
   int MPI_Finalize(void);
   int MPI_Initialized(int* value); 
 
   int MPI_Abort([[maybe_unused]] MPI_Comm const comm, int const errcode);
 
-  int MPI_Comm_f2c(MPI_Fint);
+  int MPI_Comm_f2c(MPI_Fint const);
 
   int MPI_Comm_free([[maybe_unused]] MPI_Comm* comm);
-  int MPI_Comm_dup ([[maybe_unused]] MPI_Comm comm, [[maybe_unused]] MPI_Comm* newcomm);
+  int MPI_Comm_dup ([[maybe_unused]] MPI_Comm const comm, [[maybe_unused]] MPI_Comm* newcomm);
 
-  int MPI_Comm_size([[maybe_unused]] MPI_Comm comm, int* size);
-  int MPI_Comm_rank([[maybe_unused]] MPI_Comm comm, int* rank);
+  int MPI_Comm_size([[maybe_unused]] MPI_Comm const comm, int* size);
+  int MPI_Comm_rank([[maybe_unused]] MPI_Comm const comm, int* rank);
 #endif
 
 #endif
