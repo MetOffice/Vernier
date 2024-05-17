@@ -5,10 +5,12 @@
  * -----------------------------------------------------------------------------
  */
 
-#include "mpi_context.h"
-#include <cassert>
 
+#include <cassert>
 #include <stdexcept>
+
+#include "error_handler.h"
+#include "mpi_context.h"
 
 /**
  * @brief  Constructor for an MPI context.
@@ -54,7 +56,7 @@ void meto::MPIContext::init(MPI_Comm client_comm_handle)
 
     // If MPI is initialised, then the passed communicator should not be null.
     if (client_comm_handle == MPI_COMM_NULL) {
-      throw std::runtime_error("MPIContext::init. MPI initialized, but null communicator passed.");
+      meto::error_handler("MPIContext::init. MPI initialized, but null communicator passed.", EXIT_FAILURE);
     }
 
     MPI_Comm_dup(client_comm_handle, &comm_handle_);
@@ -62,7 +64,7 @@ void meto::MPIContext::init(MPI_Comm client_comm_handle)
     MPI_Comm_size(comm_handle_, &comm_size_);
   }
   else {
-      throw std::runtime_error("MPIContext::init. MPI not initialized.");
+    meto::error_handler("MPIContext::init. MPI not initialized.", EXIT_FAILURE);
   }
 
   initialized_ = true;

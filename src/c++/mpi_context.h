@@ -19,9 +19,9 @@
 #define VERNIER_MPI_CONTEXT_H
 
 #include <unordered_map>
-#include <mpi.h>
 
 #include "hashvec.h"
+#include "vernier_mpi.h"
 #include "vernier_gettime.h"
 
 namespace meto

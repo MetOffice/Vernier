@@ -14,25 +14,31 @@ include(CMakePackageConfigHelpers)
 # Add files source files to library. This is STATIC by default and SHARED when
 # the BUILD_SHARED_LIBS option is turned ON.
 add_library(${CMAKE_PROJECT_NAME}
-        vernier.h            vernier.cpp
-        hashtable.h          hashtable.cpp
-        hashvec_handler.h    hashvec_handler.cpp
-        writer/writer.h      writer/writer.cpp
-        writer/multi.h       writer/multi.cpp
-        formatter.h          formatter.cpp
-        hashvec.h            hashvec.cpp
-        vernier_gettime.h    vernier_gettime.cpp
-        vernier_get_wtime.h  vernier_get_wtime.cpp
-        mpi_context.h        mpi_context.cpp
-        error_handler.h      error_handler.cpp
+        vernier.h           vernier.cpp
+        hashtable.h         hashtable.cpp
+        hashvec_handler.h   hashvec_handler.cpp
+        writer/writer.h     writer/writer.cpp
+        writer/multi.h      writer/multi.cpp
+        formatter.h         formatter.cpp
+        hashvec.h           hashvec.cpp
+        vernier_gettime.h   vernier_gettime.cpp
+        vernier_get_wtime.h vernier_get_wtime.cpp
+        mpi_context.h       mpi_context.cpp
+        vernier_mpi.h       vernier_mpi.cpp
+        error_handler.h     error_handler.cpp
         )
 
-set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h vernier_get_wtime.h error_handler.h)
+set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h
+          vernier_get_wtime.h vernier_mpi.h mpi_context.h error_handler.h)
 
 # Link library to and external libs (also use project warnings and options).
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-        ${OPENMP}
-        MPI::MPI_CXX)
+set (LIBS OpenMP::OpenMP_CXX)
+
+if (ENABLE_MPI)
+  list(APPEND LIBS MPI::MPI_CXX)
+endif ()
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${LIBS})
 
 # Set library C++ standard
 target_compile_features(${CMAKE_PROJECT_NAME} PUBLIC cxx_std_17)

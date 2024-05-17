@@ -135,7 +135,7 @@ void meto::Vernier::start_part1()
 
   // Check that Vernier has been initialised
   if (!initialized_) {
-    throw std::runtime_error("Vernier::start_part1. Vernier not initialised.");
+    meto::error_handler("Vernier::start_part1. Vernier not initialised.", EXIT_FAILURE);
   }
 
   // Store the calliper start time, which is used in part2.
@@ -174,7 +174,7 @@ size_t meto::Vernier::start_part2(std::string_view const region_name)
        = TracebackEntry(hash, record_index, region_start_time, logged_calliper_start_time_);
   }
   else {    
-    error_handler("EMERGENCY STOP: Traceback array exhausted.", 102);
+    error_handler("EMERGENCY STOP: Traceback array exhausted.", EXIT_FAILURE);
   }
   return hash;
 }
@@ -204,7 +204,7 @@ void meto::Vernier::stop(size_t const hash)
   // Check that we have called a start calliper before the stop calliper.
   // If not, then the call depth would be -1.
   if (call_depth_ < 0) {
-      error_handler("EMERGENCY STOP: stop called before start calliper.", 101);
+      error_handler("EMERGENCY STOP: stop called before start calliper.", EXIT_FAILURE);
   }
 
   // Get reference to the traceback entry.
@@ -215,7 +215,7 @@ void meto::Vernier::stop(size_t const hash)
   size_t last_hash_on_list = traceback_entry.record_hash_;
   if (hash != last_hash_on_list){
     std::string error_msg = "EMERGENCY STOP: hashes don't match. Expected calliper: " + thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) + " Received calliper: " + thread_hashtables_[tid].get_decorated_region_name(hash) + "\n";
-    error_handler(error_msg, 100);
+    error_handler(error_msg, EXIT_FAILURE);
   }
 
   // Compute the region time
@@ -276,7 +276,7 @@ void meto::Vernier::write()
 {
 
   if (!initialized_){
-    throw std::runtime_error("Vernier::write. Vernier not initialised.");
+    meto::error_handler("Vernier::write. Vernier not initialised.", EXIT_FAILURE);
   }
 
   // Create hashvec handler object and feed in data from thread_hashtables_

@@ -16,11 +16,11 @@
  */
 
 #include "vernier.h"
+#include "vernier_mpi.h"
 #include "vernier_get_wtime.h"
 
 #include <iostream>
 #include <cstring>
-#include <mpi.h>
 
 extern "C" {
   void   c_vernier_init(MPI_Fint const& client_comm_handle);
@@ -40,6 +40,7 @@ extern "C" {
  */
 
 void c_vernier_init(MPI_Fint const& client_comm_handle)
+
 {
   MPI_Comm local_handle = MPI_Comm_f2c(client_comm_handle);
   meto::vernier.init(local_handle);

@@ -5,10 +5,11 @@
 * -----------------------------------------------------------------------------
 */
 
-#include "error_handler.h"
-#include <mpi.h>
 #include <string>
 #include <iostream>
+
+#include "error_handler.h"
+#include "vernier_mpi.h"
 
 /**
  * @brief Error handler class
