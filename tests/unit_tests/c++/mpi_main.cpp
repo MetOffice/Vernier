@@ -6,7 +6,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <mpi.h>
+#include "vernier_mpi.h"
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

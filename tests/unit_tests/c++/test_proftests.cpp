@@ -9,14 +9,13 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <chrono>
-#include <mpi.h>
 
 #include "vernier.h"
+#include "vernier_mpi.h"
 #include "error_handler.h"
 #include "hashvec_handler.h"
 
 using ::testing::ExitedWithCode;
-using ::testing::KilledBySignal;
 
 //
 //  Tests and death tests related to profiler class members.
@@ -42,7 +41,7 @@ TEST(ProfilerDeathTest,WrongHashTest) {
     // Eventually stop prof_main to avoid Wunused telling me off...
     meto::vernier.stop(prof_main);
 
-  }, ExitedWithCode(100), "EMERGENCY STOP: hashes don't match.");
+  }, ExitedWithCode(EXIT_FAILURE), "EMERGENCY STOP: hashes don't match.");
 
   meto::vernier.finalize();
 }
@@ -57,19 +56,30 @@ TEST(ProfilerDeathTest,StopBeforeStartTest) {
     // Stop the profiler before anything is done
     meto::vernier.stop(prof_main);
 
-  }, ExitedWithCode(101), "EMERGENCY STOP: stop called before start calliper.");
+  }, ExitedWithCode(EXIT_FAILURE), "EMERGENCY STOP: stop called before start calliper.");
 }
 
 // Vernier is not initialised before first start() call.
 TEST(ProfilerDeathTest, StartBeforeInit) {
-  EXPECT_THROW(meto::vernier.start("MAIN"), std::runtime_error);
+
+  EXPECT_EXIT({
+    meto::vernier.start("MAIN");
+  }, 
+  ExitedWithCode(EXIT_FAILURE), 
+  "Vernier::start_part1. Vernier not initialised.");
 }
 
 // MPI is initialised, but the passed communicator handle is
 // MPI_COMM_NULL.
 TEST(ProfilerDeathTest, NullCommunicatorPassed) {
   [[maybe_unused]] int ierr;
-  EXPECT_THROW(meto::vernier.init(MPI_COMM_NULL), std::runtime_error);
+
+  EXPECT_EXIT({
+    meto::vernier.init(MPI_COMM_NULL);
+  },
+  ExitedWithCode(EXIT_FAILURE),
+  "MPIContext::init. MPI initialized, but null communicator passed.");
+
   meto::vernier.finalize();
 }
 
@@ -77,8 +87,12 @@ TEST(ProfilerDeathTest, NullCommunicatorPassed) {
 TEST(ProfilerDeathTest, VernierUninitialisedInWrite) {
 
   // No init() called yet, so MPI context not initialised.
-  EXPECT_THROW(meto::vernier.write(), std::runtime_error);
-
+  
+  EXPECT_EXIT({
+    meto::vernier.write();
+  },
+  ExitedWithCode(EXIT_FAILURE),
+  "Vernier::write. Vernier not initialised.");
 }
 
 // The traceback array is not a growable vector. Check that the code exits
@@ -94,7 +108,7 @@ TEST(ProfilerDeathTest, TooManyTracebackEntries) {
       [[maybe_unused]] auto prof_handle = meto::vernier.start("TracebackEntry");
     }
 
-  }, ExitedWithCode(102), "EMERGENCY STOP: Traceback array exhausted.");
+  }, ExitedWithCode(EXIT_FAILURE), "EMERGENCY STOP: Traceback array exhausted.");
 
   meto::vernier.finalize();
 }

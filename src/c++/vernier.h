@@ -21,11 +21,11 @@
 #include <string_view>
 #include <array>
 
-#include <mpi.h>
 #ifdef _OPENMP
   #include <omp.h>
 #endif
 
+#include "vernier_mpi.h"
 #include "mpi_context.h"
 #include "hashtable.h"
 
