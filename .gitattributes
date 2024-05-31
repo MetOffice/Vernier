@@ -50,6 +50,6 @@
 
 # Enable syntax highlighting for files with `.pf` extensions.
 #
-*.pf linguist-language=fortran
+*.pf linguist-language=fortran-free-form
 *.pf linguist-detectable=true
 *.pf linguist-documentation=false
