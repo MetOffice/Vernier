@@ -13,6 +13,7 @@ jobs:
       # The .clang-format file was created using clang-format 16, not all
       # checks are available in earlier versions so the --Wno-error=unknown flag
       # is used. Users should use clang-format 16 or later if possible.
+      run: clang-format -version
       run: >
         find ${{github.workspace}} -iname '*.cpp' -o -iname '*.h' | xargs 
         clang-format --dry-run --Werror --Wno-error=unknown 2>&1
