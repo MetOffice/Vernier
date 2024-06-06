@@ -60,35 +60,24 @@ void meto::Formatter::threads(std::ofstream &os, hashvec_t hashvec) {
 
   // Write key
   os << "\n";
-  os << "region_name@thread_id"
-     << "\n"
-     << "Self time : Time accrued by region itself. (Exclusive time.)"
-     << "\n"
+  os << "region_name@thread_id\n"
+     << "Self time : Time accrued by region itself. (Exclusive time.)\n"
      << "Total time: Time including cost of child routines and profiling "
-        "overheads. (Inclusive time.)"
-     << "\n"
+        "overheads. (Inclusive time.)\n"
      << "Overhead  : Profiling overhead incurred through direct child routine "
-        "calls only."
-     << "\n"
-     << "Calls     : Number of times the region is called."
-     << "\n";
+        "calls only.\n"
+     << "Calls     : Number of times the region is called.\n";
 
   // Write headings
   os << "\n";
-  os << std::setw(40) << std::left << "Region"
-     << " " << std::setw(15) << std::right << "Self (s)"
-     << " " << std::setw(15) << std::right << "Total (s)"
-     << " " << std::setw(15) << std::right << "Overhead (s)"
-     << " " << std::setw(10) << std::right << "Calls"
-     << "\n";
+  os << std::setw(40) << std::left << "Region " << std::setw(15) << std::right
+     << "Self (s) " << std::setw(15) << std::right << "Total (s) "
+     << std::setw(15) << std::right << "Overhead (s) " << std::setw(10)
+     << std::right << "Calls\n";
 
   os << std::setfill('-');
-  os << std::setw(40) << "-"
-     << " " << std::setw(15) << "-"
-     << " " << std::setw(15) << "-"
-     << " " << std::setw(15) << "-"
-     << " " << std::setw(10) << "-"
-     << "\n";
+  os << std::setw(40) << "- " << std::setw(15) << "- " << std::setw(15) << "- "
+     << std::setw(15) << "- " << std::setw(10) << "- \n";
   os << std::setfill(' ');
 
   // Data entries
@@ -125,21 +114,17 @@ void meto::Formatter::drhook(std::ofstream &os, hashvec_t hashvec) {
      << "% Time" << std::setw(13) << std::right << "Cumul" << std::setw(13)
      << std::right << "Self" << std::setw(13) << std::right << "Total"
      << std::setw(15) << std::right << "# of calls" << std::setw(12)
-     << std::right << "Self" << std::setw(12) << std::right << "Total"
-     << "    "
-     << "Routine@"
-     << "\n";
+     << std::right << "Self" << std::setw(12) << std::right << "Total    "
+     << "Routine@\n";
   os << "    " << std::setw(73) << ""
-     << "(Size; Size/sec; Size/call; MinSize; MaxSize)"
-     << "\n";
+     << "(Size; Size/sec; Size/call; MinSize; MaxSize)\n";
 
   // Subheaders
   os << "    " << std::setw(3) << std::left << "" << std::setw(7) << std::right
      << "(self)" << std::setw(13) << std::right << "(sec)" << std::setw(13)
      << std::right << "(sec)" << std::setw(13) << std::right << "(sec)"
      << std::setw(15) << std::right << "" << std::setw(12) << std::right
-     << "ms/call" << std::setw(12) << std::right << "ms/call"
-     << "\n\n";
+     << "ms/call" << std::setw(12) << std::right << "ms/call\n\n";
 
   // Find the highest walltime in table_, which should be the total runtime of
   // the program. This is used later when calculating '% Time'.

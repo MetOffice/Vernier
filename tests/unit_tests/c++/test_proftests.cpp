@@ -61,9 +61,10 @@ TEST(ProfilerDeathTest, StopBeforeStartTest) {
 
 // Vernier is not initialised before first start() call.
 TEST(ProfilerDeathTest, StartBeforeInit) {
-
+  // clang-format off
   EXPECT_EXIT({ meto::vernier.start("MAIN"); }, ExitedWithCode(EXIT_FAILURE),
               "Vernier::start_part1. Vernier not initialised.");
+  // clang-format on
 }
 
 // MPI is initialised, but the passed communicator handle is
@@ -82,9 +83,10 @@ TEST(ProfilerDeathTest, NullCommunicatorPassed) {
 TEST(ProfilerDeathTest, VernierUninitialisedInWrite) {
 
   // No init() called yet, so MPI context not initialised.
-
+  // clang-format off
   EXPECT_EXIT({ meto::vernier.write(); }, ExitedWithCode(EXIT_FAILURE),
               "Vernier::write. Vernier not initialised.");
+  // clang-format on
 }
 
 // The traceback array is not a growable vector. Check that the code exits
