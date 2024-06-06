@@ -5,7 +5,7 @@ on:
 
 jobs:
   format_check:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Check clang-format version
@@ -17,4 +17,4 @@ jobs:
       # is used. Users should use clang-format 16 or later if possible.
       run: >
         find ${{github.workspace}} -iname '*.cpp' -o -iname '*.h' | xargs 
-        clang-format-14 --Wno-error=unknown 2>&1
+        clang-format --dry-run --Werror --Wno-error=unknown 2>&1
