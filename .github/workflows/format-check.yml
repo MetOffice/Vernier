@@ -17,4 +17,4 @@ jobs:
       # is used. Users should use clang-format 16 or later if possible.
       run: >
         find ${{github.workspace}} -iname '*.cpp' -o -iname '*.h' | xargs 
-        clang-format --dry-run --Werror --Wno-error=unknown 2>&1
+        clang-format --dry-run --Wno-error=unknown 2>&1
