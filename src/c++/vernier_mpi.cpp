@@ -15,8 +15,7 @@
  * @returns MPI success code.
  */
 
-int MPI_Init([[maybe_unused]] int* const, [[maybe_unused]] char*** const)
-{
+int MPI_Init([[maybe_unused]] int *const, [[maybe_unused]] char ***const) {
   return MPI_SUCCESS;
 }
 
@@ -25,10 +24,7 @@ int MPI_Init([[maybe_unused]] int* const, [[maybe_unused]] char*** const)
  * @returns MPI success code.
  */
 
-int MPI_Finalize(void)
-{
-  return MPI_SUCCESS;
-}
+int MPI_Finalize(void) { return MPI_SUCCESS; }
 
 /**
  * @brief  Stub for MPI_Abort
@@ -37,22 +33,18 @@ int MPI_Finalize(void)
  * @returns MPI success code.
  */
 
-int MPI_Abort([[maybe_unused]] MPI_Comm const comm, int const errcode)
-{
-  std::exit (errcode);
+int MPI_Abort([[maybe_unused]] MPI_Comm const comm, int const errcode) {
+  std::exit(errcode);
 }
 
 /**
  * @brief  Stub for MPI_Comm_f2c
- * 
+ *
  * @param [in] MPI communicator handle. (Fortran)
  * @returns MPI communicator handle.
  */
 
-int MPI_Comm_f2c(MPI_Fint const comm)
-{
-  return comm;
-}
+int MPI_Comm_f2c(MPI_Fint const comm) { return comm; }
 
 /**
  * @brief  Stub for MPI_Initialized
@@ -60,8 +52,7 @@ int MPI_Comm_f2c(MPI_Fint const comm)
  * @returns MPI success code.
  */
 
-int MPI_Initialized(int* flag)
-{
+int MPI_Initialized(int *flag) {
   *flag = 1;
   return MPI_SUCCESS;
 }
@@ -72,9 +63,8 @@ int MPI_Initialized(int* flag)
  * @returns MPI success code.
  */
 
-int MPI_Comm_free([[maybe_unused]] MPI_Comm* comm)
-{
-  *comm=MPI_COMM_NULL;
+int MPI_Comm_free([[maybe_unused]] MPI_Comm *comm) {
+  *comm = MPI_COMM_NULL;
   return MPI_SUCCESS;
 }
 
@@ -87,9 +77,8 @@ int MPI_Comm_free([[maybe_unused]] MPI_Comm* comm)
  *        input and output handles are not the same.
  */
 
-int MPI_Comm_dup (MPI_Comm const comm, MPI_Comm* newcomm)
-{
-  *newcomm = comm + 1; 
+int MPI_Comm_dup(MPI_Comm const comm, MPI_Comm *newcomm) {
+  *newcomm = comm + 1;
   return MPI_SUCCESS;
 }
 
@@ -100,8 +89,7 @@ int MPI_Comm_dup (MPI_Comm const comm, MPI_Comm* newcomm)
  * @returns MPI success code.
  */
 
-int MPI_Comm_size([[maybe_unused]] MPI_Comm const comm, int* size)
-{
+int MPI_Comm_size([[maybe_unused]] MPI_Comm const comm, int *size) {
   *size = 1;
   return MPI_SUCCESS;
 }
@@ -113,8 +101,7 @@ int MPI_Comm_size([[maybe_unused]] MPI_Comm const comm, int* size)
  * @returns MPI success code.
  */
 
-int MPI_Comm_rank([[maybe_unused]] MPI_Comm const comm, int* rank)
-{
+int MPI_Comm_rank([[maybe_unused]] MPI_Comm const comm, int *rank) {
   *rank = 0;
   return MPI_SUCCESS;
 }

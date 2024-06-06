@@ -4,8 +4,8 @@
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "vernier.h"
 
@@ -16,16 +16,11 @@ TEST(TestMPINotInit, MpiNotInitialised) {
 
 #ifdef USE_MPI
   [[maybe_unused]] int ierr;
-  EXPECT_EXIT({
-      meto::vernier.init();
-  },
-  ExitedWithCode(EXIT_FAILURE),
-  "MPIContext::init. MPI not initialized."),
-  meto::vernier.finalize();
+  EXPECT_EXIT({ meto::vernier.init(); }, ExitedWithCode(EXIT_FAILURE),
+              "MPIContext::init. MPI not initialized."),
+      meto::vernier.finalize();
 #else
   meto::vernier.init();
   meto::vernier.finalize();
 #endif
-
 }
-

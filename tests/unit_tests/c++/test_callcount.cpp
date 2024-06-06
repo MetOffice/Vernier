@@ -6,14 +6,13 @@
 
 #include <gtest/gtest.h>
 #ifdef _OPENMP
-  #include <omp.h>
+#include <omp.h>
 #endif
 #include <vector>
 
 #include "vernier.h"
 
-TEST(HashEntryTest,CallCountTest)
-{
+TEST(HashEntryTest, CallCountTest) {
 
   meto::vernier.init();
 
@@ -27,23 +26,24 @@ TEST(HashEntryTest,CallCountTest)
   int num_threads = 1;
 
   // Start parallel region
-#pragma omp parallel default(none) shared(prof_sub_shared, meto::vernier, num_threads)
+#pragma omp parallel default(none)                                             \
+    shared(prof_sub_shared, meto::vernier, num_threads)
   {
     // Get total number of threads, only need to calculate on a single thread
     // since value won't change.
 #pragma omp single
     {
-    #ifdef _OPENMP
+#ifdef _OPENMP
       num_threads = omp_get_num_threads();
-    #endif 
+#endif
       prof_sub_shared.resize(static_cast<size_t>(num_threads));
     }
 
     // Current thread ID
     int thread_id = 0;
-    #ifdef _OPENMP
-      thread_id = omp_get_thread_num();
-    #endif
+#ifdef _OPENMP
+    thread_id = omp_get_thread_num();
+#endif
 
     // Also initialise prof_sub_private. The compiler doesn't know how many
     // iterations of the subsequent 'for' loop there will be, and may flag
@@ -53,17 +53,14 @@ TEST(HashEntryTest,CallCountTest)
 
     // Call a subregion a differing number of times depending on the thread ID.
     // The highest thread ID will have the fewest calls: just 1.
-    for (int i = 0; i < num_threads-thread_id; ++i)
-    {
+    for (int i = 0; i < num_threads - thread_id; ++i) {
       prof_sub_private = meto::vernier.start("SubRegion");
       meto::vernier.stop(prof_sub_private);
     }
 
     // Give prof_sub_shared a value for later use in EXPECT's
 #pragma omp critical
-    { 
-      prof_sub_shared[static_cast<size_t>(thread_id)] = prof_sub_private;
-    } 
+    { prof_sub_shared[static_cast<size_t>(thread_id)] = prof_sub_private; }
   }
 
   // Stop main region
@@ -72,13 +69,13 @@ TEST(HashEntryTest,CallCountTest)
   // Check call_count_ is the number expected on all threads. On most threads,
   // the profiler calliper call count should match this number, except on thread
   // zero which includes the main region callipers.
-  for (int thread = 0; thread < num_threads; ++thread)
-  {
+  for (int thread = 0; thread < num_threads; ++thread) {
     size_t hash = prof_sub_shared[static_cast<size_t>(thread)];
-    EXPECT_EQ(meto::vernier.get_call_count(hash,thread), num_threads-thread);
+    EXPECT_EQ(meto::vernier.get_call_count(hash, thread), num_threads - thread);
 
-    int incr = (thread==0) ? 1 : 0;
-    EXPECT_EQ(meto::vernier.get_prof_call_count(thread), num_threads-thread+incr);
+    int incr = (thread == 0) ? 1 : 0;
+    EXPECT_EQ(meto::vernier.get_prof_call_count(thread),
+              num_threads - thread + incr);
   }
 
   meto::vernier.finalize();

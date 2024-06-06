@@ -1,12 +1,12 @@
 /* -----------------------------------------------------------------------------
-*  (c) Crown copyright 2024 Met Office. All rights reserved.
-*  The file LICENCE, distributed with this code, contains details of the terms
-*  under which the code may be used.
-* -----------------------------------------------------------------------------
-*/
+ *  (c) Crown copyright 2024 Met Office. All rights reserved.
+ *  The file LICENCE, distributed with this code, contains details of the terms
+ *  under which the code may be used.
+ * -----------------------------------------------------------------------------
+ */
 
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "error_handler.h"
 #include "vernier_mpi.h"
@@ -18,9 +18,9 @@
  * @param [in] errorCode The code for the error
  */
 
-meto::error_handler::error_handler (const std::string &customError, int errorCode)
-{
-    MPI_Comm comm = MPI_COMM_WORLD;
-    std::cerr << customError << "\n";
-    MPI_Abort(comm, errorCode);
+meto::error_handler::error_handler(const std::string &customError,
+                                   int errorCode) {
+  MPI_Comm comm = MPI_COMM_WORLD;
+  std::cerr << customError << "\n";
+  MPI_Abort(comm, errorCode);
 }
