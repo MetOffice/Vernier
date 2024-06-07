@@ -78,6 +78,8 @@ function(set_project_warnings project_name)
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         if(USE_SANITIZERS)
             # Get GCC sanitizers for memory errors/leaks, undefined behaviour and pointer operands
+            # Turn off ODR violation check to avoid global vernier object
+            set(ASAN_OPTIONS=detect_odr_violation=0)
             set(GCC_WARNINGS
                     -fsanitize=address,undefined,leak,pointer-compare,pointer-subtract
                     ${GCC_WARNINGS})
