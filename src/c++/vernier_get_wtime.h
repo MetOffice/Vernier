@@ -9,16 +9,15 @@
  * @file   vernier_get_wtime().h
  * @brief  vernier_get_wtime function which returns the current time
  *
- * 
+ *
  */
 
 #ifndef VERNIER_GET_WTIME_H
 #define VERNIER_GET_WTIME_H
 
-namespace meto
-{
-    // Function prototypes
-    double vernier_get_wtime();
-}
+namespace meto {
+// Function prototypes
+double vernier_get_wtime();
+} // namespace meto
 
 #endif

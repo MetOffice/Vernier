@@ -19,15 +19,14 @@
 
 #include "hashvec.h"
 #include "mpi_context.h"
-#include "writer/writer.h"
 #include "writer/multi.h"
+#include "writer/writer.h"
 
-namespace meto
-{
+namespace meto {
 
 /**
  * @brief  HashVecHandler class
- * 
+ *
  * @details The HashVecHandler contains a hashvec vector as a data member.
  *          It wraps this vector with additional functionality to sort entries
  *          and set a writer strategy based on the PROF_IO_MODE environment
@@ -37,27 +36,23 @@ namespace meto
 
 class HashVecHandler {
 
-  private:
+private:
+  // Vector of hash entries.
+  hashvec_t hashvec_;
 
-    // Vector of hash entries.
-    hashvec_t hashvec_;
+  // Writer strategy
+  std::unique_ptr<Writer> writer_strategy_;
 
-    // Writer strategy
-    std::unique_ptr<Writer> writer_strategy_;
-    
-  public:
+public:
+  // Constructor
+  HashVecHandler(MPIContext const &);
 
-    // Constructor
-    HashVecHandler(MPIContext const&);
-
-    // Member functions
-    void sort();
-    void write();
-    void append(hashvec_t const&);
-    
+  // Member functions
+  void sort();
+  void write();
+  void append(hashvec_t const &);
 };
 
-} // End meto namespace
+} // namespace meto
 
 #endif
-

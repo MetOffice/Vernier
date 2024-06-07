@@ -8,48 +8,44 @@
 /**
  * @file   writer.h
  * @brief  Writer base strategy class.
- * 
+ *
  */
 
 #ifndef VERNIER_WRITER_H
 #define VERNIER_WRITER_H
 
-#include "../mpi_context.h"
 #include "../formatter.h"
+#include "../mpi_context.h"
 
-namespace meto
-{
+namespace meto {
 
 /**
  * @brief   Abstract Writer strategy class.
  * @details Specific implementations of this class override the 'write' function
  *          to produce different behaviour.
- * 
+ *
  */
 
 class Writer {
 
-  protected:
+protected:
+  // Formatter strategy
+  Formatter formatter_;
 
-    // Formatter strategy
-    Formatter formatter_;
+  // Default filename
+  std::string output_filename_ = "vernier-output";
 
-    // Default filename 
-    std::string output_filename_ = "vernier-output";
+  // MPI context
+  MPIContext mpi_context_;
 
-    // MPI context
-    MPIContext mpi_context_;
+public:
+  explicit Writer(MPIContext const &);
+  virtual ~Writer() = default;
 
-  public:
-
-    explicit Writer(MPIContext const&);
-    virtual ~Writer() = default;
-
-    // Pure virtual write method
-    virtual void write(std::ofstream& os, hashvec_t) = 0;
-
+  // Pure virtual write method
+  virtual void write(std::ofstream &os, hashvec_t) = 0;
 };
 
-} // End meto namespace
+} // namespace meto
 
 #endif

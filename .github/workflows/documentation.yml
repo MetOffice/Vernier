@@ -12,7 +12,7 @@ on:
     paths:
       - 'src/**.h'
       - 'src/**.cpp'
-      - 'documentation/**.md'
+      - 'documentation/**'
       - '.github/workflows/documentation.yml'
 
 env:

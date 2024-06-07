@@ -13,7 +13,6 @@
  * @returns The present time point.
  */
 
-meto::time_point_t meto::vernier_gettime()
-{
+meto::time_point_t meto::vernier_gettime() {
   return std::chrono::steady_clock::now();
 }

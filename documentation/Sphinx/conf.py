@@ -17,10 +17,14 @@ author = ''
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here.
-extensions = ["sphinx_sitemap"]
+extensions = ["sphinx_sitemap",
+              "sphinx_design"]
 
 # Add any paths that contain templates here.
 templates_path = ['_templates']
+
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -52,8 +56,18 @@ html_theme_options = {
             "name": "GitHub",
             "url": "https://github.com/MetOffice/vernier",
             "icon": "fa-brands fa-github"
+        },
+        {
+            "name": "GitHub Discussions",
+            "url": "https://github.com/MetOffice/lfric_core/discussions",
+            "icon": "far fa-comments",
         }
     ],
+    "logo": {
+        "text": "LFRic Core",
+        "image_light": "_static/MO_SQUARE_black_mono_for_light_backg_RBG.png",
+        "image_dark": "_static/MO_SQUARE_for_dark_backg_RBG.png",
+    },
     "secondary_sidebar_items": {
         "**/*": ["page-toc", "edit-this-page"],
         "index": [],

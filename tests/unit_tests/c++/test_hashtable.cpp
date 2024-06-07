@@ -4,10 +4,10 @@
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #ifdef _OPENMP
-  #include <omp.h>
+#include <omp.h>
 #endif
 
 #include "vernier.h"
@@ -18,7 +18,7 @@ using ::testing::Gt;
 
 int const tid = 0;
 std::string tid_str(std::to_string(tid));
-std::string tid_bytes(reinterpret_cast<char const*>(&tid), sizeof(tid));
+std::string tid_bytes(reinterpret_cast<char const *>(&tid), sizeof(tid));
 
 //
 //  Testing that the hashing function works as expected (we don't want
@@ -28,13 +28,14 @@ std::string tid_bytes(reinterpret_cast<char const*>(&tid), sizeof(tid));
 //  sure it returns the MDI of 0.0
 //
 
-TEST(HashTableTest,HashFunctionTest) {
+TEST(HashTableTest, HashFunctionTest) {
 
   meto::vernier.init();
 
-  // Create new hashes via HashTable::query_insert, which is used in Vernier::start
-  const auto& prof_rigatoni = meto::vernier.start("Rigatoni");
-  const auto& prof_penne    = meto::vernier.start("Penne");
+  // Create new hashes via HashTable::query_insert, which is used in
+  // Vernier::start
+  const auto &prof_rigatoni = meto::vernier.start("Rigatoni");
+  const auto &prof_penne = meto::vernier.start("Penne");
   meto::vernier.stop(prof_penne);
   meto::vernier.stop(prof_rigatoni);
 
@@ -44,9 +45,12 @@ TEST(HashTableTest,HashFunctionTest) {
     // Checking that:
     //  - query_insert'ing Penne or Rigatoni just returns the hash
     //  - the regions have different hashes
-    //  - the regions have the hashes returned by hash_function_ which uses std::hash
-    EXPECT_EQ(meto::vernier.start("Rigatoni"), std::hash<std::string_view>{}("Rigatoni" + tid_bytes));
-    EXPECT_EQ(meto::vernier.start("Penne"),    std::hash<std::string_view>{}("Penne" + tid_bytes));
+    //  - the regions have the hashes returned by hash_function_ which uses
+    //  std::hash
+    EXPECT_EQ(meto::vernier.start("Rigatoni"),
+              std::hash<std::string_view>{}("Rigatoni" + tid_bytes));
+    EXPECT_EQ(meto::vernier.start("Penne"),
+              std::hash<std::string_view>{}("Penne" + tid_bytes));
   }
 
   meto::vernier.finalize();
@@ -58,7 +62,7 @@ TEST(HashTableTest,HashFunctionTest) {
  *
  */
 
-TEST(HashTableTest,UpdateTimesTest) {
+TEST(HashTableTest, UpdateTimesTest) {
 
   meto::vernier.init();
 
@@ -66,18 +70,20 @@ TEST(HashTableTest,UpdateTimesTest) {
   size_t prof_pie = std::hash<std::string>{}("Pie" + tid_bytes);
 
   // Trying to find a time before .start() will throw an exception
-  EXPECT_THROW(meto::vernier.get_total_walltime(prof_pie, 0), std::out_of_range);
+  EXPECT_THROW(meto::vernier.get_total_walltime(prof_pie, 0),
+               std::out_of_range);
 
   // Start timing
-  auto const& expected_hash = meto::vernier.start("Pie");
-  EXPECT_EQ(expected_hash,prof_pie); // Make sure prof_pie has the hash we expect
+  auto const &expected_hash = meto::vernier.start("Pie");
+  EXPECT_EQ(expected_hash,
+            prof_pie); // Make sure prof_pie has the hash we expect
 
   sleep(1);
 
   // Time t1 declared inbetween .start() and first .stop()
   double const t1 = meto::vernier.get_total_walltime(prof_pie, 0);
 
-  //Stop timing
+  // Stop timing
   meto::vernier.stop(prof_pie);
 
   // Time t2 declared after first vernier.stop()
@@ -92,7 +98,7 @@ TEST(HashTableTest,UpdateTimesTest) {
   double const t3 = meto::vernier.get_total_walltime(prof_pie, 0);
 
   // Expected behaviour: t1 return the MDI and t3 > t2 > 0
-  constexpr double MDI = 0.0;     // Missing Data Indicator (MDI)
+  constexpr double MDI = 0.0; // Missing Data Indicator (MDI)
 
   {
     SCOPED_TRACE("MDI missing from time points expected to return it");
@@ -102,7 +108,7 @@ TEST(HashTableTest,UpdateTimesTest) {
   {
     SCOPED_TRACE("Update potentially not incrementing times correctly");
     EXPECT_GT(t2, 0.0);
-    EXPECT_GT(t3, t2 );
+    EXPECT_GT(t3, t2);
   }
 
   meto::vernier.finalize();

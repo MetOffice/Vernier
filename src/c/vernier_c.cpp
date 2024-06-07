@@ -16,21 +16,21 @@
  */
 
 #include "vernier.h"
-#include "vernier_mpi.h"
 #include "vernier_get_wtime.h"
+#include "vernier_mpi.h"
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 extern "C" {
-  void   c_vernier_init(MPI_Fint const& client_comm_handle);
-  void   c_vernier_finalize();
-  void   c_vernier_start_part1();
-  void   c_vernier_start_part2(long int&, char const*);
-  void   c_vernier_stop (long int const&);
-  void   c_vernier_write();
-  double c_vernier_get_total_walltime(long int const&, int const&);
-  double c_vernier_get_wtime();
+void c_vernier_init(MPI_Fint const &client_comm_handle);
+void c_vernier_finalize();
+void c_vernier_start_part1();
+void c_vernier_start_part2(long int &, char const *);
+void c_vernier_stop(long int const &);
+void c_vernier_write();
+double c_vernier_get_total_walltime(long int const &, int const &);
+double c_vernier_get_wtime();
 }
 
 /**
@@ -39,7 +39,7 @@ extern "C" {
  * @param [in] The Fortran communicator handle.
  */
 
-void c_vernier_init(MPI_Fint const& client_comm_handle)
+void c_vernier_init(MPI_Fint const &client_comm_handle)
 
 {
   MPI_Comm local_handle = MPI_Comm_f2c(client_comm_handle);
@@ -50,19 +50,13 @@ void c_vernier_init(MPI_Fint const& client_comm_handle)
  * @brief  Finalize Vernier.
  */
 
-void c_vernier_finalize() 
-{
-  meto::vernier.finalize();
-}
+void c_vernier_finalize() { meto::vernier.finalize(); }
 
 /**
  * @brief  Start timing, part 1 of 2.
  */
 
-void meto::c_vernier_start_part1()
-{
-  meto::vernier.start_part1();
-}
+void meto::c_vernier_start_part1() { meto::vernier.start_part1(); }
 
 /**
  * @brief  Start timing, part 2 of 2. a named region and return a unique handle.
@@ -70,9 +64,8 @@ void meto::c_vernier_start_part1()
  * @param [out]  hash_out  The returned unique hash for this region.
  */
 
-void meto::c_vernier_start_part2(long int& hash_out, char const* name)
-{
-  size_t hash = meto::vernier.start_part2( name );
+void meto::c_vernier_start_part2(long int &hash_out, char const *name) {
+  size_t hash = meto::vernier.start_part2(name);
 
   // Ensure that the source and destination have the same size.
   static_assert(sizeof(hash) == sizeof(hash_out), "Hash/Out size mismatch.");
@@ -83,35 +76,31 @@ void meto::c_vernier_start_part2(long int& hash_out, char const* name)
  * @brief  Stop timing the region with the specified handle.
  */
 
-void c_vernier_stop(long int const& hash_in)
-{
+void c_vernier_stop(long int const &hash_in) {
   size_t hash;
 
   // Ensure that the source and destination have the same size.
   static_assert(sizeof(hash) == sizeof(hash_in), "Hash/In size mismatch.");
   std::memcpy(&hash, &hash_in, sizeof(hash));
 
-  meto::vernier.stop( hash );
+  meto::vernier.stop(hash);
 }
 
 /**
  * @brief Write the profile itself.
  */
 
-void c_vernier_write()
-{
-  meto::vernier.write();
-}
+void c_vernier_write() { meto::vernier.write(); }
 
 /**
  * @brief  Get the total wallclock time for the specified region on the
  *         specified thread.
- * @param[in] hash_in     The hash of the region of interest. 
+ * @param[in] hash_in     The hash of the region of interest.
  * @param[in] thread_id   Return the time for this thread ID.
  */
 
-double c_vernier_get_total_walltime(long int const& hash_in, int const& thread_id)
-{
+double c_vernier_get_total_walltime(long int const &hash_in,
+                                    int const &thread_id) {
   size_t hash;
 
   // Ensure that the source and destination have the same size.
@@ -125,9 +114,4 @@ double c_vernier_get_total_walltime(long int const& hash_in, int const& thread_i
  * @brief  Timing with clock_gettime().
  */
 
-double c_vernier_get_wtime()
-{
-  return meto::vernier_get_wtime();
-}
-
-
+double c_vernier_get_wtime() { return meto::vernier_get_wtime(); }
