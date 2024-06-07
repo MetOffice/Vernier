@@ -7,3 +7,4 @@ dependencies:
   - sphinx
   - pydata-sphinx-theme
   - sphinx-sitemap
+  - sphinx-design

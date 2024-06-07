@@ -5,8 +5,8 @@
  * -----------------------------------------------------------------------------
  */
 
-#include <gtest/gtest.h>
 #include "vernier_mpi.h"
+#include <gtest/gtest.h>
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
@@ -19,4 +19,3 @@ int main(int argc, char **argv) {
 
   return result;
 }
-

@@ -19,8 +19,7 @@
 
 #include "vernier_gettime.h"
 
-namespace meto
-{
+namespace meto {
 
 /**
  * @brief  Structure to hold information for a particular region.
@@ -30,24 +29,22 @@ namespace meto
  */
 
 struct RegionRecord {
-  public:
+public:
+  // Constructor
+  RegionRecord() = delete;
+  explicit RegionRecord(size_t const, std::string_view const, int);
 
-    // Constructor
-    RegionRecord() = delete;
-    explicit RegionRecord(size_t const, std::string_view const, int);
-
-    // Data members
-    size_t           region_hash_;
-    std::string      region_name_;
-    std::string      decorated_region_name_;
-    time_duration_t  total_walltime_;
-    time_duration_t  recursion_total_walltime_;
-    time_duration_t  self_walltime_;
-    time_duration_t  child_walltime_;
-    time_duration_t  overhead_walltime_;
-    unsigned long long int call_count_;
-    unsigned int     recursion_level_;
-
+  // Data members
+  size_t region_hash_;
+  std::string region_name_;
+  std::string decorated_region_name_;
+  time_duration_t total_walltime_;
+  time_duration_t recursion_total_walltime_;
+  time_duration_t self_walltime_;
+  time_duration_t child_walltime_;
+  time_duration_t overhead_walltime_;
+  unsigned long long int call_count_;
+  unsigned int recursion_level_;
 };
 
 // Define the hashvec type.
@@ -56,7 +53,6 @@ using hashvec_t = std::vector<RegionRecord>;
 // Type definitions
 using record_index_t = std::vector<RegionRecord>::size_type;
 
-} // End meto namespace
+} // namespace meto
 
 #endif
-

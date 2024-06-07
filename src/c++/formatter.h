@@ -18,13 +18,12 @@
 #include <fstream>
 
 #ifdef _OPENMP
-  #include <omp.h>
+#include <omp.h>
 #endif
 
 #include "hashvec.h"
 
-namespace meto
-{
+namespace meto {
 
 /**
  * @brief  Formatter class. Methods write profile data.
@@ -35,26 +34,22 @@ namespace meto
 
 class Formatter {
 
-  private:
+private:
+  // Format method
+  void (Formatter::*format_)(std::ofstream &, hashvec_t);
 
-    // Format method
-    void (Formatter::*format_)(std::ofstream&, hashvec_t);
+  // Individual formatter functions
+  void threads(std::ofstream &os, hashvec_t);
+  void drhook(std::ofstream &os, hashvec_t);
 
-    // Individual formatter functions
-    void  threads(std::ofstream& os, hashvec_t);
-    void  drhook (std::ofstream& os, hashvec_t);
+public:
+  // Constructor
+  explicit Formatter();
 
-  public:
-
-    // Constructor
-    explicit Formatter();
-
-    // Execute the format method
-    void execute_format(std::ofstream& os, hashvec_t);
-   
+  // Execute the format method
+  void execute_format(std::ofstream &os, hashvec_t);
 };
 
-} // End meto namespace
+} // namespace meto
 
 #endif
-

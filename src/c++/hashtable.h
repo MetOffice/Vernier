@@ -28,8 +28,7 @@
 #include "hashvec.h"
 #include "vernier_gettime.h"
 
-namespace meto
-{
+namespace meto {
 
 // Forward declarations
 class HashVecHandler;
@@ -42,9 +41,7 @@ class HashVecHandler;
  */
 
 struct NullHashFunction {
-  std::size_t operator()(std::size_t const& key) const {
-      return key;
-  }
+  std::size_t operator()(std::size_t const &key) const { return key; }
 };
 
 /**
@@ -55,68 +52,66 @@ struct NullHashFunction {
  *
  */
 
-class HashTable{
+class HashTable {
 
-  private:
+private:
+  // Members
+  int tid_;
+  size_t profiler_hash_;
+  record_index_t profiler_index_;
 
-    // Members
-    int tid_;
-    size_t profiler_hash_;
-    record_index_t profiler_index_;
+  // Hash function
+  std::hash<std::string_view> hash_function_;
 
-    // Hash function
-    std::hash<std::string_view> hash_function_;
+  // Hashtable containing locations of region records.
+  std::unordered_map<size_t, record_index_t, NullHashFunction> lookup_table_;
 
-    // Hashtable containing locations of region records.
-    std::unordered_map<size_t, record_index_t, NullHashFunction> lookup_table_;
+  // Vector of region records.
+  hashvec_t hashvec_;
 
-    // Vector of region records.
-    hashvec_t hashvec_;
+  // Private member functions
+  void prepare_computed_times(RegionRecord &);
+  void prepare_computed_times_all();
+  void sort_records();
+  void erase_record(size_t const);
+  void sync_lookup();
+  RegionRecord &hash2record(size_t const);
+  RegionRecord const &hash2record(size_t const) const;
 
-    // Private member functions
-    void prepare_computed_times(RegionRecord&);
-    void prepare_computed_times_all();
-    void sort_records();
-    void erase_record(size_t const);
-    void sync_lookup();
-    RegionRecord&  hash2record(size_t const);
-    RegionRecord const&  hash2record(size_t const) const;
+public:
+  // Constructors
+  HashTable() = delete;
+  HashTable(int);
 
-  public:
+  // Prototypes
+  size_t compute_hash(std::string_view, int);
+  void query_insert(std::string_view const, int, size_t &,
+                    record_index_t &) noexcept;
+  void update(record_index_t const, time_duration_t const);
 
-    // Constructors
-    HashTable() = delete;
-    HashTable(int);
+  // Member functions
+  std::vector<size_t> list_keys();
 
-    // Prototypes
-    size_t compute_hash(std::string_view, int);
-    void query_insert(std::string_view const, int, size_t&, record_index_t&) noexcept;
-    void update(record_index_t const, time_duration_t const);
+  void add_child_time_to_parent(record_index_t const, time_duration_t const,
+                                time_duration_t *&);
+  void add_profiler_call(time_duration_t *&);
 
-    // Member functions
-    std::vector<size_t> list_keys();
+  void compute_self_times();
+  void append_to(HashVecHandler &);
 
-    void add_child_time_to_parent(record_index_t const, time_duration_t const, time_duration_t*&);
-    void add_profiler_call(time_duration_t*&);
+  // Getters
+  double get_total_walltime(size_t const hash) const;
+  double get_overhead_walltime(size_t const hash) const;
+  double get_self_walltime(size_t const hash);
+  double get_child_walltime(size_t const hash) const;
+  std::string get_decorated_region_name(size_t const hash) const;
+  unsigned long long int get_call_count(size_t const hash) const;
+  unsigned long long int get_prof_call_count() const;
 
-    void compute_self_times();
-    void append_to(HashVecHandler&);
-
-    // Getters
-    double                 get_total_walltime(size_t const hash) const;
-    double                 get_overhead_walltime(size_t const hash) const;
-    double                 get_self_walltime(size_t const hash);
-    double                 get_child_walltime(size_t const hash) const;
-    std::string            get_decorated_region_name(size_t const hash) const;
-    unsigned long long int get_call_count(size_t const hash) const;
-    unsigned long long int get_prof_call_count() const;
-
-    void increment_recursion_level(record_index_t const);
-    void decrement_recursion_level(record_index_t const);
-
+  void increment_recursion_level(record_index_t const);
+  void decrement_recursion_level(record_index_t const);
 };
 
-} // End meto namespace
+} // namespace meto
 
 #endif
-

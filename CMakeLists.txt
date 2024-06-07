@@ -46,11 +46,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         include(cmake/Doxygen.cmake)
         include(cmake/Sphinx.cmake)
 
-        # Make sphinx target depend on builing doxygen docs first
-        if(ENABLE_SPHINX)
-                add_dependencies(sphinxdocs doxygendocs)
-        endif()
-
         # Include option to build with/without OpenMP
         include(cmake/BuildOptions.cmake)
 

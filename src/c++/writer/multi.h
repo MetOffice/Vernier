@@ -8,7 +8,7 @@
 /**
  * @file   multi.h
  * @brief  Multi class, derived from Writer.
- * 
+ *
  */
 
 #ifndef VERNIER_MULTI_H
@@ -17,8 +17,7 @@
 #include "../mpi_context.h"
 #include "writer.h"
 
-namespace meto
-{
+namespace meto {
 
 /**
  * @brief   Multiple-file output strategy
@@ -28,21 +27,18 @@ namespace meto
 
 class Multi : public Writer {
 
-  private:
+private:
+  // Method
+  void open_files(std::ofstream &os);
 
-    // Method 
-    void open_files(std::ofstream& os);
+public:
+  // Constructor
+  Multi(MPIContext const &);
 
-  public:
-
-    // Constructor
-    Multi(MPIContext const&);
-
-    // Implementation of pure virtual function.
-    void write(std::ofstream& os, hashvec_t) override;
-
+  // Implementation of pure virtual function.
+  void write(std::ofstream &os, hashvec_t) override;
 };
 
-} // End meto namespace
+} // namespace meto
 
 #endif

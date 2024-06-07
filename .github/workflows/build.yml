@@ -18,17 +18,19 @@ env:
 
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # The CMake configure and build commands are platform-agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
+        mpi_enabled: [ON, OFF]
         compiler: [
           {c: gcc-10, cpp: g++-10, fortran: gfortran-10},
           {c: clang-12, cpp: clang++-12, fortran: gfortran-10}
         ]
+    name: Compiler ${{ matrix.compiler.cpp }} with MPI ${{matrix.mpi_enabled}}
  
     steps:
     - uses: actions/checkout@v3
@@ -62,6 +64,7 @@ jobs:
         -DUSE_SANITIZERS=ON
         -DENABLE_DOXYGEN=OFF
         -DBUILD_DOCS=OFF
+        -DENABLE_MPI=${{ matrix.mpi_enabled }}
 
     - name: Build
       # Build your program with the given configuration

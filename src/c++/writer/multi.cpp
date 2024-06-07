@@ -7,28 +7,26 @@
 
 #include "multi.h"
 
-
 /**
  * @brief  Construct a new Multi writer.
  * @param[in] mpi_context  The MPI context the writer will use.
  */
 
-meto::Multi::Multi(MPIContext const& mpi_context):
-  meto::Multi::Writer(mpi_context) {}
+meto::Multi::Multi(MPIContext const &mpi_context)
+    : meto::Multi::Writer(mpi_context) {}
 
 /**
  * @brief  Opens a unique file per mpi rank
- * 
+ *
  * @param[in] os  Output stream to write to
  */
 
-void meto::Multi::open_files(std::ofstream& os)
-{
+void meto::Multi::open_files(std::ofstream &os) {
 
   // Append the MPI rank to the output filename.
   std::string mpi_filename_tail = "-" + std::to_string(mpi_context_.get_rank());
   output_filename_ += mpi_filename_tail;
-    
+
   os.open(output_filename_);
 }
 
@@ -40,8 +38,7 @@ void meto::Multi::open_files(std::ofstream& os)
  * @param[in] hashvec  The vector containing all necessary data
  */
 
-void meto::Multi::write(std::ofstream& os, hashvec_t hashvec) 
-{
+void meto::Multi::write(std::ofstream &os, hashvec_t hashvec) {
   open_files(os);
   formatter_.execute_format(os, hashvec);
   os.flush();
