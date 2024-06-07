@@ -21,14 +21,14 @@ jobs:
     # The CMake configure and build commands are platform-agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         mpi_enabled: [ON, OFF]
         compiler: [
-          {c: gcc-10, cpp: g++-10, fortran: gfortran-10},
-          {c: clang-12, cpp: clang++-12, fortran: gfortran-10}
+          {c: gcc-12, cpp: g++-12, fortran: gfortran-12},
+          {c: clang-15, cpp: clang++-15, fortran: gfortran-12}
         ]
     name: Compiler ${{ matrix.compiler.cpp }} with MPI ${{matrix.mpi_enabled}}
  
@@ -39,7 +39,7 @@ jobs:
       # Ensure that the OpenMP development libraries are installed.
       run: |
         sudo apt update
-        sudo apt install -y libomp-12-dev
+        sudo apt install -y libomp-15-dev
         sudo apt install -y mpich
 
     - name: Check versions
