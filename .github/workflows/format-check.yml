@@ -1,15 +1,14 @@
-name: format-check.yml
+name: Format Check
 on:
   pull_request:
     branches: [ main ]
 
 jobs:
-  format_check:
+  check:
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
-    - name: Check clang-format version
-      run: clang-format -version
+
     - name: Check style with clang-format
       # Use clang-format to check all C++ files for code style errors.
       # The .clang-format file was created using clang-format 16, not all
