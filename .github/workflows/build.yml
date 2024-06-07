@@ -39,8 +39,9 @@ jobs:
       # Ensure that the OpenMP development libraries are installed.
       run: |
         sudo apt update
+        sudo apt purge -y mpich
         sudo apt install -y libomp-15-dev
-        sudo apt install -y mpich-dev
+        sudo apt install -y mpich
 
     - name: Check versions
       # Print the version number of installed libraries 
