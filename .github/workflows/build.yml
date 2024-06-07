@@ -40,7 +40,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y libomp-15-dev
-        sudo apt install -y mpich
+        sudo apt install -y mpich-dev
 
     - name: Check versions
       # Print the version number of installed libraries 
