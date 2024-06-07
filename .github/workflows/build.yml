@@ -30,7 +30,7 @@ jobs:
           {c: gcc-10, cpp: g++-10, fortran: gfortran-10},
           {c: clang-12, cpp: clang++-12, fortran: gfortran-10}
         ]
-    name: Compiler ${{ matrix.compiler } with MPI ${{matrix.mpi_enabled}}
+    name: Compiler ${{ matrix.compiler }} with MPI ${{matrix.mpi_enabled}}
  
     steps:
     - uses: actions/checkout@v3
