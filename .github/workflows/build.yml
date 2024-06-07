@@ -28,7 +28,7 @@ jobs:
         mpi_enabled: [ON, OFF]
         compiler: [
           {c: gcc-12, cpp: g++-12, fortran: gfortran-12},
-          {c: clang-15, cpp: clang++-15, fortran: gfortran-12}
+          {c: clang-14, cpp: clang++-14, fortran: gfortran-12}
         ]
     name: Compiler ${{ matrix.compiler.cpp }} with MPI ${{matrix.mpi_enabled}}
  
@@ -40,15 +40,8 @@ jobs:
       run: |
         sudo apt update
         sudo apt purge -y mpich
-        sudo apt install -y libomp-15-dev
+        sudo apt install -y libomp-14-dev
         sudo apt install -y mpich
-
-    - name: Check versions
-      # Print the version number of installed libraries 
-      run: | 
-        gcc --version
-        $ echo |cpp -fopenmp -dM |grep -i open
-        mpichversion
        
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
