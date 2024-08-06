@@ -89,7 +89,7 @@ Environment Variables
 
 .. glossary::
 
-   ``PROF_OUTPUT_FORMAT``
+   ``VERNIER_OUTPUT_FORMAT``
 
      This environment variable determines the format of the outputted tables of
      data. There are currently two options:
@@ -103,12 +103,12 @@ Environment Variables
      If this environment variable remains unset, then the default output format
      is the **drhook** option.
 
-   ``PROF_IO_MODE``
+   ``VERNIER_IO_MODE``
 
      Determines the output mode to use. Currently only supports being set to 
      **multi** but single-file-output may be added in the future.
 
-   ``PROF_OUTPUT_FILENAME``
+   ``VERNIER_OUTPUT_FILENAME``
 
      Sets the output filename, which is "vernier-output" by default. Vernier
      will append the MPI rank onto the end of this name by default, resulting
