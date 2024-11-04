@@ -40,9 +40,11 @@ module vernier_mod
 
   interface
 
-    subroutine vernier_init(client_comm_handle)  &
+    subroutine vernier_init(client_comm_handle, tag)  &
                bind(C, name='c_vernier_init')
-      integer, intent(in) :: client_comm_handle
+      import :: c_char
+      integer,                       intent(in) :: client_comm_handle
+      character(kind=c_char, len=1), intent(in) :: tag(*)
     end subroutine vernier_init
 
     subroutine vernier_finalize() bind(C, name='c_vernier_finalize')

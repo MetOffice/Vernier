@@ -25,18 +25,22 @@ meto::MPIContext::MPIContext() { reset(); }
 
 void meto::MPIContext::reset() {
   comm_handle_ = MPI_COMM_NULL;
-  comm_rank_ = -1;
-  comm_size_ = -1;
+  comm_rank_   = -1;
+  comm_size_   = -1;
   initialized_ = false;
+  tag_         = "null";
 }
 
 /**
  * @brief  Initialise a Vernier MPI context.
  * @param [in] comm_client_handle  The communicator to duplicate.
+ * @param [in] Tag appearing in the Vernier output filename.
  * @note  Duplicates the input MPI communicator.
  */
 
-void meto::MPIContext::init(MPI_Comm client_comm_handle) {
+void meto::MPIContext::init(MPI_Comm client_comm_handle, 
+                            std::string_view tag)
+{
 
   // Check that the storage is correctly null first.
   assert(comm_handle_ == MPI_COMM_NULL);
@@ -61,6 +65,8 @@ void meto::MPIContext::init(MPI_Comm client_comm_handle) {
   } else {
     meto::error_handler("MPIContext::init. MPI not initialized.", EXIT_FAILURE);
   }
+
+  tag_ = tag;
 
   initialized_ = true;
 
@@ -110,3 +116,13 @@ int meto::MPIContext::get_rank() { return comm_rank_; }
  */
 
 int meto::MPIContext::get_size() { return comm_size_; }
+
+/**
+ * @brief Gets the tag that will appear in the Vernier output filename.
+ * @note  If the string is set to "null", then this function will still
+ *        return "null".
+ * @returns The tag, as a string.
+ */
+
+std::string meto::MPIContext::get_tag() const { return tag_; }
+

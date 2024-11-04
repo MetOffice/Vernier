@@ -19,6 +19,7 @@
 #define VERNIER_MPI_CONTEXT_H
 
 #include <unordered_map>
+#include <string>
 
 #include "hashvec.h"
 #include "vernier_gettime.h"
@@ -37,6 +38,7 @@ private:
   int comm_size_;
   int comm_rank_;
   bool initialized_;
+  std::string tag_;
 
 public:
   // Constructor
@@ -44,13 +46,14 @@ public:
 
   // Init and finalize
   bool is_initialized();
-  void init(MPI_Comm);
+  void init(MPI_Comm, std::string_view tag = "null");
   void finalize();
   void reset();
 
   // Getters
   int get_size();
   int get_rank();
+  std::string get_tag() const;
 };
 
 } // namespace meto
