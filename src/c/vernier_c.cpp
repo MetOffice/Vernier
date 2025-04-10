@@ -20,7 +20,6 @@
 #include "vernier_mpi.h"
 
 #include <cstring>
-#include <iostream>
 
 extern "C" {
 void c_vernier_init(MPI_Fint const &client_comm_handle);
