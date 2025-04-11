@@ -7,7 +7,7 @@
 include(CMakePackageConfigHelpers)
 
 # Add files source files to library.
-add_library(${CMAKE_PROJECT_NAME}_c 
+add_library(${CMAKE_PROJECT_NAME}_c
         vernier_c.cpp)
 
 # Link library to and external libs (also use project warnings and options).
@@ -20,6 +20,11 @@ set_project_warnings(${CMAKE_PROJECT_NAME}_c)
 
 target_include_directories(${CMAKE_PROJECT_NAME}_c PRIVATE
         ${PROJECT_SOURCE_DIR}/src/c++)
+
+target_include_directories(${CMAKE_PROJECT_NAME}_c
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>)
 
 # Set the properties of the library including, the version and language. Also
 # set which header files are to be public and installed, this can be useful

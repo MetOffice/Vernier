@@ -13,7 +13,7 @@ include(cmake/PreventInSourceBuilds.cmake)
 # project description. Also set the version of the library being built.
 project(vernier LANGUAGES CXX C Fortran
         DESCRIPTION "Met Office Vernier profiler"
-        VERSION 0.1.0)
+        VERSION 0.3.1)
 
 # OpenMP required
 find_package(OpenMP 2.5 REQUIRED)

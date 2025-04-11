@@ -13,10 +13,15 @@ if (ENABLE_MPI)
   list(APPEND PLIBS MPI::MPI_Fortran)
 endif ()
 
-target_link_libraries(${CMAKE_PROJECT_NAME}_f PUBLIC 
+target_link_libraries(${CMAKE_PROJECT_NAME}_f PUBLIC
                       ${CMAKE_PROJECT_NAME}_c
                       ${PLIBS}
                       )
+
+target_include_directories(${CMAKE_PROJECT_NAME}_f
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:include>)
 
 include(FortranCInterface)
 FortranCInterface_VERIFY()
