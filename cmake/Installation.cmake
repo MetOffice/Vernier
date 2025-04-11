@@ -15,7 +15,7 @@ install(
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
-        "${CMAKE_PROJECT_NAME}Config.cmake.in"
+        "cmake/${CMAKE_PROJECT_NAME}Config.cmake.in"
         "${CMAKE_PROJECT_NAME}Config.cmake"
         INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${CMAKE_PROJECT_NAME}"
         PATH_VARS CMAKE_INSTALL_LIBDIR
