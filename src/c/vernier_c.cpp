@@ -21,7 +21,7 @@
 #include <cstring>
 
 extern "C" {
-void c_vernier_init(const MPI_Fint* const client_comm_handle);
+void c_vernier_init(const MPI_Fint *const client_comm_handle);
 void c_vernier_finalize();
 void c_vernier_start_part1();
 void c_vernier_start_part2(long int &, char const *);
@@ -37,8 +37,7 @@ double c_vernier_get_wtime();
  * @param [in] client_comm_handle Fortran communicator handle.
  */
 
-void c_vernier_init(const MPI_Fint* const client_comm_handle)
-{
+void c_vernier_init(const MPI_Fint *const client_comm_handle) {
   MPI_Comm local_handle = MPI_COMM_WORLD;
   if (client_comm_handle) {
     local_handle = MPI_Comm_f2c(*client_comm_handle);
