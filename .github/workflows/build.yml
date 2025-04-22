@@ -15,6 +15,8 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Debug
+  # Turn of ODR violations in the Address Sanitizer. This is a workaround for a known issue with the Address Sanitizer and C++17.
+  ASAN_OPTIONS: detect_odr_violation=0
 
 jobs:
   build:
