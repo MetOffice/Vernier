@@ -89,18 +89,6 @@ def merge_and_analyse(file_path, mpiranks):
 
     return mean_df
 
-
-def crop_numbers(value):
-
-    """ Provides a cropping function for the final average output """
-
-    if isinstance(value, (int, float)):
-        return float(str(value)[:5])
-    
-    return value
-
-   
-    
 def main():
 
     args = parse_cli_arguments()
@@ -117,17 +105,10 @@ def main():
     else:
 
         print("\nReading and Merging...")
-
         merged_frame = merge_and_analyse(file_path, int(mpiranks))
-
-        
- 
-
-
         print("\nWriting...")
         with open(f"{merged_file_name}", 'w') as f:
                   f.write(merged_frame.to_string(index=False, col_space=10))
-
         print(f"Merged outputs written to {merged_file_name}\n")
 
 
