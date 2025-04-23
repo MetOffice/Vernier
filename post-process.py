@@ -7,10 +7,7 @@ import argparse
 from pathlib import Path
 import glob
 
-
-""" Main funcs """
-
-def parse_cli_arguments(arguments: list[str] = None):
+def parse_cli_arguments(arguments: list[str] = None) -> argparse.ArgumentParser:
 
     """ Parses command line arguments for running the script in the terminal """
     parser = argparse.ArgumentParser()
@@ -20,14 +17,16 @@ def parse_cli_arguments(arguments: list[str] = None):
 
     return parser.parse_args(args=arguments)
 
-def read_mpi_ranks(current_dir_path, input_name):
+def read_mpi_ranks(current_dir_path: Path, input_name: str) -> int:
 
     """ Reads the number of vernier-output files from the given directory to determine no. of ranks to use """
     files = glob.glob(f"{current_dir_path}/{input_name}*")
 
     return len(files)
 
-def read_and_pre_process(file_path, rank, input_name):
+def read_and_pre_process(file_path: Path, rank: int, input_name: str) -> pd.DataFrame:
+
+    """ Reads in the current vernier-output file and prepares it for processing in 'merge_and_analyse' """
 
     """ Reads in the current file """
     file = open(f'{file_path}/{input_name}{rank}')
@@ -48,9 +47,9 @@ def read_and_pre_process(file_path, rank, input_name):
 
     return temp_dataframe
 
-def merge_and_analyse(file_path, mpiranks, input_name):
+def merge_and_analyse(file_path: Path, mpiranks: int, input_name: str) -> pd.DataFrame:
 
-    """ Reads in the files and performs analysis on them """
+    """ Reads in the files and merges them """
     print(f"Path to open: {file_path}")
     print(f"Detected {mpiranks} files.")
 
@@ -80,6 +79,7 @@ def merge_and_analyse(file_path, mpiranks, input_name):
 
 def main():
 
+    """ Read in command line arguments, assigning them to variables. Determine how many outputs to merge """
     args = parse_cli_arguments()
     file_path = args.path
     merged_file_name = args.outputname
