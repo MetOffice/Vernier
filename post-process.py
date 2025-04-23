@@ -24,9 +24,26 @@ def read_mpi_ranks(current_dir_path: Path, input_name: str) -> int:
 
     return len(files)
 
-def read_and_pre_process(file_path: Path, rank: int, input_name: str) -> pd.DataFrame:
+def read_and_pre_process(file_path: Path,
+                         rank: int, 
+                         input_name: str,
+                     ) -> pd.DataFrame:
+    """ Reads a vernier-output and processes it 
+    
+    Reads in the current vernier-output file for a given rank before removing
+    whitespace and formatting into a pandas dataframe.
 
-    """ Reads in the current vernier-output file and prepares it for processing in 'merge_and_analyse' """
+    Args:
+        file_path:  The path where the vernier outputs are located
+        rank:       The current output file to open, as different output files 
+                    are ordered according to MPI rank.
+        input_name: The name of the vernier output files without the rank.
+
+    Returns:
+        A Pandas dataframe containing the processed vernier output data.
+        In the current implementation it contains only the name of the routine
+        and corresponding 'Self' and 'Total' values.
+    """
 
     """ Reads in the current file """
     file = open(f'{file_path}/{input_name}{rank}')
