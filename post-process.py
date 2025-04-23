@@ -7,9 +7,18 @@ import argparse
 from pathlib import Path
 import glob
 
-def parse_cli_arguments(arguments: list[str] = None) -> argparse.ArgumentParser:
+def parse_cli_arguments(arguments: list[str] = None,
+                        ) -> argparse.ArgumentParser:
+    """ Parses command line arguments
+     
+    Reads in arguments used in the command line and passes them into the parser object.
+      
+    Args:
+        None.
 
-    """ Parses command line arguments for running the script in the terminal """
+    Returns:
+        The 'parser' object. This contains the arguments to be read into variables for later use.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("-path",          type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
     parser.add_argument("-outputname",    type=str,   default=str("vernier-merged-output"), help="Name of file to write to.")
@@ -17,10 +26,22 @@ def parse_cli_arguments(arguments: list[str] = None) -> argparse.ArgumentParser:
 
     return parser.parse_args(args=arguments)
 
-def read_mpi_ranks(current_dir_path: Path, input_name: str) -> int:
+def read_mpi_ranks(directory_path: Path,
+                    input_name: str,
+                ) -> int:
+    """ Returns the no. of output files
+     
+    Reads the directory containing the output files to determine how many there are.
+    
+    Args:
+        directory_path: The path to the directory containing the files to be opened later.
+        input_name:     The name of the vernier output files.    
 
-    """ Reads the number of vernier-output files from the given directory to determine no. of ranks to use """
-    files = glob.glob(f"{current_dir_path}/{input_name}*")
+    Returns:
+        The length of the 'files' list, which is equal to the number of vernier outputs in the directory         
+    """
+
+    files = glob.glob(f"{directory_path}/{input_name}*")
 
     return len(files)
 
@@ -34,7 +55,7 @@ def read_and_pre_process(file_path: Path,
     whitespace and formatting into a pandas dataframe.
 
     Args:
-        file_path:  The path where the vernier outputs are located
+        file_path:  The path where the vernier outputs are located.
         rank:       The current output file to open, as different output files 
                     are ordered according to MPI rank.
         input_name: The name of the vernier output files without the rank.
@@ -64,9 +85,24 @@ def read_and_pre_process(file_path: Path,
 
     return temp_dataframe
 
-def merge_and_analyse(file_path: Path, mpiranks: int, input_name: str) -> pd.DataFrame:
+def merge_and_analyse(file_path: Path,
+                      mpiranks: int,
+                      input_name: str,
+                  ) -> pd.DataFrame:
+    """ Reads in the files and merges them 
 
-    """ Reads in the files and merges them """
+    Iterates the 'rank' variable, opening all of the vernier outputs using the 'read_and_pre_process'
+    function. It will copy the first output file to the prev_df dataframe, then add all the other files
+    before averaging them.
+
+    Args:
+        file_path: The path where the vernier outputs are located.
+        mpiranks: The number of mpi ranks (equivalent to the number of files) to iterate through.
+        input_name: The name of the vernier output files without the rank.
+
+    Returns:
+        The merged dataframe, containing the routine names and the mean 'Self' and 'Total' values across all outputs.
+    """
     print(f"Path to open: {file_path}")
     print(f"Detected {mpiranks} files.")
 
@@ -78,9 +114,7 @@ def merge_and_analyse(file_path: Path, mpiranks: int, input_name: str) -> pd.Dat
         if rank == 0:     
 
             prev_df = dataframe.copy()
-            min_df = dataframe.copy()
-            max_df = dataframe.copy()
-                    
+
         else:
 
             """ Adds the new loaded dataframe to the previous one, resorting and reorganising the indices every time """
