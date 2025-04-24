@@ -2,7 +2,6 @@ import os
 import pandas as pd
 from io import StringIO as sio
 import re
-import sys
 import argparse
 from pathlib import Path
 import glob
@@ -10,15 +9,16 @@ import glob
 def parse_cli_arguments(arguments: list[str] = None,
                         ) -> argparse.ArgumentParser:
     """ Parses command line arguments
-     
+
     Reads in arguments used in the command line and passes them into the parser object.
-      
+
     Args:
         None.
 
     Returns:
         The 'parser' object. This contains the arguments to be read into variables for later use.
     """
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-path",          type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
     parser.add_argument("-outputname",    type=str,   default=str("vernier-merged-output"), help="Name of file to write to.")
@@ -30,9 +30,9 @@ def read_mpi_ranks(directory_path: Path,
                     input_name: str,
                 ) -> int:
     """ Returns the no. of output files
-     
+
     Reads the directory containing the output files to determine how many there are.
-    
+
     Args:
         directory_path: The path to the directory containing the files to be opened later.
         input_name:     The name of the vernier output files.    
@@ -50,7 +50,7 @@ def read_and_pre_process(file_path: Path,
                          input_name: str,
                      ) -> pd.DataFrame:
     """ Reads a vernier-output and processes it 
-    
+
     Reads in the current vernier-output file for a given rank before removing
     whitespace and formatting into a pandas dataframe.
 
@@ -103,6 +103,7 @@ def merge_and_analyse(file_path: Path,
     Returns:
         The merged dataframe, containing the routine names and the mean 'Self' and 'Total' values across all outputs.
     """
+
     print(f"Path to open: {file_path}")
     print(f"Detected {mpiranks} files.")
 
