@@ -6,6 +6,24 @@ import argparse
 from pathlib import Path
 import glob
 
+""" 
+README
+
+Further documentation is planned for the future. 
+To use this script with the appropriate environment (you'll need Pandas), run this script with:
+
+python post-process.py -path={PATH TO YOUR VERNIER OUTPUTS HERE}
+
+If no path is specified it will look in the current working directory for vernier outputs.
+By default, it will merge the data within the Vernier outputs and write it to the file "vernier-merged-output".
+This can be changed by adding the command-line argument -outputname={YOUR PREFERRED OUTPUTNAME HERE}
+The default vernier files this will attempt to read are of the form 'vernier-output-{rank no}', but this can be changed
+by adding the argument -inputname={YOUR PREFERRED INPUT NAME}
+
+
+README
+""" 
+
 def parse_cli_arguments(input_arguments: list[str] = None,
                         ) -> argparse.ArgumentParser:
     """ Parses command line arguments
