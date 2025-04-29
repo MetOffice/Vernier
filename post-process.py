@@ -6,14 +6,14 @@ import argparse
 from pathlib import Path
 import glob
 
-def parse_cli_arguments(arguments: list[str] = None,
+def parse_cli_arguments(input_arguments: list[str] = None,
                         ) -> argparse.ArgumentParser:
     """ Parses command line arguments
 
     Reads in arguments used in the command line and passes them into the parser object.
 
     Args:
-        None.
+        input_arguments: A list of command-line arguments to be parsed
 
     Returns:
         The 'parser' object. This contains the arguments to be read into variables for later use.
@@ -24,7 +24,7 @@ def parse_cli_arguments(arguments: list[str] = None,
     parser.add_argument("-outputname",    type=str,   default=str("vernier-merged-output"), help="Name of file to write to.")
     parser.add_argument("-inputname",     type=str,   default=str("vernier-output-"),       help="Vernier files to read from.")
 
-    return parser.parse_args(args=arguments)
+    return parser.parse_args(args=input_arguments)
 
 def read_mpi_ranks(directory_path: Path,
                     input_name: str,
