@@ -147,8 +147,11 @@ def main():
 
         print("\nReading and Merging...")
 
+
         merged_frame = merge_and_analyse(file_path, int(mpiranks), input_name)
 
+        thread_string = "@0" 
+        merged_frame["Routine"] = merged_frame["Routine"].str.replace(thread_string, '')
 
         print("\nWriting...")
         with open(f"{merged_file_name}", 'w') as f:
