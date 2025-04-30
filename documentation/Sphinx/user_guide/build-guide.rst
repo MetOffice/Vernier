@@ -95,6 +95,10 @@ up a terminal wherein the user can change build options interactively.
       - **ON** / OFF
       - Determines whether the libraries are linked statically (``OFF``) or 
         dynamically (``ON``).
+    * - ``-DSTRING_LENGTH``
+      - *INTEGER*
+      - Maximum length of the identifier string.  Default if
+        unspecified is truncate strings at 100 characters.
 
 The table above pertains to options specific to Vernier. An extensive
 list of CMake internal variables can be found 
