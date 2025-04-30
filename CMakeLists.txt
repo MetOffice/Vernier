@@ -47,7 +47,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         include(cmake/Sphinx.cmake)
 
         # Include option to build with/without OpenMP
-        include(cmake/BuildOptions.cmake)
+        include(cmake/BuildOptions.cmake)        
 
 endif()
 
@@ -56,3 +56,8 @@ add_subdirectory(src)
 
 # Include the installation options.
 include(cmake/Installation.cmake)
+
+if(STRING_LENGTH)
+  target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
+    PROF_STRING_BUFFER_LENGTH=${STRING_LENGTH})
+endif()
