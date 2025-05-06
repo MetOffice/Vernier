@@ -5,7 +5,7 @@
    -----------------------------------------------------------------------------
 
 Post-processing
--------------------
+---------------
 
 The file 'post-processing.py' can be used for processing the raw outputs 
 into a more usable format, merging all MPI ranks to give the means
@@ -15,16 +15,18 @@ For default usage, run it using:
 
 !!!  NTS
 
-  change the usage for the script using the shebang etc so you can ./post-process, 
-  then change the command just below
+change the usage for the script using the shebang etc so you can ./post-process, 
+then change the command just below
 
 !!! NTS
+
 .. code-block:: shell
 
     python post-process.py -path=path/to/your/vernier/outputs...
 
 There are a number of command line options that can be passed through the
 script, these are given in the table below.
+
 ..  list-table::
     :widths: 20 15 30
     :header-rows: 1
@@ -48,8 +50,6 @@ script, these are given in the table below.
 Below is an example of the current script output.
 This removes a lot of the raw data Vernier collects, most of which
 will be added back at a later date.
-
-**Example "threads" output:**
 
 .. code-block:: text
 
