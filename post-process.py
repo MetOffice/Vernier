@@ -39,8 +39,8 @@ def parse_cli_arguments(input_arguments: list[str] = None,
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-path",          type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
-    parser.add_argument("-outputname",    type=str,   default=str("vernier-merged-output"), help="Name of file to write to.")
-    parser.add_argument("-inputname",     type=str,   default=str("vernier-output-"),       help="Vernier files to read from.")
+    parser.add_argument("-outputname",    type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
+    parser.add_argument("-inputname",     type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
     parser.add_argument("-help",          action="help",                                    help="Show this message and exit")
 
     return parser.parse_args(args=input_arguments)
