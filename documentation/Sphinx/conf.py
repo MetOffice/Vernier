@@ -84,9 +84,9 @@ html_sidebars = {
 # Provides the Edit on GitHub link in the generated docs.
 html_context = {
     "display_github": True,
-    "github_user": "jedbakerMO",
+    "github_user": "MetOffice",
     "github_repo": "vernier",
-    "github_version": "168_post-processing_documentation",
+    "github_version": "main",
     "doc_path": "/documentation/Sphinx/"
 }
 
