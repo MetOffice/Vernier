@@ -5,13 +5,10 @@
    -----------------------------------------------------------------------------
 .. _user_guide_index:
 
-User Guide
+Output
 ==========
 
 .. toctree::
-   :maxdepth: 2
 
-   build-guide/index
-   setting-up/index
-   api/index
-   output/index
+   interpreting-output
+   post-processing
