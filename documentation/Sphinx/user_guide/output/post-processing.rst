@@ -11,18 +11,35 @@ The file 'post-processing.py' can be used for processing the raw outputs
 into a more usable format, merging all MPI ranks to give the means
 across all ranks.
 
-For default usage, run it using:
+Please note that you will need an environment with the pandas library. This is 
+included within the Vernier conda environment, and future versions of this
+script will require additional libraries.
 
-!!!  NTS
+.. dropdown:: ``Creating/ loading conda environments in Bash``
+	
+  1. Navigate to the .yml file
 
-change the usage for the script using the shebang etc so you can ./post-process, 
-then change the command just below
+  .. code-block:: shell
 
-!!! NTS
+    cd etc/conda/
+
+  2. Create the environment from the .yml file
+
+  .. code-block:: shell
+
+    conda env create -f vernier-env.yml
+
+  3. Activate the environment
+
+  .. code-block:: shell
+
+    conda activate vernier-env
+
+With an appropriate environment loaded, run the script with:
 
 .. code-block:: shell
 
-    python post-process.py -path=path/to/your/vernier/outputs...
+    ./post-processing/post-process.py -path=path/to/your/vernier/outputs...
 
 There are a number of command line options that can be passed through the
 script, these are given in the table below.
