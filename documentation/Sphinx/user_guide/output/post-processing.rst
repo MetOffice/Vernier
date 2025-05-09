@@ -25,7 +25,7 @@ With an appropriate environment loaded, run the script with:
 
 .. code-block:: shell
 
-    ./post-processing/post-process.py -path=path/to/your/vernier/outputs...
+    ./post-processing/post-process.py --path=path/to/your/vernier/outputs...
 
 There are a number of command line options that can be passed through the
 script, these are given in the table below.
