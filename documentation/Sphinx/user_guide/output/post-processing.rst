@@ -12,8 +12,7 @@ into a more usable format, merging all MPI ranks to give the means
 across all ranks.
 
 Please note that you will need an environment with the pandas library. This is 
-included within the Vernier conda environment, and future versions of this
-script will require additional libraries.
+included within the Vernier conda environment.
 
 .. dropdown:: ``Creating/ loading conda environments in Bash``
 	
