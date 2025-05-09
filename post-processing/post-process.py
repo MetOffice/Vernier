@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import pandas as pd
 from io import StringIO as sio
@@ -9,17 +10,7 @@ import glob
 """ 
 README
 
-Further documentation is planned for the future. 
-To use this script with the appropriate environment (you'll need Pandas), run this script with:
-
-python post-process.py -path={PATH TO YOUR VERNIER OUTPUTS HERE}
-
-If no path is specified it will look in the current working directory for vernier outputs.
-By default, it will merge the data within the Vernier outputs and write it to the file "vernier-merged-output".
-This can be changed by adding the command-line argument -outputname={YOUR PREFERRED OUTPUTNAME HERE}
-The default vernier files this will attempt to read are of the form 'vernier-output-{rank no}', but this can be changed
-by adding the argument -inputname={YOUR PREFERRED INPUT NAME}
-
+For documentation on this script, please see the post-processing section of the user guide documentation.
 
 README
 """ 
@@ -37,10 +28,10 @@ def parse_cli_arguments(input_arguments: list[str] = None,
         The 'parser' object. This contains the arguments to be read into variables for later use.
     """
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-path",          type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
-    parser.add_argument("-outputname",    type=str,   default=str("vernier-merged-output"), help="Name of file to write to.")
-    parser.add_argument("-inputname",     type=str,   default=str("vernier-output-"),       help="Vernier files to read from.")
+    parser = argparse.ArgumentParser(description="This script is for merging the outputs from a test that uses Vernier callipers into one file. For full documentation please see the post-processing section of the user guide.")
+    parser.add_argument("-p", "--path",       type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
+    parser.add_argument("-o", "--outputname", type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
+    parser.add_argument("-i", "--inputname",  type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
 
     return parser.parse_args(args=input_arguments)
 
@@ -131,21 +122,39 @@ def merge_and_analyse(file_path: Path,
         dataframe = read_and_pre_process(file_path, rank, input_name)
 
         if rank == 0:     
-
+            min_df  = dataframe.copy()
+            max_df  = dataframe.copy()
             prev_df = dataframe.copy()
 
         else:
 
-            """ Adds the new loaded dataframe to the previous one, resorting and reorganising the indices every time """
+            """ Adds the new loaded dataframe to the previous one """
             new_df = prev_df.add(dataframe)
-            new_df["Routine"] = prev_df["Routine"]           
+            new_df["Routine"] = prev_df["Routine"]
+
+            """ Calculates new min/ max values """
+
+            for column in dataframe.columns:
+                min_df[column] = min_df[column].where(min_df[column] < dataframe[column], dataframe[column])
+                max_df[column] = max_df[column].where(max_df[column] > dataframe[column], dataframe[column])
+
+
             prev_df = new_df.copy()
                 
     """ Averages the summed dataframe """    
     mean_df = prev_df.drop(columns=["Routine"]) / int(mpiranks)
     mean_df["Routine"] = prev_df["Routine"]
+    
+    """ Adds the min/ max values to the mean dataframe and renames columns """
+ 
+    for column in mean_df.drop(columns=["Routine"]):
+        mean_df[f"Mean_{column}"] = mean_df[column]
+        mean_df[f"Min_{column}"]  = min_df[column]
+        mean_df[f"Max_{column}"]  = max_df[column]
+        mean_df = mean_df.drop(columns=[f"{column}"])  
 
     return mean_df
+
 
 def main():
 

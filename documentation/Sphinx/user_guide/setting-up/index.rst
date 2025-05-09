@@ -1,17 +1,13 @@
 .. -----------------------------------------------------------------------------
-     (c) Crown copyright 2024 Met Office. All rights reserved.
+     (c) Crown copyright 2025 Met Office. All rights reserved.
      The file LICENCE, distributed with this code, contains details of the terms
      under which the code may be used.
    -----------------------------------------------------------------------------
-.. _user_guide_index:
+.. _setting-up_index:
 
-User Guide
+Setting-up
 ==========
 
 .. toctree::
-   :maxdepth: 2
 
-   build-guide/index
-   setting-up/index
-   api/index
-   output/index
+   setting-up
