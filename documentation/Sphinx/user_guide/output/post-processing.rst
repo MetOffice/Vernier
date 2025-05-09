@@ -37,16 +37,16 @@ script, these are given in the table below.
     * - Argument
       - Default
       - Description
-    * - ``-help``
+    * - ``-h/ --help``
       - N.A
       - Lists all command-line arguments and gives usage
-    * - ``-path``
+    * - ``-p/ --path``
       - Current working directory
       - The path containing the vernier outputs to be processed
-    * - ``-outputname``
+    * - ``-o/ --outputname``
       - vernier-merged-output
       - Name of file to write to
-    * - ``-inputname``
+    * - ``-i/ --inputname``
       - vernier-output-
       - Vernier files to read from
 
