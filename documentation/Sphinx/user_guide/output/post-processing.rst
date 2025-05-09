@@ -15,23 +15,10 @@ Please note that you will need an environment with the pandas library. This is
 included within the Vernier conda environment.
 
 .. dropdown:: ``Creating/ loading conda environments in Bash``
-	
-  1. Navigate to the .yml file
 
   .. code-block:: shell
 
-    cd etc/conda/
-
-  2. Create the environment from the .yml file
-
-  .. code-block:: shell
-
-    conda env create -f vernier-env.yml
-
-  3. Activate the environment
-
-  .. code-block:: shell
-
+    conda env create -f ./etc/conda/vernier-env.yml
     conda activate vernier-env
 
 With an appropriate environment loaded, run the script with:
