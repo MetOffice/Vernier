@@ -3,7 +3,10 @@
 ! The file LICENCE, distributed with this code, contains details of the terms
 ! under which the code may be used.
 !-------------------------------------------------------------------------------
-
+! A system test to allow checking that initialising the Fortran interface
+! without a communicator works and picks up the default communicator for
+! Vernier. This doesn't work as a unit test due to the way MPI is used in
+! pFUnit.
 program test_initialisation
   use vernier_mod, only: vik, &
                          vernier_init, vernier_finalize, &
@@ -26,7 +29,9 @@ program test_initialisation
   call sleep(1)
   call vernier_stop(hash_out)
 
-  Call vernier_finalize()
-call mpi_finalize(ierr)
+  call vernier_finalize()
+
+  call mpi_finalize(ierr)
 
 end program test_initialisation
+
