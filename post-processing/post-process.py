@@ -122,21 +122,39 @@ def merge_and_analyse(file_path: Path,
         dataframe = read_and_pre_process(file_path, rank, input_name)
 
         if rank == 0:     
-
+            min_df  = dataframe.copy()
+            max_df  = dataframe.copy()
             prev_df = dataframe.copy()
 
         else:
 
-            """ Adds the new loaded dataframe to the previous one, resorting and reorganising the indices every time """
+            """ Adds the new loaded dataframe to the previous one """
             new_df = prev_df.add(dataframe)
-            new_df["Routine"] = prev_df["Routine"]           
+            new_df["Routine"] = prev_df["Routine"]
+
+            """ Calculates new min/ max values """
+
+            for column in dataframe.columns:
+                min_df[column] = min_df[column].where(min_df[column] < dataframe[column], dataframe[column])
+                max_df[column] = max_df[column].where(max_df[column] > dataframe[column], dataframe[column])
+
+
             prev_df = new_df.copy()
                 
     """ Averages the summed dataframe """    
     mean_df = prev_df.drop(columns=["Routine"]) / int(mpiranks)
     mean_df["Routine"] = prev_df["Routine"]
+    
+    """ Adds the min/ max values to the mean dataframe and renames columns """
+ 
+    for column in mean_df.drop(columns=["Routine"]):
+        mean_df[f"Mean_{column}"] = mean_df[column]
+        mean_df[f"Min_{column}"]  = min_df[column]
+        mean_df[f"Max_{column}"]  = max_df[column]
+        mean_df = mean_df.drop(columns=[f"{column}"])  
 
     return mean_df
+
 
 def main():
 
