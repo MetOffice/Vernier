@@ -21,7 +21,7 @@ module vernier_mod
 
   !> The real kind for region timings.
   integer, public, parameter :: vrk = c_double
-  
+
   !-----------------------------------------------------------------------------
   ! Public interfaces / subroutines
   !-----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ module vernier_mod
   public :: vernier_stop
   public :: vernier_write
   public :: vernier_get_total_walltime
-  public :: vernier_get_wtime 
+  public :: vernier_get_wtime
 
   !-----------------------------------------------------------------------------
   ! Interfaces
@@ -42,7 +42,7 @@ module vernier_mod
 
     subroutine vernier_init(client_comm_handle)  &
                bind(C, name='c_vernier_init')
-      integer, intent(in) :: client_comm_handle
+      integer, optional, intent(in) :: client_comm_handle
     end subroutine vernier_init
 
     subroutine vernier_finalize() bind(C, name='c_vernier_finalize')
@@ -117,7 +117,7 @@ module vernier_mod
     !> @brief  Adds a null character to the end of a string.
     !> @param [in]  strlen      Length of the unterminated string.
     !> @param [in]  string_in   Unterminated string.
-    !> @param [out] string_out  Null-terminated string. 
+    !> @param [out] string_out  Null-terminated string.
     !> @note  Tests suggested that adding the null character in this manner, as
     !>     opposed to the concatenation operator (//) has performance benefits.
     subroutine append_null_char(string_in, string_out, strlen)

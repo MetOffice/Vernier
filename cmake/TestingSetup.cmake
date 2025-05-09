@@ -57,6 +57,10 @@ if(BUILD_TESTS)
         message(STATUS "Found pFUnit testing framework")
     endif()
 
+    # Set the MPI test executable name.
+    set(MPITEST_EXECUTABLE_NAME mpiexec)
+    set(MPIEXEC_NUMPROC_FLAG "-np")
+
     # Enable testing with CTest.
     enable_testing()
     add_subdirectory(tests)
