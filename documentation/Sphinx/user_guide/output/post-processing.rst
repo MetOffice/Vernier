@@ -77,10 +77,8 @@ runtime_constants_dycore_damping     14.5336     14.059     14.837    14.5336   
               transport_moisture     31.9320     31.537     32.329     5.7346      5.712      5.786
 
 * Routine: The name of the callipered region.
-* Mean_Total: Mean total time spent between the two callipers for this region including
-  calls to elsewhere.
+* Mean_Total: Mean total time spent between the two callipers for this region including calls to elsewhere.
 * Min_Total: Minimum value recorded for the Total value across all ranks
 * Max_Total: Maximum value recorded for the Total value across all ranks
-* Mean_Self: Mean total time spent inside the corresponding region only (excluding calls
-  to other regions).
+* Mean_Self: Mean total time spent inside the corresponding region only (excluding calls to other regions).
 
