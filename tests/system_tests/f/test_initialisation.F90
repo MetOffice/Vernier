@@ -27,6 +27,6 @@ program test_initialisation
   call vernier_stop(hash_out)
 
   Call vernier_finalize()
-
+call mpi_finalize(ierr)
 
 end program test_initialisation
