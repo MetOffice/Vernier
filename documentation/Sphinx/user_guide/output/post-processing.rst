@@ -51,8 +51,6 @@ script, these are given in the table below.
       - Vernier files to read from
 
 Below is an example of the current script output.
-This removes a lot of the raw data Vernier collects, most of which
-will be added back at a later date.
 
 .. code-block:: text
 
