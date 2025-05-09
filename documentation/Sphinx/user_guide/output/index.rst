@@ -6,7 +6,7 @@
 .. _output_index:
 
 Output
-==========
+======
 
 .. toctree::
 
