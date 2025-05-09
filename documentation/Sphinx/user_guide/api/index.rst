@@ -6,7 +6,7 @@
 .. _api_index:
 
 API
-==========
+===
 
 .. toctree::
 
