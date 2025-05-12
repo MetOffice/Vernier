@@ -46,7 +46,7 @@ void c_vernier_init(MPI_Fint *const client_comm_handle, char *const tag) {
     local_handle = MPI_Comm_f2c(*client_comm_handle);
   } 
 
-  std::string local_tag;
+  std::string local_tag = MPI_CONTEXT_NULL_STRING;
   if(tag) {
     local_tag = static_cast<std::string>(tag);
   }

@@ -26,7 +26,7 @@ meto::Writer::Writer(MPIContext const &mpi_context) {
   std::string tag = mpi_context.get_tag();
 
   // If the MPI context has a tag, append it to the output filename.
-  if (tag != "null") {
+  if (tag != MPI_CONTEXT_NULL_STRING) {
     output_filename_ = output_filename_ + "-" + tag;
   }
 

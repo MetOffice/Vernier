@@ -101,8 +101,8 @@ public:
   Vernier() = default;
 
   // Member functions
-  void init(MPI_Comm const client_comm_handle = MPI_COMM_WORLD,
-                           std::string_view tag = "null" );
+  void init(MPI_Comm const client_comm_handle   = MPI_COMM_WORLD,
+                           std::string_view tag = MPI_CONTEXT_NULL_STRING);
   void finalize();
   size_t start(std::string_view const);
   void stop(size_t const);

@@ -25,6 +25,8 @@
 #include "vernier_gettime.h"
 #include "vernier_mpi.h"
 
+#define MPI_CONTEXT_NULL_STRING "mpi_context_null_string"
+
 namespace meto {
 
 /**
@@ -46,7 +48,7 @@ public:
 
   // Init and finalize
   bool is_initialized();
-  void init(MPI_Comm, std::string_view tag = "null");
+  void init(MPI_Comm, std::string_view tag);
   void finalize();
   void reset();
 

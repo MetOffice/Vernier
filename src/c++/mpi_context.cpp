@@ -28,7 +28,7 @@ void meto::MPIContext::reset() {
   comm_rank_   = -1;
   comm_size_   = -1;
   initialized_ = false;
-  tag_         = "null";
+  tag_         = MPI_CONTEXT_NULL_STRING;
 }
 
 /**
@@ -119,8 +119,6 @@ int meto::MPIContext::get_size() { return comm_size_; }
 
 /**
  * @brief Gets the tag that will appear in the Vernier output filename.
- * @note  If the string is set to "null", then this function will still
- *        return "null".
  * @returns The tag, as a string.
  */
 
