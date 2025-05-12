@@ -12,7 +12,7 @@
 using ::testing::ExitedWithCode;
 
 // Attempt to initialise Vernier without MPI being initialized.
-TEST(TestMPINotInit, MpiNotInitialised) {
+TEST(MPINotInitTest, MpiNotInitialised) {
 
   // clang-format off
 #ifdef USE_MPI

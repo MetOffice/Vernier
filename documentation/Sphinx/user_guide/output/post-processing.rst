@@ -11,6 +11,7 @@ The file 'post-processing.py' can be used for processing the raw Vernier outputs
 into a more usable format, merging all MPI ranks to give the means, minimum and
 maximum of every callipered region across all ranks.
 
+
 Please note that you will need an environment with the pandas library. This is 
 included within the Vernier conda environment.
 
@@ -25,7 +26,7 @@ With an appropriate environment loaded, run the script with:
 
 .. code-block:: shell
 
-    ./post-processing/post-process.py -path=path/to/your/vernier/outputs...
+    ./post-processing/post-process.py --path=path/to/your/vernier/outputs...
 
 There are a number of command line options that can be passed through the
 script, these are given in the table below.
@@ -81,4 +82,5 @@ Below is an example of the current script output.
 * Min_Total: Minimum value recorded for the Total value across all ranks
 * Max_Total: Maximum value recorded for the Total value across all ranks
 * Mean_Self: Mean total time spent inside the corresponding region only (excluding calls to other regions).
+
 
