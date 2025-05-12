@@ -21,7 +21,7 @@ module vernier_mod
 
   !> The real kind for region timings.
   integer, public, parameter :: vrk = c_double
-  
+
   !-----------------------------------------------------------------------------
   ! Public interfaces / subroutines
   !-----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ module vernier_mod
   public :: vernier_stop
   public :: vernier_write
   public :: vernier_get_total_walltime
-  public :: vernier_get_wtime 
+  public :: vernier_get_wtime
 
   !-----------------------------------------------------------------------------
   ! Interfaces
@@ -43,8 +43,8 @@ module vernier_mod
     subroutine interface_vernier_init(client_comm_handle, tag)  &
                bind(C, name='c_vernier_init')
       import :: c_char
-      integer,                       intent(in) :: client_comm_handle
-      character(kind=c_char, len=1), intent(in) :: tag(*)
+      integer,                       optional, intent(in) :: client_comm_handle
+      character(kind=c_char, len=1), optional, intent(in) :: tag(*)
     end subroutine interface_vernier_init
 
     subroutine vernier_finalize() bind(C, name='c_vernier_finalize')
@@ -103,13 +103,17 @@ module vernier_mod
       implicit none
 
       !Arguments
-      integer,          intent(in) :: client_comm_handle
-      character(len=*), intent(in) :: tag
+      integer,          optional, intent(in) :: client_comm_handle
+      character(len=*), optional, intent(in) :: tag
 
       !Local variables
-      character(len=len_trim(tag)+1) :: local_tag
+      character(len=:), allocatable :: local_tag
 
-      call append_null_char(tag, local_tag, len_trim(tag))
+      if (present(tag)) then
+        allocate(character(len=len_trim(tag)+1) :: local_tag)
+        call append_null_char(tag, local_tag, len_trim(tag))
+      end if
+
       call interface_vernier_init(client_comm_handle, local_tag)
 
     end subroutine vernier_init
@@ -140,7 +144,7 @@ module vernier_mod
     !> @brief  Adds a null character to the end of a string.
     !> @param [in]  strlen      Length of the unterminated string.
     !> @param [in]  string_in   Unterminated string.
-    !> @param [out] string_out  Null-terminated string. 
+    !> @param [out] string_out  Null-terminated string.
     !> @note  Tests suggested that adding the null character in this manner, as
     !>     opposed to the concatenation operator (//) has performance benefits.
     subroutine append_null_char(string_in, string_out, strlen)

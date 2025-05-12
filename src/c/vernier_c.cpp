@@ -18,11 +18,11 @@
 #include "vernier.h"
 #include "vernier_get_wtime.h"
 #include "vernier_mpi.h"
-
 #include <cstring>
+#include <string>
 
 extern "C" {
-void c_vernier_init(MPI_Fint const &client_comm_handle, char const *tag);
+void c_vernier_init(MPI_Fint *const client_comm_handle, char *const tag);
 void c_vernier_finalize();
 void c_vernier_start_part1();
 void c_vernier_start_part2(long int &, char const *);
@@ -35,16 +35,23 @@ double c_vernier_get_wtime();
 /**
  * @brief  Set a client-code-defined MPI communicator handle.
  * @details May be used to set other values in future, too.
- * @param [in] client_comm_handle The Fortran communicator handle.
- * @param [in] tag The tag to appear in the Vernier output filename.
+ * @param [in] client_comm_handle Fortran communicator handle.
+ * @param [in] tag  Tag to appear in the Vernier output filename.
  */
 
-void c_vernier_init(MPI_Fint const &client_comm_handle, char const *tag)
+void c_vernier_init(MPI_Fint *const client_comm_handle, char *const tag) {
 
-{
-  MPI_Comm local_handle = MPI_Comm_f2c(client_comm_handle);
-  std::string_view sv_tag(tag);
-  meto::vernier.init(local_handle, sv_tag);
+  MPI_Comm local_handle = MPI_COMM_WORLD;
+  if (client_comm_handle) {
+    local_handle = MPI_Comm_f2c(*client_comm_handle);
+  } 
+
+  std::string local_tag;
+  if(tag) {
+    local_tag = static_cast<std::string>(tag);
+  }
+
+  meto::vernier.init(local_handle, local_tag);
 }
 
 /**

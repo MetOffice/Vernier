@@ -18,6 +18,7 @@ Documentation for the project can be found [here](https://metoffice.github.io/Ve
 - C++17 compatible compiler.
 - CMake version 3.13 or newer.
 - GoogleTest version 1.11 or newer.
+- pFUnit version 4.4.1 or newer.
 
 ### Supported Compilers
 

@@ -79,6 +79,10 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
   assert(static_cast<int>(thread_traceback_.size()) == max_threads_);
   assert(mpi_context_.is_initialized());
   assert(initialized_);
+#ifndef NDEBUG
+  std::cout << "Vernier Initialised with communicator handle: "
+            << client_comm_handle << std::endl;
+#endif
 }
 
 /**
