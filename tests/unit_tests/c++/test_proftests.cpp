@@ -17,11 +17,11 @@
 using ::testing::ExitedWithCode;
 
 //
-//  Tests and death tests related to profiler class members.
+//  Tests and death tests related to Vernier class members.
 //
 
 // Make sure the code exits when a hash mismatch happens.
-TEST(ProfilerDeathTest, WrongHashTest) {
+TEST(DeathTest, WrongHashTest) {
 
   meto::vernier.init();
 
@@ -34,7 +34,7 @@ TEST(ProfilerDeathTest, WrongHashTest) {
         const auto &prof_sub = meto::vernier.start("Vanilla");
         meto::vernier.stop(prof_sub);
 
-        // Wrong hash in profiler.stop()
+        // Wrong hash in Vernier.stop()
         meto::vernier.stop(prof_sub);
 
         // Eventually stop prof_main to avoid Wunused telling me off...
@@ -46,13 +46,13 @@ TEST(ProfilerDeathTest, WrongHashTest) {
 }
 
 // Tests for a segfault when stopping before anything else.
-TEST(ProfilerDeathTest, StopBeforeStartTest) {
+TEST(DeathTest, StopBeforeStartTest) {
 
   EXPECT_EXIT(
       {
         const auto prof_main = std::hash<std::string_view>{}("Main");
 
-        // Stop the profiler before anything is done
+        // Stop Vernier before anything is done
         meto::vernier.stop(prof_main);
       },
       ExitedWithCode(EXIT_FAILURE),
@@ -60,7 +60,7 @@ TEST(ProfilerDeathTest, StopBeforeStartTest) {
 }
 
 // Vernier is not initialised before first start() call.
-TEST(ProfilerDeathTest, StartBeforeInit) {
+TEST(DeathTest, StartBeforeInit) {
   // clang-format off
   EXPECT_EXIT({ meto::vernier.start("MAIN"); }, ExitedWithCode(EXIT_FAILURE),
               "Vernier::start_part1. Vernier not initialised.");
@@ -69,7 +69,7 @@ TEST(ProfilerDeathTest, StartBeforeInit) {
 
 // MPI is initialised, but the passed communicator handle is
 // MPI_COMM_NULL.
-TEST(ProfilerDeathTest, NullCommunicatorPassed) {
+TEST(DeathTest, NullCommunicatorPassed) {
   [[maybe_unused]] int ierr;
 
   EXPECT_EXIT(
@@ -80,7 +80,7 @@ TEST(ProfilerDeathTest, NullCommunicatorPassed) {
 }
 
 // Check that uninitialised MPI is caught in the write functionality.
-TEST(ProfilerDeathTest, VernierUninitialisedInWrite) {
+TEST(DeathTest, VernierUninitialisedInWrite) {
 
   // No init() called yet, so MPI context not initialised.
   // clang-format off
@@ -91,7 +91,7 @@ TEST(ProfilerDeathTest, VernierUninitialisedInWrite) {
 
 // The traceback array is not a growable vector. Check that the code exits
 // when available array elements are exhausted.
-TEST(ProfilerDeathTest, TooManyTracebackEntries) {
+TEST(DeathTest, TooManyTracebackEntries) {
 
   meto::vernier.init();
 
@@ -110,7 +110,7 @@ TEST(ProfilerDeathTest, TooManyTracebackEntries) {
 }
 
 // Tests the correct io mode is set. If not set correctly it will exit.
-TEST(ProfilerDeathTest, InvalidIOModeTest) {
+TEST(DeathTest, InvalidIOModeTest) {
   EXPECT_EXIT(
       {
         meto::MPIContext mpi_context;
