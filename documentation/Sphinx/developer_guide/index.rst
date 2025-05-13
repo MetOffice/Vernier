@@ -16,16 +16,6 @@ Vernier.
    :titlesonly:
    :maxdepth: 1
 
+   dev_process
    testing
-
-Development Process
--------------------
-
-Information about the development process can be found
-`here <https://github.com/MetOffice/Vernier/wiki/DevelopmentTesting>`__.
-
-Code Review Guidance
---------------------
-
-Guidelines for requesting and performing a code review are
-`here <https://github.com/MetOffice/Vernier/wiki/CodeReview>`__.
+   review_process
