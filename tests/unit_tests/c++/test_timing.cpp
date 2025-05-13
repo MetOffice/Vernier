@@ -13,7 +13,7 @@
 #include "vernier.h"
 #include "vernier_get_wtime.h"
 
-TEST(SystemTests, TimingTest) {
+TEST(SystemTest, TimingTest) {
 
   meto::vernier.init();
 

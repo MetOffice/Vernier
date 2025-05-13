@@ -3,3 +3,4 @@
 #  The file LICENCE, distributed with this code, contains details of the terms
 #  under which the code may be used.
 # ------------------------------------------------------------------------------
+add_subdirectory(f)

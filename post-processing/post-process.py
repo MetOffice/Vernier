@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import pandas as pd
 from io import StringIO as sio
@@ -9,17 +10,7 @@ import glob
 """ 
 README
 
-Further documentation is planned for the future. 
-To use this script with the appropriate environment (you'll need Pandas), run this script with:
-
-python post-process.py -path={PATH TO YOUR VERNIER OUTPUTS HERE}
-
-If no path is specified it will look in the current working directory for vernier outputs.
-By default, it will merge the data within the Vernier outputs and write it to the file "vernier-merged-output".
-This can be changed by adding the command-line argument -outputname={YOUR PREFERRED OUTPUTNAME HERE}
-The default vernier files this will attempt to read are of the form 'vernier-output-{rank no}', but this can be changed
-by adding the argument -inputname={YOUR PREFERRED INPUT NAME}
-
+For documentation on this script, please see the post-processing section of the user guide documentation.
 
 README
 """ 
@@ -37,10 +28,10 @@ def parse_cli_arguments(input_arguments: list[str] = None,
         The 'parser' object. This contains the arguments to be read into variables for later use.
     """
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-path",          type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
-    parser.add_argument("-outputname",    type=str,   default=str("vernier-merged-output"), help="Name of file to write to.")
-    parser.add_argument("-inputname",     type=str,   default=str("vernier-output-"),       help="Vernier files to read from.")
+    parser = argparse.ArgumentParser(description="This script is for merging the outputs from a test that uses Vernier callipers into one file. For full documentation please see the post-processing section of the user guide.")
+    parser.add_argument("-p", "--path",       type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
+    parser.add_argument("-o", "--outputname", type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
+    parser.add_argument("-i", "--inputname",  type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
 
     return parser.parse_args(args=input_arguments)
 
