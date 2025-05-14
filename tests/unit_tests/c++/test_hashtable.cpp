@@ -126,8 +126,7 @@ TEST(HashTableTest, NameLengthTest) {
 
   meto::vernier.init();
 
-  EXPECT_EXIT(meto::vernier.start(label),
-              testing::ExitedWithCode(1),
+  EXPECT_EXIT(meto::vernier.start(label), testing::ExitedWithCode(1),
               "Internal error: character buffer exhausted.");
 
   meto::vernier.finalize();
