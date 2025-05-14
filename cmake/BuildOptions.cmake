@@ -16,4 +16,4 @@ if(BUILD_OPENMP)
 endif()
 
 # Optional profiler string length
-option(STRING_LENGTH "Maximum identifer string length")
+option(STRING_LENGTH "Maximum identifer string length" 100)

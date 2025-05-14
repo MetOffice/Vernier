@@ -57,7 +57,13 @@ add_subdirectory(src)
 # Include the installation options.
 include(cmake/Installation.cmake)
 
+# Allow the maximum label sizes to be tuned
 if(STRING_LENGTH)
-  target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
-    PROF_STRING_BUFFER_LENGTH=${STRING_LENGTH})
+  if(STRING_LENGTH GREATER_EQUAL 100)
+    message(STATUS "Label name length is ${STRING_LENGTH}")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+      PROF_STRING_BUFFER_LENGTH=${STRING_LENGTH})
+  else()
+    message(WARNING "Label name length is too small - using 100")
+  endif()
 endif()

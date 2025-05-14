@@ -14,11 +14,6 @@
 #include <cstring>
 #include <iterator>
 
-#define PROF_HASHVEC_RESERVE_SIZE 1000
-#ifndef PROF_STRING_BUFFER_LENGTH
-#define PROF_STRING_BUFFER_LENGTH 100
-#endif
-
 /**
  * @brief Hashtable constructor
  * @param [in] tid  The thread ID.
