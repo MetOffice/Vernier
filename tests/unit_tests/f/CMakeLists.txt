@@ -14,13 +14,10 @@ if (BUILD_FORTRAN_TESTS)
         MAX_PES 2
     )
     target_include_directories(${TESTNAME_PREFIX}.${test_name} PUBLIC ${CMAKE_BINARY_DIR}/src/f/modules)
-    if (ENABLE_MPI)
-      target_compile_definitions(${TESTNAME_PREFIX}.${test_name} PRIVATE USE_MPI)
-    endif()
   endfunction()
 
   if (ENABLE_MPI)
-      add_fortran_unit_test(TestVernier test_vernier_mod.pf)
+    add_fortran_unit_test(TestVernier test_vernier_mod.pf)
   endif()
 
 endif ()

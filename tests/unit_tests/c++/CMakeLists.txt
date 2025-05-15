@@ -31,8 +31,8 @@ function(add_unit_test test_name cpp_file)
     target_include_directories(${test_name} PRIVATE
             ${PROJECT_SOURCE_DIR}/src/c++)
     gtest_discover_tests(${test_name})
-    if (ENABLE_MPI)
-      target_compile_definitions(${test_name} PRIVATE USE_MPI)
+    if (NOT ENABLE_MPI)
+      target_compile_definitions(${test_name} PRIVATE USE_VERNIER_MPI_STUB)
     endif()
 endfunction()
 
@@ -63,8 +63,8 @@ function(add_mpi_not_init_unit_test test_name cpp_file)
     target_include_directories(${test_name} PRIVATE
             ${PROJECT_SOURCE_DIR}/src/c++)
     gtest_discover_tests(${test_name})
-    if (ENABLE_MPI)
-      target_compile_definitions(${test_name} PUBLIC USE_MPI)
+    if (NOT ENABLE_MPI)
+      target_compile_definitions(${test_name} PRIVATE USE_VERNIER_MPI_STUB)
     endif()
 endfunction()
 

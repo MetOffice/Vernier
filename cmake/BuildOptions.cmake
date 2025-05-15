@@ -15,6 +15,6 @@ if(BUILD_OPENMP)
     list(APPEND OPENMP OpenMP::OpenMP_CXX OpenMP::OpenMP_Fortran)
 endif()
 
-if (ENABLE_MPI)
-  add_compile_definitions(USE_MPI)
+if (NOT ENABLE_MPI)
+  add_compile_definitions(USE_VERNIER_MPI_STUB)
 endif()
