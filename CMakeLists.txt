@@ -60,7 +60,7 @@ include(cmake/Installation.cmake)
 # Allow the maximum label sizes to be tuned
 if(STRING_LENGTH)
   if(STRING_LENGTH GREATER_EQUAL 100)
-    message(STATUS "Label name length is ${STRING_LENGTH}")
+    message(STATUS "Max caliper label length is ${STRING_LENGTH}")
     target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
       PROF_STRING_BUFFER_LENGTH=${STRING_LENGTH})
   else()
