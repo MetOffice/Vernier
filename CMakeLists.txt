@@ -47,7 +47,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         include(cmake/Sphinx.cmake)
 
         # Include option to build with/without OpenMP
-        include(cmake/BuildOptions.cmake)        
+        include(cmake/BuildOptions.cmake)
 
 endif()
 
