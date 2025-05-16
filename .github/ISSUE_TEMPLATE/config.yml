@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Vernier community support
+    url: https://github.com/MetOffice/Vernier/discussions
+    about: Please ask and answer questions here.
+  - name: Documentation
+    url: https://metoffice.github.io/Vernier
+    about: Documentation for the Vernier software.
