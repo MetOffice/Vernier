@@ -9,4 +9,3 @@ Fixes # (issue)
 - [ ] I have added a test to catch if the bug reappears (if possible).
 - [ ] This is a breaking change that will cause existing functionality to not work as previously expected.
 
-
