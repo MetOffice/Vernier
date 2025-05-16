@@ -30,6 +30,6 @@ if (BUILD_TESTS)
   endfunction()
 
   if (ENABLE_MPI)
-    add_cxx_system_test(TestVernierStub test-vernier-mpi-stub.cpp 2)
+    add_cxx_system_test(TestVernierStub test-vernier-mpi-headers.cpp 2)
   endif()
 endif ()
