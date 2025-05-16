@@ -10,10 +10,9 @@
 #include "vernier.h"
 #include <mpi.h>
 
-int main()
-{
+int main() {
 
-  MPI_Init(NULL,NULL);
+  MPI_Init(NULL, NULL);
 
   meto::vernier.init();
 
@@ -24,5 +23,4 @@ int main()
   meto::vernier.finalize();
 
   MPI_Finalize();
-
 }
