@@ -59,12 +59,12 @@ html_theme_options = {
         },
         {
             "name": "GitHub Discussions",
-            "url": "https://github.com/MetOffice/lfric_core/discussions",
+            "url": "https://github.com/MetOffice/vernier/discussions",
             "icon": "far fa-comments",
         }
     ],
     "logo": {
-        "text": "LFRic Core",
+        "text": "Vernier",
         "image_light": "_static/MO_SQUARE_black_mono_for_light_backg_RBG.png",
         "image_dark": "_static/MO_SQUARE_for_dark_backg_RBG.png",
     },
