@@ -15,10 +15,6 @@ if(BUILD_OPENMP)
     list(APPEND OPENMP OpenMP::OpenMP_CXX OpenMP::OpenMP_Fortran)
 endif()
 
-if (NOT ENABLE_MPI)
-  add_compile_definitions(USE_VERNIER_MPI_STUB)
-endif()
-
 # Optional profiler string length
 option(STRING_LENGTH "Maximum identifer string length" 100)
 
