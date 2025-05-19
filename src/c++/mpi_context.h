@@ -18,8 +18,8 @@
 #ifndef VERNIER_MPI_CONTEXT_H
 #define VERNIER_MPI_CONTEXT_H
 
+#include <string_view>
 #include <unordered_map>
-#include <string>
 
 #include "hashvec.h"
 #include "vernier_gettime.h"

@@ -47,8 +47,7 @@ meto::Vernier::TracebackEntry::TracebackEntry(
  */
 
 void meto::Vernier::init(MPI_Comm const client_comm_handle,
-                         std::string_view tag)
-{
+                         std::string_view tag) {
 
   // Set the maximum number of threads.
   max_threads_ = 1;
