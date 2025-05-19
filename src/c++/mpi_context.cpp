@@ -34,7 +34,7 @@ void meto::MPIContext::reset() {
 /**
  * @brief  Initialise a Vernier MPI context.
  * @param [in] comm_client_handle  The communicator to duplicate.
- * @param [in] Tag appearing in the Vernier output filename.
+ * @param [in] tag  Identifying tag.
  * @note  Duplicates the input MPI communicator.
  */
 
@@ -118,7 +118,7 @@ int meto::MPIContext::get_rank() { return comm_rank_; }
 int meto::MPIContext::get_size() { return comm_size_; }
 
 /**
- * @brief Gets the tag that will appear in the Vernier output filename.
+ * @brief Gets the identifying tag.
  * @returns The tag, as a string.
  */
 
