@@ -40,10 +40,12 @@ module vernier_mod
 
   interface
 
-    subroutine vernier_init(client_comm_handle)  &
+    subroutine interface_vernier_init(client_comm_handle, tag)  &
                bind(C, name='c_vernier_init')
-      integer, optional, intent(in) :: client_comm_handle
-    end subroutine vernier_init
+      import :: c_char
+      integer,                       optional, intent(in) :: client_comm_handle
+      character(kind=c_char, len=1), optional, intent(in) :: tag(*)
+    end subroutine interface_vernier_init
 
     subroutine vernier_finalize() bind(C, name='c_vernier_finalize')
         !No arguments to handle
@@ -90,6 +92,31 @@ module vernier_mod
   ! Contained functions / subroutines
   !-----------------------------------------------------------------------------
   contains
+
+    !> @brief  Initialises Vernier.
+    !> @param [in]  client_comm_handle  Handle for the MPI communicator
+    !>                                  over which Vernier will operate.
+    !> @param [in] tag The tag to appear in the Vernier output filename.
+    !> @note   Region names need not be null terminated on entry to this
+    !>         routine.
+    subroutine vernier_init(client_comm_handle, tag)
+      implicit none
+
+      !Arguments
+      integer,          optional, intent(in) :: client_comm_handle
+      character(len=*), optional, intent(in) :: tag
+
+      !Local variables
+      character(len=:), allocatable :: local_tag
+
+      if (present(tag)) then
+        allocate(character(len=len_trim(tag)+1) :: local_tag)
+        call append_null_char(tag, local_tag, len_trim(tag))
+      end if
+
+      call interface_vernier_init(client_comm_handle, local_tag)
+
+    end subroutine vernier_init
 
     !> @brief  Start profiling a code region.
     !> @param [out] hash_out      The unique hash for this region.

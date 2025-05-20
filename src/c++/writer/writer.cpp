@@ -5,6 +5,8 @@
  * -----------------------------------------------------------------------------
  */
 
+#include <string>
+
 #include "writer.h"
 
 /**
@@ -19,6 +21,13 @@ meto::Writer::Writer(MPIContext const &mpi_context) {
   const char *env_output_filename = std::getenv("VERNIER_OUTPUT_FILENAME");
   if (env_output_filename) {
     output_filename_ = env_output_filename;
+  }
+
+  std::string tag = mpi_context.get_tag();
+
+  // If the MPI context has a tag, append it to the output filename.
+  if (tag != MPI_CONTEXT_NULL_STRING) {
+    output_filename_ = output_filename_ + "-" + tag;
   }
 
   // MPI handling
