@@ -49,6 +49,9 @@ script, these are given in the table below.
     * - ``-i/ --inputname``
       - vernier-output-
       - Vernier files to read from
+    * - ``-d/ --decimals``
+      - 3
+      - Number of decimal places to report calculated values to
 
 Below is an example of the current script output.
 

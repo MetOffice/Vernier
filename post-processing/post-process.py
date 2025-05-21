@@ -32,6 +32,7 @@ def parse_cli_arguments(input_arguments: list[str] = None,
     parser.add_argument("-p", "--path",       type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
     parser.add_argument("-o", "--outputname", type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
     parser.add_argument("-i", "--inputname",  type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
+    parser.add_argument("-d", "--decimals",   type=int,   default=3,                            help="Number of decimal places calculated results will be reported to")
 
     return parser.parse_args(args=input_arguments)
 
@@ -145,7 +146,12 @@ def main():
     file_path = args.path
     merged_file_name = args.outputname
     input_name = args.inputname
+    decimals = args.decimals
     mpiranks = read_mpi_ranks(file_path, input_name)
+
+    if decimals >= 4:
+
+        print("WARNING: Calculated values may not be accurate or representative at higher precisions and may not display correctly")
 
     if mpiranks == 0:
 
@@ -161,7 +167,7 @@ def main():
 
         thread_string = "@0" 
         merged_frame["Routine"] = merged_frame["Routine"].str.replace(thread_string, '')
-
+        merged_frame = merged_frame.round(decimals)
         print("\nWriting...")
         with open(f"{merged_file_name}", 'w') as f:
                   f.write(merged_frame.to_string(index=False, col_space=10))
