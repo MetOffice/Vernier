@@ -49,6 +49,9 @@ script, these are given in the table below.
     * - ``-i/ --inputname``
       - vernier-output-
       - Vernier files to read from
+    * - ``-f/ --fullinfo``
+      - False
+      - Enables full Vernier output to be merged and output
 
 Below is an example of the current script output.
 

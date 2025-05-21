@@ -32,6 +32,7 @@ def parse_cli_arguments(input_arguments: list[str] = None,
     parser.add_argument("-p", "--path",       type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
     parser.add_argument("-o", "--outputname", type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
     parser.add_argument("-i", "--inputname",  type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
+    parser.add_argument("-f", "--fullinfo",   action="store_true", default=False,               help="Enables merging and displaying of all information Vernier records")
 
     return parser.parse_args(args=input_arguments)
 
@@ -57,6 +58,7 @@ def read_mpi_ranks(directory_path: Path,
 def read_and_pre_process(file_path: Path,
                          rank: int, 
                          input_name: str,
+                         full_info_bool: bool,
                      ) -> pd.DataFrame:
     """ Reads a vernier-output and processes it 
 
@@ -90,13 +92,23 @@ def read_and_pre_process(file_path: Path,
     """ Organises the new dataframe """
     dataframe = dataframe.sort_values(by="Routine")
     dataframe = dataframe.reset_index(drop=True)
-    temp_dataframe = dataframe[["Total", "Self", "Routine"]]
 
-    return temp_dataframe
+    """ If the user wants the full information then it will be returned, 
+    otherwise the pruned information will be pruned """
+    if full_info_bool:
+
+        return dataframe
+
+    else:
+
+        temp_dataframe = dataframe[["Total", "Self", "Routine"]]
+
+        return temp_dataframe
 
 def merge_and_analyse(file_path: Path,
                       mpiranks: int,
                       input_name: str,
+                      full_info_bool: bool,
                   ) -> pd.DataFrame:
     """ Reads in the files and merges them 
 
@@ -119,7 +131,7 @@ def merge_and_analyse(file_path: Path,
     for rank in range(0,mpiranks):
 
         """ Open the file, read it, workout where it actually starts """
-        dataframe = read_and_pre_process(file_path, rank, input_name)
+        dataframe = read_and_pre_process(file_path, rank, input_name, full_info_bool)
 
         if rank == 0:     
 
@@ -145,6 +157,7 @@ def main():
     file_path = args.path
     merged_file_name = args.outputname
     input_name = args.inputname
+    full_info_bool = args.fullinfo
     mpiranks = read_mpi_ranks(file_path, input_name)
 
     if mpiranks == 0:
@@ -157,7 +170,7 @@ def main():
         print("\nReading and Merging...")
 
 
-        merged_frame = merge_and_analyse(file_path, int(mpiranks), input_name)
+        merged_frame = merge_and_analyse(file_path, int(mpiranks), input_name, full_info_bool)
 
         thread_string = "@0" 
         merged_frame["Routine"] = merged_frame["Routine"].str.replace(thread_string, '')
