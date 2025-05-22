@@ -44,12 +44,15 @@ script, these are given in the table below.
     * - ``-p/ --path``
       - Current working directory
       - The path containing the vernier outputs to be processed
-    * - ``-o/ --outputname``
+    * - ``-o/ --output_name``
       - vernier-merged-output
       - Name of file to write to
-    * - ``-i/ --inputname``
+    * - ``-i/ --input_name``
       - vernier-output-
       - Vernier files to read from
+    * - ``-b/ --basic_output``
+      - False
+      - If used will disable minimum/ maximum calculation functionality
 
 Below is an example of the current script output.
 
