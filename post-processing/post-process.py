@@ -32,7 +32,7 @@ def parse_cli_arguments(input_arguments: list[str] = None,
     parser.add_argument("-p", "--path",       type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
     parser.add_argument("-o", "--outputname", type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
     parser.add_argument("-i", "--inputname",  type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
-    parser.add_argument("-f", "--fullinfo",   action="store_true", default=False,               help="Enables merging and displaying of all information Vernier records")
+    parser.add_argument("-f", "--full_info",  action="store_true", default=False,               help="Enables merging and displaying of all information Vernier records")
 
     return parser.parse_args(args=input_arguments)
 
@@ -66,10 +66,11 @@ def read_and_pre_process(file_path: Path,
     whitespace and formatting into a pandas dataframe.
 
     Args:
-        file_path:  The path where the vernier outputs are located.
-        rank:       The current output file to open, as different output files 
-                    are ordered according to MPI rank.
-        input_name: The name of the vernier output files without the rank.
+        file_path:      The path where the vernier outputs are located.
+        rank:           The current output file to open, as different output files 
+                        are ordered according to MPI rank.
+        input_name:     The name of the vernier output files without the rank.
+        full_info_bool: A boolean which if set to True will give merge all vernier recordings for final output.
 
     Returns:
         A Pandas dataframe containing the processed vernier output data.
@@ -117,9 +118,10 @@ def merge_and_analyse(file_path: Path,
     before averaging them.
 
     Args:
-        file_path: The path where the vernier outputs are located.
-        mpiranks: The number of mpi ranks (equivalent to the number of files) to iterate through.
-        input_name: The name of the vernier output files without the rank.
+        file_path:      The path where the vernier outputs are located.
+        mpiranks:       The number of mpi ranks (equivalent to the number of files) to iterate through.
+        input_name:     The name of the vernier output files without the rank.
+        full_info_bool: A boolean which if set to True will give merge all vernier recordings for final output.
 
     Returns:
         The merged dataframe, containing the routine names and the mean 'Self' and 'Total' values across all outputs.
