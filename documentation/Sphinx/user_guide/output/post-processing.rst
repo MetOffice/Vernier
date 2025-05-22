@@ -49,7 +49,7 @@ script, these are given in the table below.
     * - ``-i/ --inputname``
       - vernier-output-
       - Vernier files to read from
-    * - ``-f/ --fullinfo``
+    * - ``-f/ --full_info``
       - False
       - Enables full Vernier output to be merged and output
 
