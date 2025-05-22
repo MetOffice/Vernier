@@ -16,7 +16,7 @@
 #ifndef VERNIER_MPI_H
 #define VERNIER_MPI_H
 
-#ifdef USE_MPI
+#ifndef USE_VERNIER_MPI_STUB
 #include <mpi.h>
 #else
 #define MPI_COMM_NULL 0

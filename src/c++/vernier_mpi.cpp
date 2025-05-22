@@ -8,7 +8,7 @@
 
 #include "vernier_mpi.h"
 
-#ifndef USE_MPI
+#ifdef USE_VERNIER_MPI_STUB
 
 /**
  * @brief Stub for MPI_Init

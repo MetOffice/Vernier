@@ -28,6 +28,11 @@
 #include "hashvec.h"
 #include "vernier_gettime.h"
 
+#define PROF_HASHVEC_RESERVE_SIZE 1000
+#ifndef PROF_STRING_BUFFER_LENGTH
+#define PROF_STRING_BUFFER_LENGTH 100
+#endif
+
 namespace meto {
 
 // Forward declarations

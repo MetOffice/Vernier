@@ -16,6 +16,8 @@ if (BUILD_FORTRAN_TESTS)
     target_include_directories(${TESTNAME_PREFIX}.${test_name} PUBLIC ${CMAKE_BINARY_DIR}/src/f/modules)
   endfunction()
 
-  add_fortran_unit_test(TestVernier test_vernier_mod.pf)
+  if (ENABLE_MPI)
+    add_fortran_unit_test(TestVernier test_vernier_mod.pf)
+  endif()
 
 endif ()
