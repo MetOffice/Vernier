@@ -69,7 +69,7 @@ Examples
 .. code-block:: f90
 
    use vernier_mod
-   integer (kind=pik) :: vernier_handle
+   integer (kind=vik) :: vernier_handle
 
    ! Start
    call vernier_start(vernier_handle, "Main region")
