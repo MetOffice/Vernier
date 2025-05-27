@@ -37,6 +37,15 @@ It is also possible to use ``LD_LIBRARY_PATH`` instead of ``-Wl,-rpath=``:
 
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/lib
 
+If Vernier has been built without MPI support and is being used with
+C++, it can be compiled using the standard compiler and the
+`USE_VERNIER_MPI_STUB` pre-processor directive.  For example:
+
+.. code-block:: shell
+
+   # C++
+   c++ foo.cpp -DUSE_VERNIER_MPI_STUB -I/path/to/include -Wl,-rpath=/path/to/lib -L/path/to/lib -lvernier
+
 Including Vernier in a CMake Project
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
