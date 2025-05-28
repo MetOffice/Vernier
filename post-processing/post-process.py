@@ -32,7 +32,7 @@ def parse_cli_arguments(input_arguments: list[str] = None,
     parser.add_argument("-p", "--path",         type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
     parser.add_argument("-o", "--output_name",  type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
     parser.add_argument("-i", "--input_name",   type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
-    parser.add_argument("-b", "--basic_output", action="store_true", default=False,               help="Removes minimum/ maximum calculation functionality")
+    parser.add_argument("-b", "--basic_output", action="store_true", default=False,               help="Outputs only mean values across MPI ranks")
 
     return parser.parse_args(args=input_arguments)
 

@@ -52,7 +52,7 @@ script, these are given in the table below.
       - Vernier files to read from
     * - ``-b/ --basic_output``
       - False
-      - If used will disable minimum/ maximum calculation functionality
+      - If used will only output mean values across MPI ranks
 
 Below is an example of the current script output.
 
