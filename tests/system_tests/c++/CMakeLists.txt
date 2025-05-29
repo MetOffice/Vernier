@@ -4,14 +4,26 @@
 #  under which the code may be used.
 # ------------------------------------------------------------------------------
 
-if (BUILD_FORTRAN_TESTS)
+if (BUILD_TESTS)
+
+  #
+  # Add MPI to parallel libraries if required.
+  #
+
+  set (PLIBS OpenMP::OpenMP_CXX)
+  
+  if (ENABLE_MPI)
+    list(APPEND PLIBS MPI::MPI_CXX)
+  endif ()
+
   # Function to simplify adding system-tests
-  function(add_fortran_system_test test_name source_file ranks)
+  function(add_cxx_system_test test_name source_file ranks)
     set(TESTNAME_PREFIX "SystemTests")
     message(STATUS "Building ${TESTNAME_PREFIX}.${test_name}")
     add_executable(${TESTNAME_PREFIX}_${test_name} ${source_file})
-    target_link_libraries(${TESTNAME_PREFIX}_${test_name} ${CMAKE_PROJECT_NAME}_f)
-    target_include_directories(${TESTNAME_PREFIX}_${test_name} PUBLIC ${CMAKE_BINARY_DIR}/src/f/modules)
+    target_link_libraries(${TESTNAME_PREFIX}_${test_name} ${CMAKE_PROJECT_NAME} ${PLIBS}) 
+    target_include_directories(${TESTNAME_PREFIX}_${test_name} PUBLIC ${CMAKE_BINARY_DIR}/src/c++)
+    set_project_warnings(${TESTNAME_PREFIX}_${test_name})
     add_test(NAME ${TESTNAME_PREFIX}.${test_name}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMAND ${MPITEST_EXECUTABLE_NAME} ${MPIEXEC_NUMPROC_FLAG} ${ranks} $<TARGET_FILE:${TESTNAME_PREFIX}_${test_name}>
@@ -19,6 +31,6 @@ if (BUILD_FORTRAN_TESTS)
   endfunction()
 
   if (ENABLE_MPI)
-    add_fortran_system_test(TestInitialisation test_initialisation.F90 2)
+    add_cxx_system_test(TestVernierMPIHeaders test-vernier-mpi-headers.cpp 2)
   endif()
 endif ()

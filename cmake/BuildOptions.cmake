@@ -14,3 +14,7 @@ set(OPENMP ${CMAKE_DL_LIBS})
 if(BUILD_OPENMP)
     list(APPEND OPENMP OpenMP::OpenMP_CXX OpenMP::OpenMP_Fortran)
 endif()
+
+# Optional profiler string length
+option(STRING_LENGTH "Maximum identifer string length" 100)
+

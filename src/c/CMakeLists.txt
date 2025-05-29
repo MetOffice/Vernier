@@ -11,9 +11,17 @@ add_library(${CMAKE_PROJECT_NAME}_c
         vernier_c.cpp)
 
 # Link library to and external libs (also use project warnings and options).
+set (PLIBS ${OPENMP})
+
+if (ENABLE_MPI)
+  list(APPEND PLIBS MPI::MPI_C)
+else()
+  target_compile_definitions(${CMAKE_PROJECT_NAME}_c PRIVATE USE_VERNIER_MPI_STUB)
+endif()
+
 target_link_libraries(${CMAKE_PROJECT_NAME}_c PRIVATE
-                      ${OPENMP}
                       ${CMAKE_PROJECT_NAME}
+                      ${PLIBS}
                      )
 
 set_project_warnings(${CMAKE_PROJECT_NAME}_c)

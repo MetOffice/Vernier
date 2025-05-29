@@ -24,7 +24,6 @@ option(ENABLE_MPI "Enable MPI" ON)
 if (ENABLE_MPI)
   find_package(MPI REQUIRED)
   include_directories(SYSTEM ${MPI_INCLUDE_PATH})
-  add_compile_definitions(USE_MPI)
 else()
   message(STATUS "ENABLE_MPI disabled.")
 endif()
@@ -56,3 +55,14 @@ add_subdirectory(src)
 
 # Include the installation options.
 include(cmake/Installation.cmake)
+
+# Allow the maximum label sizes to be tuned
+if(STRING_LENGTH)
+  if(STRING_LENGTH GREATER_EQUAL 100)
+    message(STATUS "Max caliper label length is ${STRING_LENGTH}")
+    target_compile_definitions(${CMAKE_PROJECT_NAME} INTERFACE
+      PROF_STRING_BUFFER_LENGTH=${STRING_LENGTH})
+  else()
+    message(WARNING "Max caliper label length is too small - using 100")
+  endif()
+endif()
