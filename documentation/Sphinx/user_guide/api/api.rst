@@ -132,7 +132,7 @@ installed:
   mpic++ example.cpp -I$VERNIER/include -L$VERNIER/lib64 \
          -Wl,-rpath=$VERNIER/lib64 -lvernier
 
-The shows an example of a C++ program which uses Vernier but which
+The following shows an example of a C++ program which uses Vernier but which
 does not make use of MPI:
 
 .. code-block:: cpp
@@ -154,6 +154,9 @@ does not make use of MPI:
 
      // Write
      meto::vernier.write();
+     
+     // Finalize Vernier
+     meto::vernier.finalize();
 
      return 0;
    }
@@ -195,6 +198,9 @@ makes use of MPI:
 
      ! Write
      call vernier_write()
+     
+     ! Finalize Vernier
+     call vernier_finalize()
 
      call MPI_Finalize(ierror)
 
