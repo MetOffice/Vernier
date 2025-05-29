@@ -119,6 +119,9 @@ The following shows how to add Vernier calls to an MPI C++ program:
      // Write
      meto::vernier.write();
 
+     // Finalize Vernier
+     meto::vernier.finalize();
+
      MPI_Finalize();
      return 0;
    }
