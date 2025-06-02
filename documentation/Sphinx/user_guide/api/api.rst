@@ -92,9 +92,8 @@ CMake Support
 """""""""""""
 
 Vernier includes support for building applications using CMake.  In
-order to use this, it is necessary to directory where Vernier has been
-installed has added to your ``$CMAKE_PREFIX_PATH`` environment
-variable.
+order to use this, it is necessary to ensure the directory where Vernier is installed has been
+added to your ``$CMAKE_PREFIX_PATH`` environment variable.
 
 Fortran
 ^^^^^^^
