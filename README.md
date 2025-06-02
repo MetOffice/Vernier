@@ -23,8 +23,9 @@ Documentation for the project can be found [here](https://metoffice.github.io/Ve
 ### Supported Compilers
 
 The code has been tested with the following compilers:
-- GCC versions: 10.2.0, 11.2.0
-- Clang versions: 12.0 
+- GCC versions: 10.2.0, 11.2.0, 12.2.0, 13, 14
+- Clang versions: 12.0, 18.0
+- Cray CCE 15.0.0
 
 ### Libraries 
 
@@ -34,7 +35,16 @@ The code has been tested with the following compilers:
 ### Testing Framework and Documentation
 
 The testing framework is GoogleTest (1.11.0).  
+
 Source code documentation is generated using Doxygen (minimum 1.8.5).
+
+The user guide is generated with sphinx with the following dependencies:
+
+* sphinx
+* pydata-sphinx-theme
+* sphinx-sitemap
+* sphinx-design
+
 
 ### Building profiler
 
@@ -58,6 +68,8 @@ the generated files can be found in `<build>/html`.
 
 To build only the Doxygen docs use `make doxygen-docs`. On installation the
 HTML pages are copied to `<installation_root>/share/docs`.
+
+The user guide can be built using `make sphinxdocs`.
 
 #### Unit Test Coverage
 

@@ -100,6 +100,10 @@ up a terminal wherein the user can change build options interactively.
       - Maximum length of a caliper label.  This defaults to 100
         characters.  If the maximum length is exceeded, Vernier will
         cause the application to exit with an error.
+    * - ``-DENABLE_MPI``
+      - ON / **OFF**
+      - Build with an external MPI library.  When OFF, Vernier will
+        use stub functions to replace the required MPI calls.
 
 The table above pertains to options specific to Vernier. An extensive
 list of CMake internal variables can be found 
