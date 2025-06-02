@@ -66,7 +66,7 @@ C++
    .. cpp:function:: double get_child_walltime(size_t const hash, int const input_tid) const
 
        Returns the child time of a region, which is the time spent in child regions
-       called by that region including their descendents.
+       called by that region including their descendants.
 
    .. cpp:function:: std::string get_decorated_region_name(size_t const hash, int const input_tid) const
 
