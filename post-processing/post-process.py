@@ -32,7 +32,8 @@ def parse_cli_arguments(input_arguments: list[str] = None,
     parser.add_argument("-p", "--path",         type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
     parser.add_argument("-o", "--output_name",  type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
     parser.add_argument("-i", "--input_name",   type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
-    parser.add_argument("-b", "--basic_output", action="store_true", default=False,               help="Outputs only mean values across MPI ranks")
+    parser.add_argument("-b", "--basic_output", action="store_true", default=False,               help="Calculates and outputs only mean values across MPI ranks")
+    parser.add_argument("-f", "--full_info",    action="store_true", default=False,               help="Enables merging and displaying of all information Vernier records")
 
     return parser.parse_args(args=input_arguments)
 
@@ -58,6 +59,7 @@ def read_mpi_ranks(directory_path: Path,
 def read_and_pre_process(file_path: Path,
                          rank: int, 
                          input_name: str,
+                         full_info_bool: bool,
                      ) -> pd.DataFrame:
     """ Reads a vernier-output and processes it 
 
@@ -65,10 +67,11 @@ def read_and_pre_process(file_path: Path,
     whitespace and formatting into a pandas dataframe.
 
     Args:
-        file_path:  The path where the vernier outputs are located.
-        rank:       The current output file to open, as different output files 
-                    are ordered according to MPI rank.
-        input_name: The name of the vernier output files without the rank.
+        file_path:      The path where the vernier outputs are located.
+        rank:           The current output file to open, as different output files 
+                        are ordered according to MPI rank.
+        input_name:     The name of the vernier output files without the rank.
+        full_info_bool: A boolean which if set to True will give merge all vernier recordings for final output.
 
     Returns:
         A Pandas dataframe containing the processed vernier output data.
@@ -91,14 +94,25 @@ def read_and_pre_process(file_path: Path,
     """ Organises the new dataframe """
     dataframe = dataframe.sort_values(by="Routine")
     dataframe = dataframe.reset_index(drop=True)
-    temp_dataframe = dataframe[["Total", "Self", "Routine"]]
+    dataframe = dataframe.drop(columns=["index"])
 
-    return temp_dataframe
+    """ If the user wants the full information then it will be returned, 
+    otherwise the pruned information will be pruned """
+    if full_info_bool:
+
+        return dataframe
+
+    else:
+
+        temp_dataframe = dataframe[["Total", "Self", "Routine"]]
+
+        return temp_dataframe
 
 def merge_and_analyse(file_path: Path,
                       mpiranks: int,
                       input_name: str,
-                      basic_output_bool: bool
+                      basic_output_bool: bool,
+                      full_info_bool: bool,
                   ) -> pd.DataFrame:
     """ Reads in the files and merges them 
 
@@ -111,6 +125,10 @@ def merge_and_analyse(file_path: Path,
         mpiranks:          The number of mpi ranks (equivalent to the number of files) to iterate through.
         input_name:        The name of the vernier output files without the rank.
         basic_output_bool: A boolean which if set to True will not calculate minimum/ maximum values. 
+        file_path:      The path where the vernier outputs are located.
+        mpiranks:       The number of mpi ranks (equivalent to the number of files) to iterate through.
+        input_name:     The name of the vernier output files without the rank.
+        full_info_bool: A boolean which if set to True will give merge all vernier recordings for final output.
 
     Returns:
         The merged dataframe, containing the routine names and the mean 'Self' and 'Total' values across all outputs.
@@ -122,7 +140,7 @@ def merge_and_analyse(file_path: Path,
     for rank in range(0,mpiranks):
 
         """ Open the file, read it, workout where it actually starts """
-        dataframe = read_and_pre_process(file_path, rank, input_name)
+        dataframe = read_and_pre_process(file_path, rank, input_name, full_info_bool)
 
         if rank == 0:     
 
@@ -168,6 +186,7 @@ def main():
     merged_file_name = args.output_name
     input_name = args.input_name
     basic_output_bool = args.basic_output
+    full_info_bool = args.full_info
     mpiranks = read_mpi_ranks(file_path, input_name)
 
     if mpiranks == 0:
@@ -180,7 +199,7 @@ def main():
         print("\nReading and Merging...")
 
 
-        merged_frame = merge_and_analyse(file_path, int(mpiranks), input_name, basic_output_bool)
+        merged_frame = merge_and_analyse(file_path, int(mpiranks), input_name, basic_output_bool, full_info_bool)
 
         thread_string = "@0" 
         merged_frame["Routine"] = merged_frame["Routine"].str.replace(thread_string, '')
