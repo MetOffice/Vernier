@@ -13,7 +13,8 @@ include(cmake/PreventInSourceBuilds.cmake)
 # project description. Also set the version of the library being built.
 project(vernier LANGUAGES CXX C Fortran
         DESCRIPTION "Met Office Vernier profiler"
-        VERSION 0.3.1)
+        VERSION 0.3.1
+        HOMEPAGE_URL "https://github.com/MetOffice/Vernier")
 
 # OpenMP required
 find_package(OpenMP 2.5 REQUIRED)
@@ -24,7 +25,6 @@ option(ENABLE_MPI "Enable MPI" ON)
 if (ENABLE_MPI)
   find_package(MPI REQUIRED)
   include_directories(SYSTEM ${MPI_INCLUDE_PATH})
-  add_compile_definitions(USE_MPI)
 else()
   message(STATUS "ENABLE_MPI disabled.")
 endif()
@@ -67,3 +67,5 @@ if(STRING_LENGTH)
     message(WARNING "Max caliper label length is too small - using 100")
   endif()
 endif()
+
+include(cmake/PkgConfig.cmake)

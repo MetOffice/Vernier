@@ -1,0 +1,10 @@
+Name: Vernier
+Version: @PROJECT_VERSION@
+Description: @PROJECT_DESCRIPTION@
+URL: @CMAKE_PROJECT_HOMEPAGE_URL@
+
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Libs: -L${libdir} -lvernier -lvernier_c -lvernier_f
+Cflags: -I${includedir}
