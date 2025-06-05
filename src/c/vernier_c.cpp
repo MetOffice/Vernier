@@ -22,7 +22,7 @@
 #include <string>
 
 extern "C" {
-void c_vernier_init(MPI_Fint *const client_comm_handle, char *const tag);
+void c_vernier_init(const MPI_Fint *const client_comm_handle, const char *const tag);
 void c_vernier_finalize();
 void c_vernier_start_part1();
 void c_vernier_start_part2(long int &, char const *);
