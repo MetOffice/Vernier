@@ -22,7 +22,8 @@
 #include <string>
 
 extern "C" {
-void c_vernier_init(const MPI_Fint *const client_comm_handle, const char *const tag);
+void c_vernier_init(const MPI_Fint *const client_comm_handle,
+                    const char *const tag);
 void c_vernier_finalize();
 void c_vernier_start_part1();
 void c_vernier_start_part2(long int &, char const *);
@@ -39,7 +40,8 @@ double c_vernier_get_wtime();
  * @param [in] tag  Tag to appear in the Vernier output filename.
  */
 
-void c_vernier_init(const MPI_Fint *const client_comm_handle, const char *const tag) {
+void c_vernier_init(const MPI_Fint *const client_comm_handle,
+                    const char *const tag) {
 
   MPI_Comm local_handle = MPI_COMM_WORLD;
   if (client_comm_handle) {
