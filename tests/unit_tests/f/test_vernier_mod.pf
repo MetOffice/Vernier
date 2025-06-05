@@ -67,7 +67,7 @@ contains
     integer :: ierr
 
     ! Initialise Vernier
-    call vernier_init(this%getMpiCommunicator(), 'main')
+    call vernier_init(this%getMpiCommunicator())
 
     ! Start timing: noddy way, and using Profiler.
     call vernier_start(prof_main, 'FULL')
