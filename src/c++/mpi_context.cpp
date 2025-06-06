@@ -8,6 +8,8 @@
 #include <cassert>
 #include <stdexcept>
 
+#include <sstream>
+
 #include "error_handler.h"
 #include "mpi_context.h"
 
@@ -110,3 +112,50 @@ int meto::MPIContext::get_rank() { return comm_rank_; }
  */
 
 int meto::MPIContext::get_size() { return comm_size_; }
+
+
+/**
+ * @brief Write a string from each task to a global file
+ */
+void meto::MPIContext::write_global_file(std::string filename,
+                                        std::ostringstream& buffer) {
+  int length;                           // Local string length
+  int max_length;                       // Global maximum string length
+  MPI_Datatype mpi_buffer;              // Buffer as a contiguous item
+  MPI_File file_handle;                 // MPI File accessor
+  MPI_Status status;                    // Result of write
+
+  // Global maximum string size is required on every task to set up
+  // the custom data type
+  length = buffer.str().length();
+  MPI_Allreduce(&length, &max_length, 1, MPI_INT, MPI_MAX, comm_handle_);
+
+  MPI_Type_contiguous(max_length, MPI_CHAR, &mpi_buffer);
+  MPI_Type_commit(&mpi_buffer);
+
+  // Open the global output file and create a view for each task which
+  // represents a unique, non-overlapping region
+  MPI_File_open(comm_handle_,
+                filename.c_str(),
+                MPI_MODE_CREATE | MPI_MODE_WRONLY,
+                MPI_INFO_NULL,
+                &file_handle);
+
+  MPI_File_set_view(file_handle,
+                    max_length * comm_rank_,
+                    MPI_CHAR,
+                    mpi_buffer,
+                    "native",
+                    MPI_INFO_NULL);
+
+  // Collective write operation
+  MPI_File_write_all(file_handle,
+                     buffer.str().c_str(),
+                     max_length,
+                     MPI_CHAR,
+                     &status);
+
+  MPI_File_close(&file_handle);
+
+  return;
+}

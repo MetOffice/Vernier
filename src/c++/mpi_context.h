@@ -51,6 +51,9 @@ public:
   // Getters
   int get_size();
   int get_rank();
+
+  // Global file writer
+  void write_global_file(std::string filename, std::ostringstream& buffer);
 };
 
 } // namespace meto

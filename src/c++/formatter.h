@@ -15,6 +15,7 @@
 #ifndef FORMATTER_H
 #define FORMATTER_H
 
+#include <ostream>
 #include <fstream>
 
 #ifdef _OPENMP
@@ -36,18 +37,18 @@ class Formatter {
 
 private:
   // Format method
-  void (Formatter::*format_)(std::ofstream &, hashvec_t);
+  void (Formatter::*format_)(std::ostream &, hashvec_t);
 
   // Individual formatter functions
-  void threads(std::ofstream &os, hashvec_t);
-  void drhook(std::ofstream &os, hashvec_t);
+  void threads(std::ostream &os, hashvec_t);
+  void drhook(std::ostream &os, hashvec_t);
 
 public:
   // Constructor
   explicit Formatter();
 
   // Execute the format method
-  void execute_format(std::ofstream &os, hashvec_t);
+  void execute_format(std::ostream &os, hashvec_t);
 };
 
 } // namespace meto
