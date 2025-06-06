@@ -20,6 +20,7 @@ module test_vernier_mod
     procedure :: setup
     procedure :: teardown
     procedure :: test_vernier_timings
+    procedure :: test_vernier_tags
   end type test_vernier_type
 
 contains
@@ -120,5 +121,29 @@ contains
     call vernier_finalize()
 
   end subroutine test_vernier_timings
+
+  !------------------------------------------------------------------------------
+  ! Test Vernier tags
+  !------------------------------------------------------------------------------
+
+  @test(npes=[1,2])
+  subroutine test_vernier_tags(this)
+    implicit none
+
+    class(test_vernier_type), intent(inout) :: this
+
+    integer(kind=vik) :: vnr_handle
+
+    call vernier_init(                                &
+      client_comm_handle = this%getMpiCommunicator(), &
+      tag = "TAGTEST")
+
+    call vernier_start(vnr_handle, "tagtest_main")
+    call vernier_stop(vnr_handle)
+    call vernier_write()
+
+    call vernier_finalize()
+
+  end subroutine test_vernier_tags
 
 end module test_vernier_mod

@@ -11,10 +11,10 @@ if (BUILD_TESTS)
   #
 
   set (PLIBS OpenMP::OpenMP_CXX)
-  
+
   if (ENABLE_MPI)
     list(APPEND PLIBS MPI::MPI_CXX)
-  endif ()
+  endif()
 
   # Function to simplify adding system-tests
   function(add_cxx_system_test test_name source_file ranks)
@@ -23,12 +23,17 @@ if (BUILD_TESTS)
     add_executable(${TESTNAME_PREFIX}_${test_name} ${source_file})
     target_link_libraries(${TESTNAME_PREFIX}_${test_name} ${CMAKE_PROJECT_NAME} ${PLIBS}) 
     target_include_directories(${TESTNAME_PREFIX}_${test_name} PUBLIC ${CMAKE_BINARY_DIR}/src/c++)
+    if (NOT ENABLE_MPI)
+      target_compile_definitions(${TESTNAME_PREFIX}_${test_name} PRIVATE USE_VERNIER_MPI_STUB)
+    endif()
     set_project_warnings(${TESTNAME_PREFIX}_${test_name})
-    add_test(NAME ${TESTNAME_PREFIX}.${test_name}
+    add_test(NAME ${TESTNAME_PREFIX}_${test_name}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMAND ${MPITEST_EXECUTABLE_NAME} ${MPIEXEC_NUMPROC_FLAG} ${ranks} $<TARGET_FILE:${TESTNAME_PREFIX}_${test_name}>
     )
   endfunction()
+
+  add_cxx_system_test(TestTags test-tags.cpp 1)
 
   if (ENABLE_MPI)
     add_cxx_system_test(TestVernierMPIHeaders test-vernier-mpi-headers.cpp 2)
