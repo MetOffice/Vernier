@@ -16,7 +16,6 @@
 
 #include <ostream>
 #include <sstream>
-#include "mpi.h"
 
 #include "../mpi_context.h"
 #include "writer.h"
