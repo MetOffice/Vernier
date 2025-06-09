@@ -15,8 +15,8 @@
 #ifndef FORMATTER_H
 #define FORMATTER_H
 
-#include <ostream>
 #include <fstream>
+#include <ostream>
 
 #ifdef _OPENMP
 #include <omp.h>

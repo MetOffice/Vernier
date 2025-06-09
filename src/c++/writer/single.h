@@ -22,16 +22,16 @@
 
 namespace meto {
 
-  /**
-   * @brief   Single parallel output file
-   * @details Creates a single file for all ranks using MPI IO
-   */
+/**
+ * @brief   Single parallel output file
+ * @details Creates a single file for all ranks using MPI IO
+ */
 
-  class SingleFile : public Writer {
-  public:
-    SingleFile(MPIContext const &);
-    void write(hashvec_t) override;
-  };
+class SingleFile : public Writer {
+public:
+  SingleFile(MPIContext const &);
+  void write(hashvec_t) override;
+};
 
 } // namespace meto
 

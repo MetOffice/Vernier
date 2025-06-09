@@ -8,7 +8,6 @@
 #include "hashvec_handler.h"
 #include "error_handler.h"
 
-
 /**
  * @brief  HashVecHandler constructor
  * @param [in] mpi_context  The MPI context to use.
@@ -64,6 +63,4 @@ void meto::HashVecHandler::sort() {
  *
  */
 
-void meto::HashVecHandler::write() {
-  writer_strategy_->write(hashvec_);
-}
+void meto::HashVecHandler::write() { writer_strategy_->write(hashvec_); }
