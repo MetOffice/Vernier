@@ -20,6 +20,7 @@
 #include "hashvec.h"
 #include "mpi_context.h"
 #include "writer/multi.h"
+#include "writer/single.h"
 #include "writer/writer.h"
 
 namespace meto {

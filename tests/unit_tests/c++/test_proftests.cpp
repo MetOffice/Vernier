@@ -115,7 +115,7 @@ TEST(DeathTest, InvalidIOModeTest) {
       {
         meto::MPIContext mpi_context;
 
-        const char *invalidIOMode = "single";
+        const char *invalidIOMode = "invalid-mode";
         setenv("VERNIER_OUTPUT_MODE", invalidIOMode, 1);
 
         meto::HashVecHandler object(mpi_context);
