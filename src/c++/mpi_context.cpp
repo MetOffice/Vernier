@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include <sstream>
+#include <fstream>
 
 #include "error_handler.h"
 #include "mpi_context.h"
@@ -119,6 +120,19 @@ int meto::MPIContext::get_size() { return comm_size_; }
  */
 void meto::MPIContext::write_global_file(std::string filename,
                                         std::ostringstream& buffer) {
+#ifdef USE_VERNIER_MPI_STUB
+  /*
+   * Rather than dummy out all the MPI calls, replace with a simple
+   * file open and write when running without MPI.
+   */
+  std::ofstream os(filename);
+
+  os << buffer.str();
+  os.flush();
+  os.close();
+
+#else // USE_VERNIER_MPI_STUB
+
   int length;                           // Local string length
   int max_length;                       // Global maximum string length
   MPI_Datatype mpi_buffer;              // Buffer as a contiguous item
@@ -158,6 +172,8 @@ void meto::MPIContext::write_global_file(std::string filename,
   // Tidy up resources
   MPI_File_close(&file_handle);
   MPI_Type_free(&mpi_buffer);
+
+#endif // USE_VERNIER_MPI_STUB
 
   return;
 }
