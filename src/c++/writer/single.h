@@ -31,7 +31,7 @@ namespace meto {
   class SingleFile : public Writer {
   public:
     SingleFile(MPIContext const &);
-    void write(std::ofstream &os, hashvec_t) override;
+    void write(hashvec_t) override;
   };
 
 } // namespace meto

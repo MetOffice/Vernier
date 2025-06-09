@@ -17,11 +17,9 @@ meto::Multi::Multi(MPIContext const &mpi_context)
 
 /**
  * @brief  Opens a unique file per mpi rank
- *
- * @param[in] os  Output stream to write to
  */
 
-void meto::Multi::open_files(std::ofstream &os) {
+void meto::Multi::open_files() {
 
   // Append the MPI rank to the output filename.
   std::string mpi_filename_tail = "-" + std::to_string(mpi_context_.get_rank());
@@ -34,12 +32,11 @@ void meto::Multi::open_files(std::ofstream &os) {
  * @brief  The main write method. Includes filehandling and calls formatter
  *         strategy.
  *
- * @param[in] os       The output stream to write to
  * @param[in] hashvec  The vector containing all necessary data
  */
 
-void meto::Multi::write(std::ofstream &os, hashvec_t hashvec) {
-  open_files(os);
+void meto::Multi::write(hashvec_t hashvec) {
+  open_files();
   formatter_.execute_format(os, hashvec);
   os.flush();
   os.close();

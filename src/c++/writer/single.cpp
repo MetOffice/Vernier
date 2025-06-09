@@ -19,11 +19,10 @@ meto::SingleFile::SingleFile(MPIContext const &mpi_context)
 /**
  * @brief  The main write method.
  *
- * @param[in] os       The output stream to write to
  * @param[in] hashvec  The vector containing all necessary data
  */
 void
-meto::SingleFile::write(std::ofstream &os, hashvec_t hashvec) {
+meto::SingleFile::write(hashvec_t hashvec) {
   /* This is a complete cheat for now: ignore the ofstream and do
    * everything through MPI IO.
    */

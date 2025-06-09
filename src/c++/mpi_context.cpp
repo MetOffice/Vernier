@@ -127,7 +127,7 @@ void meto::MPIContext::write_global_file(std::string filename,
 
   // Global maximum string size is required on every task to set up
   // the custom data type
-  length = buffer.str().length();
+  length = static_cast<int>(buffer.str().length());
   MPI_Allreduce(&length, &max_length, 1, MPI_INT, MPI_MAX, comm_handle_);
 
   MPI_Type_contiguous(max_length, MPI_CHAR, &mpi_buffer);
@@ -155,7 +155,9 @@ void meto::MPIContext::write_global_file(std::string filename,
                      MPI_CHAR,
                      &status);
 
+  // Tidy up resources
   MPI_File_close(&file_handle);
+  MPI_Type_free(&mpi_buffer);
 
   return;
 }

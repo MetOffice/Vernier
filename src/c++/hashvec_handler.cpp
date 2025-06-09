@@ -65,6 +65,5 @@ void meto::HashVecHandler::sort() {
  */
 
 void meto::HashVecHandler::write() {
-  std::ofstream os;
-  writer_strategy_->write(os, hashvec_);
+  writer_strategy_->write(hashvec_);
 }
