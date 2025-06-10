@@ -7,26 +7,84 @@
 API
 ---
 
-Vernier's API consists of four primary functions; **init**, **start**,
-**stop**, and **write**. A timed region is defined by a start-stop
-pair.  The interface to these functions differs between C++ and
-Fortran, but the core functionality is the same.
+Vernier's API consists of five primary functions; ``init``, ``start``, ``stop``
+``finalise``, and ``write``. These functions are used to manage the profiling.
+A timed region is defined by a start-stop pair which return and take a hash
+respectively.
+
+How calls to these functions are made differs slightly between C++ and Fortran,
+but the core functionality is the same.
+
+There is a global Vernier object that can be used without needing to create an
+instance of the Vernier class manually. This object is called ``vernier`` and is
+used by the Fortran API.
 
 C++
 ^^^
 
 The C++ interface is implemented through the ``Vernier`` class in the
 ``meto`` namespace.  In the event of an error, the Vernier library
-will force the application to exit.  The member functions are as
+will force the application to exit. A static instance of the Vernier class  called
+``vernier`` is instantiated in the ``vernier.h`` file. The member functions are as
 follows:
 
-* **init**: initialises the Vernier instance.  Accepts an optional MPI
-  communicator.  Defaults to ``MPI_COMM_WORLD`` if not specified.
-* **start**: starts a timed region.  Argument is a string representing
-  the name of the region
-* **stop**: ends an existing timed region.  Argument is a handle which
-  represents the start of the region
-* **write**: writes the profile information to a file
+.. cpp:class:: meto::Vernier
+
+   .. cpp:function:: void init(MPI_Comm const client_comm_handle = MPI_COMM_WORLD)
+
+       Initialises the Vernier profiler with the specified MPI communicator.
+       This function must be called before any calls to ``start``.
+       The `comm` parameter is used to specify the MPI communicator for parallel
+       execution, the default when unspecified is ``MPI_COMM_WORLD``.
+
+   .. cpp:function:: size_t start(std::string_view const region_name)
+
+       Starts a timed region with the given name. Returns a handle (or "hash") for
+       the region.
+
+   .. cpp:function:: void stop(size_t const &hash)
+
+       Stops the timed region associated with the given handle.
+
+   .. cpp:function:: void write()
+
+       Writes the profiling data to the output file.
+
+   .. cpp:function:: void finalise()
+
+       Finalises the Vernier profiler, ensuring all data is written and resources
+       are cleaned up. This function should be called at the end of the program.
+
+   .. cpp:function:: double get_total_walltime(size_t const &hash, int const thread_id)
+
+       Returns the total (inclusive) time taken by a region and everything below it
+
+   .. cpp:function:: double get_overhead_walltime(size_t const hash, int const thread_id)
+
+       Returns the profiling overhead time experienced by a region, as incurred by
+       calling child regions.
+
+   .. cpp:function:: double get_self_walltime(size_t const hash, int const input_tid)
+
+       Returns the self time of a region, which is the time spent in that region
+       excluding any child regions.
+
+   .. cpp:function:: double get_child_walltime(size_t const hash, int const input_tid) const
+
+       Returns the child time of a region, which is the time spent in child regions
+       called by that region including their descendants.
+
+   .. cpp:function:: std::string get_decorated_region_name(size_t const hash, int const input_tid) const
+
+       Returns the name of a region corresponding to a given hash.
+
+   .. cpp:function:: unsigned long long int get_call_count(size_t const hash, int const input_tid) const
+
+       Returns the number of times a region has been called on the input thread ID.
+
+   .. cpp:function:: unsigned long long int get_prof_call_count(int const input_tid) const;
+
+       Returns the number of calliper pairs called on the specified thread.
 
 The library can be linked to an application with the ``-lvernier`` flag.
 
@@ -34,28 +92,45 @@ CMake Support
 """""""""""""
 
 Vernier includes support for building applications using CMake.  In
-order to use this, it is necessary to directory where Vernier has been
-installed has added to your ``$CMAKE_PREFIX_PATH`` environment
-variable.
+order to use this, it is necessary to ensure the directory where Vernier is installed has been
+added to your ``$CMAKE_PREFIX_PATH`` environment variable.
 
 Fortran
 ^^^^^^^
-.. Note: The following function is currently defined manually to avoid errors
-         caused by Breathe expecting C++ syntax.
-.. .. cpp:function:: subroutine vernier_mod::vernier_start::vernier_start(hash_out, region_name)
-
-The Fortran interface is implemented through four subroutines which
-provide the same functionality as the C++ library.  The interface
+The Fortran interface is a reduced set of the full functionality of the C++ library. The interface
 subroutines contained in the ``vernier_mod`` Fortran module are:
 
-* **vernier_init**: initialises the Vernier interface.  Accepts an
-  optional MPI communicator.  Defaults to ``MPI_COMM_WORLD`` if not
-  specified.
-* **vernier_start**: starts a timed region.  Arguments are an integer
-  of ``kind=vik`` and a a string representing the name of the region
-* **vernier_stop**: ends an existing timed region.  Argument is an
-  integer of ``kind=vik`` which represents the start of the region
-* **vernier_write**: writes the profile information to a file
+.. function:: vernier_init(client_comm_handle)
+
+   :param integer: client_comm_handle: MPI communicator (default is ``MPI_COMM_WORLD``)
+
+   Initialises the Vernier profiler with the specified MPI communicator.
+   This function must be called before any calls to ``vernier_start``.
+   The `client_comm_handle` parameter is used to specify the MPI communicator
+   for parallel execution, the default when unspecified is ``MPI_COMM_WORLD``.
+
+.. function:: vernier_start(vernier_handle, region_name)
+
+   :param integer: vernier_handle: Handle for the timed region (hash
+   :param string: region_name: Name of the timed region
+
+   Starts a timed region with the given name ``region_name``. Returns a handle (i.e. a hash) for
+   the region in ``vernier_handle``.
+
+.. function:: vernier_stop(vernier_handle)
+
+   :param integer: vernier_handle: Handle for the timed region (hash)
+
+   Stops the timed region associated with the given handle.
+
+.. function:: vernier_write()
+
+   Writes the profiling data to the output file.
+
+.. function:: vernier_finalise()
+
+   Finalises the Vernier profiler, ensuring all data is written and resources
+   are cleaned up. This function should be called at the end of the program.
 
 The library can be linked to an application with the ``-lvernier
 -lvernier_c -lvernier_f`` flags.
@@ -101,8 +176,7 @@ The following shows how to add Vernier calls to an MPI C++ program:
    #include "mpi.h"
    #include "vernier.h"
 
-   int
-   main(int argc, char *argv[])
+   int main(int argc, char *argv[])
    {
      MPI_Init(&argc, &argv);
 
@@ -142,8 +216,7 @@ does not make use of MPI:
 
    #include "vernier.h"
 
-   int
-   main()
+   int main()
    {
      meto::vernier.init();
 
