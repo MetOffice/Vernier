@@ -5,7 +5,7 @@ Please include a summary of the changes and the related issue. Please also inclu
 If there is additional detail included in the linked issue please note that here so a reviewer knows to check.      
 -->
 
-## Linked Issues
+## Linked issues
 
 Closes # (issue) <!-- Can be of the following forms Close/s/d #123 Fix/es/ed #123 or Resolve/s/d #123 (e.g. Closes #123) -->
 
@@ -15,7 +15,7 @@ Closes # (issue) <!-- Can be of the following forms Close/s/d #123 Fix/es/ed #12
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] This change requires a documentation update
 
-# How Has This Been Tested?
+# How has this been tested?
 
 Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
 
@@ -29,5 +29,5 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 - [ ] I have made corresponding changes to the documentation
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
+- [ ] New and existing unit tests pass locally with my changes, for both debug and optimised builds
 
