@@ -29,10 +29,13 @@ def parse_cli_arguments(input_arguments: list[str] = None,
     """
 
     parser = argparse.ArgumentParser(description="This script is for merging the outputs from a test that uses Vernier callipers into one file. For full documentation please see the post-processing section of the user guide.")
-    parser.add_argument("-p", "--path",         type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
-    parser.add_argument("-o", "--output_name",  type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
-    parser.add_argument("-i", "--input_name",   type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
-    parser.add_argument("-b", "--basic_output", action="store_true", default=False,               help="Outputs only mean values across MPI ranks")
+
+    parser.add_argument("-p", "--path",         type=Path,  default=(os.getcwd()),                 help="Path to Vernier output files")
+    parser.add_argument("-o", "--output_name",   type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
+    parser.add_argument("-i", "--input_name",    type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
+    parser.add_argument("-d", "--decimals",     type=int,   default=3,                             help="Number of decimal places calculated results will be reported to")
+    parser.add_argument("-b", "--basic_output", action="store_true", default=False,                help="Outputs only mean values across MPI ranks")
+
 
     return parser.parse_args(args=input_arguments)
 
@@ -168,7 +171,12 @@ def main():
     merged_file_name = args.output_name
     input_name = args.input_name
     basic_output_bool = args.basic_output
+    decimals = args.decimals
     mpiranks = read_mpi_ranks(file_path, input_name)
+
+    if decimals >= 4:
+
+        print("WARNING: Vernier typically reports values to 3 d.p, so calculated values may not be accurate or representative at higher precisions and may not display correctly")
 
     if mpiranks == 0:
 
@@ -184,7 +192,7 @@ def main():
 
         thread_string = "@0" 
         merged_frame["Routine"] = merged_frame["Routine"].str.replace(thread_string, '')
-
+        merged_frame = merged_frame.round(decimals)
         print("\nWriting...")
         with open(f"{merged_file_name}", 'w') as f:
                   f.write(merged_frame.to_string(index=False, col_space=10))

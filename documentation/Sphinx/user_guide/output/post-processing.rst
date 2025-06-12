@@ -50,9 +50,14 @@ script, these are given in the table below.
     * - ``-i/ --input_name``
       - vernier-output-
       - Vernier files to read from
+    * - ``-d/ --decimals``
+      - 3
+      - Number of decimal places to report calculated values to
+
     * - ``-b/ --basic_output``
       - False
       - If used will only output mean values across MPI ranks
+
 
 Below is an example of the current script output.
 
