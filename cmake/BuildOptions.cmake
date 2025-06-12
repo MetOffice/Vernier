@@ -18,3 +18,5 @@ endif()
 # Optional profiler string length
 option(STRING_LENGTH "Maximum identifer string length" 100)
 
+# Whether to create a vernier.pc pkgc-config file
+option(ENABLE_PKGCONFIG "Enable pkg-config support" ON)
