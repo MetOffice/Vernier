@@ -50,11 +50,14 @@ script, these are given in the table below.
     * - ``-i/ --input_name``
       - vernier-output-
       - Vernier files to read from
-    * - ``-b/ --basic_output``
+    * - ``-m/ --max_only``
       - False
-      - If used will only output mean values across MPI ranks
+      - If used will only calculate maximum values across MPI ranks
+    * - ``-f/ --full_info``
+      - False
+      - Enables full Vernier output to be merged and output
 
-Below is an example of the current script output.
+Below is an example of the current script output without additional flags.
 
 .. code-block:: text
 
