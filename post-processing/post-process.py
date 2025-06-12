@@ -32,7 +32,7 @@ def parse_cli_arguments(input_arguments: list[str] = None,
     parser.add_argument("-p", "--path",         type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
     parser.add_argument("-o", "--output_name",  type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
     parser.add_argument("-i", "--input_name",   type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
-    parser.add_argument("-b", "--basic_output", action="store_true", default=False,               help="Calculates and outputs only mean values across MPI ranks")
+    parser.add_argument("-m", "--max_only",     action="store_true", default=False,               help="Only calculates the maximum value across all ranks")
     parser.add_argument("-f", "--full_info",    action="store_true", default=False,               help="Enables merging and displaying of all information Vernier records")
 
     return parser.parse_args(args=input_arguments)
@@ -111,7 +111,7 @@ def read_and_pre_process(file_path: Path,
 def merge_and_analyse(file_path: Path,
                       mpiranks: int,
                       input_name: str,
-                      basic_output_bool: bool,
+                      max_only_bool: bool,
                       full_info_bool: bool,
                   ) -> pd.DataFrame:
     """ Reads in the files and merges them 
@@ -121,10 +121,10 @@ def merge_and_analyse(file_path: Path,
     before averaging them.
 
     Args:
-        file_path:         The path where the vernier outputs are located.
-        mpiranks:          The number of mpi ranks (equivalent to the number of files) to iterate through.
-        input_name:        The name of the vernier output files without the rank.
-        basic_output_bool: A boolean which if set to True will not calculate minimum/ maximum values. 
+        file_path:      The path where the vernier outputs are located.
+        mpiranks:       The number of mpi ranks (equivalent to the number of files) to iterate through.
+        input_name:     The name of the vernier output files without the rank.
+        max_only_bool:  A boolean which if set to True will not calculate minimum/ maximum values. 
         file_path:      The path where the vernier outputs are located.
         mpiranks:       The number of mpi ranks (equivalent to the number of files) to iterate through.
         input_name:     The name of the vernier output files without the rank.
@@ -144,10 +144,11 @@ def merge_and_analyse(file_path: Path,
 
         if rank == 0:     
 
+            """ Creates the initial dataframe for future calculations """
             prev_df = dataframe.copy()
-            if not(basic_output_bool):
+            if not(max_only_bool):
                 min_df  = dataframe.copy()
-                max_df  = dataframe.copy()
+            max_df  = dataframe.copy()
 
         else:
 
@@ -156,10 +157,10 @@ def merge_and_analyse(file_path: Path,
             new_df["Routine"] = prev_df["Routine"]
 
             """ Calculates new min/ max values """
-            if not(basic_output_bool):
-                for column in dataframe.columns:
+            for column in dataframe.columns:
+                if not(max_only_bool):
                     min_df[column] = min_df[column].where(min_df[column] < dataframe[column], dataframe[column])
-                    max_df[column] = max_df[column].where(max_df[column] > dataframe[column], dataframe[column])
+                max_df[column] = max_df[column].where(max_df[column] > dataframe[column], dataframe[column])
 
             prev_df = new_df.copy()
 
@@ -169,14 +170,19 @@ def merge_and_analyse(file_path: Path,
 
     """ Adds the min/ max values to the mean dataframe and renames columns """
 
-    for column in mean_df.drop(columns=["Routine"]):
-        mean_df[f"Mean_{column}"] = mean_df[column]
-        if not(basic_output_bool):
-            mean_df[f"Min_{column}"]  = min_df[column]
-            mean_df[f"Max_{column}"]  = max_df[column]
-        mean_df = mean_df.drop(columns=[f"{column}"])  
-
-    return mean_df
+    if full_info_bool:
+        output_df = mean_df.drop(columns=["Calls"])
+    else:
+        output_df = mean_df.copy()
+    for column in output_df.drop(columns=["Routine"]):
+        if not(max_only_bool):
+            output_df[f"Min_{column}"]  = min_df[column]
+            output_df[f"Mean_{column}"] = mean_df[column]
+        output_df[f"Max_{column}"]  = max_df[column]
+        output_df = output_df.drop(columns=[f"{column}"])  
+    if full_info_bool:
+        output_df["Calls"] = max_df["Calls"]
+    return output_df
 
 def main():
 
@@ -185,7 +191,7 @@ def main():
     file_path = args.path
     merged_file_name = args.output_name
     input_name = args.input_name
-    basic_output_bool = args.basic_output
+    max_only_bool = args.max_only
     full_info_bool = args.full_info
     mpiranks = read_mpi_ranks(file_path, input_name)
 
@@ -199,7 +205,7 @@ def main():
         print("\nReading and Merging...")
 
 
-        merged_frame = merge_and_analyse(file_path, int(mpiranks), input_name, basic_output_bool, full_info_bool)
+        merged_frame = merge_and_analyse(file_path, int(mpiranks), input_name, max_only_bool, full_info_bool)
 
         thread_string = "@0" 
         merged_frame["Routine"] = merged_frame["Routine"].str.replace(thread_string, '')
