@@ -31,15 +31,17 @@ void meto::MPIContext::reset() {
   comm_rank_ = -1;
   comm_size_ = -1;
   initialized_ = false;
+  tag_ = MPI_CONTEXT_NULL_STRING;
 }
 
 /**
  * @brief  Initialise a Vernier MPI context.
  * @param [in] comm_client_handle  The communicator to duplicate.
+ * @param [in] tag  Identifying tag.
  * @note  Duplicates the input MPI communicator.
  */
 
-void meto::MPIContext::init(MPI_Comm client_comm_handle) {
+void meto::MPIContext::init(MPI_Comm client_comm_handle, std::string_view tag) {
 
   // Check that the storage is correctly null first.
   assert(comm_handle_ == MPI_COMM_NULL);
@@ -64,6 +66,8 @@ void meto::MPIContext::init(MPI_Comm client_comm_handle) {
   } else {
     meto::error_handler("MPIContext::init. MPI not initialized.", EXIT_FAILURE);
   }
+
+  tag_ = tag;
 
   initialized_ = true;
 
@@ -166,3 +170,10 @@ void meto::MPIContext::write_global_file(std::string filename,
 
   return;
 }
+
+/**
+ * @brief Gets the identifying tag.
+ * @returns The tag, as a string.
+ */
+
+std::string meto::MPIContext::get_tag() const { return tag_; }

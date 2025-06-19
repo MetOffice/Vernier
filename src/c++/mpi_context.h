@@ -18,11 +18,14 @@
 #ifndef VERNIER_MPI_CONTEXT_H
 #define VERNIER_MPI_CONTEXT_H
 
+#include <string_view>
 #include <unordered_map>
 
 #include "hashvec.h"
 #include "vernier_gettime.h"
 #include "vernier_mpi.h"
+
+#define MPI_CONTEXT_NULL_STRING "mpi_context_null_string"
 
 namespace meto {
 
@@ -37,6 +40,7 @@ private:
   int comm_size_;
   int comm_rank_;
   bool initialized_;
+  std::string tag_;
 
 public:
   // Constructor
@@ -44,7 +48,7 @@ public:
 
   // Init and finalize
   bool is_initialized();
-  void init(MPI_Comm);
+  void init(MPI_Comm, std::string_view tag);
   void finalize();
   void reset();
 
@@ -54,6 +58,8 @@ public:
 
   // Global file writer
   void write_global_file(std::string filename, std::ostringstream &buffer);
+
+  std::string get_tag() const;
 };
 
 } // namespace meto
