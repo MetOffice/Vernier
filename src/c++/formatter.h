@@ -23,6 +23,7 @@
 #endif
 
 #include "hashvec.h"
+#include "mpi_context.h"
 
 namespace meto {
 
@@ -48,7 +49,7 @@ public:
   explicit Formatter();
 
   // Execute the format method
-  void execute_format(std::ostream &os, hashvec_t);
+  void execute_format(std::ostream &os, hashvec_t, MPIContext &);
 };
 
 } // namespace meto

@@ -28,7 +28,7 @@ void meto::SingleFile::write(hashvec_t hashvec) {
   std::string mpi_filename_tail = "-collated";
 
   // Format the report on each task and buffer it on each task
-  formatter_.execute_format(buffer, hashvec);
+  formatter_.execute_format(buffer, hashvec, mpi_context_);
 
   mpi_context_.write_global_file(output_filename_ + mpi_filename_tail, buffer);
 }

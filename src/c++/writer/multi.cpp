@@ -37,7 +37,7 @@ void meto::Multi::open_files() {
 
 void meto::Multi::write(hashvec_t hashvec) {
   open_files();
-  formatter_.execute_format(os, hashvec);
+  formatter_.execute_format(os, hashvec, mpi_context_);
   os.flush();
   os.close();
 }
