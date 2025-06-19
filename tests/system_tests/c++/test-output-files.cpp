@@ -10,10 +10,9 @@
 #include "vernier_mpi.h"
 
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
-
 
 /*
  * Check the first few lines of the output file
@@ -23,7 +22,7 @@ bool check_output_file(std::string path, std::string format) {
   std::string buffer;
   std::string expected;
 
-  if(!fb.open(path, std::ios::in)) {
+  if (!fb.open(path, std::ios::in)) {
     std::cerr << "failed to open " << path << std::endl;
     return false;
   }
@@ -32,21 +31,21 @@ bool check_output_file(std::string path, std::string format) {
 
   // Check the header lines
   std::getline(input, buffer);
-  if(buffer.compare("") != 0) {
+  if (buffer.compare("") != 0) {
     std::cerr << "Invalid line: " << buffer << std::endl;
     return false;
   }
 
   std::getline(input, buffer);
-  if(buffer.compare(0, 8, "MPI task") != 0) {
+  if (buffer.compare(0, 8, "MPI task") != 0) {
     std::cerr << "Invalid line: " << buffer << std::endl;
     return false;
   }
 
   // Match the next line to the start of an output format
-  if(format.compare("drhook") == 0) {
+  if (format.compare("drhook") == 0) {
     expected = "Profiling on ";
-  } else if(format.compare("threads") == 0) {
+  } else if (format.compare("threads") == 0) {
     // Skip extra blank line in threads format
     std::getline(input, buffer);
     expected = "region_name@thread_id";
@@ -56,7 +55,7 @@ bool check_output_file(std::string path, std::string format) {
   }
 
   std::getline(input, buffer);
-  if(buffer.compare(0, expected.length(), expected) != 0) {
+  if (buffer.compare(0, expected.length(), expected) != 0) {
     std::cerr << "Invalid next line" << std::endl;
     std::cerr << "Got:      " << buffer << std::endl;
     std::cerr << "Expected: " << expected << std::endl;
@@ -65,7 +64,6 @@ bool check_output_file(std::string path, std::string format) {
 
   return true;
 }
-
 
 /*
  * Generate some profiler output and check the contents
@@ -80,21 +78,21 @@ bool create_output(std::string mode, std::string format) {
 
   setenv("VERNIER_OUTPUT_MODE", mode.c_str(), 1);
   setenv("VERNIER_OUTPUT_FORMAT", format.c_str(), 1);
-  
+
   meto::vernier.write();
 
   meto::vernier.finalize();
 
-  if(mode.compare("multi") == 0) {
+  if (mode.compare("multi") == 0) {
     path = "vernier-output-0";
-  }   else if(mode.compare("single") == 0) {
+  } else if (mode.compare("single") == 0) {
     path = "vernier-output-collated";
   } else {
     std::cerr << "unknown mode" << std::endl;
     return false;
   }
-  
-  if(!check_output_file(path, format)) {
+
+  if (!check_output_file(path, format)) {
     std::cerr << mode << " file " << format << " test failed" << std::endl;
     return false;
   }
@@ -102,19 +100,18 @@ bool create_output(std::string mode, std::string format) {
   return true;
 }
 
-
 /*
  * Main function
  */
 int main() {
   std::string modes[] = {"multi", "single"};
   std::string formats[] = {"drhook", "threads"};
-  
+
   MPI_Init(NULL, NULL);
 
-  for(auto mode : modes) {
-    for(auto format : formats) {
-      if(!create_output(mode, format)) {
+  for (auto mode : modes) {
+    for (auto format : formats) {
+      if (!create_output(mode, format)) {
         MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
       }
     }

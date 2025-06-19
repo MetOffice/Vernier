@@ -45,11 +45,12 @@ meto::Formatter::Formatter() {
  * @param[in] hashvec  Vector of data that the format method will operate on
  */
 
-void meto::Formatter::execute_format(std::ostream &os, hashvec_t hashvec, MPIContext &mpi_context) {
+void meto::Formatter::execute_format(std::ostream &os, hashvec_t hashvec,
+                                     MPIContext &mpi_context) {
   // Add an MPI task identifier to each output file
   os << "\n"
-     << "MPI task " << mpi_context.get_rank() << " of " << mpi_context.get_size()
-     << "\n";
+     << "MPI task " << mpi_context.get_rank() << " of "
+     << mpi_context.get_size() << "\n";
   (this->*format_)(os, hashvec);
 }
 
