@@ -34,6 +34,7 @@ if (BUILD_TESTS)
   endfunction()
 
   add_cxx_system_test(TestTags test-tags.cpp 1)
+  add_cxx_system_test(TestOutputs test-output-files.cpp 1)
 
   if (ENABLE_MPI)
     add_cxx_system_test(TestVernierMPIHeaders test-vernier-mpi-headers.cpp 2)
