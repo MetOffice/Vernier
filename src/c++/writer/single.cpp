@@ -25,7 +25,7 @@ void meto::SingleFile::write(hashvec_t hashvec) {
    * everything through MPI IO.
    */
   std::ostringstream buffer; // Formatted output
-  std::string mpi_filename_tail = "-global";
+  std::string mpi_filename_tail = "-collated";
 
   // Format the report on each task and buffer it on each task
   formatter_.execute_format(buffer, hashvec);
