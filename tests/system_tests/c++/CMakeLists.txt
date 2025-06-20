@@ -38,5 +38,6 @@ if (BUILD_TESTS)
 
   if (ENABLE_MPI)
     add_cxx_system_test(TestVernierMPIHeaders test-vernier-mpi-headers.cpp 2)
+    add_cxx_system_test(TestMPIOutputs test-output-files.cpp 2)
   endif()
 endif ()
