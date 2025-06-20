@@ -37,7 +37,7 @@ bool check_output_file(std::string path, std::string format) {
   }
 
   std::getline(input, buffer);
-  if (buffer.compare(0, 8, "MPI task") != 0) {
+  if (buffer.compare(0, 9, "Task 1 of") != 0) {
     std::cerr << "Invalid line: " << buffer << std::endl;
     return false;
   }

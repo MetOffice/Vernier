@@ -49,8 +49,10 @@ void meto::Formatter::execute_format(std::ostream &os, hashvec_t hashvec,
                                      MPIContext &mpi_context) {
   // Add an MPI task identifier to each output file
   os << "\n"
-     << "MPI task " << mpi_context.get_rank() << " of "
-     << mpi_context.get_size() << "\n";
+     << "Task " << (mpi_context.get_rank() + 1) << " of "
+     << mpi_context.get_size()
+     << " : MPI rank ID " << mpi_context.get_rank()
+     << "\n";
   (this->*format_)(os, hashvec);
 }
 
