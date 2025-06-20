@@ -45,7 +45,13 @@ meto::Formatter::Formatter() {
  * @param[in] hashvec  Vector of data that the format method will operate on
  */
 
-void meto::Formatter::execute_format(std::ofstream &os, hashvec_t hashvec) {
+void meto::Formatter::execute_format(std::ostream &os, hashvec_t hashvec,
+                                     MPIContext &mpi_context) {
+  // Add an MPI task identifier to each output file
+  os << "\n"
+     << "Task " << (mpi_context.get_rank() + 1) << " of "
+     << mpi_context.get_size() << " : MPI rank ID " << mpi_context.get_rank()
+     << "\n";
   (this->*format_)(os, hashvec);
 }
 
@@ -56,7 +62,7 @@ void meto::Formatter::execute_format(std::ofstream &os, hashvec_t hashvec) {
  * @param[in] hashvec  Vector containing all the necessary data
  */
 
-void meto::Formatter::threads(std::ofstream &os, hashvec_t hashvec) {
+void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 
   // Write key
   os << "\n";
@@ -98,7 +104,7 @@ void meto::Formatter::threads(std::ofstream &os, hashvec_t hashvec) {
  * @param[in] hashvec  Vector containing all the necessary data
  */
 
-void meto::Formatter::drhook(std::ofstream &os, hashvec_t hashvec) {
+void meto::Formatter::drhook(std::ostream &os, hashvec_t hashvec) {
 
   int num_threads = 1;
 #ifdef _OPENMP
