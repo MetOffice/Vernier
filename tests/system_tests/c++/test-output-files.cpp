@@ -68,8 +68,8 @@ bool check_output_file(std::string path, std::string format) {
 /*
  * Generate some profiler output and check the contents
  */
-bool create_output(std::string mode, std::string format) {
-  std::string path;
+bool create_output(std::string mode, std::string format, int rank) {
+  std::string path = format + "-vernier-output";
   meto::vernier.init(MPI_COMM_WORLD);
 
   // Create some data
@@ -78,21 +78,27 @@ bool create_output(std::string mode, std::string format) {
 
   setenv("VERNIER_OUTPUT_MODE", mode.c_str(), 1);
   setenv("VERNIER_OUTPUT_FORMAT", format.c_str(), 1);
+  setenv("VERNIER_OUTPUT_FILENAME", path.c_str(), 1);
 
   meto::vernier.write();
 
+  unsetenv("VERNIER_OUTPUT_FILENAME");
+  unsetenv("VERNIER_OUTPUT_FORMAT");
+  unsetenv("VERNIER_OUTPUT_MODE");
+
   meto::vernier.finalize();
 
+  // Append the expected extension
   if (mode.compare("multi") == 0) {
-    path = "vernier-output-0";
+    path.append("-0");
   } else if (mode.compare("single") == 0) {
-    path = "vernier-output-collated";
+    path.append("-collated");
   } else {
     std::cerr << "unknown mode" << std::endl;
     return false;
   }
 
-  if (!check_output_file(path, format)) {
+  if (rank == 0 && !check_output_file(path, format)) {
     std::cerr << mode << " file " << format << " test failed" << std::endl;
     return false;
   }
@@ -104,14 +110,16 @@ bool create_output(std::string mode, std::string format) {
  * Main function
  */
 int main() {
+  int rank;
   std::string modes[] = {"multi", "single"};
   std::string formats[] = {"drhook", "threads"};
 
   MPI_Init(NULL, NULL);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   for (auto mode : modes) {
     for (auto format : formats) {
-      if (!create_output(mode, format)) {
+      if (!create_output(mode, format, rank)) {
         MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
       }
     }
