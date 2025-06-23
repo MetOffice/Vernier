@@ -31,6 +31,8 @@ meto::HashVecHandler::HashVecHandler(MPIContext const &mpi_context) {
   // Allocate writer to be of required type.
   if (io_mode == "multi") {
     writer_strategy_ = std::make_unique<Multi>(mpi_context);
+  } else if (io_mode == "single") {
+    writer_strategy_ = std::make_unique<SingleFile>(mpi_context);
   } else {
     error_handler("Invalid IO mode choice", EXIT_FAILURE);
   }
@@ -61,7 +63,4 @@ void meto::HashVecHandler::sort() {
  *
  */
 
-void meto::HashVecHandler::write() {
-  std::ofstream os;
-  writer_strategy_->write(os, hashvec_);
-}
+void meto::HashVecHandler::write() { writer_strategy_->write(hashvec_); }

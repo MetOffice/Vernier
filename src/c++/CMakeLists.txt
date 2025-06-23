@@ -19,6 +19,7 @@ add_library(${CMAKE_PROJECT_NAME}
         hashvec_handler.cpp
         writer/writer.cpp
         writer/multi.cpp
+        writer/single.cpp
         formatter.cpp
         hashvec.cpp
         vernier_gettime.cpp

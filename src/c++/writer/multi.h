@@ -28,15 +28,17 @@ namespace meto {
 class Multi : public Writer {
 
 private:
+  // Per-file output stream
+  std::ofstream os;
   // Method
-  void open_files(std::ofstream &os);
+  void open_files();
 
 public:
   // Constructor
   Multi(MPIContext const &);
 
   // Implementation of pure virtual function.
-  void write(std::ofstream &os, hashvec_t) override;
+  void write(hashvec_t) override;
 };
 
 } // namespace meto
