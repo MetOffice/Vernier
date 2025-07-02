@@ -9,6 +9,10 @@
 #include "vernier.h"
 #include "vernier_mpi.h"
 
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
+
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -80,7 +84,9 @@ bool create_output(std::string mode, std::string format, int rank) {
   setenv("VERNIER_OUTPUT_FORMAT", format.c_str(), 1);
   setenv("VERNIER_OUTPUT_FILENAME", path.c_str(), 1);
 
+  std::cout << "MJG: Calling vernier.write() ..." << std::endl << std::flush;
   meto::vernier.write();
+  std::cout << "MJG: ... called vernier.write()." << std::endl << std::flush;
 
   unsetenv("VERNIER_OUTPUT_FILENAME");
   unsetenv("VERNIER_OUTPUT_FORMAT");
@@ -117,8 +123,15 @@ int main() {
   MPI_Init(NULL, NULL);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+  int max_threads=1;
+#ifdef _OPENMP
+  max_threads = omp_get_max_threads();
+#endif
+  std::cout << "MJG: Running on " << max_threads << " thread(s)." << std::endl << std::flush;
+
   for (auto mode : modes) {
     for (auto format : formats) {
+      std::cout << "MJG: Testing - mode: " << mode << ", format: " << format << "." << std::endl << std::flush;
       if (!create_output(mode, format, rank)) {
         MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
       }
