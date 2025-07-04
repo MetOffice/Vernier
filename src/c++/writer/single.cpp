@@ -50,11 +50,17 @@ void meto::SingleFile::write(hashvec_t hashvec) {
   MPI_Datatype mpi_buffer; // Buffer as a contiguous item
   MPI_File file_handle;    // MPI File accessor
   MPI_Status status;       // Result of write
+  MPI_Offset displacement; // Displacement in bytes on this rank.
 
   // Global maximum string size is required on every task to set up
   // the custom data type
   length = static_cast<int>(buffer.str().length());
-  MPI_Allreduce(&length, &max_length, 1, MPI_INT, MPI_MAX, mpi_context_.get_handle());
+  MPI_Allreduce(&length, &max_length, 1, MPI_INT, MPI_MAX,
+                mpi_context_.get_handle());
+
+  // Pad out with spaces
+  buffer << std::string(
+      static_cast<std::string::size_type>(max_length - length), ' ');
 
   MPI_Type_contiguous(max_length, MPI_CHAR, &mpi_buffer);
   MPI_Type_commit(&mpi_buffer);
@@ -64,12 +70,15 @@ void meto::SingleFile::write(hashvec_t hashvec) {
   MPI_File_open(mpi_context_.get_handle(), filename.c_str(),
                 MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &file_handle);
 
-  MPI_File_set_view(file_handle, max_length * mpi_context_.get_rank(), MPI_CHAR, mpi_buffer,
-                    "native", MPI_INFO_NULL);
+  displacement = static_cast<MPI_Offset>(mpi_context_.get_rank() * max_length *
+                                         static_cast<int>(sizeof(char)));
+  MPI_File_set_view(file_handle, displacement, MPI_CHAR, mpi_buffer, "native",
+                    MPI_INFO_NULL);
 
   // Collective write operation
-  MPI_File_write_all(file_handle, buffer.str().c_str(), max_length, MPI_CHAR,
-                     &status);
+  // Some evidence of memory leak risk with MPI_File_write_all.
+  MPI_File_write(file_handle, buffer.str().c_str(), max_length, MPI_CHAR,
+                 &status);
 
   // Tidy up resources
   MPI_File_close(&file_handle);
