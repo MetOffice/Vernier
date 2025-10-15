@@ -55,6 +55,8 @@ public:
   // Getters
   int get_size();
   int get_rank();
+  int get_handle();
+
   std::string get_tag() const;
 };
 

@@ -43,7 +43,7 @@ public:
   virtual ~Writer() = default;
 
   // Pure virtual write method
-  virtual void write(std::ofstream &os, hashvec_t) = 0;
+  virtual void write(hashvec_t) = 0;
 };
 
 } // namespace meto

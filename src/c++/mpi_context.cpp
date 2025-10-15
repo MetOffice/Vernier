@@ -8,6 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
+#include <fstream>
+#include <sstream>
+
 #include "error_handler.h"
 #include "mpi_context.h"
 
@@ -114,6 +117,13 @@ int meto::MPIContext::get_rank() { return comm_rank_; }
  */
 
 int meto::MPIContext::get_size() { return comm_size_; }
+
+/**
+ * @brief Gets the MPI communicator handle.
+ * @returns The MPI communicator handle.
+ */
+
+int meto::MPIContext::get_handle() { return comm_handle_; }
 
 /**
  * @brief Gets the identifying tag.
