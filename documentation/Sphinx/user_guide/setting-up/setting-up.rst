@@ -112,7 +112,7 @@ Environment Variables
      If this environment variable remains unset, then the default output format
      is the **drhook** option.
 
-   ``VERNIER_IO_MODE``
+   ``VERNIER_OUTPUT_MODE``
 
      Determines the output mode to use. Currently supported values are:
 
