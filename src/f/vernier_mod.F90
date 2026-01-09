@@ -109,12 +109,17 @@ module vernier_mod
       !Local variables
       character(len=:), allocatable :: local_tag
 
+      ! NB: Dual calls to interface_vernier_init() ought to be unnecessary,
+      ! since unallocated actual arguments passed to optional dummy arguments
+      ! count as not present in downstream code. We separate the calls here
+      ! (with and without local_tag) to accommodate a compiler bug. 
       if (present(tag)) then
         allocate(character(len=len_trim(tag)+1) :: local_tag)
         call append_null_char(tag, local_tag, len_trim(tag))
+        call interface_vernier_init(client_comm_handle, local_tag)
+      else
+        call interface_vernier_init(client_comm_handle)
       end if
-
-      call interface_vernier_init(client_comm_handle, local_tag)
 
     end subroutine vernier_init
 
