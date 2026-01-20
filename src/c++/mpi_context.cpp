@@ -123,7 +123,7 @@ int meto::MPIContext::get_size() { return comm_size_; }
  * @returns The MPI communicator handle.
  */
 
-int meto::MPIContext::get_handle() { return comm_handle_; }
+MPI_Comm meto::MPIContext::get_handle() { return comm_handle_; }
 
 /**
  * @brief Gets the identifying tag.
