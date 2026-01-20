@@ -5,9 +5,9 @@
  * -----------------------------------------------------------------------------
  */
 
+#include <cstdlib>
 #include <iostream>
 #include <string>
-#include <cstdlib>
 
 #include "error_handler.h"
 #include "vernier_mpi.h"
