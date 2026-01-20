@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 #include "error_handler.h"
 #include "vernier_mpi.h"
@@ -28,6 +29,6 @@ meto::error_handler::error_handler(const std::string &customError,
   if (MPI_Initialized(&flag)) {
     MPI_Abort(comm, errorCode);
   } else {
-    exit(errorCode);
+    std::exit(errorCode);
   }
 }
