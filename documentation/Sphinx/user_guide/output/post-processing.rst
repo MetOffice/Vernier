@@ -56,6 +56,10 @@ script, these are given in the table below.
     * - ``-f/ --full_info``
       - False
       - Enables full Vernier output to be merged and output
+    * - ``-r/ --recursive_process``
+      - False
+      - If used will process all vernier outputs found within subdirectories of given path
+
 
 Below is an example of the current script output without additional flags.
 

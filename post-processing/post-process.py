@@ -29,12 +29,13 @@ def parse_cli_arguments(input_arguments: list[str] = None,
     """
 
     parser = argparse.ArgumentParser(description="This script is for merging the outputs from a test that uses Vernier callipers into one file. For full documentation please see the post-processing section of the user guide.")
-    parser.add_argument("-p", "--path",         type=Path,  default=(os.getcwd()),                help="Path to Vernier output files")
-    parser.add_argument("-o", "--output_name",  type=str,   default=str("vernier-merged-output"), help="Name of file to write to")
-    parser.add_argument("-i", "--input_name",   type=str,   default=str("vernier-output-"),       help="Vernier files to read from")
-    parser.add_argument("-m", "--max_only",     action="store_true", default=False,               help="Only calculates the maximum value across all ranks")
-    parser.add_argument("-f", "--full_info",    action="store_true", default=False,               help="Enables merging and displaying of all information Vernier records")
-
+    parser.add_argument("-p", "--path",              type=Path,           default=(os.getcwd()),                help="Path to Vernier output files")
+    parser.add_argument("-o", "--output_name",       type=str,            default=str("vernier-merged-output"), help="Name of file to write to")
+    parser.add_argument("-i", "--input_name",        type=str,            default=str("vernier-output-"),       help="Vernier files to read from")
+    parser.add_argument("-b", "--basic_output",      action="store_true", default=False,                        help="Outputs only mean values across MPI ranks")
+    parser.add_argument("-m", "--max_only",          action="store_true", default=False,                        help="Only calculates the maximum value across all ranks")
+    parser.add_argument("-f", "--full_info",         action="store_true", default=False,                        help="Enables merging and displaying of all information Vernier records")
+    parser.add_argument("-r", "--recursive_process", action="store_true", default=False,                        help="Recursively processes all found vernier outputs in the given directory")
     return parser.parse_args(args=input_arguments)
 
 def read_mpi_ranks(directory_path: Path,
@@ -134,7 +135,6 @@ def merge_and_analyse(file_path: Path,
         The merged dataframe, containing the routine names and the mean 'Self' and 'Total' values across all outputs.
     """
 
-    print(f"Path to open: {file_path}")
     print(f"Detected {mpiranks} files.")
 
     for rank in range(0,mpiranks):
@@ -187,34 +187,52 @@ def merge_and_analyse(file_path: Path,
 def main():
 
     """ Read in command line arguments, assigning them to variables. Determine how many outputs to merge """
-    args = parse_cli_arguments()
-    file_path = args.path
-    merged_file_name = args.output_name
-    input_name = args.input_name
-    max_only_bool = args.max_only
-    full_info_bool = args.full_info
-    mpiranks = read_mpi_ranks(file_path, input_name)
+    args              = parse_cli_arguments()
+    file_path         = args.path
+    merged_file_name  = args.output_name
+    input_name        = args.input_name
+    basic_output_bool = args.basic_output
+    max_only_bool     = args.max_only
+    full_info_bool    = args.full_info
+    recursive_process = args.recursive_process
 
-    if mpiranks == 0:
+    if recursive_process:
 
-        print("Error, no vernier-outputs detected")
-        print("Searched in: ", file_path)
+        print("\nVernier outputs found in: \n")
+
+        valid_directories = []
+
+        for root, dirs, files in os.walk("."):
+            if (input_name+"0") in files:
+                valid_directories.append(os.path.relpath(root))
+                print( os.path.relpath(root))
+
+        if len(valid_directories) == 0:
+
+            print("Error, no vernier-outputs detected")
 
     else:
 
-        print("\nReading and Merging...")
+        valid_directories = [file_path]
 
+        if read_mpi_ranks(output_path, input_name) == 0:
 
-        merged_frame = merge_and_analyse(file_path, int(mpiranks), input_name, max_only_bool, full_info_bool)
+            print("Error, no vernier-outputs detected")
+            print("Searched in: ", output_path)
 
+    for output_path in valid_directories:
+
+        mpiranks = read_mpi_ranks(output_path, input_name)
+
+        print("\nMerging files in: ", output_path)
+
+        merged_frame = merge_and_analyse(output_path, int(mpiranks), input_name, max_only_bool, full_info_bool)
         thread_string = "@0" 
         merged_frame["Routine"] = merged_frame["Routine"].str.replace(thread_string, '')
 
-        print("\nWriting...")
-        with open(f"{merged_file_name}", 'w') as f:
+        with open(f"{output_path}/{merged_file_name}", 'w') as f:
                   f.write(merged_frame.to_string(index=False, col_space=10))
-
-        print(f"Merged outputs written to {merged_file_name}\n")
+        print(f"Merged outputs written to {output_path}/{merged_file_name}")
 
 
 if __name__ == '__main__':
