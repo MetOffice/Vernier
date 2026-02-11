@@ -63,6 +63,7 @@ class VernierData():
         if txt_path is None:
             for row in txt_table:
                 print('| {:>32} | {:>16} | {:>12} | {:>10} | {:>10} | {:>18} |'.format(*row))
+            print("\n")
         else:
             with open(txt_path, 'w') as f:
                 for row in txt_table:
