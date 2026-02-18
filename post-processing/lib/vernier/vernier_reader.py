@@ -38,6 +38,8 @@ class VernierReader():
                     if not int(sline[5]) in loaded.data[caliper]["n_calls"]:
                         loaded.data[caliper]["n_calls"].append(int(sline[5]))
 
+        handle.close()
+
         return loaded
 
 
@@ -50,3 +52,6 @@ class VernierReader():
 
         elif self.path.is_dir():
             raise NotImplementedError("Loading from a directory of Vernier output files is not yet implemented.")
+
+        else:
+            raise ValueError(f"Provided path {self.path} is neither a file nor a directory.")
