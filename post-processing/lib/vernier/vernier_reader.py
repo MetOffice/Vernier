@@ -16,16 +16,14 @@ class VernierReader():
         Loads Vernier data from a single file, and returns it as a VernierData object.
         """
 
-        handle = open(self.path, 'r')
-
         loaded = VernierData()
 
         # Populate data
-        contents = handle.readlines()
+        contents = self.path.read_text().splitlines()
         for line in contents:
             sline = line.split()
-            if len(sline) > 0:
-                if sline[0].isdigit():
+            if len(sline) > 0: # Line contains data
+                if sline[0].isdigit(): # Caliper lines start with a digit
 
                     caliper = sline[-1]
                     if not caliper in loaded.data:
@@ -37,8 +35,6 @@ class VernierReader():
                     loaded.data[caliper]["total"].append(float(sline[4]))
                     if not int(sline[5]) in loaded.data[caliper]["n_calls"]:
                         loaded.data[caliper]["n_calls"].append(int(sline[5]))
-
-        handle.close()
 
         return loaded
 
@@ -54,4 +50,4 @@ class VernierReader():
             raise NotImplementedError("Loading from a directory of Vernier output files is not yet implemented.")
 
         else:
-            raise ValueError(f"Provided path {self.path} is neither a file nor a directory.")
+            raise ValueError(f"Provided path '{self.path}' is neither a file nor a directory.")
