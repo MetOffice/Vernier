@@ -16,11 +16,11 @@ class TestVernierData(unittest.TestCase):
     def test_add_empty_caliper(self):
         self.test_data.add_caliper("test_caliper")
         self.assertIn("test_caliper", self.test_data.data)
-        self.assertEqual(self.test_data.data["test_caliper"]["%time"], [])
-        self.assertEqual(self.test_data.data["test_caliper"]["cumul"], [])
-        self.assertEqual(self.test_data.data["test_caliper"]["self"], [])
-        self.assertEqual(self.test_data.data["test_caliper"]["total"], [])
-        self.assertEqual(self.test_data.data["test_caliper"]["n_calls"], [])
+        self.assertEqual(self.test_data.data["test_caliper"].time_percent, [])
+        self.assertEqual(self.test_data.data["test_caliper"].cumul_time, [])
+        self.assertEqual(self.test_data.data["test_caliper"].self_time, [])
+        self.assertEqual(self.test_data.data["test_caliper"].total_time, [])
+        self.assertEqual(self.test_data.data["test_caliper"].n_calls, [])
 
     def test_filter_caliper(self):
         self.test_data.add_caliper("timestep_caliper")
@@ -48,34 +48,34 @@ class TestVernierData(unittest.TestCase):
 
     def test_write_txt_output_file(self):
         self.test_data.add_caliper("test_caliper")
-        self.test_data.data["test_caliper"]["%time"] = [10.0, 20.0]
-        self.test_data.data["test_caliper"]["cumul"] = [30.0, 40.0]
-        self.test_data.data["test_caliper"]["self"] = [5.0, 15.0]
-        self.test_data.data["test_caliper"]["total"] = [25.0, 35.0]
-        self.test_data.data["test_caliper"]["n_calls"] = [2]
+        self.test_data.data["test_caliper"].time_percent = [10.0, 20.0]
+        self.test_data.data["test_caliper"].cumul_time = [30.0, 40.0]
+        self.test_data.data["test_caliper"].self_time = [5.0, 15.0]
+        self.test_data.data["test_caliper"].total_time = [25.0, 35.0]
+        self.test_data.data["test_caliper"].n_calls = [2]
 
         with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
             self.test_data.write_txt_output(Path(tmp_file.name))
             contents = Path(tmp_file.name).read_text().splitlines()
-            self.assertEqual("|                          Routine |   Total time (s) |     Self (s) |  No. calls |     % time |  Time per call (s) |", contents[0])
-            self.assertEqual("|                     test_caliper |             30.0 |         10.0 |          2 |       15.0 |               15.0 |", contents[1])
+            self.assertEqual("|      Routine |   Total time (s) |     Self (s) |  No. calls |     % time |  Time per call (s) |", contents[0])
+            self.assertEqual("| test_caliper |             30.0 |         10.0 |          2 |       15.0 |               15.0 |", contents[1])
 
 
     def test_write_txt_output_terminal(self):
         self.test_data.add_caliper("test_caliper")
-        self.test_data.data["test_caliper"]["%time"] = [50.0, 40.0]
-        self.test_data.data["test_caliper"]["cumul"] = [10.0, 12.0]
-        self.test_data.data["test_caliper"]["self"] = [3.0, 4.0]
-        self.test_data.data["test_caliper"]["total"] = [15.0, 55.0]
-        self.test_data.data["test_caliper"]["n_calls"] = [2]
+        self.test_data.data["test_caliper"].time_percent = [50.0, 40.0]
+        self.test_data.data["test_caliper"].cumul_time = [10.0, 12.0]
+        self.test_data.data["test_caliper"].self_time = [3.0, 4.0]
+        self.test_data.data["test_caliper"].total_time = [15.0, 55.0]
+        self.test_data.data["test_caliper"].n_calls = [2]
 
         write_output = StringIO()
         sys.stdout = write_output
         self.test_data.write_txt_output()
         sys.stdout = sys.__stdout__
 
-        self.assertEqual("|                          Routine |   Total time (s) |     Self (s) |  No. calls |     % time |  Time per call (s) |", write_output.getvalue().splitlines()[0])
-        self.assertEqual("|                     test_caliper |             35.0 |          3.5 |          2 |       45.0 |               17.5 |", write_output.getvalue().splitlines()[1])
+        self.assertEqual("|      Routine |   Total time (s) |     Self (s) |  No. calls |     % time |  Time per call (s) |", write_output.getvalue().splitlines()[0])
+        self.assertEqual("| test_caliper |             35.0 |          3.5 |          2 |       45.0 |               17.5 |", write_output.getvalue().splitlines()[1])
 
 if __name__ == '__main__':
     unittest.main()

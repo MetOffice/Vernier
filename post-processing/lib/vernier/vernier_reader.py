@@ -29,12 +29,11 @@ class VernierReader():
                     if not caliper in loaded.data:
                         loaded.add_caliper(caliper)
 
-                    loaded.data[caliper]["%time"].append(float(sline[1]))
-                    loaded.data[caliper]["cumul"].append(float(sline[2]))
-                    loaded.data[caliper]["self"].append(float(sline[3]))
-                    loaded.data[caliper]["total"].append(float(sline[4]))
-                    if not int(sline[5]) in loaded.data[caliper]["n_calls"]:
-                        loaded.data[caliper]["n_calls"].append(int(sline[5]))
+                    loaded.data[caliper].time_percent.append(float(sline[1]))
+                    loaded.data[caliper].cumul_time.append(float(sline[2]))
+                    loaded.data[caliper].self_time.append(float(sline[3]))
+                    loaded.data[caliper].total_time.append(float(sline[4]))
+                    loaded.data[caliper].n_calls.append(int(sline[5]))
 
         return loaded
 
