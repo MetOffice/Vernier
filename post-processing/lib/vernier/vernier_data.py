@@ -1,6 +1,43 @@
+from dataclasses import dataclass
 import numpy as np
 from pathlib import Path
 from typing import Optional
+
+@dataclass(order=True)
+class VernierCaliper():
+    """Class to hold data for a single Vernier caliper, including arrays for each metric."""
+
+    total_time: list[float]
+    time_percent: list[float]
+    self_time: list[float]
+    cumul_time: list[float]
+    n_calls: list[int]
+    name: str
+
+    def __init__(self, name: str):
+
+        self.name = name
+        self.time_percent = []
+        self.cumul_time = []
+        self.self_time = []
+        self.total_time = []
+        self.n_calls = []
+
+        return
+
+    def reduce(self) -> list[str]:
+        """Reduces the data for this caliper to a single row of summary data."""
+
+        return [
+            self.name.replace('@0', ''), # caliper name
+            round(np.mean(self.total_time), 5), # mean total time across calls
+            round(np.mean(self.self_time), 5), # mean self time across calls
+            round(np.mean(self.cumul_time), 5), # mean cumulative time across calls
+            self.n_calls[0], # number of calls (should be the same for all entries, so just take the first)
+            round(np.mean(self.time_percent), 5), # mean percentage of time across calls
+            round(np.mean(self.total_time) / self.n_calls[0], 5) # mean time per call
+        ]
+
 
 class VernierData():
     """Class to hold Vernier data in a structured way, and provide methods for filtering and outputting the data."""
@@ -16,13 +53,7 @@ class VernierData():
         """Adds a new caliper to the data structure, with empty arrays for each metric."""
 
         # Create empty data arrays
-        self.data[caliper_key] = {
-            "%time"   : [],
-            "cumul"   : [],
-            "self"    : [],
-            "total"   : [],
-            "n_calls" : []
-        }
+        self.data[caliper_key] = VernierCaliper(caliper_key)
 
 
     def filter(self, caliper_keys: list[str]):
@@ -49,22 +80,16 @@ class VernierData():
         it is printed to the terminal."""
 
         txt_table = []
-        txt_table.append(["Routine", "Total time (s)", "Self (s)", "No. calls", "% time", "Time per call (s)"])
+        txt_table.append(["Routine", "Total time (s)", "Self (s)", "Cumul time (s)", "No. calls", "% time", "Time per call (s)"])
         for caliper in self.data.keys():
-            txt_table.append([
-                f"{caliper.replace('@0', '')}",
-                f"{round(np.mean(self.data[caliper]['total']), 5)}",
-                f"{round(np.mean(self.data[caliper]['self']), 5)}",
-                f"{self.data[caliper]['n_calls'][0]}",
-                f"{round(np.mean(self.data[caliper]['%time']), 5)}",
-                f"{round(np.mean(self.data[caliper]['total']) / self.data[caliper]['n_calls'][0], 5)}"
-            ])
+            txt_table.append(self.data[caliper].reduce())
 
+        max_caliper_len = max([len(line[0]) for line in txt_table])
         if txt_path is None:
             for row in txt_table:
-                print('| {:>32} | {:>16} | {:>12} | {:>10} | {:>10} | {:>18} |'.format(*row))
+                print('| {:>{}} | {:>14} | {:>8} | {:>14} | {:>9} | {:>7} | {:>17} |'.format(row[0], max_caliper_len, *row[1:]))
             print("\n")
         else:
             with open(txt_path, 'w') as f:
                 for row in txt_table:
-                    f.write('| {:>32} | {:>16} | {:>12} | {:>10} | {:>10} | {:>18} |\n'.format(*row))
+                    f.write('| {:>{}} | {:>14} | {:>8} | {:>14} | {:>9} | {:>7} | {:>17} |\n'.format(row[0], max_caliper_len, *row[1:]))
