@@ -97,7 +97,7 @@ up a terminal wherein the user can change build options interactively.
         dynamically (``ON``).
     * - ``-DSTRING_LENGTH``
       - *INTEGER*
-      - Maximum length of a calliper label.  This defaults to 100
+      - Maximum length of a caliper label.  This defaults to 100
         characters.  If the maximum length is exceeded, Vernier will
         cause the application to exit with an error.
     * - ``-DENABLE_MPI``
