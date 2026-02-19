@@ -160,6 +160,7 @@ class VernierDataAggregation():
                              'please use a different label or remove the existing entry.')
         if not isinstance(vernier_data, VernierData):
             raise TypeError(f'The provided vernier_data is not a VernierData object.')
+        self.internal_consistency(vernier_data)
         self.vernier_data[label] = vernier_data
 
     def remove_data(self, label):
@@ -167,26 +168,43 @@ class VernierDataAggregation():
             raise ValueError(f'The label {label} does not exist in this aggregation. ')
         discarded = self.vernier_data.pop(label)
 
-    def internal_consistency(self):
-        # NotImplemented
-        return true
-
-    def caliper_list(self):
-        result = []
-
+    def internal_consistency(self, new_vernier_data=None):
+        """Enforce internal consistency, with the same calipers for all members."""
+        # notImplemented enforce consistent sizing of members?? needed?
+        calipers = []
         for k, vdata in self.vernier_data.items():
             loop_calipers = sorted(list(vdata.data.keys()))
-            if len(result) == 0:
-                result = loop_calipers
+            if len(calipers) == 0:
+                calipers = loop_calipers
             else:
-                if loop_calipers != result:
+                if loop_calipers != calipers:
                     raise ValueError('inconsistent calipers in contents')
-        result.sort()
+        if new_vernier_data is not None:
+            if not isinstance(new_vernier_data, VernierData):
+                raise TypeError(f'The provided vernier_data is not a VernierData object.')
+            check_calipers = sorted(list(new_vernier_data.data.keys()))
+            if calipers and check_calipers != calipers:
+                import pdb ; pdb.set_trace()
+                raise ValueError('inconsistent calipers in new_vernier_data')
+
+    def caliper_list(self):
+        """Return the list of calipers in this aggregation."""
+        result = []
+        self.internal_consistency()
+
+        for k, vdata in self.vernier_data.items():
+            result = sorted(list(vdata.data.keys()))
+            break
         return result
 
 
     def get(self, caliper_key):
-        """Return an array of all the data from all aggregation members"""
+        """
+        Return a VernierCaliper of all the data from all aggregation members
+        for this caliper_key.
+
+        """
+        self.internal_consistency()
         results = VernierCaliper(caliper_key)
         for akey, vdata in self.vernier_data.items():
             results.total_time += vdata.data[caliper_key].total_time
@@ -196,4 +214,3 @@ class VernierDataAggregation():
             results.n_calls += vdata.data[caliper_key].n_calls
 
         return results
-
