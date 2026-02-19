@@ -142,6 +142,12 @@ def aggregate(vernier_data_list: list[VernierData], internal_consistency: bool =
 
     return aggregated
 
+    def get(self, caliper_key):
+        """Return a VernierCaliper for this caliper_key."""
+        if caliper_key not in self.data.keys():
+            return None
+        return self.data[caliper_key]
+
 
 class VernierDataAggregation():
     """
@@ -204,6 +210,8 @@ class VernierDataAggregation():
         for this caliper_key.
 
         """
+        if caliper_key not in self.caliper_list():
+            return None
         self.internal_consistency()
         results = VernierCaliper(caliper_key)
         for akey, vdata in self.vernier_data.items():
