@@ -93,3 +93,32 @@ class VernierData():
             with open(txt_path, 'w') as f:
                 for row in txt_table:
                     f.write('| {:>{}} | {:>14} | {:>8} | {:>14} | {:>9} | {:>7} | {:>17} |\n'.format(row[0], max_caliper_len, *row[1:]))
+
+
+def aggregate(vernier_data_list: list[VernierData], internal_consistency: bool = True) -> VernierData:
+    """
+    Aggregates a list of VernierData objects into a single VernierData object,
+    by concatenating the data for each caliper across the input objects.
+    """
+
+    aggregated = VernierData()
+
+    if internal_consistency:
+        # Check that all input VernierData objects have the same set of calipers
+        caliper_sets = [set(vernier_data.data.keys()) for vernier_data in vernier_data_list]
+        if not all(caliper_set == caliper_sets[0] for caliper_set in caliper_sets):
+            raise ValueError("Input VernierData objects do not have the same set of calipers, " \
+                             "but internal_consistency is set to True.")
+
+    for vernier_data in vernier_data_list:
+        for caliper in vernier_data.data.keys():
+            if not caliper in aggregated.data:
+                aggregated.add_caliper(caliper)
+
+            aggregated.data[caliper].time_percent.extend(vernier_data.data[caliper].time_percent)
+            aggregated.data[caliper].cumul_time.extend(vernier_data.data[caliper].cumul_time)
+            aggregated.data[caliper].self_time.extend(vernier_data.data[caliper].self_time)
+            aggregated.data[caliper].total_time.extend(vernier_data.data[caliper].total_time)
+            aggregated.data[caliper].n_calls.extend(vernier_data.data[caliper].n_calls)
+
+    return aggregated
