@@ -57,8 +57,8 @@ class TestVernierData(unittest.TestCase):
         with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
             self.test_data.write_txt_output(Path(tmp_file.name))
             contents = Path(tmp_file.name).read_text().splitlines()
-            self.assertEqual("|      Routine |   Total time (s) |     Self (s) |  No. calls |     % time |  Time per call (s) |", contents[0])
-            self.assertEqual("| test_caliper |             30.0 |         10.0 |          2 |       15.0 |               15.0 |", contents[1])
+            self.assertEqual("|      Routine | Total time (s) | Self (s) | Cumul time (s) | No. calls |  % time | Time per call (s) |", contents[0])
+            self.assertEqual("| test_caliper |           30.0 |     10.0 |           35.0 |         2 |    15.0 |              15.0 |", contents[1])
 
 
     def test_write_txt_output_terminal(self):
@@ -74,8 +74,8 @@ class TestVernierData(unittest.TestCase):
         self.test_data.write_txt_output()
         sys.stdout = sys.__stdout__
 
-        self.assertEqual("|      Routine |   Total time (s) |     Self (s) |  No. calls |     % time |  Time per call (s) |", write_output.getvalue().splitlines()[0])
-        self.assertEqual("| test_caliper |             35.0 |          3.5 |          2 |       45.0 |               17.5 |", write_output.getvalue().splitlines()[1])
+        self.assertEqual("|      Routine | Total time (s) | Self (s) | Cumul time (s) | No. calls |  % time | Time per call (s) |", write_output.getvalue().splitlines()[0])
+        self.assertEqual("| test_caliper |           35.0 |      3.5 |           11.0 |         2 |    45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
 
 if __name__ == '__main__':
     unittest.main()

@@ -25,7 +25,7 @@ class VernierCaliper():
 
         return
 
-    def reduce(self) -> list[str]:
+    def reduce(self) -> list:
         """Reduces the data for this caliper to a single row of summary data."""
 
         return [
@@ -49,7 +49,7 @@ class VernierData():
         return
 
 
-    def add_caliper(self, caliper_key):
+    def add_caliper(self, caliper_key: str):
         """Adds a new caliper to the data structure, with empty arrays for each metric."""
 
         # Create empty data arrays

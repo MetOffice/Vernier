@@ -28,11 +28,18 @@ class TestVernierCaliper(unittest.TestCase):
         self.assertEqual(reduced_data[0], "test_caliper_a")
         self.assertEqual(reduced_data[1], 30.0)
         self.assertEqual(reduced_data[2], 10.0)
-        self.assertEqual(reduced_data[3], 2)
-        self.assertEqual(reduced_data[4], 15.0)
+        self.assertEqual(reduced_data[3], 35.0)
+        self.assertEqual(reduced_data[4], 2)
         self.assertEqual(reduced_data[5], 15.0)
+        self.assertEqual(reduced_data[6], 15.0)
 
     def test_compare(self):
+        self.caliper_a.time_percent = [10.0, 20.0]
+        self.caliper_a.cumul_time = [30.0, 40.0]
+        self.caliper_a.self_time = [5.0, 15.0]
+        self.caliper_a.total_time = [25.0, 35.0]
+        self.caliper_a.n_calls = [2, 2]
+
         self.caliper_b.time_percent = [12.0, 25.0]
         self.caliper_b.cumul_time = [35.0, 46.0]
         self.caliper_b.self_time = [6.0, 19.0]
