@@ -87,12 +87,12 @@ class VernierData():
         max_caliper_len = max([len(line[0]) for line in txt_table])
         if txt_path is None:
             for row in txt_table:
-                print('| {:>{}} | {:>14} | {:>8} | {:>14} | {:>9} | {:>7} | {:>17} |'.format(row[0], max_caliper_len, *row[1:]))
+                print('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>9} | {:>8} | {:>17} |'.format(row[0], max_caliper_len, *row[1:]))
             print("\n")
         else:
             with open(txt_path, 'w') as f:
                 for row in txt_table:
-                    f.write('| {:>{}} | {:>14} | {:>8} | {:>14} | {:>9} | {:>7} | {:>17} |\n'.format(row[0], max_caliper_len, *row[1:]))
+                    f.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>9} | {:>8} | {:>17} |\n'.format(row[0], max_caliper_len, *row[1:]))
 
 
 def aggregate(vernier_data_list: list[VernierData], internal_consistency: bool = True) -> VernierData:
