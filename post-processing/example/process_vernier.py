@@ -17,6 +17,17 @@ def process_args():
         type=Path,
         help="Path to the Vernier output file or directory."
     )
+    parser.add_argument(
+        "-f", "--filters",
+        nargs="+",
+        help="Filters to apply to the timers."
+    )
+    parser.add_argument(
+        "-o", "--output",
+        type=Path,
+        default=None,
+        help="Path to the output summary file."
+    )
 
     return parser.parse_args()
 
@@ -26,10 +37,7 @@ if __name__ == "__main__":
     args = process_args()
     timers = VernierReader(args.vernier_output).load()
 
-    timers.write_txt_output()
+    if args.filters:
+        timers = timers.filter(args.filters)
 
-    # Just get the timers we want (these filters act in glob-like fashion, so
-    # "field" will match any timer with "field" in its name)
-    timers = timers.filter(["algorithm", "field"])
-
-    timers.write_txt_output()
+    timers.write_txt_output(args.output)
