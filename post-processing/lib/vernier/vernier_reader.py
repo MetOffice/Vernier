@@ -1,5 +1,6 @@
 from pathlib import Path
-from .vernier_data import VernierData
+import os
+from .vernier_data import VernierData, aggregate
 
 class VernierReader():
     """Class handling the reading of Vernier output files, and converting them into a VernierData object."""
@@ -35,7 +36,19 @@ class VernierReader():
                     loaded.data[caliper].total_time.append(float(sline[4]))
                     loaded.data[caliper].n_calls.append(int(sline[5]))
 
+        if not loaded.data:
+            raise ValueError(f"No caliper data found in file '{self.path}'.")
+
         return loaded
+
+
+    def _load_from_directory(self) -> VernierData:
+        """Loads Vernier data from a directory of files, and returns it as a VernierData object."""
+
+        vernier_files = [f for f in os.listdir(self.path) if f.startswith("vernier-output")]
+        vernier_datasets = [VernierReader(self.path / vernier_file).load() for vernier_file in vernier_files]
+
+        return aggregate(vernier_datasets)
 
 
     def load(self) -> VernierData:
@@ -46,7 +59,7 @@ class VernierReader():
             return self._load_from_file()
 
         elif self.path.is_dir():
-            raise NotImplementedError("Loading from a directory of Vernier output files is not yet implemented.")
+            return self._load_from_directory()
 
         else:
             raise ValueError(f"Provided path '{self.path}' is neither a file nor a directory.")

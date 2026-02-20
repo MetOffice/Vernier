@@ -8,7 +8,7 @@ from vernier.vernier_data import VernierData, aggregate
 
 class TestVernierData(unittest.TestCase):
     """
-    Tests for the VernierData class
+    Tests for the VernierData class and aggregator function
     """
     def setUp(self):
         self.test_data = VernierData()
