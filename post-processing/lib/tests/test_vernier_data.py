@@ -121,6 +121,16 @@ class TestVernierData(unittest.TestCase):
         with self.assertRaises(ValueError):
             aggregate([data1, data2])
 
+    def test_aggregate_inconsistent_ok(self):
+        data1 = VernierData()
+        data1.add_caliper("caliper_a")
+
+        data2 = VernierData()
+        data2.add_caliper("caliper_b")
+
+        agg_data = aggregate([data1, data2], internal_consistency=False)
+        self.assertIn("caliper_a", agg_data.data)
+        self.assertIn("caliper_b", agg_data.data)
 
 if __name__ == '__main__':
     unittest.main()
