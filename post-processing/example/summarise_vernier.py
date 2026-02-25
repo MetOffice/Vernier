@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 from pathlib import Path
 import argparse
 import sys
@@ -17,17 +22,6 @@ def process_args():
         type=Path,
         help="Path to the Vernier output file or directory."
     )
-    parser.add_argument(
-        "-f", "--filters",
-        nargs="+",
-        help="Filters to apply to the timers."
-    )
-    parser.add_argument(
-        "-o", "--output",
-        type=Path,
-        default=None,
-        help="Path to the output summary file."
-    )
 
     return parser.parse_args()
 
@@ -36,8 +30,4 @@ if __name__ == "__main__":
 
     args = process_args()
     timers = VernierReader(args.vernier_output).load()
-
-    if args.filters:
-        timers = timers.filter(args.filters)
-
-    timers.write_txt_output(args.output)
+    timers.write_txt_output()

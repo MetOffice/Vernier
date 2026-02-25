@@ -1,4 +1,10 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
 from dataclasses import dataclass
+import sys
 import numpy as np
 from pathlib import Path
 from typing import Optional
@@ -85,15 +91,18 @@ class VernierData():
             txt_table.append(self.data[caliper].reduce())
 
         max_caliper_len = max([len(line[0]) for line in txt_table])
-        if txt_path is None:
-            for row in txt_table:
-                print('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>9} | {:>8} | {:>17} |'.format(row[0], max_caliper_len, *row[1:]))
-            print("\n")
-        else:
-            with open(txt_path, 'w') as f:
-                for row in txt_table:
-                    f.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>9} | {:>8} | {:>17} |\n'.format(row[0], max_caliper_len, *row[1:]))
 
+        # Write to stdout if no path provided, otherwise write to file
+        if txt_path is None:
+            out = sys.stdout
+        else:
+            out = open(txt_path, 'w')
+
+        for row in txt_table:
+            out.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>9} | {:>8} | {:>17} |\n'.format(row[0], max_caliper_len, *row[1:]))
+
+        if txt_path is not None:
+            out.close()
 
 def aggregate(vernier_data_list: list[VernierData], internal_consistency: bool = True) -> VernierData:
     """

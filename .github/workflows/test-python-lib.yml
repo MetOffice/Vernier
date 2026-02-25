@@ -35,4 +35,4 @@ jobs:
     - name: Run example script
       run: |
         cd post-processing/example
-        python process_vernier.py vernier-output-example-collated
+        python summarise_vernier.py vernier-output-example-collated
