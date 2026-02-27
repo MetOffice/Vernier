@@ -6,7 +6,7 @@
 from pathlib import Path
 import argparse
 import sys
-sys.path.append(str(Path(__file__).parent.parent / "lib"))
+sys.path.append(str(Path(__file__).parent.parent))
 from vernier import VernierReader
 
 
