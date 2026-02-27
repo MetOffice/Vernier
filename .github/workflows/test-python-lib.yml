@@ -32,7 +32,7 @@ jobs:
     - name: Type check with mypy
       run: |
         python -m mypy post-processing
-    - name: Run example script
+    - name: Run CLI tools
       run: |
         cd post-processing/tools
-        python summarise_vernier.py vernier-output-example-collated
+        ./summarise_vernier.py vernier-output-example-collated

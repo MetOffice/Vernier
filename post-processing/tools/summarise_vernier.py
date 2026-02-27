@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # ------------------------------------------------------------------------------
 #  (c) Crown copyright Met Office. All rights reserved.
 #  The file LICENCE, distributed with this code, contains details of the terms
