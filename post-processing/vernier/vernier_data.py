@@ -86,9 +86,11 @@ class VernierData():
         it is printed to the terminal."""
 
         txt_table = []
-        txt_table.append(["Routine", "Total time (s)", "Self (s)", "Cumul time (s)", "No. calls", "% time", "Time per call (s)"])
         for caliper in self.data.keys():
             txt_table.append(self.data[caliper].reduce())
+        txt_table = sorted(txt_table, key=lambda x: x[2], reverse=True) # sort by self time, descending
+
+        txt_table.insert(0, ["Routine", "Total time (s)", "Self (s)", "Cumul time (s)", "No. calls", "% time", "Time per call (s)"])
 
         max_caliper_len = max([len(line[0]) for line in txt_table])
 
