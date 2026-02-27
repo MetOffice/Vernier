@@ -4,8 +4,9 @@
 #  under which the code may be used.
 # ------------------------------------------------------------------------------
 import unittest
+from pathlib import Path
 import sys
-sys.path.append('../vernier')
+sys.path.append(str(Path(__file__).parent.parent))
 from vernier.vernier_data import VernierCaliper
 
 class TestVernierCaliper(unittest.TestCase):

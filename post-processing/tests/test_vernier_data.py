@@ -8,7 +8,7 @@ from io import StringIO
 import tempfile
 import unittest
 import sys
-sys.path.append('../vernier')
+sys.path.append(str(Path(__file__).parent.parent))
 from vernier.vernier_data import VernierData, aggregate
 
 class TestVernierData(unittest.TestCase):
