@@ -1,0 +1,132 @@
+
+Task 1 of 6 : MPI rank ID 0
+Profiling on 6 thread(s).
+
+    #  % Time         Cumul         Self        Total     # of calls        Self   Total    Routine@
+                                                                             (Size; Size/sec; Size/call; MinSize; MaxSize)
+        (self)        (sec)        (sec)        (sec)                    ms/call   ms/call
+
+    1   44.130        2.583        2.583        5.854              1    2583.167    5853.527    __example_app__@0
+    2   34.563        4.606        2.023        2.077              2    1011.582    1038.697    io.finalise_context@0
+    3   18.597        5.695        1.089        1.089            110       9.896       9.896    io.write_fldg@0
+    4    0.926        5.749        0.054        0.054              1      54.226      54.226    io.context_finalize@0
+    5    0.722        5.791        0.042        0.063              1      42.262      62.676    io.init_context@0
+    6    0.620        5.828        0.036        0.037              1      36.294      36.656    example_algorithm@0
+    7    0.279        5.844        0.016        0.016              1      16.354      16.354    io.close_context_definition@0
+    8    0.057        5.847        0.003        0.003             14       0.239       0.239    halo_routing_creation@0
+    9    0.049        5.850        0.003        0.003              9       0.320       0.320    fs.constructor@0
+    10   0.031        5.852        0.002        0.002             11       0.165       0.165    clock.update_calendar@0
+    11   0.011        5.853        0.001        1.089            110       0.006       9.903    field.write@0
+    12   0.008        5.853        0.000        0.004             14       0.033       0.272    field.halo_ex_1@0
+    13   0.004        5.853        0.000        0.000            353       0.001       0.001    __vernier__@0
+    14   0.001        5.854        0.000        0.000             78       0.001       0.001    field.initialise@0
+
+Task 2 of 6 : MPI rank ID 1
+Profiling on 6 thread(s).
+
+    #  % Time         Cumul         Self        Total     # of calls        Self   Total    Routine@
+                                                                             (Size; Size/sec; Size/call; MinSize; MaxSize)
+        (self)        (sec)        (sec)        (sec)                    ms/call   ms/call
+
+    1   43.991        3.009        3.009        3.069              2    1504.362    1534.740    io.finalise_context@0
+    2   37.835        5.596        2.588        6.839              1    2587.638    6839.336    __example_app__@0
+    3   15.751        6.674        1.077        1.077            110       9.794       9.794    io.write_fldg@0
+    4    0.888        6.734        0.061        0.061              1      60.754      60.754    io.context_finalize@0
+    5    0.629        6.777        0.043        0.063              1      43.047      63.469    io.init_context@0
+    6    0.532        6.814        0.036        0.037              1      36.405      36.792    example_algorithm@0
+    7    0.240        6.830        0.016        0.016              1      16.389      16.389    io.close_context_definition@0
+    8    0.051        6.834        0.004        0.004             14       0.251       0.251    halo_routing_creation@0
+    9    0.038        6.836        0.003        0.003              9       0.291       0.291    fs.constructor@0
+    10   0.024        6.838        0.002        0.002             11       0.150       0.150    clock.update_calendar@0
+    11   0.008        6.839        0.001        1.078            110       0.005       9.799    field.write@0
+    12   0.007        6.839        0.000        0.004             14       0.033       0.286    field.halo_ex_1@0
+    13   0.004        6.839        0.000        0.000            353       0.001       0.001    __vernier__@0
+    14   0.001        6.839        0.000        0.000             78       0.001       0.001    field.initialise@0
+
+Task 3 of 6 : MPI rank ID 2
+Profiling on 6 thread(s).
+
+    #  % Time         Cumul         Self        Total     # of calls        Self   Total    Routine@
+                                                                             (Size; Size/sec; Size/call; MinSize; MaxSize)
+        (self)        (sec)        (sec)        (sec)                    ms/call   ms/call
+
+    1   51.055        3.996        3.996        4.056              2    1997.848    2028.230    io.finalise_context@0
+    2   33.227        6.596        2.600        7.826              1    2600.448    7826.276    __example_app__@0
+    3   13.735        7.671        1.075        1.075            110       9.772       9.772    io.write_fldg@0
+    4    0.776        7.732        0.061        0.061              1      60.759      60.759    io.context_finalize@0
+    5    0.471        7.769        0.037        0.037              1      36.851      37.211    example_algorithm@0
+    6    0.412        7.801        0.032        0.053              1      32.210      52.583    io.init_context@0
+    7    0.210        7.817        0.016        0.016              1      16.401      16.401    io.close_context_definition@0
+    8    0.043        7.821        0.003        0.003             14       0.241       0.241    halo_routing_creation@0
+    9    0.034        7.823        0.003        0.003              9       0.296       0.296    fs.constructor@0
+    10   0.017        7.825        0.001        0.001             11       0.122       0.122    clock.update_calendar@0
+    11   0.008        7.825        0.001        0.004             14       0.046       0.287    field.halo_ex_1@0
+    12   0.008        7.826        0.001        1.076            110       0.006       9.779    field.write@0
+    13   0.003        7.826        0.000        0.000            353       0.001       0.001    __vernier__@0
+    14   0.001        7.826        0.000        0.000             78       0.001       0.001    field.initialise@0
+
+Task 4 of 6 : MPI rank ID 3
+Profiling on 6 thread(s).
+
+    #  % Time         Cumul         Self        Total     # of calls        Self   Total    Routine@
+                                                                             (Size; Size/sec; Size/call; MinSize; MaxSize)
+        (self)        (sec)        (sec)        (sec)                    ms/call   ms/call
+
+    1   44.493        2.596        2.596        5.834              1    2595.890    5834.339    __example_app__@0
+    2   34.343        4.600        2.004        2.064              2    1001.852    1032.244    io.finalise_context@0
+    3   18.668        5.689        1.089        1.089            110       9.901       9.901    io.write_fldg@0
+    4    1.042        5.750        0.061        0.061              1      60.779      60.779    io.context_finalize@0
+    5    0.623        5.786        0.036        0.037              1      36.330      36.708    example_algorithm@0
+    6    0.388        5.809        0.023        0.043              1      22.666      43.053    io.init_context@0
+    7    0.281        5.825        0.016        0.016              1      16.389      16.389    io.close_context_definition@0
+    8    0.060        5.828        0.004        0.004             14       0.251       0.251    halo_routing_creation@0
+    9    0.045        5.831        0.003        0.003              9       0.290       0.290    fs.constructor@0
+    10   0.033        5.833        0.002        0.002             11       0.173       0.173    clock.update_calendar@0
+    11   0.011        5.834        0.001        1.090            110       0.006       9.908    field.write@0
+    12   0.008        5.834        0.000        0.004             14       0.035       0.286    field.halo_ex_1@0
+    13   0.004        5.834        0.000        0.000            353       0.001       0.001    __vernier__@0
+    14   0.001        5.834        0.000        0.000             78       0.001       0.001    field.initialise@0
+
+Task 5 of 6 : MPI rank ID 4
+Profiling on 6 thread(s).
+
+    #  % Time         Cumul         Self        Total     # of calls        Self   Total    Routine@
+                                                                             (Size; Size/sec; Size/call; MinSize; MaxSize)
+        (self)        (sec)        (sec)        (sec)                    ms/call   ms/call
+
+    1   45.082        2.627        2.627        5.828              1    2627.337    5827.847    __example_app__@0
+    2   34.270        4.625        1.997        2.058              2     998.596    1028.978    io.finalise_context@0
+    3   17.969        5.672        1.047        1.047            110       9.520       9.520    io.write_fldg@0
+    4    1.043        5.733        0.061        0.061              1      60.759      60.759    io.context_finalize@0
+    5    0.625        5.769        0.036        0.037              1      36.400      36.742    example_algorithm@0
+    6    0.571        5.802        0.033        0.054              1      33.255      53.602    io.init_context@0
+    7    0.280        5.818        0.016        0.016              1      16.329      16.329    io.close_context_definition@0
+    8    0.060        5.822        0.003        0.003             14       0.249       0.249    halo_routing_creation@0
+    9    0.045        5.825        0.003        0.003              9       0.291       0.291    fs.constructor@0
+    10   0.031        5.826        0.002        0.002             11       0.165       0.165    clock.update_calendar@0
+    11   0.011        5.827        0.001        1.048            110       0.006       9.527    field.write@0
+    12   0.008        5.828        0.000        0.004             14       0.034       0.283    field.halo_ex_1@0
+    13   0.004        5.828        0.000        0.000            353       0.001       0.001    __vernier__@0
+    14   0.001        5.828        0.000        0.000             78       0.001       0.001    field.initialise@0
+
+Task 6 of 6 : MPI rank ID 5
+Profiling on 6 thread(s).
+
+    #  % Time         Cumul         Self        Total     # of calls        Self   Total    Routine@
+                                                                             (Size; Size/sec; Size/call; MinSize; MaxSize)
+        (self)        (sec)        (sec)        (sec)                    ms/call   ms/call
+
+    1   51.038        3.993        3.993        4.054              2    1996.512    2026.900    io.finalise_context@0
+    2   33.296        6.598        2.605        7.824              1    2604.951    7823.629    __example_app__@0
+    3   13.796        7.677        1.079        1.079            110       9.813       9.813    io.write_fldg@0
+    4    0.777        7.738        0.061        0.061              1      60.769      60.769    io.context_finalize@0
+    5    0.469        7.775        0.037        0.037              1      36.726      37.110    example_algorithm@0
+    6    0.300        7.798        0.023        0.044              1      23.472      43.742    io.init_context@0
+    7    0.210        7.815        0.016        0.016              1      16.418      16.418    io.close_context_definition@0
+    8    0.043        7.818        0.003        0.003             14       0.238       0.238    halo_routing_creation@0
+    9    0.034        7.821        0.003        0.003              9       0.296       0.296    fs.constructor@0
+    10   0.018        7.822        0.001        0.001             11       0.130       0.130    clock.update_calendar@0
+    11   0.007        7.823        0.001        0.004             14       0.042       0.280    field.halo_ex_1@0
+    12   0.007        7.823        0.001        1.080            110       0.005       9.819    field.write@0
+    13   0.003        7.824        0.000        0.000            353       0.001       0.001    __vernier__@0
+    14   0.001        7.824        0.000        0.000             78       0.001       0.001    field.initialise@0
