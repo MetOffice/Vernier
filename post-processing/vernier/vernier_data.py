@@ -70,8 +70,8 @@ class VernierData():
         # Create empty data arrays
         self.data[calliper_key] = VernierCalliper(calliper_key)
 
-    def filter(self, caliper_keys: list[str]):
-        """Filters the Vernier data to include only calipers matching the provided keys.
+    def filter(self, calliper_keys: list[str]):
+        """Filters the Vernier data to include only callipers matching the provided keys.
         The filtering is done in a glob-like fashion, so an input key of "timestep"
         will match any calliper with "timestep" in its name."""
 
@@ -142,11 +142,11 @@ def aggregate(vernier_data_list: list[VernierData], internal_consistency: bool =
 
     return aggregated
 
-    def get(self, caliper_key):
-        """Return a VernierCaliper for this caliper_key."""
-        if caliper_key not in self.data.keys():
+    def get(self, calliper_key):
+        """Return a VernierCalliper for this calliper_key."""
+        if calliper_key not in self.data.keys():
             return None
-        return self.data[caliper_key]
+        return self.data[calliper_key]
 
 
 class VernierDataAggregation():
@@ -175,26 +175,26 @@ class VernierDataAggregation():
         discarded = self.vernier_data.pop(label)
 
     def internal_consistency(self, new_vernier_data=None):
-        """Enforce internal consistency, with the same calipers for all members."""
+        """Enforce internal consistency, with the same callipers for all members."""
         # notImplemented enforce consistent sizing of members?? needed?
-        calipers = []
+        callipers = []
         for k, vdata in self.vernier_data.items():
-            loop_calipers = sorted(list(vdata.data.keys()))
-            if len(calipers) == 0:
-                calipers = loop_calipers
+            loop_callipers = sorted(list(vdata.data.keys()))
+            if len(callipers) == 0:
+                callipers = loop_callipers
             else:
-                if loop_calipers != calipers:
-                    raise ValueError('inconsistent calipers in contents')
+                if loop_callipers != callipers:
+                    raise ValueError('inconsistent callipers in contents')
         if new_vernier_data is not None:
             if not isinstance(new_vernier_data, VernierData):
                 raise TypeError(f'The provided vernier_data is not a VernierData object.')
-            check_calipers = sorted(list(new_vernier_data.data.keys()))
-            if calipers and check_calipers != calipers:
+            check_callipers = sorted(list(new_vernier_data.data.keys()))
+            if callipers and check_callipers != callipers:
                 import pdb ; pdb.set_trace()
-                raise ValueError('inconsistent calipers in new_vernier_data')
+                raise ValueError('inconsistent callipers in new_vernier_data')
 
-    def caliper_list(self):
-        """Return the list of calipers in this aggregation."""
+    def calliper_list(self):
+        """Return the list of callipers in this aggregation."""
         result = []
         self.internal_consistency()
 
@@ -204,21 +204,21 @@ class VernierDataAggregation():
         return result
 
 
-    def get(self, caliper_key):
+    def get(self, calliper_key):
         """
-        Return a VernierCaliper of all the data from all aggregation members
-        for this caliper_key.
+        Return a VernierCalliper of all the data from all aggregation members
+        for this calliper_key.
 
         """
-        if caliper_key not in self.caliper_list():
+        if calliper_key not in self.calliper_list():
             return None
         self.internal_consistency()
-        results = VernierCaliper(caliper_key)
+        results = VernierCalliper(calliper_key)
         for akey, vdata in self.vernier_data.items():
-            results.total_time += vdata.data[caliper_key].total_time
-            results.time_percent += vdata.data[caliper_key].time_percent
-            results.self_time += vdata.data[caliper_key].self_time
-            results.cumul_time += vdata.data[caliper_key].cumul_time
-            results.n_calls += vdata.data[caliper_key].n_calls
+            results.total_time += vdata.data[calliper_key].total_time
+            results.time_percent += vdata.data[calliper_key].time_percent
+            results.self_time += vdata.data[calliper_key].self_time
+            results.cumul_time += vdata.data[calliper_key].cumul_time
+            results.n_calls += vdata.data[calliper_key].n_calls
 
         return results
