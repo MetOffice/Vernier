@@ -31,6 +31,17 @@ class VernierCalliper():
 
         return
 
+    def __len__(self):
+        """
+        Return None if caliper elements differ in length,
+        otherwise return element lengths.
+        """
+        result = None
+        if (len(self.time_percent) == len(self.cumul_time) ==
+            len(self.self_time) == len(self.total_time) ==  len(self.n_calls)):
+            result = len(self.time_percent)
+        return result
+
     def reduce(self) -> list:
         """Reduces the data for this calliper to a single row of summary data."""
 
@@ -114,6 +125,14 @@ class VernierData():
         if txt_path is not None:
             out.close()
 
+    def get(self, calliper_key):
+        """
+        Return a VernierCalliper of the data for this calliper_key,
+        or None if it does not exist.
+        """
+        return self.data.get(calliper_key, None)
+
+
 def aggregate(vernier_data_list: list[VernierData], internal_consistency: bool = True) -> VernierData:
     """
     Aggregates a list of VernierData objects into a single VernierData object,
@@ -160,6 +179,9 @@ class VernierDataAggregation():
         self.vernier_data = {}
         return
 
+    def __len__(self):
+        return len(self.vernier_data)
+
     def add_data(self, label, vernier_data):
         if label in self.vernier_data:
             raise ValueError(f'The label {label} already exists in this aggregation. '
@@ -190,7 +212,6 @@ class VernierDataAggregation():
                 raise TypeError(f'The provided vernier_data is not a VernierData object.')
             check_callipers = sorted(list(new_vernier_data.data.keys()))
             if callipers and check_callipers != callipers:
-                import pdb ; pdb.set_trace()
                 raise ValueError('inconsistent callipers in new_vernier_data')
 
     def calliper_list(self):
@@ -203,11 +224,10 @@ class VernierDataAggregation():
             break
         return result
 
-
     def get(self, calliper_key):
         """
         Return a VernierCalliper of all the data from all aggregation members
-        for this calliper_key.
+        for this calliper_key, or None if it does not exist.
 
         """
         if calliper_key not in self.calliper_list():
