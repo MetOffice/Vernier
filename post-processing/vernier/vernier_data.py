@@ -9,31 +9,30 @@ import numpy as np
 from pathlib import Path
 from typing import Optional
 
-@dataclass(order=True)
 class VernierCalliper():
     """Class to hold data for a single Vernier calliper, including arrays for each metric."""
 
-    total_time: list[float]
-    time_percent: list[float]
-    self_time: list[float]
-    cumul_time: list[float]
-    n_calls: list[int]
+    self_time: np.ndarray
+    total_time: np.ndarray
+    time_percent: np.ndarray
+    cumul_time: np.ndarray
+    n_calls: np.ndarray
     name: str
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, n_ranks: int):
 
         self.name = name
-        self.time_percent = []
-        self.cumul_time = []
-        self.self_time = []
-        self.total_time = []
-        self.n_calls = []
+        self.time_percent = np.zeros(n_ranks)
+        self.cumul_time = np.zeros(n_ranks)
+        self.self_time = np.zeros(n_ranks)
+        self.total_time = np.zeros(n_ranks)
+        self.n_calls = np.zeros(n_ranks)
 
         return
 
     def __len__(self):
         """
-        Return None if caliper elements differ in length,
+        Return None if calliper elements differ in length,
         otherwise return element lengths.
         """
         result = None
@@ -47,18 +46,30 @@ class VernierCalliper():
 
         return [
             self.name.replace('@0', ''), # calliper name
-            round(np.mean(self.total_time), 5), # mean total time across calls
-            round(np.mean(self.self_time), 5), # mean self time across calls
-            round(np.mean(self.cumul_time), 5), # mean cumulative time across calls
-            self.n_calls[0], # number of calls (should be the same for all entries, so just take the first)
-            round(np.mean(self.time_percent), 5), # mean percentage of time across calls
-            round(np.mean(self.total_time) / self.n_calls[0], 5) # mean time per call
+            round(self.total_time.mean(), 5), # mean total time across calls
+            round(self.self_time.mean(), 5), # mean self time across calls
+            round(self.cumul_time.mean(), 5), # mean cumulative time across calls
+            int(self.n_calls[0])    , # number of calls (should be the same for all entries, so just take the first)
+            round(self.time_percent.mean(), 5), # mean percentage of time across calls
+            round(self.total_time.mean() / self.n_calls[0], 5) # mean time per call
         ]
 
     @classmethod
     def labels(self):
         return ["Routine", "Total time (s)", "Self (s)", "Cumul time (s)",
                 "No. calls", "% time", "Time per call (s)"]
+
+    def __lt__(self, other):
+        """Comparison method for sorting callipers by self time."""
+        return self.self_time.sum() < other.self_time.sum()
+
+    def __eq__(self, other):
+        """Equality method for comparing callipers by self time."""
+        return self.self_time.sum() == other.self_time.sum()
+
+    def __gt__(self, other):
+        """Comparison method for sorting callipers by self time."""
+        return self.self_time.sum() > other.self_time.sum()
 
 
 class VernierData():
@@ -75,11 +86,11 @@ class VernierData():
         return
 
 
-    def add_calliper(self, calliper_key: str):
+    def add_calliper(self, calliper_key: str, n_ranks: int):
         """Adds a new calliper to the data structure, with empty arrays for each metric."""
 
         # Create empty data arrays
-        self.data[calliper_key] = VernierCalliper(calliper_key)
+        self.data[calliper_key] = VernierCalliper(calliper_key, n_ranks)
 
     def filter(self, calliper_keys: list[str]):
         """Filters the Vernier data to include only callipers matching the provided keys.
