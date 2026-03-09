@@ -6,23 +6,30 @@
 from concurrent import futures
 from pathlib import Path
 import os
-from .vernier_data import VernierData, aggregate
+from vernier.vernier_data import VernierData, aggregate
 
 class VernierReader():
-    """Class handling the reading of Vernier output files, and converting them into a VernierData object."""
+    """
+    Class handling the reading of Vernier output files, and converting them
+    into a VernierData object.
 
+    """
     def __init__(self, vernier_path: Path):
+        """
+        Initialise the VernierReader instance and set the associated path as
+        an attribute.
 
+        :param vernier_path: Path to the Vernier data file.
+        :type vernier_path: :py:class:`pathlib.Path`
+        """
         self.path = vernier_path
-
-        return
-
 
     def _load_from_file(self) -> VernierData:
         """
-        Loads Vernier data from a single file, and returns it as a VernierData object.
-        """
+        Loads Vernier data from a single file, and returns it as a VernierData
+        object.
 
+        """
         loaded = VernierData()
 
         # Populate data
@@ -32,32 +39,39 @@ class VernierReader():
             if len(sline) > 0: # Line contains data
                 if sline[0].isdigit(): # Caliper lines start with a digit
 
-                    caliper = sline[-1]
-                    if not caliper in loaded.data:
-                        loaded.add_caliper(caliper)
+                    calliper = sline[-1]
+                    if not calliper in loaded.data:
+                        loaded.add_calliper(calliper)
 
-                    loaded.data[caliper].time_percent.append(float(sline[1]))
-                    loaded.data[caliper].cumul_time.append(float(sline[2]))
-                    loaded.data[caliper].self_time.append(float(sline[3]))
-                    loaded.data[caliper].total_time.append(float(sline[4]))
-                    loaded.data[caliper].n_calls.append(int(sline[5]))
+                    loaded.data[calliper].time_percent.append(float(sline[1]))
+                    loaded.data[calliper].cumul_time.append(float(sline[2]))
+                    loaded.data[calliper].self_time.append(float(sline[3]))
+                    loaded.data[calliper].total_time.append(float(sline[4]))
+                    loaded.data[calliper].n_calls.append(int(sline[5]))
 
         if not loaded.data:
-            raise ValueError(f"No caliper data found in file '{self.path}'.")
+            raise ValueError(f"No calliper data found in file '{self.path}'.")
 
         return loaded
 
-
     def _load_from_directory(self) -> VernierData:
-        """Loads Vernier data from a directory of files, and returns it as a VernierData object."""
+        """
+        Loads Vernier data from a directory of files, and returns it as a
+        VernierData object.
 
-        vernier_files = [f for f in os.listdir(self.path) if f.startswith("vernier-output")]
+        """
+        vernier_files = [f for f in os.listdir(self.path) if
+                         f.startswith("vernier-output")]
 
         with futures.ThreadPoolExecutor() as pool:
-            vernier_datasets = list(pool.map(lambda f: VernierReader(self.path / f)._load_from_file(), vernier_files))
+            vernier_datasets = list(
+                pool.map(lambda f:
+                         VernierReader(
+                             self.path / f)._load_from_file(),
+                             vernier_files)
+                             )
 
         return aggregate(vernier_datasets)
-
 
     def load(self) -> VernierData:
         """Generic load routine for Vernier data, aiming to handle both single
@@ -70,4 +84,5 @@ class VernierReader():
             return self._load_from_directory()
 
         else:
-            raise ValueError(f"Provided path '{self.path}' is neither a file nor a directory.")
+            raise ValueError(f"Provided path '{self.path}' is neither a file "
+                             f"nor a directory.")
