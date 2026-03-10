@@ -30,20 +30,20 @@ class VernierReader():
         for line in contents:
             sline = line.split()
             if len(sline) > 0: # Line contains data
-                if sline[0].isdigit(): # Caliper lines start with a digit
+                if sline[0].isdigit(): # Calliper lines start with a digit
 
-                    caliper = sline[-1]
-                    if not caliper in loaded.data:
-                        loaded.add_caliper(caliper)
+                    calliper = sline[-1]
+                    if not calliper in loaded.data:
+                        loaded.add_calliper(calliper)
 
-                    loaded.data[caliper].time_percent.append(float(sline[1]))
-                    loaded.data[caliper].cumul_time.append(float(sline[2]))
-                    loaded.data[caliper].self_time.append(float(sline[3]))
-                    loaded.data[caliper].total_time.append(float(sline[4]))
-                    loaded.data[caliper].n_calls.append(int(sline[5]))
+                    loaded.data[calliper].time_percent.append(float(sline[1]))
+                    loaded.data[calliper].cumul_time.append(float(sline[2]))
+                    loaded.data[calliper].self_time.append(float(sline[3]))
+                    loaded.data[calliper].total_time.append(float(sline[4]))
+                    loaded.data[calliper].n_calls.append(int(sline[5]))
 
         if not loaded.data:
-            raise ValueError(f"No caliper data found in file '{self.path}'.")
+            raise ValueError(f"No calliper data found in file '{self.path}'.")
 
         return loaded
 
