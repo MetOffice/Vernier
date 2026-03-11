@@ -10,7 +10,6 @@ import unittest
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
 from vernier import VernierData, VernierDataAggregation
-from vernier.vernier_data import aggregate
 
 class TestVernierData(unittest.TestCase):
     """
@@ -99,7 +98,8 @@ class TestVernierData(unittest.TestCase):
         data2.data["calliper_a"].total_time = [28.0, 38.0]
         data2.data["calliper_a"].n_calls = [3, 3]
 
-        aggregated = aggregate([data1, data2])
+        aggregated = VernierData()
+        aggregated.aggregate([data1, data2])
         self.assertIn("calliper_a", aggregated.data)
         self.assertEqual(aggregated.data["calliper_a"].time_percent, [10.0, 20.0, 15.0, 25.0])
         self.assertEqual(aggregated.data["calliper_a"].cumul_time, [30.0, 40.0, 35.0, 45.0])
@@ -125,7 +125,8 @@ class TestVernierData(unittest.TestCase):
         data2.data["calliper_b"].n_calls = [3, 3]
 
         with self.assertRaises(ValueError):
-            aggregate([data1, data2])
+            aggregated = VernierData()
+            aggregated.aggregate([data1, data2])
 
     def test_aggregate_inconsistent_ok(self):
         data1 = VernierData()
@@ -134,9 +135,10 @@ class TestVernierData(unittest.TestCase):
         data2 = VernierData()
         data2.add_calliper("calliper_b")
 
-        agg_data = aggregate([data1, data2], internal_consistency=False)
-        self.assertIn("calliper_a", agg_data.data)
-        self.assertIn("calliper_b", agg_data.data)
+        aggregated = VernierData()
+        aggregated.aggregate([data1, data2], internal_consistency=False)
+        self.assertIn("calliper_a", aggregated.data)
+        self.assertIn("calliper_b", aggregated.data)
 
     def test_get(self):
         data1 = VernierData()

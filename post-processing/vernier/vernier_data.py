@@ -133,33 +133,37 @@ class VernierData():
         return self.data.get(calliper_key, None)
 
 
-def aggregate(vernier_data_list: list[VernierData], internal_consistency: bool = True) -> VernierData:
-    """
-    Aggregates a list of VernierData objects into a single VernierData object,
-    by concatenating the data for each calliper across the input objects.
-    """
+    def aggregate(self, vernier_data_list=None, internal_consistency=True):
+        """
+        Aggregates a list of VernierData objects into a single VernierData
+        object, by concatenating the data for each calliper across the input
+        objects.
+        """
 
-    aggregated = VernierData()
+        if vernier_data_list is None:
+            vernier_data_list = []
+        if internal_consistency:
+            # Check that all input VernierData objects have the same
+            # set of callipers
+            calliper_sets = [set(vernier_data.data.keys()) for vernier_data in
+                             vernier_data_list]
+            if not all(calliper_set == calliper_sets[0] for
+                       calliper_set in calliper_sets):
+                raise ValueError("Input VernierData objects do not have the "
+                                 "same set of callipers, but "
+                                 "internal_consistency is set to True.")
 
-    if internal_consistency:
-        # Check that all input VernierData objects have the same set of callipers
-        calliper_sets = [set(vernier_data.data.keys()) for vernier_data in vernier_data_list]
-        if not all(calliper_set == calliper_sets[0] for calliper_set in calliper_sets):
-            raise ValueError("Input VernierData objects do not have the same set of callipers, " \
-                             "but internal_consistency is set to True.")
+        for vernier_data in vernier_data_list:
+            for calliper in vernier_data.data.keys():
+                if not calliper in self.data:
+                    self.add_calliper(calliper)
 
-    for vernier_data in vernier_data_list:
-        for calliper in vernier_data.data.keys():
-            if not calliper in aggregated.data:
-                aggregated.add_calliper(calliper)
+                self.data[calliper].time_percent.extend(vernier_data.data[calliper].time_percent)
+                self.data[calliper].cumul_time.extend(vernier_data.data[calliper].cumul_time)
+                self.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
+                self.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
+                self.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
 
-            aggregated.data[calliper].time_percent.extend(vernier_data.data[calliper].time_percent)
-            aggregated.data[calliper].cumul_time.extend(vernier_data.data[calliper].cumul_time)
-            aggregated.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
-            aggregated.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
-            aggregated.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
-
-    return aggregated
 
     def get(self, calliper_key):
         """Return a VernierCalliper for this calliper_key."""
@@ -184,20 +188,25 @@ class VernierDataAggregation():
 
     def add_data(self, label, vernier_data):
         if label in self.vernier_data:
-            raise ValueError(f'The label {label} already exists in this aggregation. '
-                             'please use a different label or remove the existing entry.')
+            raise ValueError(f'The label {label} already exists in this '
+                             'aggregation. Please use a different label or '
+                             'remove the existing entry.')
         if not isinstance(vernier_data, VernierData):
-            raise TypeError(f'The provided vernier_data is not a VernierData object.')
+            raise TypeError(f'The provided vernier_data is not a VernierData '
+                            'object.')
         self.internal_consistency(vernier_data)
         self.vernier_data[label] = vernier_data
 
     def remove_data(self, label):
         if label not in self.vernier_data:
-            raise ValueError(f'The label {label} does not exist in this aggregation. ')
+            raise ValueError(f'The label {label} does not exist in this '
+                             'aggregation.')
         discarded = self.vernier_data.pop(label)
 
     def internal_consistency(self, new_vernier_data=None):
-        """Enforce internal consistency, with the same callipers for all members."""
+        """
+        Enforce internal consistency, with the same callipers for all members.
+        """
         # notImplemented enforce consistent sizing of members?? needed?
         callipers = []
         for k, vdata in self.vernier_data.items():
@@ -209,7 +218,8 @@ class VernierDataAggregation():
                     raise ValueError('inconsistent callipers in contents')
         if new_vernier_data is not None:
             if not isinstance(new_vernier_data, VernierData):
-                raise TypeError(f'The provided vernier_data is not a VernierData object.')
+                raise TypeError(f'The provided vernier_data is not a '
+                                'VernierData object.')
             check_callipers = sorted(list(new_vernier_data.data.keys()))
             if callipers and check_callipers != callipers:
                 raise ValueError('inconsistent callipers in new_vernier_data')
