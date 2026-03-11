@@ -9,7 +9,7 @@ import tempfile
 import unittest
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
-from vernier import VernierData, VernierDataAggregation
+from vernier import VernierData, VernierDataCollation
 
 class TestVernierData(unittest.TestCase):
     """
@@ -151,12 +151,12 @@ class TestVernierData(unittest.TestCase):
         self.assertEqual(len(data1.get("calliper_a")), 2)
 
 
-class TestVernierAggregation(unittest.TestCase):
+class TestVernierCollation(unittest.TestCase):
     """
-    Tests for the VernierData Aggregation class.
+    Tests for the VernierData Collation class.
     """
     def _add_data(self):
-        self.aggregation = VernierDataAggregation()
+        self.collation = VernierDataCollation()
         data1 = VernierData()
         data1.add_calliper("calliper_a")
         data1.data["calliper_a"].time_percent = [10.0, 20.0]
@@ -173,21 +173,21 @@ class TestVernierAggregation(unittest.TestCase):
         data2.data["calliper_a"].total_time = [28.0, 38.0]
         data2.data["calliper_a"].n_calls = [3, 3]
 
-        self.aggregation.add_data('test1', data1)
-        self.aggregation.add_data('test2', data2)
+        self.collation.add_data('test1', data1)
+        self.collation.add_data('test2', data2)
         
     def test_add_data(self):
         self._add_data()
-        self.assertEqual(len(self.aggregation), 2)
+        self.assertEqual(len(self.collation), 2)
 
     def test_remove_data(self):
         self._add_data()
-        self.aggregation.remove_data('test1')
-        self.assertEqual(len(self.aggregation), 1)
+        self.collation.remove_data('test1')
+        self.assertEqual(len(self.collation), 1)
 
     def test_get(self):
         self._add_data()
-        calliper_a = self.aggregation.get("calliper_a")
+        calliper_a = self.collation.get("calliper_a")
         self.assertEqual(len(calliper_a), 4)
 
     def test_internal_consistency(self):
@@ -208,7 +208,7 @@ class TestVernierAggregation(unittest.TestCase):
         data_inc.data["calliper_b"].n_calls = [3, 3]
 
         with self.assertRaises(ValueError) as test_exception:
-            self.aggregation.add_data('test3', data_inc)
+            self.collation.add_data('test3', data_inc)
         self.assertEqual(str(test_exception.exception),
                          "inconsistent callipers in new_vernier_data")
 

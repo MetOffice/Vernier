@@ -172,9 +172,9 @@ class VernierData():
         return self.data[calliper_key]
 
 
-class VernierDataAggregation():
+class VernierDataCollation():
     """
-    Class to hold an aggregation of VernierData instances.
+    Class to hold an collation of VernierData instances.
     Instances are asserted to be consistent in terms enforced by the
     interal_consistency method.
 
@@ -189,7 +189,7 @@ class VernierDataAggregation():
     def add_data(self, label, vernier_data):
         if label in self.vernier_data:
             raise ValueError(f'The label {label} already exists in this '
-                             'aggregation. Please use a different label or '
+                             'collation. Please use a different label or '
                              'remove the existing entry.')
         if not isinstance(vernier_data, VernierData):
             raise TypeError(f'The provided vernier_data is not a VernierData '
@@ -200,7 +200,7 @@ class VernierDataAggregation():
     def remove_data(self, label):
         if label not in self.vernier_data:
             raise ValueError(f'The label {label} does not exist in this '
-                             'aggregation.')
+                             'collation.')
         discarded = self.vernier_data.pop(label)
 
     def internal_consistency(self, new_vernier_data=None):
@@ -225,7 +225,7 @@ class VernierDataAggregation():
                 raise ValueError('inconsistent callipers in new_vernier_data')
 
     def calliper_list(self):
-        """Return the list of callipers in this aggregation."""
+        """Return the list of callipers in this collation."""
         result = []
         self.internal_consistency()
 
@@ -236,7 +236,7 @@ class VernierDataAggregation():
 
     def get(self, calliper_key):
         """
-        Return a VernierCalliper of all the data from all aggregation members
+        Return a VernierCalliper of all the data from all collation members
         for this calliper_key, or None if it does not exist.
 
         """
