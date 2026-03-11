@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Optional
 
 @dataclass(order=True)
-class VernierCaliper():
-    """Class to hold data for a single Vernier caliper, including arrays for each metric."""
+class VernierCalliper():
+    """Class to hold data for a single Vernier calliper, including arrays for each metric."""
 
     total_time: list[float]
     time_percent: list[float]
@@ -32,10 +32,10 @@ class VernierCaliper():
         return
 
     def reduce(self) -> list:
-        """Reduces the data for this caliper to a single row of summary data."""
+        """Reduces the data for this calliper to a single row of summary data."""
 
         return [
-            self.name.replace('@0', ''), # caliper name
+            self.name.replace('@0', ''), # calliper name
             round(np.mean(self.total_time), 5), # mean total time across calls
             round(np.mean(self.self_time), 5), # mean self time across calls
             round(np.mean(self.cumul_time), 5), # mean cumulative time across calls
@@ -55,27 +55,27 @@ class VernierData():
         return
 
 
-    def add_caliper(self, caliper_key: str):
-        """Adds a new caliper to the data structure, with empty arrays for each metric."""
+    def add_calliper(self, calliper_key: str):
+        """Adds a new calliper to the data structure, with empty arrays for each metric."""
 
         # Create empty data arrays
-        self.data[caliper_key] = VernierCaliper(caliper_key)
+        self.data[calliper_key] = VernierCalliper(calliper_key)
 
 
-    def filter(self, caliper_keys: list[str]):
-        """Filters the Vernier data to include only calipers matching the provided keys.
+    def filter(self, calliper_keys: list[str]):
+        """Filters the Vernier data to include only callipers matching the provided keys.
         The filtering is done in a glob-like fashion, so an input key of "timestep"
-        will match any caliper with "timestep" in its name."""
+        will match any calliper with "timestep" in its name."""
 
         filtered_data = VernierData()
 
-        # Filter data for a given caliper key
+        # Filter data for a given calliper key
         for timer in self.data.keys():
-            if any(caliper_key in timer for caliper_key in caliper_keys):
+            if any(calliper_key in timer for calliper_key in calliper_keys):
                 filtered_data.data[timer] = self.data[timer]
 
         if len(filtered_data.data) == 0:
-            raise ValueError(f"No calipers found matching the provided keys: {caliper_keys}")
+            raise ValueError(f"No callipers found matching the provided keys: {calliper_keys}")
 
         return filtered_data
 
@@ -86,13 +86,13 @@ class VernierData():
         it is printed to the terminal."""
 
         txt_table = []
-        for caliper in self.data.keys():
-            txt_table.append(self.data[caliper].reduce())
+        for calliper in self.data.keys():
+            txt_table.append(self.data[calliper].reduce())
         txt_table = sorted(txt_table, key=lambda x: x[2], reverse=True) # sort by self time, descending
 
         txt_table.insert(0, ["Routine", "Total time (s)", "Self (s)", "Cumul time (s)", "No. calls", "% time", "Time per call (s)"])
 
-        max_caliper_len = max([len(line[0]) for line in txt_table])
+        max_calliper_len = max([len(line[0]) for line in txt_table])
 
         # Write to stdout if no path provided, otherwise write to file
         if txt_path is None:
@@ -101,7 +101,7 @@ class VernierData():
             out = open(txt_path, 'w')
 
         for row in txt_table:
-            out.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>9} | {:>8} | {:>17} |\n'.format(row[0], max_caliper_len, *row[1:]))
+            out.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>9} | {:>8} | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
 
         if txt_path is not None:
             out.close()
@@ -109,27 +109,27 @@ class VernierData():
 def aggregate(vernier_data_list: list[VernierData], internal_consistency: bool = True) -> VernierData:
     """
     Aggregates a list of VernierData objects into a single VernierData object,
-    by concatenating the data for each caliper across the input objects.
+    by concatenating the data for each calliper across the input objects.
     """
 
     aggregated = VernierData()
 
     if internal_consistency:
-        # Check that all input VernierData objects have the same set of calipers
-        caliper_sets = [set(vernier_data.data.keys()) for vernier_data in vernier_data_list]
-        if not all(caliper_set == caliper_sets[0] for caliper_set in caliper_sets):
-            raise ValueError("Input VernierData objects do not have the same set of calipers, " \
+        # Check that all input VernierData objects have the same set of callipers
+        calliper_sets = [set(vernier_data.data.keys()) for vernier_data in vernier_data_list]
+        if not all(calliper_set == calliper_sets[0] for calliper_set in calliper_sets):
+            raise ValueError("Input VernierData objects do not have the same set of callipers, " \
                              "but internal_consistency is set to True.")
 
     for vernier_data in vernier_data_list:
-        for caliper in vernier_data.data.keys():
-            if not caliper in aggregated.data:
-                aggregated.add_caliper(caliper)
+        for calliper in vernier_data.data.keys():
+            if not calliper in aggregated.data:
+                aggregated.add_calliper(calliper)
 
-            aggregated.data[caliper].time_percent.extend(vernier_data.data[caliper].time_percent)
-            aggregated.data[caliper].cumul_time.extend(vernier_data.data[caliper].cumul_time)
-            aggregated.data[caliper].self_time.extend(vernier_data.data[caliper].self_time)
-            aggregated.data[caliper].total_time.extend(vernier_data.data[caliper].total_time)
-            aggregated.data[caliper].n_calls.extend(vernier_data.data[caliper].n_calls)
+            aggregated.data[calliper].time_percent.extend(vernier_data.data[calliper].time_percent)
+            aggregated.data[calliper].cumul_time.extend(vernier_data.data[calliper].cumul_time)
+            aggregated.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
+            aggregated.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
+            aggregated.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
 
     return aggregated
