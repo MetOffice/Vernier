@@ -165,13 +165,6 @@ class VernierData():
                 self.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
 
 
-    def get(self, calliper_key):
-        """Return a VernierCalliper for this calliper_key."""
-        if calliper_key not in self.data.keys():
-            return None
-        return self.data[calliper_key]
-
-
 class VernierDataCollation():
     """
     Class to hold an collation of VernierData instances.
