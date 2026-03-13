@@ -9,7 +9,7 @@ import tempfile
 import unittest
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
-from vernier.vernier_data import VernierData, aggregate
+from vernier import VernierData, VernierDataCollation
 
 class TestVernierData(unittest.TestCase):
     """
@@ -98,7 +98,8 @@ class TestVernierData(unittest.TestCase):
         data2.data["calliper_a"].total_time = [28.0, 38.0]
         data2.data["calliper_a"].n_calls = [3, 3]
 
-        aggregated = aggregate([data1, data2])
+        aggregated = VernierData()
+        aggregated.aggregate([data1, data2])
         self.assertIn("calliper_a", aggregated.data)
         self.assertEqual(aggregated.data["calliper_a"].time_percent, [10.0, 20.0, 15.0, 25.0])
         self.assertEqual(aggregated.data["calliper_a"].cumul_time, [30.0, 40.0, 35.0, 45.0])
@@ -124,7 +125,8 @@ class TestVernierData(unittest.TestCase):
         data2.data["calliper_b"].n_calls = [3, 3]
 
         with self.assertRaises(ValueError):
-            aggregate([data1, data2])
+            aggregated = VernierData()
+            aggregated.aggregate([data1, data2])
 
     def test_aggregate_inconsistent_ok(self):
         data1 = VernierData()
@@ -133,9 +135,83 @@ class TestVernierData(unittest.TestCase):
         data2 = VernierData()
         data2.add_calliper("calliper_b")
 
-        agg_data = aggregate([data1, data2], internal_consistency=False)
-        self.assertIn("calliper_a", agg_data.data)
-        self.assertIn("calliper_b", agg_data.data)
+        aggregated = VernierData()
+        aggregated.aggregate([data1, data2], internal_consistency=False)
+        self.assertIn("calliper_a", aggregated.data)
+        self.assertIn("calliper_b", aggregated.data)
+
+    def test_get(self):
+        data1 = VernierData()
+        data1.add_calliper("calliper_a")
+        data1.data["calliper_a"].time_percent = [10.0, 20.0]
+        data1.data["calliper_a"].cumul_time = [30.0, 40.0]
+        data1.data["calliper_a"].self_time = [5.0, 15.0]
+        data1.data["calliper_a"].total_time = [25.0, 35.0]
+        data1.data["calliper_a"].n_calls = [2, 2]
+        self.assertEqual(len(data1.get("calliper_a")), 2)
+
+
+class TestVernierCollation(unittest.TestCase):
+    """
+    Tests for the VernierData Collation class.
+    """
+    def _add_data(self):
+        self.collation = VernierDataCollation()
+        data1 = VernierData()
+        data1.add_calliper("calliper_a")
+        data1.data["calliper_a"].time_percent = [10.0, 20.0]
+        data1.data["calliper_a"].cumul_time = [30.0, 40.0]
+        data1.data["calliper_a"].self_time = [5.0, 15.0]
+        data1.data["calliper_a"].total_time = [25.0, 35.0]
+        data1.data["calliper_a"].n_calls = [2, 2]
+
+        data2 = VernierData()
+        data2.add_calliper("calliper_a")
+        data2.data["calliper_a"].time_percent = [15.0, 25.0]
+        data2.data["calliper_a"].cumul_time = [35.0, 45.0]
+        data2.data["calliper_a"].self_time = [6.0, 16.0]
+        data2.data["calliper_a"].total_time = [28.0, 38.0]
+        data2.data["calliper_a"].n_calls = [3, 3]
+
+        self.collation.add_data('test1', data1)
+        self.collation.add_data('test2', data2)
+        
+    def test_add_data(self):
+        self._add_data()
+        self.assertEqual(len(self.collation), 2)
+
+    def test_remove_data(self):
+        self._add_data()
+        self.collation.remove_data('test1')
+        self.assertEqual(len(self.collation), 1)
+
+    def test_get(self):
+        self._add_data()
+        calliper_a = self.collation.get("calliper_a")
+        self.assertEqual(len(calliper_a), 4)
+
+    def test_internal_consistency(self):
+        self._add_data()
+        data_inc = VernierData()
+        data_inc.add_calliper("calliper_a")
+        data_inc.data["calliper_a"].time_percent = [10.0, 20.0]
+        data_inc.data["calliper_a"].cumul_time = [30.0, 40.0]
+        data_inc.data["calliper_a"].self_time = [5.0, 15.0]
+        data_inc.data["calliper_a"].total_time = [25.0, 35.0]
+        data_inc.data["calliper_a"].n_calls = [2, 2]
+
+        data_inc.add_calliper("calliper_b")
+        data_inc.data["calliper_b"].time_percent = [15.0, 25.0]
+        data_inc.data["calliper_b"].cumul_time = [35.0, 45.0]
+        data_inc.data["calliper_b"].self_time = [6.0, 16.0]
+        data_inc.data["calliper_b"].total_time = [28.0, 38.0]
+        data_inc.data["calliper_b"].n_calls = [3, 3]
+
+        with self.assertRaises(ValueError) as test_exception:
+            self.collation.add_data('test3', data_inc)
+        self.assertEqual(str(test_exception.exception),
+                         "inconsistent callipers in new_vernier_data")
+
 
 if __name__ == '__main__':
     unittest.main()

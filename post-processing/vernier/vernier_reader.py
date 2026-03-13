@@ -6,7 +6,7 @@
 from concurrent import futures
 from pathlib import Path
 import os
-from .vernier_data import VernierData, aggregate
+from .vernier_data import VernierData
 
 class VernierReader():
     """Class handling the reading of Vernier output files, and converting them into a VernierData object."""
@@ -56,7 +56,9 @@ class VernierReader():
         with futures.ThreadPoolExecutor() as pool:
             vernier_datasets = list(pool.map(lambda f: VernierReader(self.path / f)._load_from_file(), vernier_files))
 
-        return aggregate(vernier_datasets)
+        result = VernierData()
+        result.aggregate(vernier_datasets)
+        return result
 
 
     def load(self) -> VernierData:
