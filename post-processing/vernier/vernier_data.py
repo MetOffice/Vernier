@@ -12,9 +12,6 @@ import numpy as np
 from pathlib import Path
 from typing import Optional
 
-@dataclass(order=True)
-class VernierCalliper():
-    """Class to hold data for a single Vernier calliper, including arrays for each metric."""
 
 @dataclass(order=True)
 class VernierCalliper():
