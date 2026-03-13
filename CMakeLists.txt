@@ -64,7 +64,7 @@ if(STRING_LENGTH)
     target_compile_definitions(${CMAKE_PROJECT_NAME} INTERFACE
       PROF_STRING_BUFFER_LENGTH=${STRING_LENGTH})
   else()
-    message(WARNING "Max caliper label length is too small - using 100")
+    message(WARNING "Max calliper label length is too small - using 100")
   endif()
 endif()
 
