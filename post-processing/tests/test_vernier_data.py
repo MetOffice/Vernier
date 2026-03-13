@@ -295,7 +295,8 @@ class TestVernierCollation(unittest.TestCase):
         with self.assertRaises(ValueError) as test_exception:
             self.collation.add_data('test3', data_inc)
         self.assertEqual(str(test_exception.exception),
-                         "inconsistent callipers in new_vernier_data")
+                         "Inconsistent callipers in new_vernier_data: "
+                         "['calliper_a', 'calliper_b'] detected as unmatched")
 
 
 if __name__ == '__main__':

@@ -186,8 +186,7 @@ class VernierData():
         return self.data.get(calliper_key, None)
 
 
-    def aggregate(vernier_data_list: list[VernierData],
-                internal_consistency: bool = True) -> VernierData:
+    def aggregate(self, vernier_data_list=None, internal_consistency=True):
         """
         Aggregates a list of VernierData objects into a single VernierData
         object by concatenating the data for each calliper across the input
@@ -209,29 +208,30 @@ class VernierData():
                             identical.
 
         """
-        aggregated = VernierData()
-
+        if vernier_data_list is None:
+            vernier_data_list = []
         if internal_consistency:
-            # Check that all input VernierData objects have the same set of
-            # callipers
-            calliper_sets = [set(vernier_data.data.keys()) for
-                            vernier_data in vernier_data_list]
+            # Check that all input VernierData objects have the same
+            # set of callipers
+            calliper_sets = [set(vernier_data.data.keys()) for vernier_data in
+                             vernier_data_list]
             if not all(calliper_set == calliper_sets[0] for
-                    calliper_set in calliper_sets):
+                       calliper_set in calliper_sets):
                 raise ValueError("Input VernierData objects do not have the "
-                                "same set of callipers, but "
-                                "internal_consistency is set to True.")
+                                 "same set of callipers, but "
+                                 "internal_consistency is set to True.")
 
         for vernier_data in vernier_data_list:
             for calliper in vernier_data.data.keys():
-                if not calliper in aggregated.data:
-                    aggregated.add_calliper(calliper)
+                if not calliper in self.data:
+                    self.add_calliper(calliper)
 
-                aggregated.data[calliper].time_percent.extend(vernier_data.data[calliper].time_percent)
-                aggregated.data[calliper].cumul_time.extend(vernier_data.data[calliper].cumul_time)
-                aggregated.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
-                aggregated.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
-                aggregated.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
+                self.data[calliper].time_percent.extend(vernier_data.data[calliper].time_percent)
+                self.data[calliper].cumul_time.extend(vernier_data.data[calliper].cumul_time)
+                self.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
+                self.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
+                self.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
+
 
 
 class VernierDataCollation():
@@ -242,49 +242,89 @@ class VernierDataCollation():
 
     """
     def __init__(self):
+        """
+        Initialise an empty dictionary for storing VernierData objects.
+        """
         self.vernier_data = {}
-        return
 
     def __len__(self):
+        """
+        Gets the number of VernierData objects held by the VernierDataCollation
+        object.
+
+        :returns: The number of VernierData objects.
+        :rtype: int
+
+        """
         return len(self.vernier_data)
 
     def add_data(self, label, vernier_data):
+        """
+        Add a VernierData object to the collation.
+
+        """
         if label in self.vernier_data:
             raise ValueError(f'The label {label} already exists in this '
-                             'collation. Please use a different label or '
-                             'remove the existing entry.')
+                             f'collation. Please use a different label or '
+                             f'remove the existing entry.')
         if not isinstance(vernier_data, VernierData):
             raise TypeError(f'The provided vernier_data is not a VernierData '
-                            'object.')
+                            f'object.')
+        # Check for consistency
         self.internal_consistency(vernier_data)
+        # Add the new data
         self.vernier_data[label] = vernier_data
 
     def remove_data(self, label):
+        """
+        Removes a VernierData object with a matching label from the collation
+        object.
+
+        :param str label: The label of the VernierData object to be removed.
+        """
         if label not in self.vernier_data:
             raise ValueError(f'The label {label} does not exist in this '
                              'collation.')
-        discarded = self.vernier_data.pop(label)
+
+        # Drop the VernierData object from the collation.
+        self.vernier_data.pop(label)
 
     def internal_consistency(self, new_vernier_data=None):
         """
         Enforce internal consistency, with the same callipers for all members.
+
+        :param new_vernier_data: A VernierData object being tested for
+                                 consistent callipers.
+
         """
         # notImplemented enforce consistent sizing of members?? needed?
         callipers = []
-        for k, vdata in self.vernier_data.items():
+        # Loop over VernierData objects
+        for _, vdata in self.vernier_data.items():
+            # Get a list of the VernierData's callipers, sorted by name
             loop_callipers = sorted(list(vdata.data.keys()))
+            # If no callipers checked yet, set these as the truth callipers
             if len(callipers) == 0:
                 callipers = loop_callipers
             else:
+                # Check callipers against 'truth'
                 if loop_callipers != callipers:
-                    raise ValueError('inconsistent callipers in contents')
+                    # Extract callipers that were mismatched using Python XOR
+                    # Note that this works both ways so all callipers not in the
+                    # others list are included.
+                    mismatched = set(loop_callipers) ^ set(callipers)
+                    raise ValueError(f'Inconsistent callipers in contents: '
+                                     f'{mismatched} detected as unmatched')
         if new_vernier_data is not None:
             if not isinstance(new_vernier_data, VernierData):
                 raise TypeError(f'The provided vernier_data is not a '
                                 'VernierData object.')
             check_callipers = sorted(list(new_vernier_data.data.keys()))
             if callipers and check_callipers != callipers:
-                raise ValueError('inconsistent callipers in new_vernier_data')
+                # Extract callipers that were mismatched using Python XOR
+                mismatched = set(check_callipers) ^ set(callipers)
+                raise ValueError(f'Inconsistent callipers in new_vernier_data: '
+                                 f'{check_callipers} detected as unmatched')
 
     def calliper_list(self):
         """
@@ -319,7 +359,7 @@ class VernierDataCollation():
             return None
         self.internal_consistency()
         results = VernierCalliper(calliper_key)
-        for akey, vdata in self.vernier_data.items():
+        for _, vdata in self.vernier_data.items():
             results.total_time += vdata.data[calliper_key].total_time
             results.time_percent += vdata.data[calliper_key].time_percent
             results.self_time += vdata.data[calliper_key].self_time
