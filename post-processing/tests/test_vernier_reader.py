@@ -11,6 +11,7 @@ import sys
 sys.path.append(str(Path(__file__).parent.parent))
 from vernier.vernier_reader import VernierReader
 
+
 class TestVernierReader(unittest.TestCase):
     """
     Tests for the VernierReader class

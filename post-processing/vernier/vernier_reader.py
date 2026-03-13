@@ -6,7 +6,8 @@
 from concurrent import futures
 from pathlib import Path
 import os
-from vernier.vernier_data import VernierData, aggregate
+from vernier.vernier_data import VernierData
+
 
 class VernierReader():
     """
@@ -37,7 +38,7 @@ class VernierReader():
         for line in contents:
             sline = line.split()
             if len(sline) > 0: # Line contains data
-                if sline[0].isdigit(): # Caliper lines start with a digit
+                if sline[0].isdigit(): # Calliper lines start with a digit
 
                     calliper = sline[-1]
                     if not calliper in loaded.data:
@@ -71,7 +72,9 @@ class VernierReader():
                              vernier_files)
                              )
 
-        return aggregate(vernier_datasets)
+        result = VernierData()
+        result.aggregate(vernier_datasets)
+        return result
 
     def load(self) -> VernierData:
         """Generic load routine for Vernier data, aiming to handle both single

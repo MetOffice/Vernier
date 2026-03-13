@@ -12,6 +12,9 @@ import numpy as np
 from pathlib import Path
 from typing import Optional
 
+@dataclass(order=True)
+class VernierCalliper():
+    """Class to hold data for a single Vernier calliper, including arrays for each metric."""
 
 @dataclass(order=True)
 class VernierCalliper():
@@ -42,9 +45,21 @@ class VernierCalliper():
         self.total_time = []
         self.n_calls = []
 
-    def reduce(self) -> list:
+        return
+
+    def __len__(self):
         """
-        Reduces the data for this calliper to a single row of summary data.
+        Return None if caliper elements differ in length,
+        otherwise return element lengths.
+        """
+        result = None
+        if (len(self.time_percent) == len(self.cumul_time) ==
+            len(self.self_time) == len(self.total_time) ==  len(self.n_calls)):
+            result = len(self.time_percent)
+        return result
+
+    def reduce(self) -> list:
+        """Reduces the data for this calliper to a single row of summary data.
 
         :returns: A list containing the aggregate (mean) for each metric of the
                   VernierCalliper instance.
@@ -61,11 +76,18 @@ class VernierCalliper():
             round(np.mean(self.total_time) / self.n_calls[0], 5) # mean time per call
         ]
 
+    @classmethod
+    def labels(self):
+        return ["Routine", "Total time (s)", "Self (s)", "Cumul time (s)",
+                "No. calls", "% time", "Time per call (s)"]
+
 
 class VernierData():
     """
-    Class to hold Vernier data in a structured way, and provide methods for
-    filtering and outputting the data.
+    Class to hold Vernier data from a single instrumented job in a structured
+    way.
+
+    Provides methods for filtering and outputting the data.
 
     """
     def __init__(self):
@@ -156,48 +178,152 @@ class VernierData():
         if txt_path is not None:
             out.close()
 
+    def get(self, calliper_key):
+        """
+        Return a VernierCalliper of the data for this calliper_key,
+        or None if it does not exist.
+        """
+        return self.data.get(calliper_key, None)
 
-def aggregate(vernier_data_list: list[VernierData],
-              internal_consistency: bool = True) -> VernierData:
+
+    def aggregate(vernier_data_list: list[VernierData],
+                internal_consistency: bool = True) -> VernierData:
+        """
+        Aggregates a list of VernierData objects into a single VernierData
+        object by concatenating the data for each calliper across the input
+        objects.
+
+        :param vernier_data_list: A list of VernierData objects to combine.
+        :type vernier_datalist: list[:py:class:`vernier.VernierData`]
+
+        :param bool internal_conistency: If set to True (default), callipers
+                                         between all items in the
+                                         vernier_data_list must be identical.
+
+        :returns: A single VernierData object containing the data from all
+                VernierData objects in vernier_data_list.
+        :rtype: :py:class:`vernier.VernierData`
+
+        :raises ValueError: if internal_consistency is set to True and callipers
+                            between items in vernier_data_list are not
+                            identical.
+
+        """
+        aggregated = VernierData()
+
+        if internal_consistency:
+            # Check that all input VernierData objects have the same set of
+            # callipers
+            calliper_sets = [set(vernier_data.data.keys()) for
+                            vernier_data in vernier_data_list]
+            if not all(calliper_set == calliper_sets[0] for
+                    calliper_set in calliper_sets):
+                raise ValueError("Input VernierData objects do not have the "
+                                "same set of callipers, but "
+                                "internal_consistency is set to True.")
+
+        for vernier_data in vernier_data_list:
+            for calliper in vernier_data.data.keys():
+                if not calliper in aggregated.data:
+                    aggregated.add_calliper(calliper)
+
+                aggregated.data[calliper].time_percent.extend(vernier_data.data[calliper].time_percent)
+                aggregated.data[calliper].cumul_time.extend(vernier_data.data[calliper].cumul_time)
+                aggregated.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
+                aggregated.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
+                aggregated.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
+
+
+class VernierDataCollation():
     """
-    Aggregates a list of VernierData objects into a single VernierData object,
-    by concatenating the data for each calliper across the input objects.
+    Class to hold an collation of VernierData instances.
+    Instances are asserted to be consistent in terms enforced by the
+    interal_consistency method.
 
-    :param vernier_data_list: A list of VernierData objects to combine.
-    :type vernier_datalist: list[:py:class:`vernier.VernierData`]
-
-    :param bool internal_conistency: If set to True (default), callipers between
-                                     all items in the vernier_data_list must be
-                                     identical.
-
-    :returns: A single VernierData object containing the data from all
-              VernierData objects in vernier_data_list.
-    :rtype: :py:class:`vernier.VernierData`
-
-    :raises ValueError: if internal_consistency is set to True and callipers
-                        between items in vernier_data_list are not identical.
     """
-    aggregated = VernierData()
+    def __init__(self):
+        self.vernier_data = {}
+        return
 
-    if internal_consistency:
-        # Check that all input VernierData objects have the same set of callipers
-        calliper_sets = [set(vernier_data.data.keys()) for
-                         vernier_data in vernier_data_list]
-        if not all(calliper_set == calliper_sets[0] for
-                   calliper_set in calliper_sets):
-            raise ValueError("Input VernierData objects do not have the same "
-                             "set of callipers, but internal_consistency is "
-                             "set to True.")
+    def __len__(self):
+        return len(self.vernier_data)
 
-    for vernier_data in vernier_data_list:
-        for calliper in vernier_data.data.keys():
-            if not calliper in aggregated.data:
-                aggregated.add_calliper(calliper)
+    def add_data(self, label, vernier_data):
+        if label in self.vernier_data:
+            raise ValueError(f'The label {label} already exists in this '
+                             'collation. Please use a different label or '
+                             'remove the existing entry.')
+        if not isinstance(vernier_data, VernierData):
+            raise TypeError(f'The provided vernier_data is not a VernierData '
+                            'object.')
+        self.internal_consistency(vernier_data)
+        self.vernier_data[label] = vernier_data
 
-            aggregated.data[calliper].time_percent.extend(vernier_data.data[calliper].time_percent)
-            aggregated.data[calliper].cumul_time.extend(vernier_data.data[calliper].cumul_time)
-            aggregated.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
-            aggregated.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
-            aggregated.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
+    def remove_data(self, label):
+        if label not in self.vernier_data:
+            raise ValueError(f'The label {label} does not exist in this '
+                             'collation.')
+        discarded = self.vernier_data.pop(label)
 
-    return aggregated
+    def internal_consistency(self, new_vernier_data=None):
+        """
+        Enforce internal consistency, with the same callipers for all members.
+        """
+        # notImplemented enforce consistent sizing of members?? needed?
+        callipers = []
+        for k, vdata in self.vernier_data.items():
+            loop_callipers = sorted(list(vdata.data.keys()))
+            if len(callipers) == 0:
+                callipers = loop_callipers
+            else:
+                if loop_callipers != callipers:
+                    raise ValueError('inconsistent callipers in contents')
+        if new_vernier_data is not None:
+            if not isinstance(new_vernier_data, VernierData):
+                raise TypeError(f'The provided vernier_data is not a '
+                                'VernierData object.')
+            check_callipers = sorted(list(new_vernier_data.data.keys()))
+            if callipers and check_callipers != callipers:
+                raise ValueError('inconsistent callipers in new_vernier_data')
+
+    def calliper_list(self):
+        """
+        Return the list of callipers in this collation.
+
+        :returns: A list of all callipers held by the collation
+        :rtype: list[str]
+
+        """
+        result = []
+        self.internal_consistency()
+
+        for _, vdata in self.vernier_data.items():
+            result = sorted(list(vdata.data.keys()))
+            break
+        return result
+
+    def get(self, calliper_key):
+        """
+        Return a VernierCalliper of all the data from all collation members
+        for this calliper_key, or None if it does not exist.
+
+        :param str calliper_key: The name of the VernierCalliper to extract
+                                 from the VernierData object.
+
+        :returns: A VernierCalliper instance containing the data of all
+                  callipers matching the calliper_key
+        :rtype: :py:class:`vernier.VernierCalliper`
+
+        """
+        if calliper_key not in self.calliper_list():
+            return None
+        self.internal_consistency()
+        results = VernierCalliper(calliper_key)
+        for akey, vdata in self.vernier_data.items():
+            results.total_time += vdata.data[calliper_key].total_time
+            results.time_percent += vdata.data[calliper_key].time_percent
+            results.self_time += vdata.data[calliper_key].self_time
+            results.cumul_time += vdata.data[calliper_key].cumul_time
+            results.n_calls += vdata.data[calliper_key].n_calls
+
+        return results
