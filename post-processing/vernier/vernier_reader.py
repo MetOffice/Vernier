@@ -28,10 +28,10 @@ class VernierReader():
         rank = 0
 
         # Populate data
-        contents = self.path.read_text()
-        n_ranks_in_file = contents.count("Task") # Number of ranks worth of data in file only countable this way
-        contents = contents.splitlines()
-        for line in contents:
+        file_contents = self.path.read_text()
+        n_ranks_in_file = file_contents.count("Task") # Number of ranks worth of data in file only countable this way
+        file_data = file_contents.splitlines()
+        for line in file_data:
             sline = line.split()
             if len(sline) > 0: # Line contains data
                 if "Task" in sline:
@@ -72,7 +72,29 @@ class VernierReader():
             vernier_datasets = list(pool.map(lambda f: VernierReader(self.path / f)._load_from_file(), vernier_files))
 
         result = VernierData()
-        result.aggregate(vernier_datasets)
+
+        # Check that all input VernierData objects have the same
+        # set of callipers
+        calliper_sets = [set(vernier_data.data.keys()) for vernier_data in
+                            vernier_datasets]
+        if not all(calliper_set == calliper_sets[0] for
+                    calliper_set in calliper_sets):
+            raise ValueError("Input VernierData objects do not have the "
+                                "same set of callipers, but "
+                                "internal_consistency is set to True.")
+
+        for i, vernier_data in enumerate(vernier_datasets):
+            for calliper in vernier_data.data.keys():
+                if not calliper in result.data:
+                    result.add_calliper(calliper, len(vernier_datasets))
+
+                result.data[calliper].time_percent[i] = vernier_data.data[calliper].time_percent
+                result.data[calliper].cumul_time[i] = vernier_data.data[calliper].cumul_time
+                result.data[calliper].self_time[i] = vernier_data.data[calliper].self_time
+                result.data[calliper].total_time[i] = vernier_data.data[calliper].total_time
+                result.data[calliper].n_calls[i] = vernier_data.data[calliper].n_calls
+
+
         return result
 
 

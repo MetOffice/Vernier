@@ -144,38 +144,6 @@ class VernierData():
         return self.data.get(calliper_key, None)
 
 
-    def aggregate(self, vernier_data_list=None, internal_consistency=True):
-        """
-        Aggregates a list of VernierData objects into a single VernierData
-        object, by concatenating the data for each calliper across the input
-        objects.
-        """
-
-        if vernier_data_list is None:
-            vernier_data_list = []
-        if internal_consistency:
-            # Check that all input VernierData objects have the same
-            # set of callipers
-            calliper_sets = [set(vernier_data.data.keys()) for vernier_data in
-                             vernier_data_list]
-            if not all(calliper_set == calliper_sets[0] for
-                       calliper_set in calliper_sets):
-                raise ValueError("Input VernierData objects do not have the "
-                                 "same set of callipers, but "
-                                 "internal_consistency is set to True.")
-
-        for vernier_data in vernier_data_list:
-            for calliper in vernier_data.data.keys():
-                if not calliper in self.data:
-                    self.add_calliper(calliper)
-
-                self.data[calliper].time_percent.extend(vernier_data.data[calliper].time_percent)
-                self.data[calliper].cumul_time.extend(vernier_data.data[calliper].cumul_time)
-                self.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
-                self.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
-                self.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
-
-
 class VernierDataCollation():
     """
     Class to hold an collation of VernierData instances.
