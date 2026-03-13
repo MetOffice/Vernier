@@ -30,6 +30,8 @@ class VernierReader():
         # Populate data
         file_contents = self.path.read_text()
         n_ranks_in_file = file_contents.count("Task") # Number of ranks worth of data in file only countable this way
+        calliper_ids = [line.split()[-1] for line in file_contents.splitlines() if line.split() and line.split()[0].isdigit()]
+
         file_data = file_contents.splitlines()
         for line in file_data:
             sline = line.split()
@@ -39,23 +41,27 @@ class VernierReader():
                         n_ranks_total = int(sline[3])
                         if not n_ranks_in_file in [1, n_ranks_total]:
                             raise ValueError(f"Input data not consistent with either collated or multi-file vernier output.")
-                    rank = int(sline[1]) # Extract rank number from the data line
+                    rank = int(sline[-1]) # Extract rank number from the data line
                 if sline[0].isdigit(): # Calliper lines start with a digit
 
                     if n_ranks_in_file == 1:
-                        data_index = 0
+                        rank_index = 0
                     else:
-                        data_index = rank - 1 # Data index for this rank (0-based)
+                        rank_index = rank
 
-                    calliper = sline[-1]
+                    calliper, thread = sline[-1].split('@')
+                    thread_id = int(thread)
+
+                    n_threads = int(len([cal_id for cal_id in calliper_ids if f"{calliper}@" in cal_id]) / n_ranks_in_file)
+
                     if not calliper in loaded.data:
-                        loaded.add_calliper(calliper, n_ranks_in_file)
+                        loaded.add_calliper(calliper, n_ranks_in_file, n_threads)
 
-                    loaded.data[calliper].time_percent[data_index] = float(sline[1])
-                    loaded.data[calliper].cumul_time[data_index] = float(sline[2])
-                    loaded.data[calliper].self_time[data_index] = float(sline[3])
-                    loaded.data[calliper].total_time[data_index] = float(sline[4])
-                    loaded.data[calliper].n_calls[data_index] = int(sline[5])
+                    loaded.data[calliper].time_percent[rank_index, thread_id] = float(sline[1])
+                    loaded.data[calliper].cumul_time[rank_index, thread_id] = float(sline[2])
+                    loaded.data[calliper].self_time[rank_index, thread_id] = float(sline[3])
+                    loaded.data[calliper].total_time[rank_index, thread_id] = float(sline[4])
+                    loaded.data[calliper].n_calls[rank_index, thread_id] = int(sline[5])
 
         if not loaded.data:
             raise ValueError(f"No calliper data found in file '{self.path}'.")
@@ -86,14 +92,14 @@ class VernierReader():
         for i, vernier_data in enumerate(vernier_datasets):
             for calliper in vernier_data.data.keys():
                 if not calliper in result.data:
-                    result.add_calliper(calliper, len(vernier_datasets))
+                    _, n_threads = vernier_data.data[calliper].self_time.shape
+                    result.add_calliper(calliper, len(vernier_datasets), n_threads)
 
-                result.data[calliper].time_percent[i] = vernier_data.data[calliper].time_percent
-                result.data[calliper].cumul_time[i] = vernier_data.data[calliper].cumul_time
-                result.data[calliper].self_time[i] = vernier_data.data[calliper].self_time
-                result.data[calliper].total_time[i] = vernier_data.data[calliper].total_time
-                result.data[calliper].n_calls[i] = vernier_data.data[calliper].n_calls
-
+                result.data[calliper].time_percent[i] = vernier_data.data[calliper].time_percent[0]
+                result.data[calliper].cumul_time[i] = vernier_data.data[calliper].cumul_time[0]
+                result.data[calliper].self_time[i] = vernier_data.data[calliper].self_time[0]
+                result.data[calliper].total_time[i] = vernier_data.data[calliper].total_time[0]
+                result.data[calliper].n_calls[i] = vernier_data.data[calliper].n_calls[0]
 
         return result
 

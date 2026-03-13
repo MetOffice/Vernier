@@ -19,14 +19,14 @@ class VernierCalliper():
     n_calls: np.ndarray
     name: str
 
-    def __init__(self, name: str, n_ranks: int):
+    def __init__(self, name: str, n_ranks: int, n_threads: int):
 
         self.name = name
-        self.time_percent = np.zeros(n_ranks)
-        self.cumul_time = np.zeros(n_ranks)
-        self.self_time = np.zeros(n_ranks)
-        self.total_time = np.zeros(n_ranks)
-        self.n_calls = np.zeros(n_ranks)
+        self.time_percent = np.zeros((n_ranks, n_threads))
+        self.cumul_time = np.zeros((n_ranks, n_threads))
+        self.self_time = np.zeros((n_ranks, n_threads))
+        self.total_time = np.zeros((n_ranks, n_threads))
+        self.n_calls = np.zeros((n_ranks, n_threads), dtype=int)
 
         return
 
@@ -49,9 +49,9 @@ class VernierCalliper():
             round(self.total_time.mean(), 5), # mean total time across calls
             round(self.self_time.mean(), 5), # mean self time across calls
             round(self.cumul_time.mean(), 5), # mean cumulative time across calls
-            int(self.n_calls[0])    , # number of calls (should be the same for all entries, so just take the first)
+            int(self.n_calls.max())    , # number of calls
             round(self.time_percent.mean(), 5), # mean percentage of time across calls
-            round(self.total_time.mean() / self.n_calls[0], 5) # mean time per call
+            round(np.mean(self.total_time / self.n_calls), 5) # mean time per call
         ]
 
     @classmethod
@@ -86,11 +86,11 @@ class VernierData():
         return
 
 
-    def add_calliper(self, calliper_key: str, n_ranks: int):
+    def add_calliper(self, calliper_key: str, n_ranks: int, n_threads: int):
         """Adds a new calliper to the data structure, with empty arrays for each metric."""
 
         # Create empty data arrays
-        self.data[calliper_key] = VernierCalliper(calliper_key, n_ranks)
+        self.data[calliper_key] = VernierCalliper(calliper_key, n_ranks, n_threads)
 
     def filter(self, calliper_keys: list[str]):
         """Filters the Vernier data to include only callipers matching the provided keys.
