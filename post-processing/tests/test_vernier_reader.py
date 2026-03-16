@@ -6,8 +6,11 @@
 from pathlib import Path
 import unittest
 import sys
+
+# pylint: disable=wrong-import-position
 sys.path.append(str(Path(__file__).parent.parent))
 from vernier.vernier_reader import VernierReader
+
 
 class TestVernierReader(unittest.TestCase):
     """

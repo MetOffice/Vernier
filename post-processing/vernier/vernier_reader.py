@@ -6,23 +6,31 @@
 from concurrent import futures
 from pathlib import Path
 import os
-from .vernier_data import VernierData
+from vernier.vernier_data import VernierData
+
 
 class VernierReader():
-    """Class handling the reading of Vernier output files, and converting them into a VernierData object."""
+    """
+    Class handling the reading of Vernier output files, and converting them
+    into a VernierData object.
 
+    """
     def __init__(self, vernier_path: Path):
+        """
+        Initialise the VernierReader instance and set the associated path as
+        an attribute.
 
+        :param vernier_path: Path to the Vernier data file.
+        :type vernier_path: :py:class:`pathlib.Path`
+        """
         self.path = vernier_path
-
-        return
-
 
     def _load_from_file(self) -> VernierData:
         """
-        Loads Vernier data from a single file, and returns it as a VernierData object.
-        """
+        Loads Vernier data from a single file, and returns it as a VernierData
+        object.
 
+        """
         loaded = VernierData()
 
         # Populate data
@@ -47,19 +55,26 @@ class VernierReader():
 
         return loaded
 
-
     def _load_from_directory(self) -> VernierData:
-        """Loads Vernier data from a directory of files, and returns it as a VernierData object."""
+        """
+        Loads Vernier data from a directory of files, and returns it as a
+        VernierData object.
 
-        vernier_files = [f for f in os.listdir(self.path) if f.startswith("vernier-output")]
+        """
+        vernier_files = [f for f in os.listdir(self.path) if
+                         f.startswith("vernier-output")]
 
         with futures.ThreadPoolExecutor() as pool:
-            vernier_datasets = list(pool.map(lambda f: VernierReader(self.path / f)._load_from_file(), vernier_files))
+            vernier_datasets = list(
+                pool.map(lambda f:
+                         VernierReader(
+                             self.path / f)._load_from_file(),
+                             vernier_files)
+                             )
 
         result = VernierData()
         result.aggregate(vernier_datasets)
         return result
-
 
     def load(self) -> VernierData:
         """Generic load routine for Vernier data, aiming to handle both single
@@ -72,4 +87,5 @@ class VernierReader():
             return self._load_from_directory()
 
         else:
-            raise ValueError(f"Provided path '{self.path}' is neither a file nor a directory.")
+            raise ValueError(f"Provided path '{self.path}' is neither a file "
+                             f"nor a directory.")
