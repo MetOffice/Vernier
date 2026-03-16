@@ -13,16 +13,16 @@ from vernier.vernier_data import VernierCalliper
 class TestVernierCalliper(unittest.TestCase):
 
     def setUp(self):
-        self.calliper_a = VernierCalliper("test_calliper_a", 2)
-        self.calliper_b = VernierCalliper("test_calliper_b", 2)
+        self.calliper_a = VernierCalliper("test_calliper_a", 2, 1)
+        self.calliper_b = VernierCalliper("test_calliper_b", 2, 1)
 
     def test_init(self):
         self.assertEqual(self.calliper_a.name, "test_calliper_a")
-        self.assertTrue(np.array_equal(self.calliper_a.time_percent, np.array([0.0, 0.0])))
-        self.assertTrue(np.array_equal(self.calliper_a.cumul_time, np.array([0.0, 0.0])))
-        self.assertTrue(np.array_equal(self.calliper_a.self_time, np.array([0.0, 0.0])))
-        self.assertTrue(np.array_equal(self.calliper_a.total_time, np.array([0.0, 0.0])))
-        self.assertTrue(np.array_equal(self.calliper_a.n_calls, np.array([0.0, 0.0])))
+        self.assertTrue(np.array_equal(self.calliper_a.time_percent.flatten(), np.array([0.0, 0.0])))
+        self.assertTrue(np.array_equal(self.calliper_a.cumul_time.flatten(), np.array([0.0, 0.0])))
+        self.assertTrue(np.array_equal(self.calliper_a.self_time.flatten(), np.array([0.0, 0.0])))
+        self.assertTrue(np.array_equal(self.calliper_a.total_time.flatten(), np.array([0.0, 0.0])))
+        self.assertTrue(np.array_equal(self.calliper_a.n_calls.flatten(), np.array([0.0, 0.0])))
 
     def test_reduce(self):
         self.calliper_a.time_percent = np.array([10.0, 20.0])

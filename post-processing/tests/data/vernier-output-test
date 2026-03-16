@@ -6,8 +6,8 @@ Profiling on 1 thread(s).
                                                                              (Size; Size/sec; Size/call; MinSize; MaxSize)
         (self)        (sec)        (sec)        (sec)                    ms/call   ms/call
 
-    1   44.130        2.583        2.583        5.854              1    2583.167    5853.527    __test_app__
-    2   34.563        4.606        2.023        2.077              2    1011.582    1038.697    some_process
+    1   44.130        2.583        2.583        5.854              1    2583.167    5853.527    __test_app__@0
+    2   34.563        4.606        2.023        2.077              2    1011.582    1038.697    some_process@0
 
 Task 2 of 2 : MPI rank ID 1
 Profiling on 1 thread(s).
@@ -16,5 +16,5 @@ Profiling on 1 thread(s).
                                                                              (Size; Size/sec; Size/call; MinSize; MaxSize)
         (self)        (sec)        (sec)        (sec)                    ms/call   ms/call
 
-    1   43.991        3.009        3.009        3.069              2    1504.362    1534.740    some_process
-    2   37.835        5.596        2.588        6.839              1    2587.638    6839.336    __test_app__
+    1   43.991        3.009        3.009        3.069              2    1504.362    1534.740    some_process@0
+    2   37.835        5.596        2.588        6.839              1    2587.638    6839.336    __test_app__@0
