@@ -17,11 +17,15 @@ class VernierCalliper():
     time_percent: np.ndarray
     cumul_time: np.ndarray
     n_calls: np.ndarray
+    n_ranks: int
+    n_threads: int
     name: str
 
     def __init__(self, name: str, n_ranks: int, n_threads: int):
 
         self.name = name
+        self.ranks = n_ranks
+        self.threads = n_threads
         self.time_percent = np.zeros((n_ranks, n_threads))
         self.cumul_time = np.zeros((n_ranks, n_threads))
         self.self_time = np.zeros((n_ranks, n_threads))
@@ -215,12 +219,18 @@ class VernierDataCollation():
         if calliper_key not in self.calliper_list():
             return None
         self.internal_consistency()
-        results = VernierCalliper(calliper_key)
+
+        n_ranks = sum([vdata.data[calliper_key].ranks for _, vdata in self.vernier_data.items()])
+        n_threads = max([vdata.data[calliper_key].threads for _, vdata in self.vernier_data.items()])
+        results = VernierCalliper(calliper_key, n_ranks, n_threads)
+        rank_begin_index = 0
         for akey, vdata in self.vernier_data.items():
-            results.total_time += vdata.data[calliper_key].total_time
-            results.time_percent += vdata.data[calliper_key].time_percent
-            results.self_time += vdata.data[calliper_key].self_time
-            results.cumul_time += vdata.data[calliper_key].cumul_time
-            results.n_calls += vdata.data[calliper_key].n_calls
+            rank_end_index = rank_begin_index + vdata.data[calliper_key].ranks
+            results.total_time[rank_begin_index:rank_end_index][:] = vdata.data[calliper_key].total_time
+            results.time_percent[rank_begin_index:rank_end_index][:] = vdata.data[calliper_key].time_percent
+            results.self_time[rank_begin_index:rank_end_index][:] = vdata.data[calliper_key].self_time
+            results.cumul_time[rank_begin_index:rank_end_index][:] = vdata.data[calliper_key].cumul_time
+            results.n_calls[rank_begin_index:rank_end_index][:] = vdata.data[calliper_key].n_calls
+            rank_begin_index = rank_end_index
 
         return results

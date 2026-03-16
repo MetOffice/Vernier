@@ -83,5 +83,78 @@ class TestVernierData(unittest.TestCase):
         self.assertEqual("| test_calliper |           35.0 |          3.5 |           11.0 |         2 |     45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
 
 
+    def test_get(self):
+        data1 = VernierData()
+        data1.add_calliper("calliper_a", 2, 1)
+        data1.data["calliper_a"].time_percent = np.array([10.0, 20.0])
+        data1.data["calliper_a"].cumul_time = np.array([30.0, 40.0])
+        data1.data["calliper_a"].self_time = np.array([5.0, 15.0])
+        data1.data["calliper_a"].total_time = np.array([25.0, 35.0])
+        data1.data["calliper_a"].n_calls = np.array([2, 2])
+        self.assertEqual(len(data1.get("calliper_a")), 2)
+
+
+class TestVernierCollation(unittest.TestCase):
+    """
+    Tests for the VernierData Collation class.
+    """
+    def _add_data(self):
+        self.collation = VernierDataCollation()
+        data1 = VernierData()
+        data1.add_calliper("calliper_a", 2, 1)
+        data1.data["calliper_a"].time_percent = np.array([[10.0], [20.0]])
+        data1.data["calliper_a"].cumul_time = np.array([[30.0], [40.0]])
+        data1.data["calliper_a"].self_time = np.array([[5.0], [15.0]])
+        data1.data["calliper_a"].total_time = np.array([[25.0], [35.0]])
+        data1.data["calliper_a"].n_calls = np.array([[2], [2]])
+
+        data2 = VernierData()
+        data2.add_calliper("calliper_a", 2, 1)
+        data2.data["calliper_a"].time_percent = np.array([[15.0], [25.0]])
+        data2.data["calliper_a"].cumul_time = np.array([[35.0], [45.0]])
+        data2.data["calliper_a"].self_time = np.array([[6.0], [16.0]])
+        data2.data["calliper_a"].total_time = np.array([[28.0], [38.0]])
+        data2.data["calliper_a"].n_calls = np.array([[3], [3]])
+
+        self.collation.add_data('test1', data1)
+        self.collation.add_data('test2', data2)
+        
+    def test_add_data(self):
+        self._add_data()
+        self.assertEqual(len(self.collation), 2)
+
+    def test_remove_data(self):
+        self._add_data()
+        self.collation.remove_data('test1')
+        self.assertEqual(len(self.collation), 1)
+
+    def test_get(self):
+        self._add_data()
+        calliper_a = self.collation.get("calliper_a")
+        self.assertEqual(len(calliper_a), 4)
+
+    def test_internal_consistency(self):
+        self._add_data()
+        data_inc = VernierData()
+        data_inc.add_calliper("calliper_a", 2, 1)
+        data_inc.data["calliper_a"].time_percent = np.array([[10.0], [20.0]])
+        data_inc.data["calliper_a"].cumul_time = np.array([[30.0], [40.0]])
+        data_inc.data["calliper_a"].self_time = np.array([[5.0], [15.0]])
+        data_inc.data["calliper_a"].total_time = np.array([[25.0], [35.0]])
+        data_inc.data["calliper_a"].n_calls = np.array([[2], [2]])
+
+        data_inc.add_calliper("calliper_b", 2, 1)
+        data_inc.data["calliper_b"].time_percent = np.array([[15.0], [25.0]])
+        data_inc.data["calliper_b"].cumul_time = np.array([[35.0], [45.0]])
+        data_inc.data["calliper_b"].self_time = np.array([[6.0], [16.0]])
+        data_inc.data["calliper_b"].total_time = np.array([[28.0], [38.0]])
+        data_inc.data["calliper_b"].n_calls = np.array([[3], [3]])
+
+        with self.assertRaises(ValueError) as test_exception:
+            self.collation.add_data('test3', data_inc)
+        self.assertEqual(str(test_exception.exception),
+                         "inconsistent callipers in new_vernier_data")
+
+
 if __name__ == '__main__':
     unittest.main()
