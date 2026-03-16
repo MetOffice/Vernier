@@ -61,7 +61,7 @@ class VernierCalliper():
     @classmethod
     def labels(self):
         return ["Routine", "Total time (s)", "Self (s)", "Cumul time (s)",
-                "No. calls", "% time", "Time per call (s)"]
+                "Max no. calls", "% time", "Time per call (s)"]
 
     def __lt__(self, other):
         """Comparison method for sorting callipers by self time."""
@@ -120,11 +120,14 @@ class VernierData():
         it is printed to the terminal."""
 
         txt_table = []
+        labels = None
         for calliper in self.data.keys():
             txt_table.append(self.data[calliper].reduce())
+            if labels is None:
+                labels = self.data[calliper].labels()
         txt_table = sorted(txt_table, key=lambda x: x[2], reverse=True) # sort by self time, descending
 
-        txt_table.insert(0, ["Routine", "Total time (s)", "Self (s)", "Cumul time (s)", "No. calls", "% time", "Time per call (s)"])
+        txt_table.insert(0, labels)
 
         max_calliper_len = max([len(line[0]) for line in txt_table])
 
@@ -135,7 +138,7 @@ class VernierData():
             out = open(txt_path, 'w')
 
         for row in txt_table:
-            out.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>9} | {:>8} | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
+            out.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>13} | {:>8} | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
 
         if txt_path is not None:
             out.close()
