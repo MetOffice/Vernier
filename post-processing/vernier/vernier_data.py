@@ -50,12 +50,14 @@ class VernierCalliper():
 
         return [
             self.name.replace('@0', ''), # calliper name
-            round(self.total_time.mean(), 5), # mean total time across calls
-            round(self.self_time.mean(), 5), # mean self time across calls
-            round(self.cumul_time.mean(), 5), # mean cumulative time across calls
-            int(self.n_calls.max())    , # number of calls
-            round(self.time_percent.mean(), 5), # mean percentage of time across calls
-            round(np.mean(self.total_time / self.n_calls), 5) # mean time per call
+            # We use nanmean to avoid NaN's where array shapes are non-conformant
+            # due to collated data possibly having different numbers of threads
+            round(np.nanmean(self.total_time), 5), # mean total time across calls
+            round(np.nanmean(self.self_time), 5), # mean self time across calls
+            round(np.nanmean(self.cumul_time), 5), # mean cumulative time across calls
+            int(np.nanmax(self.n_calls))    , # number of calls
+            round(np.nanmean(self.time_percent), 5), # mean percentage of time across calls
+            round(np.nanmean(self.total_time / self.n_calls), 5) # mean time per call
         ]
 
     @classmethod
@@ -120,14 +122,11 @@ class VernierData():
         it is printed to the terminal."""
 
         txt_table = []
-        labels = None
         for calliper in self.data.keys():
             txt_table.append(self.data[calliper].reduce())
-            if labels is None:
-                labels = self.data[calliper].labels()
         txt_table = sorted(txt_table, key=lambda x: x[2], reverse=True) # sort by self time, descending
 
-        txt_table.insert(0, labels)
+        txt_table.insert(0, VernierCalliper.labels())
 
         max_calliper_len = max([len(line[0]) for line in txt_table])
 
@@ -143,7 +142,7 @@ class VernierData():
         if txt_path is not None:
             out.close()
 
-    def get(self, calliper_key):
+    def get(self, calliper_key) -> VernierCalliper:
         """
         Return a VernierCalliper of the data for this calliper_key,
         or None if it does not exist.
@@ -188,7 +187,7 @@ class VernierDataCollation():
         """
         # notImplemented enforce consistent sizing of members?? needed?
         callipers = []
-        for k, vdata in self.vernier_data.items():
+        for _, vdata in self.vernier_data.items():
             loop_callipers = sorted(list(vdata.data.keys()))
             if len(callipers) == 0:
                 callipers = loop_callipers
@@ -208,12 +207,12 @@ class VernierDataCollation():
         result = []
         self.internal_consistency()
 
-        for k, vdata in self.vernier_data.items():
+        for _, vdata in self.vernier_data.items():
             result = sorted(list(vdata.data.keys()))
             break
         return result
 
-    def get(self, calliper_key):
+    def get(self, calliper_key) -> VernierCalliper:
         """
         Return a VernierCalliper of all the data from all collation members
         for this calliper_key, or None if it does not exist.
@@ -227,7 +226,7 @@ class VernierDataCollation():
         n_threads = max([vdata.data[calliper_key].threads for _, vdata in self.vernier_data.items()])
         results = VernierCalliper(calliper_key, n_ranks, n_threads)
         rank_begin_index = 0
-        for akey, vdata in self.vernier_data.items():
+        for _, vdata in self.vernier_data.items():
             rank_end_index = rank_begin_index + vdata.data[calliper_key].ranks
             results.total_time[rank_begin_index:rank_end_index][:] = vdata.data[calliper_key].total_time
             results.time_percent[rank_begin_index:rank_end_index][:] = vdata.data[calliper_key].time_percent
