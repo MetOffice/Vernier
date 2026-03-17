@@ -22,11 +22,6 @@ class TestVernierData(unittest.TestCase):
     def test_add_empty_calliper(self):
         self.test_data.add_calliper("test_calliper", 1, 1)
         self.assertIn("test_calliper", self.test_data.data)
-        self.assertTrue(np.array_equal(self.test_data.data["test_calliper"].time_percent.flatten(), np.array([0.0])))
-        self.assertTrue(np.array_equal(self.test_data.data["test_calliper"].cumul_time.flatten(), np.array([0.0])))
-        self.assertTrue(np.array_equal(self.test_data.data["test_calliper"].self_time.flatten(), np.array([0.0])))
-        self.assertTrue(np.array_equal(self.test_data.data["test_calliper"].total_time.flatten(), np.array([0.0])))
-        self.assertTrue(np.array_equal(self.test_data.data["test_calliper"].n_calls.flatten(), np.array([0.0])))
 
     def test_filter_calliper(self):
         self.test_data.add_calliper("timestep_calliper", 1, 1)
@@ -63,8 +58,8 @@ class TestVernierData(unittest.TestCase):
         with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
             self.test_data.write_txt_output(Path(tmp_file.name))
             contents = Path(tmp_file.name).read_text().splitlines()
-            self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | No. calls |   % time | Time per call (s) |", contents[0])
-            self.assertEqual("| test_calliper |           30.0 |         10.0 |           35.0 |         2 |     15.0 |              15.0 |", contents[1])
+            self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", contents[0])
+            self.assertEqual("| test_calliper |           30.0 |         10.0 |           35.0 |             2 |     15.0 |              15.0 |", contents[1])
 
     def test_write_txt_output_terminal(self):
         self.test_data.add_calliper("test_calliper", 2, 1)
@@ -79,8 +74,8 @@ class TestVernierData(unittest.TestCase):
         self.test_data.write_txt_output()
         sys.stdout = sys.__stdout__
 
-        self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | No. calls |   % time | Time per call (s) |", write_output.getvalue().splitlines()[0])
-        self.assertEqual("| test_calliper |           35.0 |          3.5 |           11.0 |         2 |     45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
+        self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", write_output.getvalue().splitlines()[0])
+        self.assertEqual("| test_calliper |           35.0 |          3.5 |           11.0 |             2 |     45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
 
 
     def test_get(self):

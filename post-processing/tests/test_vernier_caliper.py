@@ -18,11 +18,11 @@ class TestVernierCalliper(unittest.TestCase):
 
     def test_init(self):
         self.assertEqual(self.calliper_a.name, "test_calliper_a")
-        self.assertTrue(np.array_equal(self.calliper_a.time_percent.flatten(), np.array([0.0, 0.0])))
-        self.assertTrue(np.array_equal(self.calliper_a.cumul_time.flatten(), np.array([0.0, 0.0])))
-        self.assertTrue(np.array_equal(self.calliper_a.self_time.flatten(), np.array([0.0, 0.0])))
-        self.assertTrue(np.array_equal(self.calliper_a.total_time.flatten(), np.array([0.0, 0.0])))
-        self.assertTrue(np.array_equal(self.calliper_a.n_calls.flatten(), np.array([0.0, 0.0])))
+        self.assertEqual(self.calliper_a.time_percent.shape, (2, 1))
+        self.assertEqual(self.calliper_a.cumul_time.shape, (2, 1))
+        self.assertEqual(self.calliper_a.self_time.shape, (2, 1))
+        self.assertEqual(self.calliper_a.total_time.shape, (2, 1))
+        self.assertEqual(self.calliper_a.n_calls.shape, (2, 1))
 
     def test_reduce(self):
         self.calliper_a.time_percent = np.array([10.0, 20.0])

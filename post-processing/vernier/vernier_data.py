@@ -21,16 +21,16 @@ class VernierCalliper():
     n_threads: int
     name: str
 
-    def __init__(self, name: str, n_ranks: int, n_threads: int):
+    def __init__(self, name: str, n_ranks: int, n_threads: int = 1):
 
         self.name = name
         self.ranks = n_ranks
         self.threads = n_threads
-        self.time_percent = np.zeros((n_ranks, n_threads))
-        self.cumul_time = np.zeros((n_ranks, n_threads))
-        self.self_time = np.zeros((n_ranks, n_threads))
-        self.total_time = np.zeros((n_ranks, n_threads))
-        self.n_calls = np.zeros((n_ranks, n_threads), dtype=int)
+        self.time_percent = np.full((n_ranks, n_threads), np.nan)
+        self.cumul_time = np.full((n_ranks, n_threads), np.nan)
+        self.self_time = np.full((n_ranks, n_threads), np.nan)
+        self.total_time = np.full((n_ranks, n_threads), np.nan)
+        self.n_calls = np.full((n_ranks, n_threads), np.nan)
 
         return
 
