@@ -25,6 +25,8 @@ class VernierCalliper():
     self_time: list[float]
     cumul_time: list[float]
     n_calls: list[int]
+    rank: list[int]
+    thread: list[int]
     name: str
 
     def __init__(self, name: str):
@@ -36,6 +38,8 @@ class VernierCalliper():
 
         """
         self.name = name
+        self.rank = []
+        self.thread = []
         self.time_percent = []
         self.cumul_time = []
         self.self_time = []
@@ -153,13 +157,7 @@ class VernierData():
         # sort by self time, descending
         txt_table = sorted(txt_table, key=lambda x: x[2], reverse=True)
 
-        txt_table.insert(0, ["Routine",
-                             "Total time (s)",
-                             "Self (s)",
-                             "Cumul time (s)",
-                             "No. calls",
-                             "% time",
-                             "Time per call (s)"])
+        txt_table.insert(0, VernierCalliper.labels())
 
         max_calliper_len = max([len(line[0]) for line in txt_table])
 
