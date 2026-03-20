@@ -39,6 +39,71 @@ class TestVernierData(unittest.TestCase):
         self.assertEqual(self.test_data.data["test_calliper"].self_time, [])
         self.assertEqual(self.test_data.data["test_calliper"].total_time, [])
         self.assertEqual(self.test_data.data["test_calliper"].n_calls, [])
+        self.assertEqual(self.test_data.data["test_calliper"].rank, [])
+        self.assertEqual(self.test_data.data["test_calliper"].thread, [])
+
+    def test_get(self):
+        """
+        Tests that the get method of VernierData returns the expected data.
+        """
+        self.test_data.add_calliper("test_calliper")
+        self.test_data.data["test_calliper"].time_percent = [10.0, 20.0]
+        self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0]
+        self.test_data.data["test_calliper"].self_time = [5.0, 15.0]
+        self.test_data.data["test_calliper"].total_time = [25.0, 35.0]
+        self.test_data.data["test_calliper"].n_calls = [2, 2]
+        self.test_data.data["test_calliper"].rank = [0, 1]
+        self.test_data.data["test_calliper"].thread = [0, 0]
+        calliper_data = self.test_data.get("test_calliper")
+        self.assertEqual(calliper_data.time_percent, [10.0, 20.0])
+        self.assertEqual(calliper_data.cumul_time, [30.0, 40.0])
+        self.assertEqual(calliper_data.self_time, [5.0, 15.0])
+        self.assertEqual(calliper_data.total_time, [25.0, 35.0])
+        self.assertEqual(calliper_data.n_calls, [2, 2])
+        self.assertEqual(calliper_data.rank, [0, 1])
+        self.assertEqual(calliper_data.thread, [0, 0])
+
+    def test_get_rank(self):
+        """
+        Tests getter for data from a single rank
+        """
+        self.test_data.add_calliper("test_calliper")
+        self.test_data.data["test_calliper"].time_percent = [10.0, 20.0]
+        self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0]
+        self.test_data.data["test_calliper"].self_time = [5.0, 15.0]
+        self.test_data.data["test_calliper"].total_time = [25.0, 35.0]
+        self.test_data.data["test_calliper"].n_calls = [2, 2]
+        self.test_data.data["test_calliper"].rank = [0, 1]
+        self.test_data.data["test_calliper"].thread = [0, 0]
+        calliper_data = self.test_data.get("test_calliper", rank=1)
+        self.assertEqual(calliper_data.time_percent, [20.0])
+        self.assertEqual(calliper_data.cumul_time, [40.0])
+        self.assertEqual(calliper_data.self_time, [15.0])
+        self.assertEqual(calliper_data.total_time, [35.0])
+        self.assertEqual(calliper_data.n_calls, [2])
+        self.assertEqual(calliper_data.rank, [1])
+        self.assertEqual(calliper_data.thread, [0])
+
+    def test_get_thread(self):
+        """
+        Tests getter for data from a single thread
+        """
+        self.test_data.add_calliper("test_calliper")
+        self.test_data.data["test_calliper"].time_percent = [10.0, 20.0]
+        self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0]
+        self.test_data.data["test_calliper"].self_time = [5.0, 15.0]
+        self.test_data.data["test_calliper"].total_time = [25.0, 35.0]
+        self.test_data.data["test_calliper"].n_calls = [2, 2]
+        self.test_data.data["test_calliper"].rank = [0, 0]
+        self.test_data.data["test_calliper"].thread = [0, 1]
+        calliper_data = self.test_data.get("test_calliper", thread=1)
+        self.assertEqual(calliper_data.time_percent, [20.0])
+        self.assertEqual(calliper_data.cumul_time, [40.0])
+        self.assertEqual(calliper_data.self_time, [15.0])
+        self.assertEqual(calliper_data.total_time, [35.0])
+        self.assertEqual(calliper_data.n_calls, [2])
+        self.assertEqual(calliper_data.rank, [0])
+        self.assertEqual(calliper_data.thread, [1])
 
     def test_filter_calliper(self):
         """
@@ -91,6 +156,8 @@ class TestVernierData(unittest.TestCase):
         self.test_data.data["test_calliper"].self_time = [5.0, 15.0]
         self.test_data.data["test_calliper"].total_time = [25.0, 35.0]
         self.test_data.data["test_calliper"].n_calls = [2]
+        self.test_data.data["test_calliper"].rank = [0, 1]
+        self.test_data.data["test_calliper"].thread = [0, 0]
 
         # pylint: disable=unspecified-encoding
         with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
@@ -111,6 +178,8 @@ class TestVernierData(unittest.TestCase):
         self.test_data.data["test_calliper"].self_time = [3.0, 4.0]
         self.test_data.data["test_calliper"].total_time = [15.0, 55.0]
         self.test_data.data["test_calliper"].n_calls = [2]
+        self.test_data.data["test_calliper"].rank = [0, 1]
+        self.test_data.data["test_calliper"].thread = [0, 0]
 
         write_output = StringIO()
         sys.stdout = write_output
@@ -133,6 +202,8 @@ class TestVernierData(unittest.TestCase):
         data1.data["calliper_a"].self_time = [5.0, 15.0]
         data1.data["calliper_a"].total_time = [25.0, 35.0]
         data1.data["calliper_a"].n_calls = [2, 2]
+        data1.data["calliper_a"].rank = [0, 1]
+        data1.data["calliper_a"].thread = [0, 0]
 
         data2 = VernierData()
         data2.add_calliper("calliper_a")
@@ -141,6 +212,8 @@ class TestVernierData(unittest.TestCase):
         data2.data["calliper_a"].self_time = [6.0, 16.0]
         data2.data["calliper_a"].total_time = [28.0, 38.0]
         data2.data["calliper_a"].n_calls = [3, 3]
+        data2.data["calliper_a"].rank = [0, 1]
+        data2.data["calliper_a"].thread = [0, 0]
 
         aggregated = VernierData()
         aggregated.aggregate([data1, data2])
@@ -174,6 +247,8 @@ class TestVernierData(unittest.TestCase):
         data1.data["calliper_a"].self_time = [5.0, 15.0]
         data1.data["calliper_a"].total_time = [25.0, 35.0]
         data1.data["calliper_a"].n_calls = [2, 2]
+        data1.data["calliper_a"].rank = [0, 1]
+        data1.data["calliper_a"].thread = [0, 0]
 
         data2 = VernierData()
         data2.add_calliper("calliper_b")
@@ -182,6 +257,8 @@ class TestVernierData(unittest.TestCase):
         data2.data["calliper_b"].self_time = [6.0, 16.0]
         data2.data["calliper_b"].total_time = [28.0, 38.0]
         data2.data["calliper_b"].n_calls = [3, 3]
+        data2.data["calliper_b"].rank = [0, 1]
+        data2.data["calliper_b"].thread = [0, 0]
 
         with self.assertRaises(ValueError):
             aggregated = VernierData()
@@ -214,6 +291,8 @@ class TestVernierData(unittest.TestCase):
         data1.data["calliper_a"].self_time = [5.0, 15.0]
         data1.data["calliper_a"].total_time = [25.0, 35.0]
         data1.data["calliper_a"].n_calls = [2, 2]
+        data1.data["calliper_a"].rank = [0, 1]
+        data1.data["calliper_a"].thread = [0, 0]
         self.assertEqual(len(data1.get("calliper_a")), 2)
 
 
@@ -233,6 +312,8 @@ class TestVernierCollation(unittest.TestCase):
         data1.data["calliper_a"].self_time = [5.0, 15.0]
         data1.data["calliper_a"].total_time = [25.0, 35.0]
         data1.data["calliper_a"].n_calls = [2, 2]
+        data1.data["calliper_a"].rank = [0, 1]
+        data1.data["calliper_a"].thread = [0, 0]
 
         data2 = VernierData()
         data2.add_calliper("calliper_a")
@@ -241,6 +322,8 @@ class TestVernierCollation(unittest.TestCase):
         data2.data["calliper_a"].self_time = [6.0, 16.0]
         data2.data["calliper_a"].total_time = [28.0, 38.0]
         data2.data["calliper_a"].n_calls = [3, 3]
+        data2.data["calliper_a"].rank = [0, 1]
+        data2.data["calliper_a"].thread = [0, 0]
 
         self.collation.add_data('test1', data1)
         self.collation.add_data('test2', data2)
@@ -284,6 +367,8 @@ class TestVernierCollation(unittest.TestCase):
         data_inc.data["calliper_a"].self_time = [5.0, 15.0]
         data_inc.data["calliper_a"].total_time = [25.0, 35.0]
         data_inc.data["calliper_a"].n_calls = [2, 2]
+        data_inc.data["calliper_a"].rank = [0, 1]
+        data_inc.data["calliper_a"].thread = [0, 0]
 
         data_inc.add_calliper("calliper_b")
         data_inc.data["calliper_b"].time_percent = [15.0, 25.0]
@@ -291,6 +376,8 @@ class TestVernierCollation(unittest.TestCase):
         data_inc.data["calliper_b"].self_time = [6.0, 16.0]
         data_inc.data["calliper_b"].total_time = [28.0, 38.0]
         data_inc.data["calliper_b"].n_calls = [3, 3]
+        data_inc.data["calliper_b"].rank = [0, 1]
+        data_inc.data["calliper_b"].thread = [0, 0]
 
         with self.assertRaises(ValueError) as test_exception:
             self.collation.add_data('test3', data_inc)

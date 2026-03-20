@@ -59,6 +59,72 @@ class VernierCalliper():
             result = len(self.time_percent)
         return result
 
+    def _get_rank_indices(self, rank: int):
+        """
+        Return the indices of the data for a given rank.
+
+        :param int rank: The rank number to extract indices for.
+
+        :returns: A list of indices corresponding to the entries for the
+                  provided rank.
+        :rtype: list[int]
+
+        """
+        results = []
+        start = 0
+        while True:
+            try:
+                start = self.rank.index(rank, start)
+                results.append(start)
+                start += 1
+            except ValueError:
+                return results
+
+    def _get_thread_indices(self, thread: int):
+        """
+        Return the indices of the data for a given thread.
+
+        :param int thread: The thread number to extract indices for.
+
+        :returns: A list of indices corresponding to the entries for the
+                  provided thread.
+        :rtype: list[int]
+
+        """
+        results = []
+        start = 0
+        while True:
+            try:
+                start = self.thread.index(thread, start)
+                results.append(start)
+                start += 1
+            except ValueError:
+                return results
+
+    def _filter_by_indices(self, indices: list[int]):
+        """
+        Return a new VernierCalliper containing only the entries corresponding
+        to the provided indices.
+
+        :param list[int] indices: A list of indices to filter by.
+
+        :returns: A new VernierCalliper instance containing only the entries
+                  corresponding to the provided indices.
+        :rtype: :py:class:`vernier.VernierCalliper`
+
+        """
+        filtered = VernierCalliper(self.name)
+        for index in indices:
+            filtered.rank.append(self.rank[index])
+            filtered.thread.append(self.thread[index])
+            filtered.time_percent.append(self.time_percent[index])
+            filtered.cumul_time.append(self.cumul_time[index])
+            filtered.self_time.append(self.self_time[index])
+            filtered.total_time.append(self.total_time[index])
+            filtered.n_calls.append(self.n_calls[index])
+
+        return filtered
+
     def reduce(self) -> list:
         """Reduces the data for this calliper to a single row of summary data.
 
@@ -173,13 +239,24 @@ class VernierData():
         if txt_path is not None:
             out.close()
 
-    def get(self, calliper_key):
+    def get(self, calliper_key: str, rank: Optional[int] = None, thread: Optional[int] = None) -> VernierCalliper | None:
         """
         Return a VernierCalliper of the data for this calliper_key,
         or None if it does not exist.
         """
-        return self.data.get(calliper_key, None)
+        return_caliper = self.data[calliper_key]
+        if rank is not None:
+            rank_indices = return_caliper._get_rank_indices(rank)
+            if len(rank_indices) == 0:
+                return None
+            return_caliper = return_caliper._filter_by_indices(rank_indices)
+        if thread is not None:
+            thread_indices = return_caliper._get_thread_indices(thread)
+            if len(thread_indices) == 0:
+                return None
+            return_caliper = return_caliper._filter_by_indices(thread_indices)
 
+        return return_caliper
 
     def aggregate(self, vernier_data_list=None, internal_consistency=True):
         """
@@ -337,7 +414,7 @@ class VernierDataCollation():
             break
         return result
 
-    def get(self, calliper_key):
+    def get(self, calliper_key, rank=None, thread=None) -> VernierCalliper | None:
         """
         Return a VernierCalliper of all the data from all collation members
         for this calliper_key, or None if it does not exist.
@@ -355,10 +432,10 @@ class VernierDataCollation():
         self.internal_consistency()
         results = VernierCalliper(calliper_key)
         for _, vdata in self.vernier_data.items():
-            results.total_time += vdata.data[calliper_key].total_time
-            results.time_percent += vdata.data[calliper_key].time_percent
-            results.self_time += vdata.data[calliper_key].self_time
-            results.cumul_time += vdata.data[calliper_key].cumul_time
-            results.n_calls += vdata.data[calliper_key].n_calls
+            results.total_time += vdata.get(calliper_key, rank, thread).total_time
+            results.time_percent += vdata.get(calliper_key, rank, thread).time_percent
+            results.self_time += vdata.get(calliper_key, rank, thread).self_time
+            results.cumul_time += vdata.get(calliper_key, rank, thread).cumul_time
+            results.n_calls += vdata.get(calliper_key, rank, thread).n_calls
 
         return results
