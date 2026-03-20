@@ -140,13 +140,13 @@ class VernierCalliper():
             round(np.mean(self.cumul_time), 5), # mean cumulative time across calls
             self.n_calls[0], # number of calls (should be the same for all entries, so just take the first)
             round(np.mean(self.time_percent), 5), # mean percentage of time across calls
-            round(np.mean(self.total_time) / self.n_calls[0], 5) # mean time per call
+            round(np.mean(np.array(self.total_time) / np.array(self.n_calls)), 5) # mean time per call
         ]
 
     @classmethod
     def labels(self):
         return ["Routine", "Total time (s)", "Self (s)", "Cumul time (s)",
-                "No. calls", "% time", "Time per call (s)"]
+                "Max no. calls", "% time", "Time per call (s)"]
 
 
 class VernierData():
@@ -234,7 +234,7 @@ class VernierData():
             out = open(txt_path, 'w')
 
         for row in txt_table:
-            out.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>9} | {:>8} | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
+            out.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>13} | {:>8} | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
 
         if txt_path is not None:
             out.close()

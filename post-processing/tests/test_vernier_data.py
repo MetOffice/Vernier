@@ -164,8 +164,8 @@ class TestVernierData(unittest.TestCase):
             self.test_data.write_txt_output(Path(tmp_file.name))
             contents = Path(tmp_file.name).read_text().splitlines()
             # pylint: disable=line-too-long
-            self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | No. calls |   % time | Time per call (s) |", contents[0])
-            self.assertEqual("| test_calliper |           30.0 |         10.0 |           35.0 |         2 |     15.0 |              15.0 |", contents[1])
+            self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", contents[0])
+            self.assertEqual("| test_calliper |           30.0 |         10.0 |           35.0 |             2 |     15.0 |              15.0 |", contents[1])
 
     def test_write_txt_output_terminal(self):
         """
@@ -187,8 +187,8 @@ class TestVernierData(unittest.TestCase):
         sys.stdout = sys.__stdout__
 
         # pylint: disable=line-too-long
-        self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | No. calls |   % time | Time per call (s) |", write_output.getvalue().splitlines()[0])
-        self.assertEqual("| test_calliper |           35.0 |          3.5 |           11.0 |         2 |     45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
+        self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", write_output.getvalue().splitlines()[0])
+        self.assertEqual("| test_calliper |           35.0 |          3.5 |           11.0 |             2 |     45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
 
     def test_aggregate(self):
         """
@@ -280,21 +280,6 @@ class TestVernierData(unittest.TestCase):
         self.assertIn("calliper_a", aggregated.data)
         self.assertIn("calliper_b", aggregated.data)
 
-    def test_get(self):
-        """
-        Test that the get method of the VernierData class works as expected.
-        """
-        data1 = VernierData()
-        data1.add_calliper("calliper_a")
-        data1.data["calliper_a"].time_percent = [10.0, 20.0]
-        data1.data["calliper_a"].cumul_time = [30.0, 40.0]
-        data1.data["calliper_a"].self_time = [5.0, 15.0]
-        data1.data["calliper_a"].total_time = [25.0, 35.0]
-        data1.data["calliper_a"].n_calls = [2, 2]
-        data1.data["calliper_a"].rank = [0, 1]
-        data1.data["calliper_a"].thread = [0, 0]
-        self.assertEqual(len(data1.get("calliper_a")), 2)
-
 
 class TestVernierCollation(unittest.TestCase):
     """
@@ -345,7 +330,7 @@ class TestVernierCollation(unittest.TestCase):
         self.collation.remove_data('test1')
         self.assertEqual(len(self.collation), 1)
 
-    def test_get(self):
+    def test_get__collation(self):
         """
         Test that the get method of VernierCollation returns the expected
         VernierData instance.
