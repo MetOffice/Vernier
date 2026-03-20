@@ -303,6 +303,8 @@ class VernierData():
                 self.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
                 self.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
                 self.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
+                self.data[calliper].rank.extend(vernier_data.data[calliper].rank)
+                self.data[calliper].thread.extend(vernier_data.data[calliper].thread)
 
 
 
@@ -414,7 +416,7 @@ class VernierDataCollation():
             break
         return result
 
-    def get(self, calliper_key, rank=None, thread=None) -> VernierCalliper | None:
+    def get(self, calliper_key: str, rank: Optional[int] = None, thread: Optional[int] = None) -> VernierCalliper | None:
         """
         Return a VernierCalliper of all the data from all collation members
         for this calliper_key, or None if it does not exist.
@@ -432,10 +434,13 @@ class VernierDataCollation():
         self.internal_consistency()
         results = VernierCalliper(calliper_key)
         for _, vdata in self.vernier_data.items():
-            results.total_time += vdata.get(calliper_key, rank, thread).total_time
-            results.time_percent += vdata.get(calliper_key, rank, thread).time_percent
-            results.self_time += vdata.get(calliper_key, rank, thread).self_time
-            results.cumul_time += vdata.get(calliper_key, rank, thread).cumul_time
-            results.n_calls += vdata.get(calliper_key, rank, thread).n_calls
+            data_to_add = vdata.get(calliper_key, rank, thread)
+            if data_to_add is None:
+                continue
+            results.total_time += data_to_add.total_time
+            results.time_percent += data_to_add.time_percent
+            results.self_time += data_to_add.self_time
+            results.cumul_time += data_to_add.cumul_time
+            results.n_calls += data_to_add.n_calls
 
         return results
