@@ -239,7 +239,7 @@ class VernierData():
         if txt_path is not None:
             out.close()
 
-    def get(self, calliper_key: str, rank: Optional[int] = None, thread: Optional[int] = None) -> VernierCalliper | None:
+    def get(self, calliper_key: str, rank: Optional[int] = None, thread: Optional[int] = None) -> Optional[VernierCalliper]:
         """
         Return a VernierCalliper of the data for this calliper_key,
         or None if it does not exist.
@@ -416,7 +416,7 @@ class VernierDataCollation():
             break
         return result
 
-    def get(self, calliper_key: str, rank: Optional[int] = None, thread: Optional[int] = None) -> VernierCalliper | None:
+    def get(self, calliper_key: str, rank: Optional[int] = None, thread: Optional[int] = None) -> Optional[VernierCalliper]:
         """
         Return a VernierCalliper of all the data from all collation members
         for this calliper_key, or None if it does not exist.
