@@ -5,17 +5,13 @@ build-backend = 'setuptools.build_meta'
 [project]
 name = "Vernier"
 description = "Python post-processing library for Vernier profiling tool"
-authors = [
-]
 license = {file = 'LICENSE'}
 requires-python = '>=3.12'
 dependencies = ['numpy']
 version = '0.4.0'
 
 [project.optional-dependencies]
-dev = [
-    'mypy'
-]
+dev = ['mypy']
 
 [project.scripts]
 summarise-vernier = 'vernier.tools.summarise_vernier:main'
