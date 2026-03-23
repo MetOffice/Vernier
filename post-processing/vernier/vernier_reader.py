@@ -34,18 +34,15 @@ class VernierReader():
         loaded = VernierData()
 
         # Populate data
-        file_contents = self.path.read_text()
-
-        file_data = file_contents.splitlines()
-        for line in file_data:
+        contents = self.path.read_text().splitlines()
+        for line in contents:
             sline = line.split()
             if len(sline) > 0: # Line contains data
                 if "Task" in sline:
                     rank = int(sline[-1]) # Extract rank number from the data line
+
                 if sline[0].isdigit(): # Calliper lines start with a digit
-
                     calliper, thread = sline[-1].split('@')
-
                     if not calliper in loaded.data:
                         loaded.add_calliper(calliper)
 
