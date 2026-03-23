@@ -22,17 +22,18 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: 3.13
-    - name: Install dependencies
+    - name: Install python library
       run: |
+        cd post-processing
         python -m pip install --upgrade pip
-        python -m pip install -r post-processing/requirements.txt
+        python -m pip install .
+        python -m pip install .[dev]
     - name: Run unit tests
       run: |
-        python -m unittest discover -s post-processing
+        python -m unittest discover -s .
     - name: Type check with mypy
       run: |
-        python -m mypy post-processing
+        python -m mypy .
     - name: Run CLI tools
       run: |
-        cd post-processing/tools
-        ./summarise_vernier.py vernier-output-example-collated
+        summarise-vernier vernier/tools/vernier-output-example-collated
