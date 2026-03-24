@@ -78,7 +78,6 @@ class VernierCalliper():
             try:
                 # Find next instance of rank ID in rank list
                 rank_index = self.rank.index(rank, start)
-                # Add
                 rank_indices.append(rank_index)
                 start = rank_index + 1
             except ValueError:
@@ -101,6 +100,7 @@ class VernierCalliper():
         # indices matching the chosen thread ID
         while True:
             try:
+                # Find the next instance of thread ID in the list
                 thread_index = self.thread.index(thread, start)
                 thread_indices.append(thread_index)
                 start = thread_index + 1
