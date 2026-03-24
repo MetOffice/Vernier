@@ -70,15 +70,19 @@ class VernierCalliper():
         :rtype: list[int]
 
         """
-        results = []
+        rank_indices = []
         start = 0
+        # Incrementally iterate though list with List.index() to find all the
+        # indices matching the chosen rank ID
         while True:
             try:
-                start = self.rank.index(rank, start)
-                results.append(start)
-                start += 1
+                # Find next instance of rank ID in rank list
+                rank_index = self.rank.index(rank, start)
+                # Add
+                rank_indices.append(rank_index)
+                start = rank_index + 1
             except ValueError:
-                return results
+                return rank_indices
 
     def _get_thread_indices(self, thread: int):
         """
@@ -91,15 +95,17 @@ class VernierCalliper():
         :rtype: list[int]
 
         """
-        results = []
+        thread_indices = []
         start = 0
+        # Incrementally iterate though list with List.index() to find all the
+        # indices matching the chosen thread ID
         while True:
             try:
-                start = self.thread.index(thread, start)
-                results.append(start)
-                start += 1
+                thread_index = self.thread.index(thread, start)
+                thread_indices.append(thread_index)
+                start = thread_index + 1
             except ValueError:
-                return results
+                return thread_indices
 
     def _filter_by_indices(self, indices: list[int]):
         """
@@ -134,7 +140,7 @@ class VernierCalliper():
 
         """
         return [
-            self.name.replace('@0', ''), # calliper name
+            self.name, # calliper name
             round(np.mean(self.total_time), 5), # mean total time across calls
             round(np.mean(self.self_time), 5), # mean self time across calls
             round(np.mean(self.cumul_time), 5), # mean cumulative time across calls
@@ -243,13 +249,28 @@ class VernierData():
         """
         Return a VernierCalliper of the data for this calliper_key,
         or None if it does not exist.
+
+        :param str calliper_key: The name of the VernierCalliper to extract
+                                 from the VernierData object.
+        :param int rank: The rank ID to extract data for.
+        :param int thread: The thread ID to extract data for.
+
+        :returns: A VernierCalliper instance containing the data of all
+                  callipers matching the calliper_key
+        :rtype: :py:class:`vernier.VernierCalliper`
         """
+        # First get data for calliper key
         return_caliper = self.data[calliper_key]
+
+        # If rank ID given as argument, filter only data indices where rank data
+        # matches the rank ID given as argument
         if rank is not None:
             rank_indices = return_caliper._get_rank_indices(rank)
             if len(rank_indices) == 0:
                 return None
             return_caliper = return_caliper._filter_by_indices(rank_indices)
+
+        # Same above but for thread ID
         if thread is not None:
             thread_indices = return_caliper._get_thread_indices(thread)
             if len(thread_indices) == 0:
@@ -423,6 +444,8 @@ class VernierDataCollation():
 
         :param str calliper_key: The name of the VernierCalliper to extract
                                  from the VernierData object.
+        :param int rank: The rank ID to extract data for.
+        :param int thread: The thread ID to extract data for.
 
         :returns: A VernierCalliper instance containing the data of all
                   callipers matching the calliper_key

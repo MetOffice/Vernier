@@ -38,7 +38,7 @@ class VernierReader():
         for line in contents:
             sline = line.split()
             if len(sline) > 0: # Line contains data
-                if "Task" in sline:
+                if sline[0] == "Task":
                     rank = int(sline[-1]) # Extract rank number from the data line
 
                 if sline[0].isdigit(): # Calliper lines start with a digit

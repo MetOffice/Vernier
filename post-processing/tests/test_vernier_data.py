@@ -105,6 +105,24 @@ class TestVernierData(unittest.TestCase):
         self.assertEqual(calliper_data.rank, [0])
         self.assertEqual(calliper_data.thread, [1])
 
+    def test_get_rank_and_thread(self):
+        self.test_data.add_calliper("test_calliper")
+        self.test_data.data["test_calliper"].time_percent = [10.0, 20.0, 10.5, 20.5]
+        self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0, 30.5, 40.5]
+        self.test_data.data["test_calliper"].self_time = [5.0, 15.0, 5.5, 15.5]
+        self.test_data.data["test_calliper"].total_time = [25.0, 35.0, 25.5, 35.5]
+        self.test_data.data["test_calliper"].n_calls = [2, 2, 2, 2]
+        self.test_data.data["test_calliper"].rank = [0, 0, 1, 1]
+        self.test_data.data["test_calliper"].thread = [0, 1, 0, 1]
+        calliper_data = self.test_data.get("test_calliper", thread=1, rank=1)
+        self.assertEqual(calliper_data.time_percent, [20.5])
+        self.assertEqual(calliper_data.cumul_time, [40.5])
+        self.assertEqual(calliper_data.self_time, [15.5])
+        self.assertEqual(calliper_data.total_time, [35.5])
+        self.assertEqual(calliper_data.n_calls, [2])
+        self.assertEqual(calliper_data.rank, [1])
+        self.assertEqual(calliper_data.thread, [1])
+
     def test_filter_calliper(self):
         """
         Tests that callipers that do not match the pattern pased to
