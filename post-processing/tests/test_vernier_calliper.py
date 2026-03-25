@@ -13,7 +13,7 @@ import sys
 
 # pylint: disable=wrong-import-position
 sys.path.append(str(Path(__file__).parent.parent))
-from vernier.vernier_data import VernierCalliper
+from vernier.lib.vernier_data import VernierCalliper
 
 
 class TestVernierCalliper(unittest.TestCase):

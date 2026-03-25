@@ -6,7 +6,7 @@
 from concurrent import futures
 from pathlib import Path
 import os
-from vernier.vernier_data import VernierData
+from vernier.lib.vernier_data import VernierData
 
 
 class VernierReader():

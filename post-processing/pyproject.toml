@@ -1,0 +1,23 @@
+[build-system]
+requires = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = "Vernier"
+description = "Python post-processing library for Vernier profiling tool"
+license = {file = 'LICENSE'}
+requires-python = '>=3.9'
+dependencies = ['numpy']
+version = '0.4.0'
+
+[project.optional-dependencies]
+dev = ['mypy']
+
+[project.scripts]
+summarise-vernier = 'vernier.tools.summarise_vernier:main'
+
+[project.urls]
+homepage = 'https://github.com/MetOffice/Vernier'
+documentation = 'https://MetOffice.github.io/Vernier'
+repository = 'https://github.com/MetOffice/Vernier'
+

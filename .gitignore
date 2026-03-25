@@ -175,3 +175,4 @@ documentation/Sphinx/doxylog
 
 # Python junk
 __pycache__/
+*.egg-info
