@@ -52,11 +52,15 @@ class TestVernierCalliper(unittest.TestCase):
         reduced_data = self.calliper_a.reduce()
         self.assertEqual(reduced_data[0], "test_calliper_a")
         self.assertEqual(reduced_data[1], 30.0)
-        self.assertEqual(reduced_data[2], 10.0)
+        self.assertEqual(reduced_data[2], 25.0)
         self.assertEqual(reduced_data[3], 35.0)
-        self.assertEqual(reduced_data[4], 2)
-        self.assertEqual(reduced_data[5], 15.0)
+        self.assertEqual(reduced_data[4], 10.0)
+        self.assertEqual(reduced_data[5], 5.0)
         self.assertEqual(reduced_data[6], 15.0)
+        self.assertEqual(reduced_data[7], 35.0)
+        self.assertEqual(reduced_data[8], 2)
+        self.assertEqual(reduced_data[9], 15.0)
+        self.assertEqual(reduced_data[10], 15.0)
 
     def test_compare(self):
         """
