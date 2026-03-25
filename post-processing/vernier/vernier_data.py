@@ -245,8 +245,7 @@ class VernierData():
 
         # The issue is here, the write is manually formatted.....
         for row in txt_table:
-            out.write('| {:>{}} | {:>14} | {:>14} | {:>14} | {:>14} | {:>14} | {:>12} | {:>14} | {:>13} | {:>8}  | {:>17} |\
-                       \n'.format(row[0], max_calliper_len, *row[1:]))
+            out.write('| {:>{}} | {:>14} | {:>14} | {:>14} | {:>14} | {:>14} | {:>12} | {:>14} | {:>13} | {:>8}  | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
 
         if txt_path is not None:
             out.close()
