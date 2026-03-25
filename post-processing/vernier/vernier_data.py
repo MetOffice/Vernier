@@ -55,7 +55,7 @@ class VernierCalliper():
         """
         result = None
         if (len(self.time_percent) == len(self.cumul_time) ==
-            len(self.self_time) == len(self.total_time) ==  len(self.n_calls)):
+            len(self.self_time) == len(self.total_time) == len(self.n_calls)):
             result = len(self.time_percent)
         return result
 
@@ -140,22 +140,22 @@ class VernierCalliper():
 
         """
         return [
-            self.name, # calliper name
-            round(np.mean(self.total_time), 5), # mean total time across calls
-            round(np.min(self.total_time), 5),  # min total time across calls
-            round(np.max(self.total_time), 5),  # max total time across calls
-            round(np.mean(self.self_time), 5),  # mean self time across calls
-            round(np.min(self.self_time), 5),   # min self time across calls
-            round(np.max(self.self_time), 5),   # max self time across calls
-            round(np.mean(self.cumul_time), 5), # mean cumulative time across calls
-            self.n_calls[0], # number of calls (should be the same for all entries, so just take the first)
-            round(np.mean(self.time_percent), 5), # mean percentage of time across calls
-            round(np.mean(np.array(self.total_time) / np.array(self.n_calls)), 5) # mean time per call
+            self.name,  # calliper name
+            round(np.mean(self.total_time), 5),  # mean total time across calls
+            round(np.min(self.total_time), 5),   # min total time across calls
+            round(np.max(self.total_time), 5),   # max total time across calls
+            round(np.mean(self.self_time), 5),   # mean self time across calls
+            round(np.min(self.self_time), 5),    # min self time across calls
+            round(np.max(self.self_time), 5),    # max self time across calls
+            round(np.mean(self.cumul_time), 5),  # mean cumulative time across calls
+            self.n_calls[0],  # number of calls (should be the same for all entries, so just take the first)
+            round(np.mean(self.time_percent), 5),  # mean percentage of time across calls
+            round(np.mean(np.array(self.total_time) / np.array(self.n_calls)), 5)  # mean time per call
         ]
 
     @classmethod
     def labels(self):
-        return ["Routine", "Total Mean(s)", "Total Min(s)", "Total Max(s)","Self Mean(s)", "Self Min(s)", "Self Max(s)", "Cumul time(s)",
+        return ["Routine", "Total Mean(s)", "Total Min(s)", "Total Max(s)", "Self Mean(s)", "Self Min(s)", "Self Max(s)", "Cumul time(s)",
                 "Max no. calls", "% time", "Time per call(s)"]
 
 
@@ -330,7 +330,6 @@ class VernierData():
                 self.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
                 self.data[calliper].rank.extend(vernier_data.data[calliper].rank)
                 self.data[calliper].thread.extend(vernier_data.data[calliper].thread)
-
 
 
 class VernierDataCollation():
