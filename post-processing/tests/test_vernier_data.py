@@ -182,8 +182,8 @@ class TestVernierData(unittest.TestCase):
             self.test_data.write_txt_output(Path(tmp_file.name))
             contents = Path(tmp_file.name).read_text().splitlines()
             # pylint: disable=line-too-long
-            self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", contents[0])
-            self.assertEqual("| test_calliper |           30.0 |         10.0 |           35.0 |             2 |     15.0 |              15.0 |", contents[1])
+            self.assertEqual("|       Routine |  Total Mean(s) |   Total Min(s) |   Total Max(s) |   Self Mean(s) |    Self Min(s) |  Self Max(s) |  Cumul time(s) | Max no. calls |   % time  |  Time per call(s) |", contents[0])
+            self.assertEqual("| test_calliper |           30.0 |           25.0 |           35.0 |           10.0 |            5.0 |         15.0 |           35.0 |             2 |     15.0  |              15.0 |", contents[1])
 
     def test_write_txt_output_terminal(self):
         """
@@ -205,8 +205,8 @@ class TestVernierData(unittest.TestCase):
         sys.stdout = sys.__stdout__
 
         # pylint: disable=line-too-long
-        self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", write_output.getvalue().splitlines()[0])
-        self.assertEqual("| test_calliper |           35.0 |          3.5 |           11.0 |             2 |     45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
+        self.assertEqual("|       Routine |  Total Mean(s) |   Total Min(s) |   Total Max(s) |   Self Mean(s) |    Self Min(s) |  Self Max(s) |  Cumul time(s) | Max no. calls |   % time  |  Time per call(s) |", write_output.getvalue().splitlines()[0])
+        self.assertEqual("| test_calliper |           35.0 |           15.0 |           55.0 |            3.5 |            3.0 |          4.0 |           11.0 |             2 |     45.0  |              17.5 |", write_output.getvalue().splitlines()[1])
 
     def test_aggregate(self):
         """

@@ -6,3 +6,4 @@
 | mo-marqh        | mark Hedley      | Met Office  | 2026-03-10 |
 | oakleybrunt     | Oakley Brunt     | Met Office  | 2026-03-09 |
 | EdHone          | Ed Hone          | Met Office  | 2026-03-20 |
+| MetBenjaminWent | Benjamin Went    | Met Office  | 2026-03-25 |
