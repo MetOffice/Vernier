@@ -27,8 +27,14 @@ def process_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
-
+def main():
+    """
+    Main function to process Vernier output and generate summary.
+    """
     args = process_args()
     timers = VernierReader(args.vernier_output).load()
     timers.write_txt_output()
+
+
+if __name__ == "__main__":
+    main()

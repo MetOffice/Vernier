@@ -19,7 +19,7 @@ class TestCLITools(unittest.TestCase):
         """
         Initialise useful attributes for testing.
         """
-        self.tools_dir = Path(__file__).parent.parent / 'tools'
+        self.tools_dir = Path(__file__).parent.parent / 'vernier' / 'tools'
         self.test_data_dir = Path(__file__).parent / 'data'
         # pylint: disable=line-too-long
         self.test_data_kgo = (

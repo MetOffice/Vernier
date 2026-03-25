@@ -199,7 +199,7 @@ class VernierData():
 
         :returns: A new VernierData object containing only the
                                 filtered callipers.
-        :rtype:  :py:class:`vernier.VernierData`
+        :rtype:  :py:class:`vernier.lib.vernierData`
 
         :raises ValueError: if no callipers are found that match calliper_keys.
 
@@ -290,7 +290,7 @@ class VernierData():
         objects.
 
         :param vernier_data_list: A list of VernierData objects to combine.
-        :type vernier_datalist: list[:py:class:`vernier.VernierData`]
+        :type vernier_datalist: list[:py:class:`vernier.lib.vernierData`]
 
         :param bool internal_conistency: If set to True (default), callipers
                                          between all items in the
@@ -298,7 +298,7 @@ class VernierData():
 
         :returns: A single VernierData object containing the data from all
                 VernierData objects in vernier_data_list.
-        :rtype: :py:class:`vernier.VernierData`
+        :rtype: :py:class:`vernier.lib.vernierData`
 
         :raises ValueError: if internal_consistency is set to True and callipers
                             between items in vernier_data_list are not
@@ -452,7 +452,7 @@ class VernierDataCollation():
 
         :returns: A VernierCalliper instance containing the data of all
                   callipers matching the calliper_key
-        :rtype: :py:class:`vernier.VernierCalliper`
+        :rtype: :py:class:`vernier.lib.vernierCalliper`
 
         """
         if calliper_key not in self.calliper_list():
