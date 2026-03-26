@@ -128,7 +128,7 @@ TEST(HashTableTest, NameLengthTest) {
   meto::vernier.init();
 
   EXPECT_EXIT(meto::vernier.start(label), testing::ExitedWithCode(1),
-              HasSubstr("Internal error: region name too long"));
+              HasSubstr("Vernier internal error: region name too long"));
 
   meto::vernier.finalize();
 }
