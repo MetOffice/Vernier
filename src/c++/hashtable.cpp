@@ -70,9 +70,8 @@ size_t meto::HashTable::compute_hash(std::string_view region_name, int tid) {
 
   if (region_name.length() + num_extra_bytes > new_chars.size()) {
     std::stringstream message;
-    message << "Internal error: region name too long ("
-            << region_name.length() << " > "
-            << new_chars.size() - num_extra_bytes << ")";
+    message << "Internal error: region name too long (" << region_name.length()
+            << " > " << new_chars.size() - num_extra_bytes << ")";
     error_handler(message.str(), EXIT_FAILURE);
   }
 
