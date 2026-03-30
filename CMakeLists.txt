@@ -29,6 +29,10 @@ else()
   message(STATUS "ENABLE_MPI disabled.")
 endif()
 
+# PAPI optional
+option(ENABLE_PAPI "Enable PAPI hardware performance counters" OFF)
+include(cmake/PAPI.cmake)
+
 # Defines some standard install directories such as $(prefix)/include.
 include(GNUInstallDirs)
 
