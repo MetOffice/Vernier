@@ -70,6 +70,11 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
   // Initialise MPI context
   mpi_context_.init(client_comm_handle, tag);
 
+#ifdef USE_PAPI
+  // Inititialize PAPI
+  papi_init(max_threads_);
+#endif
+
   // Set Vernier initialised.
   initialized_ = true;
 
@@ -91,6 +96,11 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
  */
 
 void meto::Vernier::finalize() {
+
+#ifdef USE_PAPI
+  papi_finalize();
+#endif
+
   if (mpi_context_.is_initialized()) {
     mpi_context_.finalize();
   }

@@ -29,6 +29,10 @@
 #include "mpi_context.h"
 #include "vernier_mpi.h"
 
+#ifdef USE_PAPI
+#include "vernier_papi.h"
+#endif
+
 #define PROF_MAX_TRACEBACK_SIZE 1000
 
 namespace meto {
