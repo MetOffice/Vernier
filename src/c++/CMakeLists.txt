@@ -46,6 +46,12 @@ else()
   target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_VERNIER_MPI_STUB)
 endif()
 
+if (ENABLE_PAPI)
+  list(APPEND PLIBS PAPI::PAPI)
+  target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_PAPI)
+endif()
+
+
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${PLIBS})
 
 # Set library C++ standard

@@ -25,6 +25,14 @@ find_package_handle_standard_args(PAPI
 if (PAPI_FOUND)
   set(PAPI_INCLUDE_DIRS "${PAPI_INCLUDE_DIR}")
   set(PAPI_LIBRARIES    "${PAPI_LIBRARY}")
+
+  if (NOT TARGET PAPI::PAPI)
+    add_library(PAPI::PAPI UNKNOWN IMPORTED)
+    set_target_properties(PAPI::PAPI PROPERTIES
+      IMPORTED_LOCATION             "${PAPI_LIBRARY}"
+      INTERFACE_INCLUDE_DIRECTORIES "${PAPI_INCLUDE_DIR}"
+    )
+  endif()
 endif()
 
 mark_as_advanced(PAPI_INCLUDE_DIR PAPI_LIBRARY)
