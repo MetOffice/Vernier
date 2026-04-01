@@ -20,9 +20,33 @@
 
 namespace meto {
 
-  // Functions prototypes
-  void papi_init(int);
-  void papi_finalize();
+// Functions prototypes
+void papi_init(int);
+void papi_finalize();
+
+
+/**
+* @brief  Manage PAPI events and data.
+*
+*/
+
+class PAPIContext {
+
+private:
+  bool initialized_;
+  int event_set_;
+
+
+public:
+  // Constructor
+  PAPIContext();
+
+  // Init and finalize
+  bool is_initialized();
+  void init();
+  void finalize();
+
+};
 
 } // namespace meto
 
