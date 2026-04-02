@@ -43,6 +43,8 @@ public:
 
   // Init and finalize
   bool is_initialized();
+
+  // These two functions need to be called by each thread
   void init();
   void finalize();
 

@@ -96,6 +96,12 @@ private:
   typedef std::vector<std::array<TracebackEntry, PROF_MAX_TRACEBACK_SIZE>>::
       size_type traceback_index_t;
 
+#ifdef USE_PAPI
+  // At the moment only a single PAPI context (eventset) per thread.
+  std::vector<PAPIContext> papi_contexts_;
+  typedef std::vector<PAPIContext>::size_type papicontext_iterator_t_;
+#endif
+
   // Private methods
   void start_part1();
   size_t start_part2(std::string_view const);

@@ -78,14 +78,16 @@ bool meto::PAPIContext::is_initialized() {
 
 /**
  * @brief  Initialise PAPI context.
- 8
+ *
+ * @note This need to be called inside the thread that will compute
+ * the metrics.
  */
 
 void meto::PAPIContext::init() {
 
   // Check that the storage is correctly null first.
-  assert(event_set_ == PAPI_NULL);
-  assert(initialized_ == false);
+  assert(event_set_ != PAPI_NULL);
+  assert(initialized_ != false);
 
   if( PAPI_create_eventset(&event_set_) != PAPI_OK ) {
     meto::error_handler(

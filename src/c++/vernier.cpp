@@ -73,6 +73,9 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
 #ifdef USE_PAPI
   // Inititialize PAPI
   papi_init(max_threads_);
+
+  // One PAPI context for each thread.
+  papi_contexts_.resize(static_cast<papicontext_iterator_t_>(max_threads_),PAPIContext());
 #endif
 
   // Set Vernier initialised.
@@ -98,6 +101,20 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
 void meto::Vernier::finalize() {
 
 #ifdef USE_PAPI
+
+  // The finalize of a PAPI context need to be called by the thread
+  // that called the init otherwsie there could be a problem in PAPI.
+  // The following call crate a parallel region for this purpose.
+#pragma omp parallel
+  {
+    auto tid = static_cast<papicontext_iterator_t_>(0);
+
+#ifdef _OPENMP
+    tid = static_cast<papicontext_iterator_t_>(omp_get_thread_num());
+#endif
+    papi_contexts_[tid].finalize();
+  }
+
   papi_finalize();
 #endif
 
@@ -147,6 +164,7 @@ void meto::Vernier::start_part1() {
 
   // Store the calliper start time, which is used in part2.
   logged_calliper_start_time_ = vernier_gettime();
+
 }
 
 /**
