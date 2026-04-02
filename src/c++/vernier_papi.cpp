@@ -12,6 +12,34 @@
 #include <pthread.h>
 #include <cassert>
 
+#include <cstdlib>
+#include <string>
+#include <sstream>
+#include <vector>
+
+
+// Contains the codes of the PAPI events that need to be collected.
+static std::vector<int> events_code = std::vector<int>(0);
+
+/**
+ * @brief Read the event strings from an env variable
+ *
+ */
+std::vector<std::string> read_events_str_from_env(const char* env_var) {
+  std::vector<std::string> events_str;
+  const char* env_val = std::getenv(env_var);
+  if (!env_val) return events_str;
+
+  std::stringstream ss(env_val);
+  std::string token;
+  while (std::getline(ss, token, ',')) {
+    if (!token.empty()) {
+      events_str.push_back(token);
+    }
+  }
+  return events_str;
+}
+
 /**
  * @brief  Initialise PAPI
  *
@@ -39,6 +67,21 @@ void meto::papi_init(int max_threads) {
                           EXIT_FAILURE);
     }
   }
+
+  // Read the events to collect from an environment variable
+  // Ex: VERNIER_PAPI_EVENTS1=PAPI_FP_OPS,PAPI_TOT_INS
+  auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS1");
+  for (const auto& event_str : events_str) {
+    int code;
+    if (PAPI_event_name_to_code(event_str.c_str(), &code) != PAPI_OK) {
+      meto::error_handler(
+                          "papi_init. Failed to find the PAPI code of event: " +
+                          event_str,
+                          EXIT_FAILURE);
+    }
+    events_code.push_back(code);
+  }
+
 }
 
 
@@ -62,7 +105,7 @@ meto::PAPIContext::PAPIContext() :
   initialized_(false),
   started_(false),
   event_set_(PAPI_NULL),
-  values_{}{
+  values_{} {
 }
 
 
@@ -99,19 +142,25 @@ void meto::PAPIContext::init() {
 
   initialized_ = true;
 
-  if( PAPI_add_event(event_set_, PAPI_FP_OPS) != PAPI_OK) {
-    meto::error_handler(
-                        "PAPIContext::init. Failed to add event.",
-                        EXIT_FAILURE);
-  }
+  // Add the events to collect metrics and start collecting
+  if (events_code.size() > 0) {
 
-  if( PAPI_start(event_set_) != PAPI_OK ) {
-    meto::error_handler(
-                        "PAPIContext::init. Failed to start metric collection.",
-                        EXIT_FAILURE);
-  }
+    for (const auto& code : events_code) {
+      if( PAPI_add_event(event_set_, code) != PAPI_OK) {
+        meto::error_handler(
+                            "PAPIContext::init. Failed to add event.",
+                            EXIT_FAILURE);
+      }
+    }
 
-  started_ = true;
+    if( PAPI_start(event_set_) != PAPI_OK ) {
+      meto::error_handler(
+                          "PAPIContext::init. Failed to start metric collection.",
+                          EXIT_FAILURE);
+    }
+
+    started_ = true;
+  }
 }
 
 /**
@@ -133,7 +182,7 @@ void meto::PAPIContext::finalize() {
       }
       started_=false;
     }
-    
+
     if( PAPI_cleanup_eventset(event_set_) != PAPI_OK ) {
       meto::error_handler(
                           "PAPIContext::finalize. Failed to cleanup.",

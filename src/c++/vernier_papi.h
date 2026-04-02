@@ -23,6 +23,7 @@
 
 namespace meto {
 
+
 // Functions prototypes
 void papi_init(int);
 void papi_finalize();
@@ -41,7 +42,6 @@ private:
   int event_set_;
 
   long long values_[VERNIER_MAX_PAPI_METRICS];
-
 
 public:
   // Constructor
