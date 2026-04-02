@@ -60,7 +60,9 @@ void meto::papi_finalize() {
 
 meto::PAPIContext::PAPIContext() :
   initialized_(false),
-  event_set_(PAPI_NULL) {
+  started_(false),
+  event_set_(PAPI_NULL),
+  values_{}{
 }
 
 
@@ -86,8 +88,8 @@ bool meto::PAPIContext::is_initialized() {
 void meto::PAPIContext::init() {
 
   // Check that the storage is correctly null first.
-  assert(event_set_ != PAPI_NULL);
-  assert(initialized_ != false);
+  assert(event_set_ == PAPI_NULL);
+  assert(initialized_ == false);
 
   if( PAPI_create_eventset(&event_set_) != PAPI_OK ) {
     meto::error_handler(
@@ -100,20 +102,32 @@ void meto::PAPIContext::init() {
 
 /**
  * @brief  Finaliser for PAPI  context.
+ *
+ * @note Each thread that call init should call finalize.
  */
 
 void meto::PAPIContext::finalize() {
 
   if(event_set_ != PAPI_NULL) {
 
+    // Nedd to stop metrics if started
+    if(started_) {
+      if (PAPI_stop(event_set_, values_) != PAPI_OK) {
+        meto::error_handler(
+                            "PAPIContext::finalize. Failed to stop metrics collection.",
+                            EXIT_FAILURE);
+      }
+      started_=false;
+    }
+
     if( PAPI_cleanup_eventset(event_set_) != PAPI_OK ) {
       meto::error_handler(
-                          "PAPIContext::finalize. Cleanup failed.",
+                          "PAPIContext::finalize. Failed to cleanup.",
                           EXIT_FAILURE);
     }
     if( PAPI_destroy_eventset(&event_set_)  != PAPI_OK ) {
       meto::error_handler(
-                          "PAPIContext::finalize. Destroy failed.",
+                          "PAPIContext::finalize. Failed to destroy eventset.",
                           EXIT_FAILURE);
     }
   }

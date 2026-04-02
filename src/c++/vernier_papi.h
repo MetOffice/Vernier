@@ -17,6 +17,9 @@
 #ifndef VERNIER_PAPI_H
 #define VERNIER_PAPI_H
 
+// The maximum number of metrics collected for an eventset. If this is
+// too big, the metrics could be multiplexed.
+#define VERNIER_MAX_PAPI_METRICS 5
 
 namespace meto {
 
@@ -34,7 +37,10 @@ class PAPIContext {
 
 private:
   bool initialized_;
+  bool started_;
   int event_set_;
+
+  long long values_[VERNIER_MAX_PAPI_METRICS];
 
 
 public:

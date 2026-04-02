@@ -97,9 +97,9 @@ private:
       size_type traceback_index_t;
 
 #ifdef USE_PAPI
-  // At the moment only a single PAPI context (eventset) per thread.
-  std::vector<PAPIContext> papi_contexts_;
-  typedef std::vector<PAPIContext>::size_type papicontext_iterator_t_;
+  // Aa single PAPI context (eventset) per thread.
+  static PAPIContext papi_context_;
+#pragma omp threadprivate(papi_context_)
 #endif
 
   // Private methods

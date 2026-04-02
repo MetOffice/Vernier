@@ -19,6 +19,10 @@
 int meto::Vernier::call_depth_ = -1;
 meto::time_point_t meto::Vernier::logged_calliper_start_time_{};
 
+#ifdef USE_PAPI
+meto::PAPIContext meto::Vernier::papi_context_{};
+#endif
+
 /**
  * @brief Constructor for TracebackEntry struct.
  * @param [in]  record_hash   The hash of the region name.
@@ -73,9 +77,6 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
 #ifdef USE_PAPI
   // Inititialize PAPI
   papi_init(max_threads_);
-
-  // One PAPI context for each thread.
-  papi_contexts_.resize(static_cast<papicontext_iterator_t_>(max_threads_),PAPIContext());
 #endif
 
   // Set Vernier initialised.
@@ -107,12 +108,7 @@ void meto::Vernier::finalize() {
   // The following call crate a parallel region for this purpose.
 #pragma omp parallel
   {
-    auto tid = static_cast<papicontext_iterator_t_>(0);
-
-#ifdef _OPENMP
-    tid = static_cast<papicontext_iterator_t_>(omp_get_thread_num());
-#endif
-    papi_contexts_[tid].finalize();
+    papi_context_.finalize();
   }
 
   papi_finalize();
