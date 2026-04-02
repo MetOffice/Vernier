@@ -79,25 +79,39 @@ bool meto::PAPIContext::is_initialized() {
 
 
 /**
- * @brief  Initialise PAPI context.
+ * @brief  Initialise PAPI context and start collecting metrics.
  *
  * @note This need to be called inside the thread that will compute
  * the metrics.
  */
 
 void meto::PAPIContext::init() {
-
   // Check that the storage is correctly null first.
   assert(event_set_ == PAPI_NULL);
   assert(initialized_ == false);
+  assert(started_ == false);
 
   if( PAPI_create_eventset(&event_set_) != PAPI_OK ) {
     meto::error_handler(
-                        "PAPIContext::init. Create eventset failed.",
+                        "PAPIContext::init. Failed to create eventset.",
                         EXIT_FAILURE);
   }
 
   initialized_ = true;
+
+  if( PAPI_add_event(event_set_, PAPI_FP_OPS) != PAPI_OK) {
+    meto::error_handler(
+                        "PAPIContext::init. Failed to add event.",
+                        EXIT_FAILURE);
+  }
+
+  if( PAPI_start(event_set_) != PAPI_OK ) {
+    meto::error_handler(
+                        "PAPIContext::init. Failed to start metric collection.",
+                        EXIT_FAILURE);
+  }
+
+  started_ = true;
 }
 
 /**
@@ -119,7 +133,7 @@ void meto::PAPIContext::finalize() {
       }
       started_=false;
     }
-
+    
     if( PAPI_cleanup_eventset(event_set_) != PAPI_OK ) {
       meto::error_handler(
                           "PAPIContext::finalize. Failed to cleanup.",

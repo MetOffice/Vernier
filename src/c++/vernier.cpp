@@ -161,6 +161,15 @@ void meto::Vernier::start_part1() {
   // Store the calliper start time, which is used in part2.
   logged_calliper_start_time_ = vernier_gettime();
 
+#ifdef USE_PAPI
+  // Initialize PAPI context if not done yet.  This is called here
+  // because each thread need to do it. Also we wnat VERNIER to
+  // consider the time spend on doing so but we don;t want this extra
+  // time to be part of a region.
+  if(!papi_context_.is_initialized())
+    papi_context_.init();
+
+#endif
 }
 
 /**
