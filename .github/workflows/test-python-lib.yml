@@ -1,0 +1,40 @@
+# ------------------------------------------------------------------------------
+#  (c) Crown copyright Met Office. All rights reserved.
+#  The file LICENCE, distributed with this code, contains details of the terms
+#  under which the code may be used.
+# ------------------------------------------------------------------------------
+name: Test Python library
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: 3.13
+    - name: Install python library
+      run: |
+        cd post-processing
+        python -m pip install --upgrade pip
+        python -m pip install .
+        python -m pip install .[dev]
+    - name: Run unit tests
+      run: |
+        python -m unittest discover -s post-processing
+    - name: Type check with mypy
+      run: |
+        python -m mypy post-processing/vernier
+        python -m mypy post-processing/tests
+    - name: Run CLI tools
+      run: |
+        summarise-vernier post-processing/vernier/tools/vernier-output-example-collated

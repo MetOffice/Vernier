@@ -172,3 +172,7 @@ build/
 
 # Doxygen error log
 documentation/Sphinx/doxylog
+
+# Python junk
+__pycache__/
+*.egg-info
