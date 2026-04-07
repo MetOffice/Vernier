@@ -7,3 +7,4 @@
 | oakleybrunt     | Oakley Brunt     | Met Office  | 2026-03-09 |
 | EdHone          | Ed Hone          | Met Office  | 2026-03-20 |
 | MetBenjaminWent | Benjamin Went    | Met Office  | 2026-03-25 |
+| t00sa           | Sam Clarke-Green | Met Office  | 2026-03-26 |
