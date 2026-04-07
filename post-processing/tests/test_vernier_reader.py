@@ -27,7 +27,7 @@ class TestVernierReader(unittest.TestCase):
         with self.assertRaises(ValueError):
             VernierReader(self.test_data_dir / "junk-data").load()
 
-    def test_load_from_file(self):
+    def test_load_from_file_drhook_format(self):
         test_reader = VernierReader(self.test_data_dir / "vernier-output-test")
         loaded_data = test_reader.load()
         self.assertIn("__test_app__", loaded_data.data)
@@ -47,7 +47,27 @@ class TestVernierReader(unittest.TestCase):
         self.assertEqual(loaded_data.data["__test_app__"].total_time, [5.854, 6.839])
         self.assertEqual(loaded_data.data["some_process"].total_time,[2.077, 3.069])
 
-    def test_load_from_directory(self):
+    def test_load_from_directory_threads_format(self):
+        test_reader = VernierReader(self.test_data_dir / "vernier-output-threads-format")
+        loaded_data = test_reader.load()
+        self.assertIn("__test_app__", loaded_data.data)
+        self.assertIn("some_process", loaded_data.data)
+        self.assertCountEqual(loaded_data.data["__test_app__"].n_calls, [1, 1])
+        self.assertCountEqual(loaded_data.data["some_process"].n_calls, [2, 2])
+        self.assertCountEqual(loaded_data.data["__test_app__"].rank, [0, 1])
+        self.assertCountEqual(loaded_data.data["some_process"].rank, [0, 1])
+        self.assertCountEqual(loaded_data.data["__test_app__"].thread, [0, 0])
+        self.assertCountEqual(loaded_data.data["some_process"].thread, [0, 0])
+        self.assertCountEqual(loaded_data.data["__test_app__"].time_percent, [44.130, 37.835])
+        self.assertCountEqual(loaded_data.data["some_process"].time_percent, [34.563, 43.991])
+        self.assertCountEqual(loaded_data.data["__test_app__"].cumul_time, [2.583, 5.596])
+        self.assertCountEqual(loaded_data.data["some_process"].cumul_time, [4.606, 3.009])
+        self.assertCountEqual(loaded_data.data["__test_app__"].self_time, [2.583, 2.588])
+        self.assertCountEqual(loaded_data.data["some_process"].self_time, [2.023, 3.009])
+        self.assertCountEqual(loaded_data.data["__test_app__"].total_time, [5.854, 6.839])
+        self.assertCountEqual(loaded_data.data["some_process"].total_time,[2.077, 3.069])
+
+    def test_load_from_directory_drhook_format(self):
         test_reader = VernierReader(self.test_data_dir / "vernier-output")
         loaded_data = test_reader.load()
         self.assertIn("__test_app__", loaded_data.data)
