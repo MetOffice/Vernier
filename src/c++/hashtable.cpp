@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <cstring>
 #include <iterator>
+#include <sstream>
 
 /**
  * @brief Hashtable constructor
@@ -68,7 +69,11 @@ size_t meto::HashTable::compute_hash(std::string_view region_name, int tid) {
   new_chars.fill('\0');
 
   if (region_name.length() + num_extra_bytes > new_chars.size()) {
-    error_handler("Internal error: character buffer exhausted.", EXIT_FAILURE);
+    std::stringstream message;
+    message << "Vernier internal error: region name too long ("
+            << region_name.length() << " > "
+            << new_chars.size() - num_extra_bytes << ")";
+    error_handler(message.str(), EXIT_FAILURE);
   }
 
   // Get iterator to the start of the string buffer.
