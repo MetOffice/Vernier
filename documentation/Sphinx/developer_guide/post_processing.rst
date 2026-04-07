@@ -9,7 +9,7 @@ Post Processing Design
 
 The post processing is delivered in Python, independent of the code calipering functionality.
 
-The post processing is implemented as a library, which can beb used by Python programmes, and as a set of callable scripts.
+The post processing is implemented as a library, which can be used by Python programmes, and as a set of callable scripts.
 
 Callable Script Design Constraints
 ----------------------------------
