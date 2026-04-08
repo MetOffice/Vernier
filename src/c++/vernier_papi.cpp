@@ -17,7 +17,6 @@
 #include <sstream>
 #include <vector>
 
-
 // Contains the codes of the PAPI events that need to be collected.
 static std::vector<int> events_code = std::vector<int>(0);
 
@@ -105,6 +104,7 @@ meto::PAPIContext::PAPIContext() :
   initialized_(false),
   started_(false),
   event_set_(PAPI_NULL),
+  num_events_(0),
   values_{} {
 }
 
@@ -122,7 +122,7 @@ bool meto::PAPIContext::is_initialized() {
 
 
 /**
- * @brief  Initialise PAPI context and start collecting metrics.
+ * @brief Initialise PAPI context and start collecting the metrics.
  *
  * @note This need to be called inside the thread that will compute
  * the metrics.
@@ -146,11 +146,15 @@ void meto::PAPIContext::init() {
   if (events_code.size() > 0) {
 
     for (const auto& code : events_code) {
-      if( PAPI_add_event(event_set_, code) != PAPI_OK) {
+      int ret_val = PAPI_add_event(event_set_, code) ;
+      if( ret_val != PAPI_OK) {
+        std::stringstream ss;
+        ss << "PAPIContext::init. Failed to add event: " << PAPI_strerror(ret_val);
         meto::error_handler(
-                            "PAPIContext::init. Failed to add event.",
+                            ss.str(),
                             EXIT_FAILURE);
       }
+      num_events_++;
     }
 
     if( PAPI_start(event_set_) != PAPI_OK ) {
@@ -173,7 +177,8 @@ void meto::PAPIContext::finalize() {
 
   if(event_set_ != PAPI_NULL) {
 
-    // Nedd to stop metrics if started
+    // Nedd to stop metrics if started values_ are not used after this
+    // thus we can use them in this call.
     if(started_) {
       if (PAPI_stop(event_set_, values_) != PAPI_OK) {
         meto::error_handler(
@@ -196,4 +201,33 @@ void meto::PAPIContext::finalize() {
   }
 
   initialized_ = false;
+}
+
+
+
+/**
+ * @brief  Read the metrics.
+ * @returns The total values of the metrics collected.
+ *
+ * @note The metrics are continuesly collected like time passed, they are
+ *  not reset, hence "total".
+ */
+
+void meto::PAPIContext::read(long long *total_values) {
+
+  // Adds the counters of the indicated event set into the array
+  // values_. The counters are zeroed and continue counting after the
+  // operation.
+  //
+  // This is done becuse the PMU registers are probably 48 bits and
+  // can overflow while "values_" are 64 bits and are unlikely to
+  // overflow.
+  if( PAPI_accum(event_set_,values_)  != PAPI_OK ) {
+    meto::error_handler(
+                        "PAPIContext::finalize. Failed to destroy eventset.",
+                        EXIT_FAILURE);
+  }
+
+  for(int e=0; e < num_events_; e++)
+    total_values[e] = values_[e];
 }

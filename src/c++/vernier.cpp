@@ -38,9 +38,13 @@ meto::Vernier::TracebackEntry::TracebackEntry(
     size_t record_hash, meto::record_index_t record_index,
     meto::time_point_t region_start_time,
     meto::time_point_t calliper_start_time)
-    : record_hash_(record_hash), record_index_(record_index),
+    :
+#ifdef USE_PAPI
+      region_start_metrics_{},
+#endif
+      record_hash_(record_hash), record_index_(record_index),
       region_start_time_(region_start_time),
-      calliper_start_time_(calliper_start_time) {}
+      calliper_start_time_(calliper_start_time){}
 
 /**
  * @brief  Initialise Vernier object.
@@ -163,8 +167,8 @@ void meto::Vernier::start_part1() {
 
 #ifdef USE_PAPI
   // Initialize PAPI context if not done yet.  This is called here
-  // because each thread need to do it. Also we wnat VERNIER to
-  // consider the time spend on doing so but we don;t want this extra
+  // because each thread need to do it. Also we want VERNIER to
+  // consider the time spent on doing so but we don't want this extra
   // time to be part of a region.
   if(!papi_context_.is_initialized())
     papi_context_.init();
@@ -202,6 +206,9 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
     auto region_start_time = vernier_gettime();
     thread_traceback_[tid].at(call_depth_index) = TracebackEntry(
         hash, record_index, region_start_time, logged_calliper_start_time_);
+#ifdef USE_PAPI
+    papi_context_.read(thread_traceback_[tid].at(call_depth_index).region_start_metrics_);
+#endif
   } else {
     error_handler("EMERGENCY STOP: Traceback array exhausted.", EXIT_FAILURE);
   }

@@ -40,7 +40,13 @@ private:
   bool initialized_;
   bool started_;
   int event_set_;
+  int num_events_;
 
+  // PMU (Performance Monitoring Unit) registers used by PAPI to
+  // collects metrics are usually 48 bit. Thus they can overflow in a
+  // normal long run. Thus PAPIContext retrive the metrics, add them
+  // into "values_" array and then reset the PMU to zero.  The
+  // "values_" array is 64 bit and thus very unlikely to overflow.
   long long values_[VERNIER_MAX_PAPI_METRICS];
 
 public:
@@ -50,9 +56,14 @@ public:
   // Init and finalize
   bool is_initialized();
 
-  // These two functions need to be called by each thread
+  // The following functions need to be called by each thread
+
   void init();
   void finalize();
+
+  // Read the metrics. The metrics are continuesly collected like a
+  // timer, they are not reset, hence "total".
+  void read(long long *total_values);
 
 };
 

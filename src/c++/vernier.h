@@ -64,6 +64,11 @@ private:
     TracebackEntry() = default;
     TracebackEntry(size_t, record_index_t, time_point_t, time_point_t);
 
+    // PAPI metrics
+#ifdef USE_PAPI
+    long long region_start_metrics_[VERNIER_MAX_PAPI_METRICS];
+#endif
+
     // Data members
     size_t record_hash_;
     record_index_t record_index_;
