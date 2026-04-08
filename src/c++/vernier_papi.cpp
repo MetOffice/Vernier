@@ -182,6 +182,7 @@ void meto::PAPIContext::init() {
   // Add the events to collect metrics and start collecting
   if (events_code.size() > 0) {
 
+    num_events_=0;
     for (const auto& code : events_code) {
       char event_name[PAPI_MAX_STR_LEN] = {};
       PAPI_event_code_to_name(code, event_name);
