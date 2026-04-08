@@ -15,7 +15,12 @@
 
 meto::RegionRecord::RegionRecord(size_t const region_hash,
                                  std::string_view const region_name, int tid)
-    : region_hash_(region_hash), region_name_(region_name),
+    :
+#ifdef USE_PAPI
+      total_metrics_{},
+      recursion_total_metrics_{},
+#endif
+      region_hash_(region_hash), region_name_(region_name),
       total_walltime_(time_duration_t::zero()),
       recursion_total_walltime_(time_duration_t::zero()),
       self_walltime_(time_duration_t::zero()),

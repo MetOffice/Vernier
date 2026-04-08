@@ -158,6 +158,16 @@ bool meto::PAPIContext::is_initialized() {
 
 
 /**
+ * @brief  Returns the number of events that are being collected.
+ * @returns  Number of events.
+ */
+
+int meto::PAPIContext::get_num_events() {
+  return num_events_;
+}
+
+
+/**
  * @brief Initialise PAPI context and start collecting the metrics.
  *
  * @note This need to be called inside the thread that will compute
@@ -204,7 +214,6 @@ void meto::PAPIContext::init() {
                           "PAPIContext::init. Failed to start metric collection.",
                           EXIT_FAILURE);
     }
-
     started_ = true;
   }
 }
@@ -217,7 +226,7 @@ void meto::PAPIContext::init() {
 
 void meto::PAPIContext::finalize() {
 
-  if(event_set_ != PAPI_NULL) {
+  if(initialized_ && event_set_ != PAPI_NULL) {
 
     // Nedd to stop metrics if started values_ are not used after this
     // thus we can use them in this call.
@@ -245,6 +254,7 @@ void meto::PAPIContext::finalize() {
     }
   }
 
+  event_set_ = PAPI_NULL;
   initialized_ = false;
 }
 
@@ -259,6 +269,12 @@ void meto::PAPIContext::finalize() {
  */
 
 void meto::PAPIContext::read(long long *total_values) {
+
+  assert(num_events_ <= VERNIER_MAX_PAPI_METRICS);
+
+  // Do nothing if PAPI is not initilized or started.
+  if(!initialized_ || !started_)
+    return;
 
   // Adds the counters of the indicated event set into the array
   // values_. The counters are zeroed and continue counting after the

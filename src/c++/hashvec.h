@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "vernier_gettime.h"
+#include "vernier_papi.h"
 
 namespace meto {
 
@@ -33,6 +34,12 @@ public:
   // Constructor
   RegionRecord() = delete;
   explicit RegionRecord(size_t const, std::string_view const, int);
+
+  // PAPI metrics
+#ifdef USE_PAPI
+  long long total_metrics_[VERNIER_MAX_PAPI_METRICS];
+  long long recursion_total_metrics_[VERNIER_MAX_PAPI_METRICS];
+#endif
 
   // Data members
   size_t region_hash_;

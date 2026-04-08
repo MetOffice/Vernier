@@ -94,6 +94,10 @@ public:
                     record_index_t &) noexcept;
   void update(record_index_t const, time_duration_t const);
 
+#ifdef USE_PAPI
+  void update_metrics(record_index_t const, long long const *, int const);
+#endif
+
   // Member functions
   std::vector<size_t> list_keys();
 

@@ -230,6 +230,12 @@ void meto::Vernier::stop(size_t const hash) {
   // Log the region stop time.
   auto region_stop_time = vernier_gettime();
 
+#ifdef USE_PAPI
+  // Log the papy metrics
+  long long region_stop_metrics[VERNIER_MAX_PAPI_METRICS];
+  papi_context_.read(region_stop_metrics);
+#endif
+
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
 #ifdef _OPENMP
@@ -261,11 +267,24 @@ void meto::Vernier::stop(size_t const hash) {
   // Compute the region time
   auto region_duration = region_stop_time - traceback_entry.region_start_time_;
 
+#ifdef USE_PAPI
+  long long region_duration_metrics[VERNIER_MAX_PAPI_METRICS];
+
+  for(int e=0; e < papi_context_.get_num_events(); e++)
+    region_duration_metrics[e] = region_stop_metrics[e] - traceback_entry.region_start_metrics_[e];
+
+#endif
+
   // Do the hashtable update for the child region.
   thread_hashtables_[tid].decrement_recursion_level(
       traceback_entry.record_index_);
   thread_hashtables_[tid].update(traceback_entry.record_index_,
                                  region_duration);
+#ifdef USE_PAPI
+  thread_hashtables_[tid].update_metrics(traceback_entry.record_index_,
+                                         region_duration_metrics,
+                                         papi_context_.get_num_events());
+#endif
 
   // Precompute times as far as possible. We just need the calliper stop time
   // later.

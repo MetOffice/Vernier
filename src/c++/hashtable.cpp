@@ -150,6 +150,33 @@ void meto::HashTable::update(record_index_t const record_index,
   ++record.call_count_;
 }
 
+#ifdef USE_PAPI
+/**
+ * @brief  Updates the total PAPI metrics for the specified region.
+ * @param [in] record_index  The index in hashvec_ corresponding to the
+ *                           profiled region.
+ * @param [in] metrics_delta The PAPI metrics increment to add.
+ * @param [in] num_events    The number of events to update.
+ */
+
+void meto::HashTable::update_metrics(record_index_t const record_index,
+                                     long long const *metrics_delta,
+                                     int num_events) {
+
+  auto &record = hashvec_[record_index];
+
+  // Check if this region has been called recursively
+  if (record.recursion_level_ > 0) {
+    for(int e=0; e < num_events; e++){}
+      //      record.recursion_total_metrics_[e] += metrics_delta[e];
+  } else {
+    for(int e=0; e < num_events; e++){}
+      // record.total_metrics_[e] += metrics_delta[e];
+  }
+
+}
+#endif
+
 /**
  * @brief  Increments by 1 the recursion level in a region record.
  * @param [in] record_index  The index corresponding to the region record.

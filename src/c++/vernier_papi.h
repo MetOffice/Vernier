@@ -56,6 +56,9 @@ public:
   // Init and finalize
   bool is_initialized();
 
+
+  int get_num_events();
+
   // The following functions need to be called by each thread
 
   void init();
