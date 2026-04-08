@@ -56,6 +56,9 @@ endif()
 if (ENABLE_PAPI)
   list(APPEND PLIBS PAPI::PAPI)
   target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_PAPI)
+  if (PAPI_DEBUG)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE VERNIER_PAPI_DEBUG)
+  endif()
 endif()
 
 

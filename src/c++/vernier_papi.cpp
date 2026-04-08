@@ -17,8 +17,35 @@
 #include <sstream>
 #include <vector>
 
+#ifdef VERNIER_PAPI_DEBUG
+#include <fstream>
+#include <iostream>
+#include <sched.h>
+#endif
+
 // Contains the codes of the PAPI events that need to be collected.
 static std::vector<int> events_code = std::vector<int>(0);
+
+#ifdef VERNIER_PAPI_DEBUG
+/**
+ * @brief Returns a debug string showing the current thread and CPU placement.
+ */
+static std::string papi_debug_str() {
+  int logical_cpu = sched_getcpu();
+  int physical_core = -1;
+  {
+    std::string path = "/sys/devices/system/cpu/cpu" +
+                       std::to_string(logical_cpu) + "/topology/core_id";
+    std::ifstream f(path);
+    if (f) f >> physical_core;
+  }
+  std::ostringstream oss;
+  oss << "thread=" << pthread_self()
+      << " | logical_cpu=" << logical_cpu
+      << " | physical_core=" << physical_core;
+  return oss.str();
+}
+#endif
 
 /**
  * @brief Read the event strings from an env variable
@@ -47,6 +74,9 @@ std::vector<std::string> read_events_str_from_env(const char* env_var) {
 
 void meto::papi_init(int max_threads) {
 
+#ifdef VERNIER_PAPI_DEBUG
+  std::cout << "[PAPI_DEBUG] PAPI_library_init | " << papi_debug_str() << "\n";
+#endif
   int retval = PAPI_library_init(PAPI_VER_CURRENT);
   if (retval != PAPI_VER_CURRENT) {
     meto::error_handler(
@@ -59,6 +89,9 @@ void meto::papi_init(int max_threads) {
   // value can be reused while the former is unique.  Without an
   // unique value, PAPI get confused.
   if(max_threads>1) {
+#ifdef VERNIER_PAPI_DEBUG
+    std::cout << "[PAPI_DEBUG] PAPI_thread_init | " << papi_debug_str() << "\n";
+#endif
     retval = PAPI_thread_init(pthread_self);
     if (retval != PAPI_OK) {
       meto::error_handler(
@@ -72,6 +105,9 @@ void meto::papi_init(int max_threads) {
   auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS1");
   for (const auto& event_str : events_str) {
     int code;
+#ifdef VERNIER_PAPI_DEBUG
+    std::cout << "[PAPI_DEBUG] PAPI_event_name_to_code(" << event_str << ") | " << papi_debug_str() << "\n";
+#endif
     if (PAPI_event_name_to_code(event_str.c_str(), &code) != PAPI_OK) {
       meto::error_handler(
                           "papi_init. Failed to find the PAPI code of event: " +
@@ -91,7 +127,13 @@ void meto::papi_init(int max_threads) {
  */
 
 void meto::papi_finalize() {
+  // This need to be cleared in case PAPIContext is initialized and finalized
+  // multiple time on the same run
+  events_code.clear();
 
+#ifdef VERNIER_PAPI_DEBUG
+  std::cout << "[PAPI_DEBUG] PAPI_shutdown | " << papi_debug_str() << "\n";
+#endif
   PAPI_shutdown();
 }
 
@@ -134,6 +176,9 @@ void meto::PAPIContext::init() {
   assert(initialized_ == false);
   assert(started_ == false);
 
+#ifdef VERNIER_PAPI_DEBUG
+  std::cout << "[PAPI_DEBUG] PAPI_create_eventset | " << papi_debug_str() << "\n";
+#endif
   if( PAPI_create_eventset(&event_set_) != PAPI_OK ) {
     meto::error_handler(
                         "PAPIContext::init. Failed to create eventset.",
@@ -146,6 +191,11 @@ void meto::PAPIContext::init() {
   if (events_code.size() > 0) {
 
     for (const auto& code : events_code) {
+      char event_name[PAPI_MAX_STR_LEN] = {};
+      PAPI_event_code_to_name(code, event_name);
+#ifdef VERNIER_PAPI_DEBUG
+      std::cout << "[PAPI_DEBUG] PAPI_add_event(" << event_name << ") | " << papi_debug_str() << "\n";
+#endif
       int ret_val = PAPI_add_event(event_set_, code) ;
       if( ret_val != PAPI_OK) {
         std::stringstream ss;
@@ -157,6 +207,9 @@ void meto::PAPIContext::init() {
       num_events_++;
     }
 
+#ifdef VERNIER_PAPI_DEBUG
+    std::cout << "[PAPI_DEBUG] PAPI_start | " << papi_debug_str() << "\n";
+#endif
     if( PAPI_start(event_set_) != PAPI_OK ) {
       meto::error_handler(
                           "PAPIContext::init. Failed to start metric collection.",
@@ -180,6 +233,9 @@ void meto::PAPIContext::finalize() {
     // Nedd to stop metrics if started values_ are not used after this
     // thus we can use them in this call.
     if(started_) {
+#ifdef VERNIER_PAPI_DEBUG
+      std::cout << "[PAPI_DEBUG] PAPI_stop | " << papi_debug_str() << "\n";
+#endif
       if (PAPI_stop(event_set_, values_) != PAPI_OK) {
         meto::error_handler(
                             "PAPIContext::finalize. Failed to stop metrics collection.",
@@ -188,11 +244,17 @@ void meto::PAPIContext::finalize() {
       started_=false;
     }
 
+#ifdef VERNIER_PAPI_DEBUG
+    std::cout << "[PAPI_DEBUG] PAPI_cleanup_eventset | " << papi_debug_str() << "\n";
+#endif
     if( PAPI_cleanup_eventset(event_set_) != PAPI_OK ) {
       meto::error_handler(
                           "PAPIContext::finalize. Failed to cleanup.",
                           EXIT_FAILURE);
     }
+#ifdef VERNIER_PAPI_DEBUG
+    std::cout << "[PAPI_DEBUG] PAPI_destroy_eventset | " << papi_debug_str() << "\n";
+#endif
     if( PAPI_destroy_eventset(&event_set_)  != PAPI_OK ) {
       meto::error_handler(
                           "PAPIContext::finalize. Failed to destroy eventset.",
@@ -222,6 +284,9 @@ void meto::PAPIContext::read(long long *total_values) {
   // This is done becuse the PMU registers are probably 48 bits and
   // can overflow while "values_" are 64 bits and are unlikely to
   // overflow.
+#ifdef VERNIER_PAPI_DEBUG
+  std::cout << "[PAPI_DEBUG] PAPI_accum | " << papi_debug_str() << "\n";
+#endif
   if( PAPI_accum(event_set_,values_)  != PAPI_OK ) {
     meto::error_handler(
                         "PAPIContext::finalize. Failed to destroy eventset.",
