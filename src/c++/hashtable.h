@@ -87,6 +87,7 @@ public:
   // Constructors
   HashTable() = delete;
   HashTable(int);
+  ~HashTable();
 
   // Prototypes
   size_t compute_hash(std::string_view, int);

@@ -114,6 +114,7 @@ private:
 public:
   // Default constructor needed for `inline` global Vernier object.
   Vernier() = default;
+  ~Vernier();
 
   // Member functions
   void init(MPI_Comm const client_comm_handle = MPI_COMM_WORLD,

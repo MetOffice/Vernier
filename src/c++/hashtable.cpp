@@ -20,6 +20,9 @@
  *
  */
 
+// Needed to avoid issue between RegionRecord and USE_PAPI.
+meto::HashTable::~HashTable() = default;
+
 meto::HashTable::HashTable(int const tid) : tid_(tid) {
   // Reserve enough places in hashvec_
   hashvec_.reserve(PROF_HASHVEC_RESERVE_SIZE);

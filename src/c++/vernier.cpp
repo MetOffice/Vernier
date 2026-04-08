@@ -23,6 +23,9 @@ meto::time_point_t meto::Vernier::logged_calliper_start_time_{};
 meto::PAPIContext meto::Vernier::papi_context_{};
 #endif
 
+// Needed to avoid an issue with RegionRecord and USE_PAPI
+meto::Vernier::~Vernier() = default;
+
 /**
  * @brief Constructor for TracebackEntry struct.
  * @param [in]  record_hash   The hash of the region name.
