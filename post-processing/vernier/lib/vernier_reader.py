@@ -161,13 +161,14 @@ class VernierReader():
         header = contents[0:10]
 
         # Match file format and populate data
-        match self._get_file_format(header):
-            case VernierFileFormat.THREADS:
-                loaded = self._parse_threadsfile_data(contents)
-            case VernierFileFormat.DRHOOK:
-                loaded = self._parse_drhook_data(contents)
-            case VernierFileFormat.INVALID:
-                raise ValueError("Invalid file format - cannot load Vernier data.")
+        # We don't use the match pattern to keep python3.9 compatibility.
+        file_format = self._get_file_format(header)
+        if file_format == VernierFileFormat.THREADS:
+            loaded = self._parse_threadsfile_data(contents)
+        elif file_format == VernierFileFormat.DRHOOK:
+            loaded = self._parse_drhook_data(contents)
+        elif file_format == VernierFileFormat.INVALID:
+            raise ValueError("Invalid file format - cannot load Vernier data.")
 
         return loaded
 
