@@ -79,8 +79,8 @@ class VernierReader():
                 if "--------------" in sline:
                     calliper_data_section = True
                     pc_self_times = {}
-                    max_tot_time = 0
-                    cumul_self_time = 0
+                    max_tot_time = 0.0
+                    cumul_self_time = 0.0
                     continue
 
                 if calliper_data_section:
@@ -88,11 +88,10 @@ class VernierReader():
                     if not calliper in loaded.data:
                         loaded.add_calliper(calliper)
 
-                    # Add values to percentage calculation temporaries
+                    # Add values to percentage/cumul calculation temporaries
                     if float(sline[2]) > max_tot_time:
                         max_tot_time = float(sline[2])
                     pc_self_times[sline[0]] = float(sline[1])
-
                     cumul_self_time += float(sline[1])
 
                     loaded.data[calliper].rank.append(int(rank))
