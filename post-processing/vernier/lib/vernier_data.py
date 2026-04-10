@@ -23,7 +23,6 @@ class VernierCalliper():
     total_time: list[float]
     time_percent: list[float]
     self_time: list[float]
-    cumul_time: list[float]
     n_calls: list[int]
     rank: list[int]
     thread: list[int]
@@ -41,7 +40,6 @@ class VernierCalliper():
         self.rank = []
         self.thread = []
         self.time_percent = []
-        self.cumul_time = []
         self.self_time = []
         self.total_time = []
         self.n_calls = []
@@ -54,8 +52,8 @@ class VernierCalliper():
         otherwise return element lengths.
         """
         result = None
-        if (len(self.time_percent) == len(self.cumul_time) ==
-            len(self.self_time) == len(self.total_time) ==  len(self.n_calls)):
+        if (len(self.time_percent) == len(self.self_time) ==
+            len(self.total_time) ==  len(self.n_calls)):
             result = len(self.time_percent)
         return result
 
@@ -124,7 +122,6 @@ class VernierCalliper():
             filtered.rank.append(self.rank[index])
             filtered.thread.append(self.thread[index])
             filtered.time_percent.append(self.time_percent[index])
-            filtered.cumul_time.append(self.cumul_time[index])
             filtered.self_time.append(self.self_time[index])
             filtered.total_time.append(self.total_time[index])
             filtered.n_calls.append(self.n_calls[index])
@@ -143,7 +140,6 @@ class VernierCalliper():
             self.name, # calliper name
             round(np.mean(self.total_time), 5), # mean total time across calls
             round(np.mean(self.self_time), 5), # mean self time across calls
-            round(np.mean(self.cumul_time), 5), # mean cumulative time across calls
             self.n_calls[0], # number of calls (should be the same for all entries, so just take the first)
             round(np.mean(self.time_percent), 5), # mean percentage of time across calls
             round(np.mean(np.array(self.total_time) / np.array(self.n_calls)), 5) # mean time per call
@@ -151,8 +147,8 @@ class VernierCalliper():
 
     @classmethod
     def labels(self):
-        return ["Routine", "Total time (s)", "Self (s)", "Cumul time (s)",
-                "Max no. calls", "% time", "Time per call (s)"]
+        return ["Routine", "Total time (s)", "Self (s)", "Max no. calls",
+                "% time", "Time per call (s)"]
 
 
 class VernierData():
@@ -240,7 +236,7 @@ class VernierData():
             out = open(txt_path, 'w')
 
         for row in txt_table:
-            out.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>13} | {:>8} | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
+            out.write('| {:>{}} | {:>14} | {:>12} | {:>13} | {:>8} | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
 
         if txt_path is not None:
             out.close()
@@ -320,7 +316,6 @@ class VernierData():
                     self.add_calliper(calliper)
 
                 self.data[calliper].time_percent.extend(vernier_data.data[calliper].time_percent)
-                self.data[calliper].cumul_time.extend(vernier_data.data[calliper].cumul_time)
                 self.data[calliper].self_time.extend(vernier_data.data[calliper].self_time)
                 self.data[calliper].total_time.extend(vernier_data.data[calliper].total_time)
                 self.data[calliper].n_calls.extend(vernier_data.data[calliper].n_calls)
@@ -463,7 +458,6 @@ class VernierDataCollation():
             results.total_time += data_to_add.total_time
             results.time_percent += data_to_add.time_percent
             results.self_time += data_to_add.self_time
-            results.cumul_time += data_to_add.cumul_time
             results.n_calls += data_to_add.n_calls
 
         return results

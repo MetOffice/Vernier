@@ -49,7 +49,6 @@ class VernierReader():
                     loaded.data[calliper].rank.append(int(rank))
                     loaded.data[calliper].thread.append(int(thread))
                     loaded.data[calliper].time_percent.append(float(sline[1]))
-                    loaded.data[calliper].cumul_time.append(float(sline[2]))
                     loaded.data[calliper].self_time.append(float(sline[3]))
                     loaded.data[calliper].total_time.append(float(sline[4]))
                     loaded.data[calliper].n_calls.append(int(sline[5]))

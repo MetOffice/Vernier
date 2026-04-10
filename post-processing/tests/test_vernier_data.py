@@ -35,7 +35,6 @@ class TestVernierData(unittest.TestCase):
         self.test_data.add_calliper("test_calliper")
         self.assertIn("test_calliper", self.test_data.data)
         self.assertEqual(self.test_data.data["test_calliper"].time_percent, [])
-        self.assertEqual(self.test_data.data["test_calliper"].cumul_time, [])
         self.assertEqual(self.test_data.data["test_calliper"].self_time, [])
         self.assertEqual(self.test_data.data["test_calliper"].total_time, [])
         self.assertEqual(self.test_data.data["test_calliper"].n_calls, [])
@@ -48,7 +47,6 @@ class TestVernierData(unittest.TestCase):
         """
         self.test_data.add_calliper("test_calliper")
         self.test_data.data["test_calliper"].time_percent = [10.0, 20.0]
-        self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0]
         self.test_data.data["test_calliper"].self_time = [5.0, 15.0]
         self.test_data.data["test_calliper"].total_time = [25.0, 35.0]
         self.test_data.data["test_calliper"].n_calls = [2, 2]
@@ -56,7 +54,6 @@ class TestVernierData(unittest.TestCase):
         self.test_data.data["test_calliper"].thread = [0, 0]
         calliper_data = self.test_data.get("test_calliper")
         self.assertEqual(calliper_data.time_percent, [10.0, 20.0])
-        self.assertEqual(calliper_data.cumul_time, [30.0, 40.0])
         self.assertEqual(calliper_data.self_time, [5.0, 15.0])
         self.assertEqual(calliper_data.total_time, [25.0, 35.0])
         self.assertEqual(calliper_data.n_calls, [2, 2])
@@ -69,7 +66,6 @@ class TestVernierData(unittest.TestCase):
         """
         self.test_data.add_calliper("test_calliper")
         self.test_data.data["test_calliper"].time_percent = [10.0, 20.0]
-        self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0]
         self.test_data.data["test_calliper"].self_time = [5.0, 15.0]
         self.test_data.data["test_calliper"].total_time = [25.0, 35.0]
         self.test_data.data["test_calliper"].n_calls = [2, 2]
@@ -77,7 +73,6 @@ class TestVernierData(unittest.TestCase):
         self.test_data.data["test_calliper"].thread = [0, 0]
         calliper_data = self.test_data.get("test_calliper", rank=1)
         self.assertEqual(calliper_data.time_percent, [20.0])
-        self.assertEqual(calliper_data.cumul_time, [40.0])
         self.assertEqual(calliper_data.self_time, [15.0])
         self.assertEqual(calliper_data.total_time, [35.0])
         self.assertEqual(calliper_data.n_calls, [2])
@@ -90,7 +85,6 @@ class TestVernierData(unittest.TestCase):
         """
         self.test_data.add_calliper("test_calliper")
         self.test_data.data["test_calliper"].time_percent = [10.0, 20.0]
-        self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0]
         self.test_data.data["test_calliper"].self_time = [5.0, 15.0]
         self.test_data.data["test_calliper"].total_time = [25.0, 35.0]
         self.test_data.data["test_calliper"].n_calls = [2, 2]
@@ -98,7 +92,6 @@ class TestVernierData(unittest.TestCase):
         self.test_data.data["test_calliper"].thread = [0, 1]
         calliper_data = self.test_data.get("test_calliper", thread=1)
         self.assertEqual(calliper_data.time_percent, [20.0])
-        self.assertEqual(calliper_data.cumul_time, [40.0])
         self.assertEqual(calliper_data.self_time, [15.0])
         self.assertEqual(calliper_data.total_time, [35.0])
         self.assertEqual(calliper_data.n_calls, [2])
@@ -108,7 +101,6 @@ class TestVernierData(unittest.TestCase):
     def test_get_rank_and_thread(self):
         self.test_data.add_calliper("test_calliper")
         self.test_data.data["test_calliper"].time_percent = [10.0, 20.0, 10.5, 20.5]
-        self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0, 30.5, 40.5]
         self.test_data.data["test_calliper"].self_time = [5.0, 15.0, 5.5, 15.5]
         self.test_data.data["test_calliper"].total_time = [25.0, 35.0, 25.5, 35.5]
         self.test_data.data["test_calliper"].n_calls = [2, 2, 2, 2]
@@ -116,7 +108,6 @@ class TestVernierData(unittest.TestCase):
         self.test_data.data["test_calliper"].thread = [0, 1, 0, 1]
         calliper_data = self.test_data.get("test_calliper", thread=1, rank=1)
         self.assertEqual(calliper_data.time_percent, [20.5])
-        self.assertEqual(calliper_data.cumul_time, [40.5])
         self.assertEqual(calliper_data.self_time, [15.5])
         self.assertEqual(calliper_data.total_time, [35.5])
         self.assertEqual(calliper_data.n_calls, [2])
@@ -170,7 +161,6 @@ class TestVernierData(unittest.TestCase):
         """
         self.test_data.add_calliper("test_calliper")
         self.test_data.data["test_calliper"].time_percent = [10.0, 20.0]
-        self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0]
         self.test_data.data["test_calliper"].self_time = [5.0, 15.0]
         self.test_data.data["test_calliper"].total_time = [25.0, 35.0]
         self.test_data.data["test_calliper"].n_calls = [2]
@@ -182,8 +172,8 @@ class TestVernierData(unittest.TestCase):
             self.test_data.write_txt_output(Path(tmp_file.name))
             contents = Path(tmp_file.name).read_text().splitlines()
             # pylint: disable=line-too-long
-            self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", contents[0])
-            self.assertEqual("| test_calliper |           30.0 |         10.0 |           35.0 |             2 |     15.0 |              15.0 |", contents[1])
+            self.assertEqual("|       Routine | Total time (s) |     Self (s) | Max no. calls |   % time | Time per call (s) |", contents[0])
+            self.assertEqual("| test_calliper |           30.0 |         10.0 |             2 |     15.0 |              15.0 |", contents[1])
 
     def test_write_txt_output_terminal(self):
         """
@@ -192,7 +182,6 @@ class TestVernierData(unittest.TestCase):
         """
         self.test_data.add_calliper("test_calliper")
         self.test_data.data["test_calliper"].time_percent = [50.0, 40.0]
-        self.test_data.data["test_calliper"].cumul_time = [10.0, 12.0]
         self.test_data.data["test_calliper"].self_time = [3.0, 4.0]
         self.test_data.data["test_calliper"].total_time = [15.0, 55.0]
         self.test_data.data["test_calliper"].n_calls = [2]
@@ -205,8 +194,8 @@ class TestVernierData(unittest.TestCase):
         sys.stdout = sys.__stdout__
 
         # pylint: disable=line-too-long
-        self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", write_output.getvalue().splitlines()[0])
-        self.assertEqual("| test_calliper |           35.0 |          3.5 |           11.0 |             2 |     45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
+        self.assertEqual("|       Routine | Total time (s) |     Self (s) | Max no. calls |   % time | Time per call (s) |", write_output.getvalue().splitlines()[0])
+        self.assertEqual("| test_calliper |           35.0 |          3.5 |             2 |     45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
 
     def test_aggregate(self):
         """
@@ -216,7 +205,6 @@ class TestVernierData(unittest.TestCase):
         data1 = VernierData()
         data1.add_calliper("calliper_a")
         data1.data["calliper_a"].time_percent = [10.0, 20.0]
-        data1.data["calliper_a"].cumul_time = [30.0, 40.0]
         data1.data["calliper_a"].self_time = [5.0, 15.0]
         data1.data["calliper_a"].total_time = [25.0, 35.0]
         data1.data["calliper_a"].n_calls = [2, 2]
@@ -226,7 +214,6 @@ class TestVernierData(unittest.TestCase):
         data2 = VernierData()
         data2.add_calliper("calliper_a")
         data2.data["calliper_a"].time_percent = [15.0, 25.0]
-        data2.data["calliper_a"].cumul_time = [35.0, 45.0]
         data2.data["calliper_a"].self_time = [6.0, 16.0]
         data2.data["calliper_a"].total_time = [28.0, 38.0]
         data2.data["calliper_a"].n_calls = [3, 3]
@@ -239,9 +226,6 @@ class TestVernierData(unittest.TestCase):
         self.assertEqual(
             aggregated.data["calliper_a"].time_percent,
             [10.0, 20.0, 15.0, 25.0])
-        self.assertEqual(
-            aggregated.data["calliper_a"].cumul_time,
-            [30.0, 40.0, 35.0, 45.0])
         self.assertEqual(
             aggregated.data["calliper_a"].self_time,
             [5.0, 15.0, 6.0, 16.0])
@@ -261,7 +245,6 @@ class TestVernierData(unittest.TestCase):
         data1 = VernierData()
         data1.add_calliper("calliper_a")
         data1.data["calliper_a"].time_percent = [10.0, 20.0]
-        data1.data["calliper_a"].cumul_time = [30.0, 40.0]
         data1.data["calliper_a"].self_time = [5.0, 15.0]
         data1.data["calliper_a"].total_time = [25.0, 35.0]
         data1.data["calliper_a"].n_calls = [2, 2]
@@ -271,7 +254,6 @@ class TestVernierData(unittest.TestCase):
         data2 = VernierData()
         data2.add_calliper("calliper_b")
         data2.data["calliper_b"].time_percent = [15.0, 25.0]
-        data2.data["calliper_b"].cumul_time = [35.0, 45.0]
         data2.data["calliper_b"].self_time = [6.0, 16.0]
         data2.data["calliper_b"].total_time = [28.0, 38.0]
         data2.data["calliper_b"].n_calls = [3, 3]
@@ -311,7 +293,6 @@ class TestVernierCollation(unittest.TestCase):
         data1 = VernierData()
         data1.add_calliper("calliper_a")
         data1.data["calliper_a"].time_percent = [10.0, 20.0]
-        data1.data["calliper_a"].cumul_time = [30.0, 40.0]
         data1.data["calliper_a"].self_time = [5.0, 15.0]
         data1.data["calliper_a"].total_time = [25.0, 35.0]
         data1.data["calliper_a"].n_calls = [2, 2]
@@ -321,7 +302,6 @@ class TestVernierCollation(unittest.TestCase):
         data2 = VernierData()
         data2.add_calliper("calliper_a")
         data2.data["calliper_a"].time_percent = [15.0, 25.0]
-        data2.data["calliper_a"].cumul_time = [35.0, 45.0]
         data2.data["calliper_a"].self_time = [6.0, 16.0]
         data2.data["calliper_a"].total_time = [28.0, 38.0]
         data2.data["calliper_a"].n_calls = [3, 3]
@@ -366,7 +346,6 @@ class TestVernierCollation(unittest.TestCase):
         data_inc = VernierData()
         data_inc.add_calliper("calliper_a")
         data_inc.data["calliper_a"].time_percent = [10.0, 20.0]
-        data_inc.data["calliper_a"].cumul_time = [30.0, 40.0]
         data_inc.data["calliper_a"].self_time = [5.0, 15.0]
         data_inc.data["calliper_a"].total_time = [25.0, 35.0]
         data_inc.data["calliper_a"].n_calls = [2, 2]
@@ -375,7 +354,6 @@ class TestVernierCollation(unittest.TestCase):
 
         data_inc.add_calliper("calliper_b")
         data_inc.data["calliper_b"].time_percent = [15.0, 25.0]
-        data_inc.data["calliper_b"].cumul_time = [35.0, 45.0]
         data_inc.data["calliper_b"].self_time = [6.0, 16.0]
         data_inc.data["calliper_b"].total_time = [28.0, 38.0]
         data_inc.data["calliper_b"].n_calls = [3, 3]

@@ -33,7 +33,6 @@ class TestVernierCalliper(unittest.TestCase):
         """
         self.assertEqual(self.calliper_a.name, "test_calliper_a")
         self.assertEqual(self.calliper_a.time_percent, [])
-        self.assertEqual(self.calliper_a.cumul_time, [])
         self.assertEqual(self.calliper_a.self_time, [])
         self.assertEqual(self.calliper_a.total_time, [])
         self.assertEqual(self.calliper_a.n_calls, [])
@@ -44,7 +43,6 @@ class TestVernierCalliper(unittest.TestCase):
         """
         # pylint: disable=pointless-statement
         self.calliper_a.time_percent = [10.0, 20.0]
-        self.calliper_a.cumul_time = [30.0, 40.0]
         self.calliper_a.self_time = [5.0, 15.0]
         self.calliper_a.total_time = [25.0, 35.0]
         self.calliper_a.n_calls = [2, 2]
@@ -53,10 +51,9 @@ class TestVernierCalliper(unittest.TestCase):
         self.assertEqual(reduced_data[0], "test_calliper_a")
         self.assertEqual(reduced_data[1], 30.0)
         self.assertEqual(reduced_data[2], 10.0)
-        self.assertEqual(reduced_data[3], 35.0)
-        self.assertEqual(reduced_data[4], 2)
+        self.assertEqual(reduced_data[3], 2)
+        self.assertEqual(reduced_data[4], 15.0)
         self.assertEqual(reduced_data[5], 15.0)
-        self.assertEqual(reduced_data[6], 15.0)
 
     def test_compare(self):
         """
@@ -65,13 +62,11 @@ class TestVernierCalliper(unittest.TestCase):
         """
         # pylint: disable=pointless-statement
         self.calliper_a.time_percent = [10.0, 20.0]
-        self.calliper_a.cumul_time = [30.0, 40.0]
         self.calliper_a.self_time = [5.0, 15.0]
         self.calliper_a.total_time = [25.0, 35.0]
         self.calliper_a.n_calls = [2, 2]
 
         self.calliper_b.time_percent = [12.0, 25.0]
-        self.calliper_b.cumul_time = [35.0, 46.0]
         self.calliper_b.self_time = [6.0, 19.0]
         self.calliper_b.total_time = [28.0, 39.0]
         self.calliper_b.n_calls = [2, 2]
