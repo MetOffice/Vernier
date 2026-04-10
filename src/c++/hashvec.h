@@ -18,7 +18,9 @@
 #include <vector>
 
 #include "vernier_gettime.h"
+#ifdef USE_PAPI
 #include "vernier_papi.h"
+#endif
 
 namespace meto {
 
@@ -35,10 +37,10 @@ public:
   RegionRecord() = delete;
   explicit RegionRecord(size_t const, std::string_view const, int);
 
-  // PAPI metrics
 #ifdef USE_PAPI
+  // PAPI metrics total metrics, "self" metrics are not computed and
+  // thus recursion metrics are not needed.
   long long total_metrics_[VERNIER_MAX_PAPI_METRICS];
-  long long recursion_total_metrics_[VERNIER_MAX_PAPI_METRICS];
 #endif
 
   // Data members

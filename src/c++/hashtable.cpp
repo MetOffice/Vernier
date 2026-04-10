@@ -169,14 +169,10 @@ void meto::HashTable::update_metrics(record_index_t const record_index,
   auto &record = hashvec_[record_index];
 
   // Check if this region has been called recursively
-  if (record.recursion_level_ > 0) {
-    for(int e=0; e < num_events; e++){}
-      //      record.recursion_total_metrics_[e] += metrics_delta[e];
-  } else {
-    for(int e=0; e < num_events; e++){}
-      // record.total_metrics_[e] += metrics_delta[e];
+  if (record.recursion_level_ == 0) {
+    for(int e=0; e < num_events; e++)
+      record.total_metrics_[e] += metrics_delta[e];
   }
-
 }
 #endif
 

@@ -13,9 +13,7 @@
 #include <cassert>
 
 #include <cstdlib>
-#include <string>
 #include <sstream>
-#include <vector>
 
 #ifdef VERNIER_PAPI_DEBUG
 #include <fstream>
@@ -23,8 +21,9 @@
 #include <sched.h>
 #endif
 
+
 // Contains the codes of the PAPI events that need to be collected.
-static std::vector<int> events_code = std::vector<int>(0);
+meto::events_vector meto::events_code;
 
 #ifdef VERNIER_PAPI_DEBUG
 /**
@@ -110,7 +109,7 @@ void meto::papi_init(int max_threads) {
                           event_str,
                           EXIT_FAILURE);
     }
-    events_code.push_back(code);
+    events_code.emplace_back(code,event_str);
   }
 
 }
@@ -194,13 +193,12 @@ void meto::PAPIContext::init() {
 
     num_events_=0;
     for (const auto& code : events_code) {
-      char event_name[PAPI_MAX_STR_LEN] = {};
-      PAPI_event_code_to_name(code, event_name);
-      PAPI_DEBUG_LOG("PAPI_add_event(" + std::string(event_name) + ")");
-      int ret_val = PAPI_add_event(event_set_, code) ;
+      PAPI_DEBUG_LOG("PAPI_add_event(" + code.second + ")");
+      int ret_val = PAPI_add_event(event_set_, code.first) ;
       if( ret_val != PAPI_OK) {
         std::stringstream ss;
-        ss << "PAPIContext::init. Failed to add event: " << PAPI_strerror(ret_val);
+        ss << "PAPIContext::init. Failed to add event (" <<
+          code.second << "): " << PAPI_strerror(ret_val);
         meto::error_handler(
                             ss.str(),
                             EXIT_FAILURE);

@@ -8,6 +8,11 @@
 #include "formatter.h"
 #include "error_handler.h"
 
+#ifdef USE_PAPI
+#include "vernier_papi.h"
+#endif
+
+
 #include <algorithm>
 #include <iomanip>
 
@@ -79,11 +84,31 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
   os << std::setw(40) << std::left << "Region " << std::setw(15) << std::right
      << "Self (s) " << std::setw(15) << std::right << "Total (s) "
      << std::setw(15) << std::right << "Overhead (s) " << std::setw(10)
-     << std::right << "Calls\n";
+     << std::right << "Calls ";
+
+#ifdef USE_PAPI
+  if (events_code.size() > 0) {
+    for (const auto& code : events_code) {
+      os << std::right << std::setw(15) << code.second << " ";
+    }
+  }
+#endif
+
+  os << "\n";
 
   os << std::setfill('-');
   os << std::setw(40) << "- " << std::setw(15) << "- " << std::setw(15) << "- "
-     << std::setw(15) << "- " << std::setw(10) << "- \n";
+     << std::setw(15) << "- " << std::setw(10) << "- ";
+
+#ifdef USE_PAPI
+  if (events_code.size() > 0) {
+    for (const auto& code : events_code) {
+      os << std::setw(15) << "- ";
+    }
+  }
+#endif
+
+  os << "\n";
   os << std::setfill(' ');
 
   // Data entries
@@ -92,7 +117,17 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
        << std::setw(15) << std::right << record.self_walltime_.count() << " "
        << std::setw(15) << std::right << record.total_walltime_.count() << " "
        << std::setw(15) << std::right << record.overhead_walltime_.count()
-       << " " << std::setw(10) << std::right << record.call_count_ << "\n";
+       << " " << std::setw(10) << std::right << record.call_count_ << " ";
+
+#ifdef USE_PAPI
+    if (events_code.size() > 0) {
+      for(int e=0; e < static_cast<int>(events_code.size()); e++) {
+        os << std::right << std::setw(15) << record.total_metrics_[e] << " ";
+      }
+    }
+#endif
+
+    os << "\n";
   }
 }
 

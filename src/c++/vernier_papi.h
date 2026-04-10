@@ -11,7 +11,8 @@
  *  Contains abstractions for functions and classes that manage PAPI.
  *
  */
-
+#include <string>
+#include <vector>
 
 
 #ifndef VERNIER_PAPI_H
@@ -24,10 +25,13 @@
 namespace meto {
 
 
-// Functions prototypes
+// General functions
 void papi_init(int);
 void papi_finalize();
 
+// Contains the codes of the PAPI events that need to be collected.
+using events_vector = std::vector<std::pair<int, std::string>>;
+extern events_vector events_code;
 
 /**
 * @brief  Manage PAPI events and data.
