@@ -9,7 +9,7 @@ import sys
 
 # pylint: disable=wrong-import-position
 sys.path.append(str(Path(__file__).parent.parent))
-from vernier.lib.vernier_reader import VernierReader
+from vernier.lib.vernier_reader import VernierReader, VernierFileFormat
 
 
 class TestVernierReader(unittest.TestCase):
@@ -26,6 +26,9 @@ class TestVernierReader(unittest.TestCase):
     def test_junk_file(self):
         with self.assertRaises(ValueError):
             VernierReader(self.test_data_dir / "junk-data").load()
+
+    def test_invalid_format_file(self):
+        self.assertEqual(VernierReader._get_file_format(["This is a junk file"]), VernierFileFormat.INVALID)
 
     def test_load_from_file_threads_format(self):
         test_reader = VernierReader(self.test_data_dir / "vernier-output-threads-collated")

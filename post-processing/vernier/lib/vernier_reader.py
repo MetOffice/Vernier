@@ -36,12 +36,18 @@ class VernierReader():
         """
         self.path = vernier_path
 
-    def _get_file_format(self, file_header) -> VernierFileFormat:
+    @classmethod
+    def _get_file_format(cls, file_header: list[str]) -> VernierFileFormat:
         """
         Determines file format based on file contents - looks for the presence
         of characteristic string fragments in a provided section of the file
         contents.
 
+        :param file_header: A section of the file contents to be used to
+                            detect file format.
+        :type file_header: list[str]
+        :return: Detected file format.
+        :rtype: VernierFileFormat
         """
 
         if "region_name@thread_id" in file_header:
@@ -51,16 +57,21 @@ class VernierReader():
         else:
             return VernierFileFormat.INVALID
 
-    def _parse_threadsfile_data(self, file_contents) -> VernierData:
+    def _parse_threadsfile_data(self, file_contents: list[str]) -> VernierData:
         """
         Parses the contents of a Vernier output file in the 'threads' format
         into a VernierData object.
+
+        :param file_contents: Contents of the Vernier data file.
+        :type file_contents: list[str]
+        :return: VernierData object containing the parsed data.
+        :rtype: VernierData
+
         """
 
         loaded = VernierData()
 
         calliper_data_section = False
-        calc_time_percent = False
 
         # Add EOF line to ensure percentage calculation is triggered at end of
         # file
@@ -99,7 +110,6 @@ class VernierReader():
                     loaded.data[calliper].self_time.append(float(sline[1]))
                     loaded.data[calliper].total_time.append(float(sline[2]))
                     loaded.data[calliper].n_calls.append(int(sline[4]))
-
                     loaded.data[calliper].cumul_time.append(cumul_self_time)
 
 
@@ -115,10 +125,16 @@ class VernierReader():
 
         return loaded
 
-    def _parse_drhook_data(self, file_contents) -> VernierData:
+    def _parse_drhook_data(self, file_contents: list[str]) -> VernierData:
         """
         Parses the contents of a Vernier output file in the 'drhook' format
         into a VernierData object.
+
+        :param file_contents: Contents of the Vernier data file.
+        :type file_contents: list[str]
+        :return: VernierData object containing the parsed data.
+        :rtype: VernierData
+
         """
 
         loaded = VernierData()
@@ -153,6 +169,9 @@ class VernierReader():
         Loads Vernier data from a single file, and returns it as a VernierData
         object.
 
+        :return: VernierData object containing the loaded data.
+        :rtype: VernierData
+
         """
 
         contents = self.path.read_text().splitlines()
@@ -161,7 +180,7 @@ class VernierReader():
 
         # Match file format and populate data
         # We don't use the match pattern to keep python3.9 compatibility.
-        file_format = self._get_file_format(header)
+        file_format = VernierReader._get_file_format(header)
         if file_format == VernierFileFormat.THREADS:
             loaded = self._parse_threadsfile_data(contents)
         elif file_format == VernierFileFormat.DRHOOK:
@@ -175,6 +194,9 @@ class VernierReader():
         """
         Loads Vernier data from a directory of files, and returns it as a
         VernierData object.
+
+        :return: VernierData object containing the loaded data.
+        :rtype: VernierData
 
         """
         vernier_files = [f for f in os.listdir(self.path) if
@@ -193,8 +215,14 @@ class VernierReader():
         return result
 
     def load(self) -> VernierData:
-        """Generic load routine for Vernier data, aiming to handle both single
-        files and directories of files."""
+        """
+        Generic load routine for Vernier data, aiming to handle both single
+        files and directories of files.
+
+        :return: VernierData object containing the loaded data.
+        :rtype: VernierData
+
+        """
 
         if self.path.is_file():
             return self._load_from_file()
