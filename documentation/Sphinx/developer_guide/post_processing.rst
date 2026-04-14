@@ -11,6 +11,20 @@ The post processing is delivered in Python, independent of the code calipering f
 
 The post processing is implemented as a library, which can be used by Python programmes, and as a set of callable scripts.
 
+Dependency Management
+---------------------
+
+Vernier post-processing is a lightweight pure python implementation, intended for use on a range of platforms,
+some of which may have highly customised environments and setups.
+
+For this reason, Vernier post-processing has a dependency constraint that it shall only depending on imports available from
+the Python standard library.
+
+‎This is to avoid the dependency management challenges across platforms of complicated but useful modules such as numpy.
+
+Environments which do have rich support can always use Vernier as part of a richer anaysis environment,
+but dependency imports beyond the standard library shall not be allowed.
+
 Callable Script Design Constraints
 ----------------------------------
 
