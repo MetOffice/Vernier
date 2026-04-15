@@ -147,7 +147,7 @@ class VernierCalliper():
             round(min(self.self_time), 5),                # min self time across calls
             round(statistics.mean(self.self_time), 5),    # mean self time across calls
             round(max(self.self_time), 5),                # max self time across calls
-            self.n_calls[0], # number of calls (should be the same for all entries, so just take the first)
+            max(self.n_calls), # number of calls (should be the same for all entries, so just take the first)
             round(statistics.mean(self.time_percent), 5), # mean percentage of time across calls
             round(statistics.mean([t / n for t, n in zip(self.total_time, self.n_calls)]), 5) # mean time per call
         ]
