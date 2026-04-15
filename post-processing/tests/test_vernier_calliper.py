@@ -51,16 +51,15 @@ class TestVernierCalliper(unittest.TestCase):
 
         reduced_data = self.calliper_a.reduce()
         self.assertEqual(reduced_data[0], "test_calliper_a")
-        self.assertEqual(reduced_data[1], 30.0)
-        self.assertEqual(reduced_data[2], 25.0)
-        self.assertEqual(reduced_data[3], 35.0)
-        self.assertEqual(reduced_data[4], 10.0)
-        self.assertEqual(reduced_data[5], 5.0)
-        self.assertEqual(reduced_data[6], 15.0)
-        self.assertEqual(reduced_data[7], 35.0)
-        self.assertEqual(reduced_data[8], 2)
-        self.assertEqual(reduced_data[9], 15.0)
-        self.assertEqual(reduced_data[10], 15.0)
+        self.assertEqual(reduced_data[1], 25.0)  # Min
+        self.assertEqual(reduced_data[2], 30.0)  # Mean
+        self.assertEqual(reduced_data[3], 35.0)  # Max 
+        self.assertEqual(reduced_data[4], 5.0)   # Min self
+        self.assertEqual(reduced_data[5], 10.0)  # Mean self
+        self.assertEqual(reduced_data[6], 15.0)  # Max self
+        self.assertEqual(reduced_data[7], 2)     # No calls
+        self.assertEqual(reduced_data[8], 15.0)  # Mean % T accross calls
+        self.assertEqual(reduced_data[9], 15.0)  # Mean Time per calls
 
     def test_compare(self):
         """
