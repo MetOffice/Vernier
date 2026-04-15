@@ -7,9 +7,9 @@
 Module for storing the VernierData and VernierCalliper classes.
 """
 from dataclasses import dataclass
-import sys
-import numpy as np
 from pathlib import Path
+import statistics
+import sys
 from typing import Optional
 
 
@@ -141,16 +141,17 @@ class VernierCalliper():
         """
         return [
             self.name,  # calliper name
-            round(np.mean(self.total_time), 5),  # mean total time across calls
+            self.name, # calliper name
             round(np.min(self.total_time), 5),   # min total time across calls
+            round(statistics.mean(self.total_time), 5), # mean total time across calls
             round(np.max(self.total_time), 5),   # max total time across calls
-            round(np.mean(self.self_time), 5),   # mean self time across calls
             round(np.min(self.self_time), 5),    # min self time across calls
+            round(statistics.mean(self.self_time), 5), # mean self time across calls
             round(np.max(self.self_time), 5),    # max self time across calls
-            round(np.mean(self.cumul_time), 5),  # mean cumulative time across calls
-            self.n_calls[0],  # number of calls (should be the same for all entries, so just take the first)
-            round(np.mean(self.time_percent), 5),  # mean percentage of time across calls
-            round(np.mean(np.array(self.total_time) / np.array(self.n_calls)), 5)  # mean time per call
+            round(statistics.mean(self.cumul_time), 5), # mean cumulative time across calls
+            self.n_calls[0], # number of calls (should be the same for all entries, so just take the first)
+            round(statistics.mean(self.time_percent), 5), # mean percentage of time across calls
+            round(statistics.mean([t / n for t, n in zip(self.total_time, self.n_calls)]), 5) # mean time per call
         ]
 
     @classmethod
