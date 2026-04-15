@@ -141,12 +141,12 @@ class VernierCalliper():
         """
         return [
             self.name, # calliper name
-            round(statistics.min(self.total_time), 5),   # min total time across calls
-            round(statistics.mean(self.total_time), 5),  # mean total time across calls
-            round(statistics.max(self.total_time), 5),   # max total time across calls
-            round(statistics.min(self.self_time), 5),    # min self time across calls
-            round(statistics.mean(self.self_time), 5),   # mean self time across calls
-            round(statistics.max(self.self_time), 5),    # max self time across calls
+            round(min(self.total_time), 5),               # min total time across calls
+            round(statistics.mean(self.total_time), 5),   # mean total time across calls
+            round(max(self.total_time), 5),               # max total time across calls
+            round(min(self.self_time), 5),                # min self time across calls
+            round(statistics.mean(self.self_time), 5),    # mean self time across calls
+            round(max(self.self_time), 5),                # max self time across calls
             self.n_calls[0], # number of calls (should be the same for all entries, so just take the first)
             round(statistics.mean(self.time_percent), 5), # mean percentage of time across calls
             round(statistics.mean([t / n for t, n in zip(self.total_time, self.n_calls)]), 5) # mean time per call
@@ -154,7 +154,7 @@ class VernierCalliper():
 
     @classmethod
     def labels(self):
-        return ["Routine", "Total Mean(s)", "Total Min(s)", "Total Max(s)", "Self Mean(s)", "Self Min(s)", "Self Max(s)",
+        return ["Routine", "Total Min(s)", "Total Mean(s)", "Total Max(s)", "Self Min(s)", "Self Mean(s)", "Self Max(s)",
                 "Max no. calls", "% time", "Time per call(s)"]
 
 
