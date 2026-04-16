@@ -135,7 +135,8 @@ class VernierCalliper():
         """Reduces the data for this calliper to a single row of summary data.
 
         :returns: A list containing the aggregate (mean) for each metric of the
-                  VernierCalliper instance.
+                  VernierCalliper instance, and the min/max for total time and
+                  self time.
         :rtype: list[str, float, float, float, int, float, float]
 
         """
