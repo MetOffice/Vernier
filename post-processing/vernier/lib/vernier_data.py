@@ -11,6 +11,7 @@ from pathlib import Path
 import statistics
 import sys
 from typing import Optional
+from collections import OrderedDict
 
 
 @dataclass(order=True)
@@ -131,27 +132,27 @@ class VernierCalliper():
 
         return filtered
 
-    def reduce(self) -> list:
+    def reduce(self) -> OrderedDict:
         """Reduces the data for this calliper to a single row of summary data.
 
-        :returns: A list containing the aggregate (mean) for each metric of the
+        :returns: A OrderedDict containing the aggregate (mean) for each metric of the
                   VernierCalliper instance, and the min/max for total time and
                   self time.
-        :rtype: list[str, float, float, float, int, float, float]
 
         """
-        return [
-            self.name, # calliper name
-            round(min(self.total_time), 5),               # min total time across calls
-            round(statistics.mean(self.total_time), 5),   # mean total time across calls
-            round(max(self.total_time), 5),               # max total time across calls
-            round(min(self.self_time), 5),                # min self time across calls
-            round(statistics.mean(self.self_time), 5),    # mean self time across calls
-            round(max(self.self_time), 5),                # max self time across calls
-            max(self.n_calls), # number of calls (should be the same for all entries, so just take the first)
-            round(statistics.mean(self.time_percent), 5), # mean percentage of time across calls
-            round(statistics.mean([t / n for t, n in zip(self.total_time, self.n_calls)]), 5) # mean time per call
-        ]
+
+        return OrderedDict([
+            ("Routine",self.name), # calliper name
+            ("Total Min(s)", round(min(self.total_time), 5)),               # min total time across calls
+            ("Total Mean(s)", round(statistics.mean(self.total_time), 5)),   # mean total time across calls
+            ("Total Max(s)", round(max(self.total_time), 5)),               # max total time across calls
+            ("Self Min(s)", round(min(self.self_time), 5)),                # min self time across calls
+            ("Self Mean(s)", round(statistics.mean(self.self_time), 5)),    # mean self time across calls
+            ("Self Max(s)", round(max(self.self_time), 5)),                # max self time across calls
+            ("Max no. calls", max(self.n_calls)), # number of calls (should be the same for all entries, so just take the first)
+            ("% time", round(statistics.mean(self.time_percent), 5)), # mean percentage of time across calls
+            ("Time per call(s)", round(statistics.mean([t / n for t, n in zip(self.total_time, self.n_calls)]), 5)) # mean time per call
+        ])
 
     @classmethod
     def labels(self):
@@ -228,12 +229,28 @@ class VernierData():
 
         """
         txt_table = []
+        header_list = []
+
+        # From reduce, grab all of the data and separate from the header keys
+        header_pass=True
         for calliper in self.data.keys():
-            txt_table.append(self.data[calliper].reduce())
+            reduce_row = []
+            reduce_dict=self.data[calliper].reduce()
+            # Work through each caliper key pair returned by reduce
+            for caliper_key in reduce_dict:
+                # Append the keys data
+                reduce_row.append(reduce_dict[caliper_key])
+                # On the first pass capture the key header for later
+                if header_pass:
+                    header_list.append(caliper_key)
+            txt_table.append(reduce_row)
+            header_pass=False
+
         # sort by self time, descending
         txt_table = sorted(txt_table, key=lambda x: x[2], reverse=True)
 
-        txt_table.insert(0, VernierCalliper.labels())
+        # Use the header key to add to the top of the output
+        txt_table.insert(0, header_pass_list)
 
         max_calliper_len = max([len(line[0]) for line in txt_table])
 
@@ -243,8 +260,20 @@ class VernierData():
         else:
             out = open(txt_path, 'w')
 
+        # For each line in the text table, format the string to be written
         for row in txt_table:
-            out.write('| {:>{}} | {:>14} | {:>14} | {:>14} | {:>14} | {:>14} | {:>14} | {:>13} | {:>8}  | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
+            row_output_string=''
+            for index, column in enumerate(row):
+                 # The first column, the caliper name uses the maximum size to align all lines
+                if index == 0:
+                    row_output_string=row_output_string+('| {:>{}} '.format(row[0], max_calliper_len))
+                # Per each other element, align them to the header length, or where this is too small, 8
+                else:
+                    row_output_string=row_output_string+('| {:>{}} '.format(row[index], max(len(header_pass_list[index]),8)))
+            row_output_string=row_output_string+' |\n'
+            
+            # Write the string
+            out.write(row_output_string)
 
         if txt_path is not None:
             out.close()
