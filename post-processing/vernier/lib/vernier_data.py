@@ -154,11 +154,6 @@ class VernierCalliper():
             ("Time per call(s)", round(statistics.mean([t / n for t, n in zip(self.total_time, self.n_calls)]), 5)) # mean time per call
         ])
 
-    @classmethod
-    def labels(self):
-        return ["Routine", "Total Min(s)", "Total Mean(s)", "Total Max(s)", "Self Min(s)", "Self Mean(s)", "Self Max(s)",
-                "Max no. calls", "% time", "Time per call(s)"]
-
 
 class VernierData():
     """
@@ -266,10 +261,12 @@ class VernierData():
             for index, column in enumerate(row):
                  # The first column, the caliper name uses the maximum size to align all lines
                 if index == 0:
-                    row_output_string=row_output_string+('| {:>{}} '.format(row[0], max_calliper_len))
+                    row_output_string=row_output_string+(
+                        '| {:>{}} '.format(row[0], max_calliper_len))
                 # Per each other element, align them to the header length, or where this is too small, 8
                 else:
-                    row_output_string=row_output_string+('| {:>{}} '.format(row[index], max(len(header_list[index]),8)))
+                    row_output_string=row_output_string+(
+                        '| {:>{}} '.format(row[index], max(len(header_list[index]),8)))
             row_output_string=row_output_string+'|\n'
             
             # Write the string
