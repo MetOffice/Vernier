@@ -250,7 +250,7 @@ class VernierData():
         txt_table = sorted(txt_table, key=lambda x: x[2], reverse=True)
 
         # Use the header key to add to the top of the output
-        txt_table.insert(0, header_pass_list)
+        txt_table.insert(0, header_list)
 
         max_calliper_len = max([len(line[0]) for line in txt_table])
 
@@ -269,7 +269,7 @@ class VernierData():
                     row_output_string=row_output_string+('| {:>{}} '.format(row[0], max_calliper_len))
                 # Per each other element, align them to the header length, or where this is too small, 8
                 else:
-                    row_output_string=row_output_string+('| {:>{}} '.format(row[index], max(len(header_pass_list[index]),8)))
+                    row_output_string=row_output_string+('| {:>{}} '.format(row[index], max(len(header_list[index]),8)))
             row_output_string=row_output_string+' |\n'
             
             # Write the string
