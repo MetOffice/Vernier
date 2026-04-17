@@ -270,7 +270,7 @@ class VernierData():
                 # Per each other element, align them to the header length, or where this is too small, 8
                 else:
                     row_output_string=row_output_string+('| {:>{}} '.format(row[index], max(len(header_list[index]),8)))
-            row_output_string=row_output_string+' |\n'
+            row_output_string=row_output_string+'|\n'
             
             # Write the string
             out.write(row_output_string)
