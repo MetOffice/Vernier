@@ -46,6 +46,8 @@ static std::string papi_debug_str() {
   return oss.str();
 }
 #define PAPI_DEBUG_LOG(msg) std::cerr << "[PAPI_DEBUG] " << msg << " | " << papi_debug_str() << "\n"
+#else
+#define PAPI_DEBUG_LOG(msg) do {} while(0)
 #endif
 
 /**

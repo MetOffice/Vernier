@@ -81,15 +81,15 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 
   // Write headings
   os << "\n";
-  os << std::setw(40) << std::left << "Region " << std::setw(15) << std::right
-     << "Self (s) " << std::setw(15) << std::right << "Total (s) "
-     << std::setw(15) << std::right << "Overhead (s) " << std::setw(10)
-     << std::right << "Calls ";
+  os << std::setw(40) << std::left << "Region" << std::setw(15) << std::right
+     << "Self (s)" << std::setw(15) << std::right << "Total (s)"
+     << std::setw(15) << std::right << "Overhead (s)" << std::setw(10)
+     << std::right << "Calls";
 
 #ifdef USE_PAPI
   if (events_code.size() > 0) {
     for (const auto& code : events_code) {
-      os << std::right << std::setw(15) << code.second << " ";
+      os << std::right << std::setw(15) << code.second;
     }
   }
 #endif
@@ -97,13 +97,14 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
   os << "\n";
 
   os << std::setfill('-');
-  os << std::setw(40) << "- " << std::setw(15) << "- " << std::setw(15) << "- "
-     << std::setw(15) << "- " << std::setw(10) << "- ";
+  os << std::left;
+  os << std::setw(40) << " " << std::setw(15) << " " << std::setw(15) << " "
+     << std::setw(15) << " " << std::setw(10) << " ";
 
 #ifdef USE_PAPI
   if (events_code.size() > 0) {
     for (const auto& code : events_code) {
-      os << std::setw(15) << "- ";
+      os << std::setw(15) << " ";
     }
   }
 #endif
@@ -113,16 +114,16 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 
   // Data entries
   for (auto const &record : hashvec) {
-    os << std::setw(40) << std::left << record.decorated_region_name_ << " "
-       << std::setw(15) << std::right << record.self_walltime_.count() << " "
-       << std::setw(15) << std::right << record.total_walltime_.count() << " "
+    os << std::setw(40) << std::left << record.decorated_region_name_
+       << std::setw(15) << std::right << record.self_walltime_.count()
+       << std::setw(15) << std::right << record.total_walltime_.count()
        << std::setw(15) << std::right << record.overhead_walltime_.count()
-       << " " << std::setw(10) << std::right << record.call_count_ << " ";
+       << std::setw(10) << std::right << record.call_count_;
 
 #ifdef USE_PAPI
     if (events_code.size() > 0) {
       for(int e=0; e < static_cast<int>(events_code.size()); e++) {
-        os << std::right << std::setw(15) << record.total_metrics_[e] << " ";
+        os << std::right << std::setw(15) << record.total_metrics_[e];
       }
     }
 #endif
