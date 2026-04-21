@@ -47,6 +47,16 @@ add_unit_test(test_callcount test_callcount.cpp)
 add_unit_test(test_recursion test_recursion.cpp)
 
 # ------------------------------------------------------------------------------
+# PAPI unit tests (only built when ENABLE_PAPI=ON).
+# ------------------------------------------------------------------------------
+
+if (ENABLE_PAPI)
+    add_unit_test(test_papi_fp_ops test_papi_fp_ops.cpp)
+    target_compile_definitions(test_papi_fp_ops PRIVATE USE_PAPI)
+    target_link_libraries(test_papi_fp_ops PRIVATE PAPI::PAPI)
+endif ()
+
+# ------------------------------------------------------------------------------
 # Test behaviour when MPI is not initialised.
 # ------------------------------------------------------------------------------
 

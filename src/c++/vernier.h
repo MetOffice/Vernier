@@ -129,6 +129,10 @@ public:
   double get_overhead_walltime(size_t const, int const);
   double get_self_walltime(size_t const hash, int const input_tid);
   double get_child_walltime(size_t const hash, int const input_tid) const;
+#ifdef USE_PAPI
+  long long get_total_metrics(size_t const hash, int const input_tid,
+                              int const event_idx) const;
+#endif
   std::string get_decorated_region_name(size_t const hash,
                                         int const input_tid) const;
   unsigned long long int get_call_count(size_t const hash,

@@ -446,6 +446,20 @@ unsigned long long int meto::HashTable::get_prof_call_count() const {
   return record.call_count_;
 }
 
+#ifdef USE_PAPI
+/**
+ * @brief  Get the total accumulated PAPI metric for a specified region.
+ * @param [in] hash       The hash corresponding to the region.
+ * @param [in] event_idx  The index of the PAPI event (0-based).
+ * @returns  Total PAPI metric count.
+ */
+long long meto::HashTable::get_total_metrics(size_t const hash,
+                                             int const event_idx) const {
+  auto &record = hash2record(hash);
+  return record.total_metrics_[event_idx];
+}
+#endif
+
 /**
  * @brief   Gets a reference to a region record for a given hash.
  * @param [in]  hash   The region

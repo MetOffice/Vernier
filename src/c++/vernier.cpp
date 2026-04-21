@@ -419,6 +419,24 @@ double meto::Vernier::get_child_walltime(size_t const hash,
   return thread_hashtables_[tid].get_child_walltime(hash);
 }
 
+#ifdef USE_PAPI
+/**
+ * @brief  Get the total accumulated PAPI metric for a region on a given thread.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest.
+ * @param[in] input_tid  The thread ID.
+ * @param[in] event_idx  The index of the PAPI event (0-based).
+ *
+ * @returns  Total PAPI metric count.
+ */
+long long meto::Vernier::get_total_metrics(size_t const hash,
+                                                 int const input_tid,
+                                                 int const event_idx) const {
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_total_metrics(hash, event_idx);
+}
+#endif
+
 /**
  * @brief  Get the name of a region corresponding to a given hash.
  *
