@@ -54,6 +54,10 @@ if (ENABLE_PAPI)
     add_unit_test(test_papi_fp_ops test_papi_fp_ops.cpp)
     target_compile_definitions(test_papi_fp_ops PRIVATE USE_PAPI)
     target_link_libraries(test_papi_fp_ops PAPI::PAPI)
+
+    add_unit_test(test_papi_cyc_ins test_papi_cyc_ins.cpp)
+    target_compile_definitions(test_papi_cyc_ins PRIVATE USE_PAPI)
+    target_link_libraries(test_papi_cyc_ins PAPI::PAPI)
 endif ()
 
 # ------------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
 
 #include <gtest/gtest.h>
 #include <papi.h>
@@ -64,6 +65,8 @@ TEST(PAPITest, FPOpsOnlyTest) {
   // or repeat-count for iterative SQRT implementations on some architectures.
   EXPECT_LE(fp_ops, 3'000'000LL)
       << "Expected at most 3 FP ops per iteration (sanity upper bound).";
+
+  std::cout << "\n  PAPI_FP_OPS : " << fp_ops << "\n";
 
   meto::vernier.finalize();
   unsetenv("VERNIER_PAPI_EVENTS1");
