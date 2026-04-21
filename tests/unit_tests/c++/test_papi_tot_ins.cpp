@@ -34,10 +34,10 @@
 //
 // Instruction count bounds for one WorkRegion call:
 //   The body executes WORK_ITERS iterations.  Each iteration emits at minimum
-//   ~7 scalar instructions (cvtsi2sd, 2x vmovsd, vsqrtsd, vaddsd, inc, cmp/jne)
-//   and at most ~10 (with extra loads, stores, or loop-management instructions
-//   depending on the compiler).  A 2x upper-bound headroom covers preamble,
-//   postamble and any inlined helper calls.
+//   ~7 scalar instructions: int-to-double conversion, a load and a store of
+//   the volatile accumulator, sqrt, add, loop-counter increment, and branch.
+//   A 2x upper-bound headroom covers preamble, postamble and any inlined
+//   helper calls regardless of architecture.
 // ---------------------------------------------------------------------------
 
 static constexpr int  WORK_ITERS        = 100'000;
