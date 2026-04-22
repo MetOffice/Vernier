@@ -23,9 +23,9 @@ class TestCLITools(unittest.TestCase):
         self.test_data_dir = Path(__file__).parent / 'data'
         # pylint: disable=line-too-long
         self.test_data_kgo = (
-            '|      Routine |   Total Min(s) |  Total Mean(s) |   Total Max(s) |    Self Min(s) |   Self Mean(s) |    Self Max(s) | Max no. calls |   % time  |  Time per call(s) |\n' +
-            '| __test_app__ |          5.854 |         6.3465 |          6.839 |          2.583 |         2.5855 |          2.588 |             1 |  40.9825  |            6.3465 |\n' +
-            '| some_process |          2.077 |          2.573 |          3.069 |          2.023 |          2.516 |          3.009 |             2 |   39.277  |            1.2865 |\n'
+            '|      Routine | Total Min(s) | Total Mean(s) | Total Max(s) | Self Min(s) | Self Mean(s) | Self Max(s) | Max no. calls |   % time | Time per call(s) |\n' +
+            '| __test_app__ |        5.854 |        6.3465 |        6.839 |       2.583 |       2.5855 |       2.588 |             1 |  40.9825 |           6.3465 |\n' +
+            '| some_process |        2.077 |         2.573 |        3.069 |       2.023 |        2.516 |       3.009 |             2 |   39.277 |           1.2865 |\n'
             )
         return super().setUp()
 
