@@ -233,9 +233,9 @@ class VernierData():
             reduce_dict=self.data[calliper].reduce()
             # Work through each caliper key pair returned by reduce
             for caliper_key in reduce_dict:
-                # Append the keys data
+                # Append the keys data/value to the row
                 reduce_row.append(reduce_dict[caliper_key])
-                # On the first pass capture the key header for later
+                # On the first pass capture the key for later as headers
                 if header_pass:
                     header_list.append(caliper_key)
             txt_table.append(reduce_row)
