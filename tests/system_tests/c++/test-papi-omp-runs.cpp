@@ -30,9 +30,11 @@
 //              stop("OuterRegion");
 //            }
 //
-// On thread 0, each pattern profiles exactly one do_work() call.  The
-// PAPI_TOT_INS values for Run1Region (Run 1), Run2Region (Run 2), and
-// InnerRegion (Run 3) should therefore be very similar.
+// In Run 1 and Run 3, every thread profiles exactly one do_work()
+// call, so PAPI_TOT_INS should be very similar across threads and
+// across the two runs.  In Run 2 the region wraps the entire parallel
+// block; only thread 0 holds the Run2Region entry, and its count
+// should match the sum of per-thread values of the other runs.
 //
 // A single init / write / finalize cycle is used for all three runs.
 // The test writes threads-format output.
@@ -42,6 +44,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -152,15 +155,29 @@ int main() {
   // -------------------------------------------------------------------------
   // Run 1: vernier region inside the parallel region.
   // -------------------------------------------------------------------------
-  size_t run1_hash = 0;
+  int num_threads = 1;
+  std::vector<size_t> run1_hashes;
 
-#pragma omp parallel default(none) shared(run1_hash, meto::vernier)
+#pragma omp parallel default(none) shared(num_threads, run1_hashes, meto::vernier)
   {
+#pragma omp single
+    {
+#ifdef _OPENMP
+      num_threads = omp_get_num_threads();
+#endif
+      run1_hashes.resize(static_cast<size_t>(num_threads), 0);
+    }
+
+    int tid = 0;
+#ifdef _OPENMP
+    tid = omp_get_thread_num();
+#endif
+
     size_t const h = meto::vernier.start("Run1Region");
     do_work();
     meto::vernier.stop(h);
-#pragma omp single
-    { run1_hash = h; }
+#pragma omp critical
+    { run1_hashes[static_cast<size_t>(tid)] = h; }
   }
 
   // -------------------------------------------------------------------------
@@ -168,7 +185,7 @@ int main() {
   // -------------------------------------------------------------------------
   size_t const run2_hash = meto::vernier.start("Run2Region");
 
-#pragma omp parallel
+#pragma omp parallel default(none)
   { do_work(); }
 
   meto::vernier.stop(run2_hash);
@@ -176,26 +193,39 @@ int main() {
   // -------------------------------------------------------------------------
   // Run 3: per-thread outer region, nested inner region via extra_routine.
   // -------------------------------------------------------------------------
-  size_t run3_inner_hash = 0;
+  std::vector<size_t> run3_outer_hashes(static_cast<size_t>(num_threads), 0);
+  std::vector<size_t> run3_inner_hashes(static_cast<size_t>(num_threads), 0);
 
-#pragma omp parallel default(none) shared(run3_inner_hash, meto::vernier)
+#pragma omp parallel default(none) shared(run3_outer_hashes, run3_inner_hashes, meto::vernier)
   {
+    int tid = 0;
+#ifdef _OPENMP
+    tid = omp_get_thread_num();
+#endif
+
     size_t const outer_h = meto::vernier.start("OuterRegion");
     size_t const inner_h = extra_routine();
     meto::vernier.stop(outer_h);
-#pragma omp single
-    { run3_inner_hash = inner_h; }
+
+    run3_outer_hashes[static_cast<size_t>(tid)] = outer_h;
+    run3_inner_hashes[static_cast<size_t>(tid)] = inner_h;
   }
 
   // -------------------------------------------------------------------------
-  // Collect thread-0 metrics before write / finalize.
+  // Collect per-thread metrics before write / finalize.
+  // Run2Region is started/stopped on thread 0 only (outside the parallel block)
+  // so only thread-0 metrics exist for that region.
   // -------------------------------------------------------------------------
 #ifdef USE_PAPI
-  long long const ins[3] = {
-    meto::vernier.get_total_metrics(run1_hash,       0, 0),
-    meto::vernier.get_total_metrics(run2_hash,       0, 0),
-    meto::vernier.get_total_metrics(run3_inner_hash, 0, 0),
-  };
+  std::vector<long long> run1_ins(static_cast<size_t>(num_threads));
+  std::vector<long long> run3_ins(static_cast<size_t>(num_threads));
+  for (int t = 0; t < num_threads; ++t) {
+    run1_ins[static_cast<size_t>(t)] =
+        meto::vernier.get_total_metrics(run1_hashes[static_cast<size_t>(t)], t, 0);
+    run3_ins[static_cast<size_t>(t)] =
+        meto::vernier.get_total_metrics(run3_inner_hashes[static_cast<size_t>(t)], t, 0);
+  }
+  long long const run2_ins = meto::vernier.get_total_metrics(run2_hash, 0, 0);
 #endif
 
   // -------------------------------------------------------------------------
@@ -219,27 +249,44 @@ int main() {
   // Print table and verify bounds.
   // -------------------------------------------------------------------------
 #ifdef USE_PAPI
-  std::cout << "\n  Run | Region       | PAPI_TOT_INS (thread 0)\n"
-            << "  ----|--------------|------------------------\n"
-            << "  1   | Run1Region   | " << ins[0] << "\n"
-            << "  2   | Run2Region   | " << ins[1] << "\n"
-            << "  3   | InnerRegion  | " << ins[2] << "\n";
+  std::cout << "\n  Run 1 (Run1Region) and Run 3 (InnerRegion) — all threads:\n"
+            << "  Thread | Run1Region       | InnerRegion\n"
+            << "  -------|------------------|------------------\n";
+  for (int t = 0; t < num_threads; ++t) {
+    std::cout << "  " << t << "      | "
+              << run1_ins[static_cast<size_t>(t)] << "  | "
+              << run3_ins[static_cast<size_t>(t)] << "\n";
+  }
+  std::cout << "\n  Run 2 (Run2Region) — thread 0 only (region wraps parallel):\n"
+            << "  Thread | Run2Region\n"
+            << "  -------|------------------\n"
+            << "  0      | " << run2_ins << "\n";
 
-  static const char *const region_names[3] = {
-    "Run1Region", "Run2Region", "InnerRegion"
-  };
-
-  for (int r = 0; r < 3; ++r) {
-    if (ins[r] < MIN_INS_PER_CALL) {
-      std::cerr << region_names[r] << ": PAPI_TOT_INS " << ins[r]
-                << " below lower bound " << MIN_INS_PER_CALL << "\n";
+  // Bounds check: Run1Region and InnerRegion on all threads.
+  for (int t = 0; t < num_threads; ++t) {
+    if (run1_ins[static_cast<size_t>(t)] < MIN_INS_PER_CALL ||
+        run1_ins[static_cast<size_t>(t)] > MAX_INS_PER_CALL) {
+      std::cerr << "Run1Region thread " << t << ": PAPI_TOT_INS "
+                << run1_ins[static_cast<size_t>(t)]
+                << " out of bounds [" << MIN_INS_PER_CALL
+                << ", " << MAX_INS_PER_CALL << "]\n";
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
-    if (ins[r] > MAX_INS_PER_CALL) {
-      std::cerr << region_names[r] << ": PAPI_TOT_INS " << ins[r]
-                << " above upper bound " << MAX_INS_PER_CALL << "\n";
+    if (run3_ins[static_cast<size_t>(t)] < MIN_INS_PER_CALL ||
+        run3_ins[static_cast<size_t>(t)] > MAX_INS_PER_CALL) {
+      std::cerr << "InnerRegion thread " << t << ": PAPI_TOT_INS "
+                << run3_ins[static_cast<size_t>(t)]
+                << " out of bounds [" << MIN_INS_PER_CALL
+                << ", " << MAX_INS_PER_CALL << "]\n";
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
+  }
+  // Bounds check: Run2Region thread 0.
+  if (run2_ins < num_threads * MIN_INS_PER_CALL || run2_ins > num_threads*MAX_INS_PER_CALL) {
+    std::cerr << "Run2Region thread 0: PAPI_TOT_INS " << run2_ins
+              << " out of bounds [" << num_threads * MIN_INS_PER_CALL
+              << ", " << num_threads * MAX_INS_PER_CALL << "]\n";
+    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
 #endif
 
