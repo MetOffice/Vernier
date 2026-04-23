@@ -141,8 +141,7 @@ meto::PAPIContext::PAPIContext() :
   initialized_(false),
   started_(false),
   event_set_(PAPI_NULL),
-  num_events_(0),
-  values_{} {
+  num_events_(0) {
 }
 
 
@@ -228,11 +227,12 @@ void meto::PAPIContext::finalize() {
 
   if(initialized_ && event_set_ != PAPI_NULL) {
 
-    // Nedd to stop metrics if started values_ are not used after this
+    // Nedd to stop metrics if started values are not used after this
     // thus we can use them in this call.
     if(started_) {
       PAPI_DEBUG_LOG("PAPI_stop");
-      if (PAPI_stop(event_set_, values_) != PAPI_OK) {
+      long long values[VERNIER_MAX_PAPI_METRICS];
+      if (PAPI_stop(event_set_, values) != PAPI_OK) {
         meto::error_handler(
                             "PAPIContext::finalize. Failed to stop metrics collection.",
                             EXIT_FAILURE);
@@ -264,8 +264,9 @@ void meto::PAPIContext::finalize() {
  * @brief  Read the metrics.
  * @returns The total values of the metrics collected.
  *
- * @note The metrics are continuesly collected like time passed, they are
- *  not reset, hence "total".
+ * @note The metrics are continuesly collected like time passed, they
+ *  are not reset, hence "total". Also only the metrics of the calling
+ *  thread are collected.
  */
 
 void meto::PAPIContext::read(long long *total_values) {
@@ -276,20 +277,10 @@ void meto::PAPIContext::read(long long *total_values) {
   if(!initialized_ || !started_)
     return;
 
-  // Adds the counters of the indicated event set into the array
-  // values_. The counters are zeroed and continue counting after the
-  // operation.
-  //
-  // This is done becuse the PMU registers are probably 48 bits and
-  // can overflow while "values_" are 64 bits and are unlikely to
-  // overflow.
-  PAPI_DEBUG_LOG("PAPI_accum");
-  if( PAPI_accum(event_set_,values_)  != PAPI_OK ) {
+  PAPI_DEBUG_LOG("PAPI_read");
+  if( PAPI_read(event_set_,total_values)  != PAPI_OK ) {
     meto::error_handler(
-                        "PAPIContext::finalize. Failed to destroy eventset.",
+                        "PAPIContext::read. Failed to read eventset.",
                         EXIT_FAILURE);
   }
-
-  for(int e=0; e < num_events_; e++)
-    total_values[e] = values_[e];
 }

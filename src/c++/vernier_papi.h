@@ -46,13 +46,6 @@ private:
   int event_set_;
   int num_events_;
 
-  // PMU (Performance Monitoring Unit) registers used by PAPI to
-  // collects metrics are usually 48 bit. Thus they can overflow in a
-  // normal long run. Thus PAPIContext retrive the metrics, add them
-  // into "values_" array and then reset the PMU to zero.  The
-  // "values_" array is 64 bit and thus very unlikely to overflow.
-  long long values_[VERNIER_MAX_PAPI_METRICS];
-
 public:
   // Constructor
   PAPIContext();
