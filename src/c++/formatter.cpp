@@ -89,7 +89,7 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 #ifdef USE_PAPI
   if (events_code.size() > 0) {
     for (const auto& code : events_code) {
-      os << std::right << std::setw(15) << code.second;
+      os << std::right << std::setw(15) << code.second.substr(code.second.size() > 14 ? code.second.size() - 14 : 0);
     }
   }
 #endif
