@@ -273,7 +273,8 @@ void meto::Vernier::stop(size_t const hash) {
 #ifdef USE_PAPI
   long long region_duration_metrics[VERNIER_MAX_PAPI_METRICS];
 
-  for(int e=0; e < papi_context_.get_num_events(); e++)
+  int num_events = papi_context_.get_num_events();
+  for(int e=0; e < num_events; e++)
     region_duration_metrics[e] = region_stop_metrics[e] - traceback_entry.region_start_metrics_[e];
 
 #endif
@@ -286,7 +287,7 @@ void meto::Vernier::stop(size_t const hash) {
 #ifdef USE_PAPI
   thread_hashtables_[tid].update_metrics(traceback_entry.record_index_,
                                          region_duration_metrics,
-                                         papi_context_.get_num_events());
+                                         num_events);
 #endif
 
   // Precompute times as far as possible. We just need the calliper stop time

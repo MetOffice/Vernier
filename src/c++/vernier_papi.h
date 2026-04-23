@@ -50,11 +50,9 @@ public:
   // Constructor
   PAPIContext();
 
-  // Init and finalize
-  bool is_initialized();
 
-
-  int get_num_events();
+  bool is_initialized() const {  return initialized_; }
+  int get_num_events() const {  return num_events_; }
 
   // The following functions need to be called by each thread
 

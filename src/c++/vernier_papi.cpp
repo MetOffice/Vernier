@@ -146,28 +146,6 @@ meto::PAPIContext::PAPIContext() :
 
 
 /**
- * @brief  Returns true if the Vernier PAPI context is initialised.
- * @returns  Boolean initialisation status.
- */
-
-bool meto::PAPIContext::is_initialized() {
-  // Returning local_initialized ought to be sufficient. Belt and braces.
-  bool local_initialized = initialized_;
-  return local_initialized;
-}
-
-
-/**
- * @brief  Returns the number of events that are being collected.
- * @returns  Number of events.
- */
-
-int meto::PAPIContext::get_num_events() {
-  return num_events_;
-}
-
-
-/**
  * @brief Initialise PAPI context and start collecting the metrics.
  *
  * @note This need to be called inside the thread that will compute
