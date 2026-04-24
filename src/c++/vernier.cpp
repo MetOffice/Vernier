@@ -46,7 +46,7 @@ meto::Vernier::TracebackEntry::TracebackEntry(
     meto::time_point_t region_start_time,
     meto::time_point_t calliper_start_time
 #ifdef USE_PAPI
-    , metrics_array& region_start_metrics
+    , metrics_vector& region_start_metrics
 #endif
                                               )
     : record_hash_(record_hash), record_index_(record_index),
@@ -214,9 +214,42 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
   ++call_depth_;
   if (call_depth_ < PROF_MAX_TRACEBACK_SIZE) {
 #ifdef USE_PAPI
-    // Read mettrics before getting the start time.
-    metrics_array region_start_metrics;
-    papi_context_.read(region_start_metrics);
+    metrics_vector region_start_metrics;
+
+    // Read mettrics before getting the start time.  However we need
+    // to check if we are in a parallel region first.
+    int parallel = 0;
+#ifdef _OPENMP
+    parallel = omp_in_parallel();
+#endif
+    if(parallel) {
+      // If we are in a parellel region, then we take the metrics for
+      // only this thread (which could be any thread).
+      region_start_metrics.resize(1);
+      papi_context_.read(region_start_metrics[0]);
+    }
+    else {
+      // We are not inside a parallel region so we are in thread
+      // zero. There is a possibility that this vernier region has
+      // some OMP paralel region inside. We need to take the start
+      // metrics for each possible thread.
+
+      // Set the maximum number of threads.
+      int max_threads = 1;
+#ifdef _OPENMP
+      max_threads = omp_get_max_threads();
+#endif
+      region_start_metrics.resize(static_cast<metrics_vector::size_type>(max_threads));
+#pragma omp parallel
+      {
+        int t = 0;
+#ifdef _OPENMP
+        t = omp_get_thread_num();
+#endif
+        papi_context_.read(region_start_metrics[static_cast<metrics_vector::size_type>(t)]);
+      }
+    }
+
 #endif
 
     auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
@@ -249,9 +282,41 @@ void meto::Vernier::stop(size_t const hash) {
   auto region_stop_time = vernier_gettime();
 
 #ifdef USE_PAPI
-  // Log the papy metrics
-  metrics_array region_stop_metrics;
-  papi_context_.read(region_stop_metrics);
+  // Log the papi metrics
+  metrics_vector region_stop_metrics;
+
+  // However we need to check if we are in a parallel region first.
+  int parallel = 0;
+#ifdef _OPENMP
+  parallel = omp_in_parallel();
+#endif
+  if(parallel) {
+    // If we are in a parellel region, then we take the metrics for
+    // only this thread (which could be any thread).
+    region_stop_metrics.resize(1);
+    papi_context_.read(region_stop_metrics[0]);
+  }
+  else {
+    // We are not inside a parallel region so we are in thread
+    // zero. There is a possibility that this vernier region has
+    // some OMP paralel region inside. We need to take the start
+    // metrics for each possible thread.
+
+    // Set the maximum number of threads.
+    int max_threads = 1;
+#ifdef _OPENMP
+    max_threads = omp_get_max_threads();
+#endif
+    region_stop_metrics.resize(static_cast<metrics_vector::size_type>(max_threads));
+#pragma omp parallel
+    {
+      int tid = 0;
+#ifdef _OPENMP
+      tid = omp_get_thread_num();
+#endif
+      papi_context_.read(region_stop_metrics[static_cast<metrics_vector::size_type>(tid)]);
+    }
+  }
 #endif
 
   // Determine the thread number

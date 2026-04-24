@@ -65,7 +65,7 @@ private:
 
     TracebackEntry(size_t, record_index_t, time_point_t, time_point_t
 #ifdef USE_PAPI
-                   , metrics_array& region_start_metrics
+                   , metrics_vector& region_start_metrics
 #endif
                    );
 
@@ -77,8 +77,11 @@ private:
     time_point_t calliper_start_time_;
 
 #ifdef USE_PAPI
-    // PAPI metrics
-    metrics_array region_start_metrics_;
+    // PAPI metrics. For thread zero, this can be multiple
+    // metrics_arrays, one for any possible thread inside the parallel
+    // regions of a vernier region. For the other threads, this is a
+    // single metrics array.
+    metrics_vector region_start_metrics_;
 #endif
 
   };

@@ -164,16 +164,31 @@ void meto::HashTable::update(record_index_t const record_index,
  */
 
 void meto::HashTable::update_metrics(record_index_t const record_index,
-                                     metrics_array& stop_metrics,
-                                     metrics_array& start_metrics,
+                                     metrics_vector& stop_metrics,
+                                     metrics_vector& start_metrics,
                                      int const num_events) {
 
   auto &record = hashvec_[record_index];
 
   // Check if this region has been called recursively
   if (record.recursion_level_ == 0) {
-    for(metrics_array::size_type e=0; e < static_cast<metrics_array::size_type>(num_events); e++)
-      record.total_metrics_[e] += (stop_metrics[e] - start_metrics[e]);
+    // The number of elements in the metrics_vector paint two cases.
+    //
+    // If there is only one element, then the vernier region started
+    // inside a parallel region or there was at maximum one thread. In
+    // this case the metrics of on single thread are added into the
+    // total.
+    //
+    // If there are more than one elements, then the vernier region
+    // did not started inside a parallel region and it was run by
+    // thread zero. We need to consider the possibility that a
+    // parallel region was run inside the vernier region. We need to
+    // sum all the metrics from all the threads to the one of thread
+    // zero.
+    for (metrics_vector::size_type i = 0; i < stop_metrics.size(); ++i) {
+      for(metrics_array::size_type e=0; e < static_cast<metrics_array::size_type>(num_events); e++)
+        record.total_metrics_[e] += (stop_metrics[i][e] - start_metrics[i][e]);
+    }
   }
 }
 #endif

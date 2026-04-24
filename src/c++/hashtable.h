@@ -97,8 +97,8 @@ public:
 
 #ifdef USE_PAPI
   void update_metrics(record_index_t const,
-                      metrics_array&,
-                      metrics_array&,
+                      metrics_vector&,
+                      metrics_vector&,
                       int const);
 #endif
 

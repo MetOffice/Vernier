@@ -35,7 +35,9 @@ extern events_vector events_code;
 
 
 // The type of an array that contains the metrics
-using metrics_array = std::array<long long,VERNIER_MAX_PAPI_METRICS>;
+using metrics_array  = std::array<long long,VERNIER_MAX_PAPI_METRICS>;
+// The vector that can contains multiple metrics_array.
+using metrics_vector = std::vector<metrics_array>;
 
 /**
 * @brief  Manage PAPI events and data.
