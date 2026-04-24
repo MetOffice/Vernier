@@ -35,27 +35,29 @@ meto::Vernier::~Vernier() = default;
  * @param [in]  calliper_start_time The clock measurement on entry to the start
  *                                  calliper.
 #ifdef USE_PAPI
- * @param [in]  region_start_metrics The PAPI metrics measurement on entry to the start
- *                                  calliper.
+ * @param [in]  region_start_metrics The PAPI metrics measurement on entry to
+ *              the start calliper.
 #endif
  *
  */
 
 meto::Vernier::TracebackEntry::TracebackEntry(
     size_t record_hash, meto::record_index_t record_index,
-    meto::time_point_t region_start_time,
-    meto::time_point_t calliper_start_time
+    meto::time_point_t region_start_time, meto::time_point_t calliper_start_time
 #ifdef USE_PAPI
-    , metrics_vector& region_start_metrics
+    ,
+    metrics_vector &region_start_metrics
 #endif
-                                              )
+    )
     : record_hash_(record_hash), record_index_(record_index),
       region_start_time_(region_start_time),
       calliper_start_time_(calliper_start_time)
 #ifdef USE_PAPI
-      , region_start_metrics_(region_start_metrics)
+      ,
+      region_start_metrics_(region_start_metrics)
 #endif
-    {}
+{
+}
 
 /**
  * @brief  Initialise Vernier object.
@@ -122,9 +124,7 @@ void meto::Vernier::finalize() {
   // that called the init otherwsie there could be a problem in PAPI.
   // The following call crate a parallel region for this purpose.
 #pragma omp parallel
-  {
-    papi_context_.finalize();
-  }
+  { papi_context_.finalize(); }
 
   papi_finalize();
 #endif
@@ -178,7 +178,7 @@ void meto::Vernier::start_part1() {
   // because each thread need to do it. We do not want VERNIER to
   // consider the time spent on initilizaing the PAPI context in the
   // overhead since it is quite expensive but done only once.
-  if(!papi_context_.is_initialized())
+  if (!papi_context_.is_initialized())
     papi_context_.init();
 
 #endif
@@ -222,13 +222,12 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
 #ifdef _OPENMP
     parallel = omp_in_parallel();
 #endif
-    if(parallel) {
+    if (parallel) {
       // If we are in a parellel region, then we take the metrics for
       // only this thread (which could be any thread).
       region_start_metrics.resize(1);
       papi_context_.read(region_start_metrics[0]);
-    }
-    else {
+    } else {
       // We are not inside a parallel region so we are in thread
       // zero. There is a possibility that this vernier region has
       // some OMP paralel region inside. We need to take the start
@@ -239,14 +238,16 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
 #ifdef _OPENMP
       max_threads = omp_get_max_threads();
 #endif
-      region_start_metrics.resize(static_cast<metrics_vector::size_type>(max_threads));
+      region_start_metrics.resize(
+          static_cast<metrics_vector::size_type>(max_threads));
 #pragma omp parallel
       {
         int t = 0;
 #ifdef _OPENMP
         t = omp_get_thread_num();
 #endif
-        papi_context_.read(region_start_metrics[static_cast<metrics_vector::size_type>(t)]);
+        papi_context_.read(
+            region_start_metrics[static_cast<metrics_vector::size_type>(t)]);
       }
     }
 
@@ -257,9 +258,10 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
     thread_traceback_[tid].at(call_depth_index) = TracebackEntry(
         hash, record_index, region_start_time, logged_calliper_start_time_
 #ifdef USE_PAPI
-        , region_start_metrics
+        ,
+        region_start_metrics
 #endif
-                                                                 );
+    );
   } else {
     error_handler("EMERGENCY STOP: Traceback array exhausted.", EXIT_FAILURE);
   }
@@ -290,13 +292,12 @@ void meto::Vernier::stop(size_t const hash) {
 #ifdef _OPENMP
   parallel = omp_in_parallel();
 #endif
-  if(parallel) {
+  if (parallel) {
     // If we are in a parellel region, then we take the metrics for
     // only this thread (which could be any thread).
     region_stop_metrics.resize(1);
     papi_context_.read(region_stop_metrics[0]);
-  }
-  else {
+  } else {
     // We are not inside a parallel region so we are in thread
     // zero. There is a possibility that this vernier region has
     // some OMP paralel region inside. We need to take the start
@@ -307,14 +308,16 @@ void meto::Vernier::stop(size_t const hash) {
 #ifdef _OPENMP
     max_threads = omp_get_max_threads();
 #endif
-    region_stop_metrics.resize(static_cast<metrics_vector::size_type>(max_threads));
+    region_stop_metrics.resize(
+        static_cast<metrics_vector::size_type>(max_threads));
 #pragma omp parallel
     {
       int tid = 0;
 #ifdef _OPENMP
       tid = omp_get_thread_num();
 #endif
-      papi_context_.read(region_stop_metrics[static_cast<metrics_vector::size_type>(tid)]);
+      papi_context_.read(
+          region_stop_metrics[static_cast<metrics_vector::size_type>(tid)]);
     }
   }
 #endif
@@ -356,10 +359,9 @@ void meto::Vernier::stop(size_t const hash) {
   thread_hashtables_[tid].update(traceback_entry.record_index_,
                                  region_duration);
 #ifdef USE_PAPI
-  thread_hashtables_[tid].update_metrics(traceback_entry.record_index_,
-                                         region_stop_metrics,
-                                         traceback_entry.region_start_metrics_,
-                                         papi_context_.get_num_events());
+  thread_hashtables_[tid].update_metrics(
+      traceback_entry.record_index_, region_stop_metrics,
+      traceback_entry.region_start_metrics_, papi_context_.get_num_events());
 #endif
 
   // Precompute times as far as possible. We just need the calliper stop time
@@ -506,8 +508,8 @@ double meto::Vernier::get_child_walltime(size_t const hash,
  *         Met Office Github Copilot Enterprise
  */
 long long meto::Vernier::get_total_metrics(size_t const hash,
-                                                 int const input_tid,
-                                                 int const event_idx) const {
+                                           int const input_tid,
+                                           int const event_idx) const {
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_total_metrics(hash, event_idx);
 }

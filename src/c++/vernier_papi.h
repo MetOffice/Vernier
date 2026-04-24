@@ -24,7 +24,6 @@
 
 namespace meto {
 
-
 // General functions
 void papi_init(int);
 void papi_finalize();
@@ -33,16 +32,15 @@ void papi_finalize();
 using events_vector = std::vector<std::pair<int, std::string>>;
 extern events_vector events_code;
 
-
 // The type of an array that contains the metrics
-using metrics_array  = std::array<long long,VERNIER_MAX_PAPI_METRICS>;
+using metrics_array = std::array<long long, VERNIER_MAX_PAPI_METRICS>;
 // The vector that can contains multiple metrics_array.
 using metrics_vector = std::vector<metrics_array>;
 
 /**
-* @brief  Manage PAPI events and data.
-*
-*/
+ * @brief  Manage PAPI events and data.
+ *
+ */
 
 class PAPIContext {
 
@@ -56,9 +54,8 @@ public:
   // Constructor
   PAPIContext();
 
-
-  bool is_initialized() const {  return initialized_; }
-  int get_num_events() const {  return num_events_; }
+  bool is_initialized() const { return initialized_; }
+  int get_num_events() const { return num_events_; }
 
   // The following functions need to be called by each thread
 
@@ -67,8 +64,7 @@ public:
 
   // Read the metrics. The metrics are continuesly collected like a
   // timer, they are not reset, hence "total".
-  void read(metrics_array& total_values);
-
+  void read(metrics_array &total_values);
 };
 
 } // namespace meto

@@ -65,10 +65,10 @@ private:
 
     TracebackEntry(size_t, record_index_t, time_point_t, time_point_t
 #ifdef USE_PAPI
-                   , metrics_vector& region_start_metrics
+                   ,
+                   metrics_vector &region_start_metrics
 #endif
-                   );
-
+    );
 
     // Data members
     size_t record_hash_;
@@ -83,7 +83,6 @@ private:
     // single metrics array.
     metrics_vector region_start_metrics_;
 #endif
-
   };
 
   // Default initialisation flag.  No explicit constructor, and pointless

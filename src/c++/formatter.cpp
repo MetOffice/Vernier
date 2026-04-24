@@ -12,7 +12,6 @@
 #include "vernier_papi.h"
 #endif
 
-
 #include <algorithm>
 #include <iomanip>
 
@@ -88,8 +87,10 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 
 #ifdef USE_PAPI
   if (events_code.size() > 0) {
-    for (const auto& code : events_code) {
-      os << std::right << std::setw(15) << code.second.substr(code.second.size() > 14 ? code.second.size() - 14 : 0);
+    for (const auto &code : events_code) {
+      os << std::right << std::setw(15)
+         << code.second.substr(code.second.size() > 14 ? code.second.size() - 14
+                                                       : 0);
     }
   }
 #endif
@@ -103,7 +104,7 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 
 #ifdef USE_PAPI
   if (events_code.size() > 0) {
-    for (const auto& code : events_code) {
+    for (const auto &code : events_code) {
       os << std::setw(15) << " ";
     }
   }
@@ -122,8 +123,9 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 
 #ifdef USE_PAPI
     if (events_code.size() > 0) {
-      for(int e=0; e < static_cast<int>(events_code.size()); e++) {
-        os << std::right << std::setw(15) << record.total_metrics_[static_cast<metrics_array::size_type>(e)];
+      for (int e = 0; e < static_cast<int>(events_code.size()); e++) {
+        os << std::right << std::setw(15)
+           << record.total_metrics_[static_cast<metrics_array::size_type>(e)];
       }
     }
 #endif

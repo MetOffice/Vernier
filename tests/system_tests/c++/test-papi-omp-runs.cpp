@@ -57,12 +57,12 @@
 #include "vernier_mpi.h"
 
 #ifdef USE_PAPI
-#include <papi.h>
 #include "vernier_papi.h"
+#include <papi.h>
 #endif
 
-static constexpr int       WORK_ITERS       = 100'000;
-static constexpr long long MIN_OPS_PER_CALL = 1LL  * WORK_ITERS;
+static constexpr int WORK_ITERS = 100'000;
+static constexpr long long MIN_OPS_PER_CALL = 1LL * WORK_ITERS;
 static constexpr long long MAX_OPS_PER_CALL = 3LL * WORK_ITERS;
 
 // ---------------------------------------------------------------------------
@@ -103,33 +103,33 @@ static bool check_threads_output(std::string const &path) {
   }
 
   std::istream in(&fb);
-  std::string  buf;
+  std::string buf;
 
   std::getline(in, buf);
   if (buf != "") {
-    std::cerr << "check_threads_output: expected blank line, got: '"
-              << buf << "'\n";
+    std::cerr << "check_threads_output: expected blank line, got: '" << buf
+              << "'\n";
     return false;
   }
 
   std::getline(in, buf);
   if (buf.compare(0, 9, "Task 1 of") != 0) {
-    std::cerr << "check_threads_output: expected 'Task 1 of ...', got: '"
-              << buf << "'\n";
+    std::cerr << "check_threads_output: expected 'Task 1 of ...', got: '" << buf
+              << "'\n";
     return false;
   }
 
   std::getline(in, buf);
   if (buf != "") {
-    std::cerr << "check_threads_output: expected blank line, got: '"
-              << buf << "'\n";
+    std::cerr << "check_threads_output: expected blank line, got: '" << buf
+              << "'\n";
     return false;
   }
 
   std::getline(in, buf);
   if (buf.compare(0, 21, "region_name@thread_id") != 0) {
-    std::cerr << "check_threads_output: expected column header, got: '"
-              << buf << "'\n";
+    std::cerr << "check_threads_output: expected column header, got: '" << buf
+              << "'\n";
     return false;
   }
 
@@ -161,7 +161,8 @@ int main() {
   int num_threads = 1;
   std::vector<size_t> run1_hashes;
 
-#pragma omp parallel default(none) shared(num_threads, run1_hashes, meto::vernier)
+#pragma omp parallel default(none)                                             \
+    shared(num_threads, run1_hashes, meto::vernier)
   {
 #pragma omp single
     {
@@ -199,7 +200,8 @@ int main() {
   std::vector<size_t> run3_outer_hashes(static_cast<size_t>(num_threads), 0);
   std::vector<size_t> run3_inner_hashes(static_cast<size_t>(num_threads), 0);
 
-#pragma omp parallel default(none) shared(run3_outer_hashes, run3_inner_hashes, meto::vernier)
+#pragma omp parallel default(none)                                             \
+    shared(run3_outer_hashes, run3_inner_hashes, meto::vernier)
   {
     int tid = 0;
 #ifdef _OPENMP
@@ -223,10 +225,10 @@ int main() {
   std::vector<long long> run1_ins(static_cast<size_t>(num_threads));
   std::vector<long long> run3_ins(static_cast<size_t>(num_threads));
   for (int t = 0; t < num_threads; ++t) {
-    run1_ins[static_cast<size_t>(t)] =
-        meto::vernier.get_total_metrics(run1_hashes[static_cast<size_t>(t)], t, 0);
-    run3_ins[static_cast<size_t>(t)] =
-        meto::vernier.get_total_metrics(run3_inner_hashes[static_cast<size_t>(t)], t, 0);
+    run1_ins[static_cast<size_t>(t)] = meto::vernier.get_total_metrics(
+        run1_hashes[static_cast<size_t>(t)], t, 0);
+    run3_ins[static_cast<size_t>(t)] = meto::vernier.get_total_metrics(
+        run3_inner_hashes[static_cast<size_t>(t)], t, 0);
   }
   long long const run2_ins = meto::vernier.get_total_metrics(run2_hash, 0, 0);
 #endif
@@ -236,8 +238,8 @@ int main() {
   // -------------------------------------------------------------------------
   static constexpr char OUTPUT_FILENAME[] = "papi-omp-threads-output";
 
-  setenv("VERNIER_OUTPUT_FORMAT",   "threads",       /*overwrite=*/1);
-  setenv("VERNIER_OUTPUT_MODE",     "multi",         /*overwrite=*/1);
+  setenv("VERNIER_OUTPUT_FORMAT", "threads", /*overwrite=*/1);
+  setenv("VERNIER_OUTPUT_MODE", "multi", /*overwrite=*/1);
   setenv("VERNIER_OUTPUT_FILENAME", OUTPUT_FILENAME, /*overwrite=*/1);
 
   meto::vernier.write();
@@ -256,39 +258,38 @@ int main() {
             << "  Thread | Run1Region       | InnerRegion\n"
             << "  -------|------------------|------------------\n";
   for (int t = 0; t < num_threads; ++t) {
-    std::cout << "  " << t << "      | "
-              << run1_ins[static_cast<size_t>(t)] << "  | "
-              << run3_ins[static_cast<size_t>(t)] << "\n";
+    std::cout << "  " << t << "      | " << run1_ins[static_cast<size_t>(t)]
+              << "  | " << run3_ins[static_cast<size_t>(t)] << "\n";
   }
-  std::cout << "\n  Run 2 (Run2Region) — thread 0 only (region wraps parallel):\n"
-            << "  Thread | Run2Region\n"
-            << "  -------|------------------\n"
-            << "  0      | " << run2_ins << "\n";
+  std::cout
+      << "\n  Run 2 (Run2Region) — thread 0 only (region wraps parallel):\n"
+      << "  Thread | Run2Region\n"
+      << "  -------|------------------\n"
+      << "  0      | " << run2_ins << "\n";
 
   // Bounds check: Run1Region and InnerRegion on all threads.
   for (int t = 0; t < num_threads; ++t) {
     if (run1_ins[static_cast<size_t>(t)] < MIN_OPS_PER_CALL ||
         run1_ins[static_cast<size_t>(t)] > MAX_OPS_PER_CALL) {
       std::cerr << "Run1Region thread " << t << ": PAPI_FP_OPS "
-                << run1_ins[static_cast<size_t>(t)]
-                << " out of bounds [" << MIN_OPS_PER_CALL
-                << ", " << MAX_OPS_PER_CALL << "]\n";
+                << run1_ins[static_cast<size_t>(t)] << " out of bounds ["
+                << MIN_OPS_PER_CALL << ", " << MAX_OPS_PER_CALL << "]\n";
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
     if (run3_ins[static_cast<size_t>(t)] < MIN_OPS_PER_CALL ||
         run3_ins[static_cast<size_t>(t)] > MAX_OPS_PER_CALL) {
       std::cerr << "InnerRegion thread " << t << ": PAPI_FP_OPS "
-                << run3_ins[static_cast<size_t>(t)]
-                << " out of bounds [" << MIN_OPS_PER_CALL
-                << ", " << MAX_OPS_PER_CALL << "]\n";
+                << run3_ins[static_cast<size_t>(t)] << " out of bounds ["
+                << MIN_OPS_PER_CALL << ", " << MAX_OPS_PER_CALL << "]\n";
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
   }
   // Bounds check: Run2Region thread 0.
-  if (run2_ins < num_threads * MIN_OPS_PER_CALL || run2_ins > num_threads*MAX_OPS_PER_CALL) {
+  if (run2_ins < num_threads * MIN_OPS_PER_CALL ||
+      run2_ins > num_threads * MAX_OPS_PER_CALL) {
     std::cerr << "Run2Region thread 0: PAPI_FP_OPS " << run2_ins
-              << " out of bounds [" << num_threads * MIN_OPS_PER_CALL
-              << ", " << num_threads * MAX_OPS_PER_CALL << "]\n";
+              << " out of bounds [" << num_threads * MIN_OPS_PER_CALL << ", "
+              << num_threads * MAX_OPS_PER_CALL << "]\n";
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
 #endif

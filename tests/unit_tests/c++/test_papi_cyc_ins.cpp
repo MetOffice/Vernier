@@ -35,7 +35,8 @@ TEST(PAPITest, TotCycTotInsTest) {
   if (meto::events_code.empty()) {
     meto::vernier.finalize();
     unsetenv("VERNIER_PAPI_EVENTS1");
-    GTEST_SKIP() << "PAPI_TOT_CYC / PAPI_TOT_INS not available on this hardware.";
+    GTEST_SKIP()
+        << "PAPI_TOT_CYC / PAPI_TOT_INS not available on this hardware.";
   }
 
   // Exactly two events must be active and in the expected order.
@@ -70,8 +71,7 @@ TEST(PAPITest, TotCycTotInsTest) {
       << "Expected at least 1 instruction per loop iteration.";
 
   std::cout << "\n  PAPI_TOT_CYC : " << tot_cyc
-            << "\n  PAPI_TOT_INS : " << tot_ins
-            << "\n  IPC          : "
+            << "\n  PAPI_TOT_INS : " << tot_ins << "\n  IPC          : "
             << static_cast<double>(tot_ins) / static_cast<double>(tot_cyc)
             << "\n";
 

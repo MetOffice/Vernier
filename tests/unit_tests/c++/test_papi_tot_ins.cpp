@@ -43,8 +43,8 @@
 //   helper calls regardless of architecture.
 // ---------------------------------------------------------------------------
 
-static constexpr int  WORK_ITERS        = 100'000;
-static constexpr long long MIN_INS_PER_CALL = 7LL  * WORK_ITERS;
+static constexpr int WORK_ITERS = 100'000;
+static constexpr long long MIN_INS_PER_CALL = 7LL * WORK_ITERS;
 static constexpr long long MAX_INS_PER_CALL = 20LL * WORK_ITERS;
 
 // Perform a fixed, deterministic amount of work.
@@ -78,7 +78,8 @@ TEST(PAPITest, TotInsMultiThreadTest) {
 
   auto prof_main = meto::vernier.start("MainRegion");
 
-#pragma omp parallel default(none) shared(num_threads, work_hash_per_thread, meto::vernier)
+#pragma omp parallel default(none)                                             \
+    shared(num_threads, work_hash_per_thread, meto::vernier)
   {
 #pragma omp single
     {
@@ -116,8 +117,8 @@ TEST(PAPITest, TotInsMultiThreadTest) {
             << "  -------|-------|-------------\n";
 
   for (int t = 0; t < num_threads; ++t) {
-    size_t const hash  = work_hash_per_thread[static_cast<size_t>(t)];
-    int    const calls = t + 1;
+    size_t const hash = work_hash_per_thread[static_cast<size_t>(t)];
+    int const calls = t + 1;
 
     // Call count
     auto const actual_calls = meto::vernier.get_call_count(hash, t);
@@ -130,12 +131,12 @@ TEST(PAPITest, TotInsMultiThreadTest) {
     long long const lo = static_cast<long long>(calls) * MIN_INS_PER_CALL;
     long long const hi = static_cast<long long>(calls) * MAX_INS_PER_CALL;
 
-    EXPECT_GE(tot_ins, lo)
-        << "Thread " << t << ": PAPI_TOT_INS below lower bound "
-        << lo << " for " << calls << " call(s).";
-    EXPECT_LE(tot_ins, hi)
-        << "Thread " << t << ": PAPI_TOT_INS above upper bound "
-        << hi << " for " << calls << " call(s).";
+    EXPECT_GE(tot_ins, lo) << "Thread " << t
+                           << ": PAPI_TOT_INS below lower bound " << lo
+                           << " for " << calls << " call(s).";
+    EXPECT_LE(tot_ins, hi) << "Thread " << t
+                           << ": PAPI_TOT_INS above upper bound " << hi
+                           << " for " << calls << " call(s).";
 
     std::cout << "  " << t << "      | " << calls << "     | " << tot_ins
               << "\n";

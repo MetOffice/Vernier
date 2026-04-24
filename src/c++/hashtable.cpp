@@ -164,8 +164,8 @@ void meto::HashTable::update(record_index_t const record_index,
  */
 
 void meto::HashTable::update_metrics(record_index_t const record_index,
-                                     metrics_vector& stop_metrics,
-                                     metrics_vector& start_metrics,
+                                     metrics_vector &stop_metrics,
+                                     metrics_vector &start_metrics,
                                      int const num_events) {
 
   auto &record = hashvec_[record_index];
@@ -186,7 +186,8 @@ void meto::HashTable::update_metrics(record_index_t const record_index,
     // sum all the metrics from all the threads to the one of thread
     // zero.
     for (metrics_vector::size_type i = 0; i < stop_metrics.size(); ++i) {
-      for(metrics_array::size_type e=0; e < static_cast<metrics_array::size_type>(num_events); e++)
+      for (metrics_array::size_type e = 0;
+           e < static_cast<metrics_array::size_type>(num_events); e++)
         record.total_metrics_[e] += (stop_metrics[i][e] - start_metrics[i][e]);
     }
   }
@@ -475,7 +476,8 @@ unsigned long long int meto::HashTable::get_prof_call_count() const {
 long long meto::HashTable::get_total_metrics(size_t const hash,
                                              int const event_idx) const {
   auto &record = hash2record(hash);
-  return record.total_metrics_[static_cast<metrics_array::size_type>(event_idx)];
+  return record
+      .total_metrics_[static_cast<metrics_array::size_type>(event_idx)];
 }
 #endif
 

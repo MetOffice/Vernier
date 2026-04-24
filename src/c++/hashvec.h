@@ -54,8 +54,6 @@ public:
   // thus recursion metrics are not needed.
   metrics_array total_metrics_;
 #endif
-
-
 };
 
 // Define the hashvec type.
