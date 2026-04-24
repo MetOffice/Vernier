@@ -11,12 +11,12 @@
  *  Contains abstractions for functions and classes that manage PAPI.
  *
  */
-#include <string>
-#include <vector>
-#include <array>
-
 #ifndef VERNIER_PAPI_H
 #define VERNIER_PAPI_H
+
+#include <array>
+#include <string>
+#include <vector>
 
 // The maximum number of metrics collected for an eventset. If this is
 // too big, the metrics could be multiplexed.

@@ -59,7 +59,7 @@ static std::string papi_debug_str() {
  * @note  This function has been produced with the assistance of
  *        Met Office Github Copilot Enterprise
  */
-std::vector<std::string> read_events_str_from_env(const char* env_var) {
+static std::vector<std::string> read_events_str_from_env(const char* env_var) {
   std::vector<std::string> events_str;
   const char* env_val = std::getenv(env_var);
   if (!env_val) return events_str;
