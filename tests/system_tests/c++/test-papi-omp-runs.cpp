@@ -4,7 +4,7 @@
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
-// System test: verify PAPI_TOT_INS counts are consistent across three
+// System test: verify PAPI_FP_OPS counts are consistent across three
 // OpenMP/profiling patterns.
 //
 // Run 1 – vernier region inside the parallel region (each thread profiles its
@@ -31,7 +31,7 @@
 //            }
 //
 // In Run 1 and Run 3, every thread profiles exactly one do_work()
-// call, so PAPI_TOT_INS should be very similar across threads and
+// call, so PAPI_FP_OPS should be very similar across threads and
 // across the two runs.  In Run 2 the region wraps the entire parallel
 // block; only thread 0 holds the Run2Region entry, and its count
 // should match the sum of per-thread values of the other runs.
@@ -59,8 +59,8 @@
 #endif
 
 static constexpr int       WORK_ITERS       = 100'000;
-static constexpr long long MIN_INS_PER_CALL = 7LL  * WORK_ITERS;
-static constexpr long long MAX_INS_PER_CALL = 20LL * WORK_ITERS;
+static constexpr long long MIN_OPS_PER_CALL = 1LL  * WORK_ITERS;
+static constexpr long long MAX_OPS_PER_CALL = 3LL * WORK_ITERS;
 
 // ---------------------------------------------------------------------------
 // Perform a fixed, deterministic amount of work.
@@ -137,16 +137,16 @@ static bool check_threads_output(std::string const &path) {
 int main() {
   MPI_Init(NULL, NULL);
 
-  setenv("VERNIER_PAPI_EVENTS1", "PAPI_TOT_INS", /*overwrite=*/1);
+  setenv("VERNIER_PAPI_EVENTS1", "PAPI_FP_OPS", /*overwrite=*/1);
 
   meto::vernier.init();
 
 #ifdef USE_PAPI
-  // Skip gracefully if PAPI_TOT_INS is unavailable on this hardware.
+  // Skip gracefully if PAPI_FP_OPS is unavailable on this hardware.
   if (meto::events_code.empty()) {
     meto::vernier.finalize();
     unsetenv("VERNIER_PAPI_EVENTS1");
-    std::cout << "PAPI_TOT_INS not available on this hardware – test skipped.\n";
+    std::cout << "PAPI_FP_OPS not available on this hardware – test skipped.\n";
     MPI_Finalize();
     return EXIT_SUCCESS;
   }
@@ -264,28 +264,28 @@ int main() {
 
   // Bounds check: Run1Region and InnerRegion on all threads.
   for (int t = 0; t < num_threads; ++t) {
-    if (run1_ins[static_cast<size_t>(t)] < MIN_INS_PER_CALL ||
-        run1_ins[static_cast<size_t>(t)] > MAX_INS_PER_CALL) {
-      std::cerr << "Run1Region thread " << t << ": PAPI_TOT_INS "
+    if (run1_ins[static_cast<size_t>(t)] < MIN_OPS_PER_CALL ||
+        run1_ins[static_cast<size_t>(t)] > MAX_OPS_PER_CALL) {
+      std::cerr << "Run1Region thread " << t << ": PAPI_FP_OPS "
                 << run1_ins[static_cast<size_t>(t)]
-                << " out of bounds [" << MIN_INS_PER_CALL
-                << ", " << MAX_INS_PER_CALL << "]\n";
+                << " out of bounds [" << MIN_OPS_PER_CALL
+                << ", " << MAX_OPS_PER_CALL << "]\n";
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
-    if (run3_ins[static_cast<size_t>(t)] < MIN_INS_PER_CALL ||
-        run3_ins[static_cast<size_t>(t)] > MAX_INS_PER_CALL) {
-      std::cerr << "InnerRegion thread " << t << ": PAPI_TOT_INS "
+    if (run3_ins[static_cast<size_t>(t)] < MIN_OPS_PER_CALL ||
+        run3_ins[static_cast<size_t>(t)] > MAX_OPS_PER_CALL) {
+      std::cerr << "InnerRegion thread " << t << ": PAPI_FP_OPS "
                 << run3_ins[static_cast<size_t>(t)]
-                << " out of bounds [" << MIN_INS_PER_CALL
-                << ", " << MAX_INS_PER_CALL << "]\n";
+                << " out of bounds [" << MIN_OPS_PER_CALL
+                << ", " << MAX_OPS_PER_CALL << "]\n";
       MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
     }
   }
   // Bounds check: Run2Region thread 0.
-  if (run2_ins < num_threads * MIN_INS_PER_CALL || run2_ins > num_threads*MAX_INS_PER_CALL) {
-    std::cerr << "Run2Region thread 0: PAPI_TOT_INS " << run2_ins
-              << " out of bounds [" << num_threads * MIN_INS_PER_CALL
-              << ", " << num_threads * MAX_INS_PER_CALL << "]\n";
+  if (run2_ins < num_threads * MIN_OPS_PER_CALL || run2_ins > num_threads*MAX_OPS_PER_CALL) {
+    std::cerr << "Run2Region thread 0: PAPI_FP_OPS " << run2_ins
+              << " out of bounds [" << num_threads * MIN_OPS_PER_CALL
+              << ", " << num_threads * MAX_OPS_PER_CALL << "]\n";
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
 #endif
