@@ -37,12 +37,6 @@ public:
   RegionRecord() = delete;
   explicit RegionRecord(size_t const, std::string_view const, int);
 
-#ifdef USE_PAPI
-  // PAPI metrics total metrics, "self" metrics are not computed and
-  // thus recursion metrics are not needed.
-  long long total_metrics_[VERNIER_MAX_PAPI_METRICS];
-#endif
-
   // Data members
   size_t region_hash_;
   std::string region_name_;
@@ -54,6 +48,14 @@ public:
   time_duration_t overhead_walltime_;
   unsigned long long int call_count_;
   unsigned int recursion_level_;
+
+#ifdef USE_PAPI
+  // PAPI metrics total metrics, "self" metrics are not computed and
+  // thus recursion metrics are not needed.
+  metrics_array total_metrics_;
+#endif
+
+
 };
 
 // Define the hashvec type.

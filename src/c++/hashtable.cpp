@@ -158,20 +158,22 @@ void meto::HashTable::update(record_index_t const record_index,
  * @brief  Updates the total PAPI metrics for the specified region.
  * @param [in] record_index  The index in hashvec_ corresponding to the
  *                           profiled region.
- * @param [in] metrics_delta The PAPI metrics increment to add.
+ * @param [in] stop_metrics  The PAPI metrics at the end of the region.
+ * @param [in] start_metrics The PAPI metrics at the start of the region.
  * @param [in] num_events    The number of events to update.
  */
 
 void meto::HashTable::update_metrics(record_index_t const record_index,
-                                     long long const *metrics_delta,
-                                     int num_events) {
+                                     metrics_array& stop_metrics,
+                                     metrics_array& start_metrics,
+                                     int const num_events) {
 
   auto &record = hashvec_[record_index];
 
   // Check if this region has been called recursively
   if (record.recursion_level_ == 0) {
-    for(int e=0; e < num_events; e++)
-      record.total_metrics_[e] += metrics_delta[e];
+    for(metrics_array::size_type e=0; e < static_cast<metrics_array::size_type>(num_events); e++)
+      record.total_metrics_[e] += (stop_metrics[e] - start_metrics[e]);
   }
 }
 #endif
@@ -456,7 +458,7 @@ unsigned long long int meto::HashTable::get_prof_call_count() const {
 long long meto::HashTable::get_total_metrics(size_t const hash,
                                              int const event_idx) const {
   auto &record = hash2record(hash);
-  return record.total_metrics_[event_idx];
+  return record.total_metrics_[static_cast<metrics_array::size_type>(event_idx)];
 }
 #endif
 

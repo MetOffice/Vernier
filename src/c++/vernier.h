@@ -62,18 +62,25 @@ private:
   public:
     // Constructors
     TracebackEntry() = default;
-    TracebackEntry(size_t, record_index_t, time_point_t, time_point_t);
 
-    // PAPI metrics
+    TracebackEntry(size_t, record_index_t, time_point_t, time_point_t
 #ifdef USE_PAPI
-    long long region_start_metrics_[VERNIER_MAX_PAPI_METRICS];
+                   , metrics_array& region_start_metrics
 #endif
+                   );
+
 
     // Data members
     size_t record_hash_;
     record_index_t record_index_;
     time_point_t region_start_time_;
     time_point_t calliper_start_time_;
+
+#ifdef USE_PAPI
+    // PAPI metrics
+    metrics_array region_start_metrics_;
+#endif
+
   };
 
   // Default initialisation flag.  No explicit constructor, and pointless

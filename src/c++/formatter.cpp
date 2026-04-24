@@ -123,7 +123,7 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 #ifdef USE_PAPI
     if (events_code.size() > 0) {
       for(int e=0; e < static_cast<int>(events_code.size()); e++) {
-        os << std::right << std::setw(15) << record.total_metrics_[e];
+        os << std::right << std::setw(15) << record.total_metrics_[static_cast<metrics_array::size_type>(e)];
       }
     }
 #endif

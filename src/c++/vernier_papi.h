@@ -13,7 +13,7 @@
  */
 #include <string>
 #include <vector>
-
+#include <array>
 
 #ifndef VERNIER_PAPI_H
 #define VERNIER_PAPI_H
@@ -32,6 +32,10 @@ void papi_finalize();
 // Contains the codes of the PAPI events that need to be collected.
 using events_vector = std::vector<std::pair<int, std::string>>;
 extern events_vector events_code;
+
+
+// The type of an array that contains the metrics
+using metrics_array = std::array<long long,VERNIER_MAX_PAPI_METRICS>;
 
 /**
 * @brief  Manage PAPI events and data.
@@ -61,7 +65,7 @@ public:
 
   // Read the metrics. The metrics are continuesly collected like a
   // timer, they are not reset, hence "total".
-  void read(long long *total_values);
+  void read(metrics_array& total_values);
 
 };
 

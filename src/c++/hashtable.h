@@ -96,7 +96,10 @@ public:
   void update(record_index_t const, time_duration_t const);
 
 #ifdef USE_PAPI
-  void update_metrics(record_index_t const, long long const *, int const);
+  void update_metrics(record_index_t const,
+                      metrics_array&,
+                      metrics_array&,
+                      int const);
 #endif
 
   // Member functions

@@ -247,7 +247,7 @@ void meto::PAPIContext::finalize() {
  *  thread are collected.
  */
 
-void meto::PAPIContext::read(long long *total_values) {
+void meto::PAPIContext::read(metrics_array& total_values) {
 
   assert(num_events_ <= VERNIER_MAX_PAPI_METRICS);
 
@@ -256,7 +256,7 @@ void meto::PAPIContext::read(long long *total_values) {
     return;
 
   PAPI_DEBUG_LOG("PAPI_read");
-  if( PAPI_read(event_set_,total_values)  != PAPI_OK ) {
+  if( PAPI_read(event_set_,total_values.data())  != PAPI_OK ) {
     meto::error_handler(
                         "PAPIContext::read. Failed to read eventset.",
                         EXIT_FAILURE);

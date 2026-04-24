@@ -34,20 +34,28 @@ meto::Vernier::~Vernier() = default;
  *                                 start calliper.
  * @param [in]  calliper_start_time The clock measurement on entry to the start
  *                                  calliper.
+#ifdef USE_PAPI
+ * @param [in]  region_start_metrics The PAPI metrics measurement on entry to the start
+ *                                  calliper.
+#endif
  *
  */
 
 meto::Vernier::TracebackEntry::TracebackEntry(
     size_t record_hash, meto::record_index_t record_index,
     meto::time_point_t region_start_time,
-    meto::time_point_t calliper_start_time)
-    :
+    meto::time_point_t calliper_start_time
 #ifdef USE_PAPI
-      region_start_metrics_{},
+    , metrics_array& region_start_metrics
 #endif
-      record_hash_(record_hash), record_index_(record_index),
+                                              )
+    : record_hash_(record_hash), record_index_(record_index),
       region_start_time_(region_start_time),
-      calliper_start_time_(calliper_start_time){}
+      calliper_start_time_(calliper_start_time)
+#ifdef USE_PAPI
+      , region_start_metrics_(region_start_metrics)
+#endif
+    {}
 
 /**
  * @brief  Initialise Vernier object.
@@ -165,18 +173,18 @@ void meto::Vernier::start_part1() {
                         EXIT_FAILURE);
   }
 
-  // Store the calliper start time, which is used in part2.
-  logged_calliper_start_time_ = vernier_gettime();
-
 #ifdef USE_PAPI
   // Initialize PAPI context if not done yet.  This is called here
-  // because each thread need to do it. Also we want VERNIER to
-  // consider the time spent on doing so but we don't want this extra
-  // time to be part of a region.
+  // because each thread need to do it. We do not want VERNIER to
+  // consider the time spent on initilizaing the PAPI context in the
+  // overhead since it is quite expensive but done only once.
   if(!papi_context_.is_initialized())
     papi_context_.init();
 
 #endif
+
+  // Store the calliper start time, which is used in part2.
+  logged_calliper_start_time_ = vernier_gettime();
 }
 
 /**
@@ -205,13 +213,20 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
   // Store the calliper and region start times.
   ++call_depth_;
   if (call_depth_ < PROF_MAX_TRACEBACK_SIZE) {
+#ifdef USE_PAPI
+    // Read mettrics before getting the start time.
+    metrics_array region_start_metrics;
+    papi_context_.read(region_start_metrics);
+#endif
+
     auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
     auto region_start_time = vernier_gettime();
     thread_traceback_[tid].at(call_depth_index) = TracebackEntry(
-        hash, record_index, region_start_time, logged_calliper_start_time_);
+        hash, record_index, region_start_time, logged_calliper_start_time_
 #ifdef USE_PAPI
-    papi_context_.read(thread_traceback_[tid].at(call_depth_index).region_start_metrics_);
+        , region_start_metrics
 #endif
+                                                                 );
   } else {
     error_handler("EMERGENCY STOP: Traceback array exhausted.", EXIT_FAILURE);
   }
@@ -235,7 +250,7 @@ void meto::Vernier::stop(size_t const hash) {
 
 #ifdef USE_PAPI
   // Log the papy metrics
-  long long region_stop_metrics[VERNIER_MAX_PAPI_METRICS];
+  metrics_array region_stop_metrics;
   papi_context_.read(region_stop_metrics);
 #endif
 
@@ -270,15 +285,6 @@ void meto::Vernier::stop(size_t const hash) {
   // Compute the region time
   auto region_duration = region_stop_time - traceback_entry.region_start_time_;
 
-#ifdef USE_PAPI
-  long long region_duration_metrics[VERNIER_MAX_PAPI_METRICS];
-
-  int num_events = papi_context_.get_num_events();
-  for(int e=0; e < num_events; e++)
-    region_duration_metrics[e] = region_stop_metrics[e] - traceback_entry.region_start_metrics_[e];
-
-#endif
-
   // Do the hashtable update for the child region.
   thread_hashtables_[tid].decrement_recursion_level(
       traceback_entry.record_index_);
@@ -286,8 +292,9 @@ void meto::Vernier::stop(size_t const hash) {
                                  region_duration);
 #ifdef USE_PAPI
   thread_hashtables_[tid].update_metrics(traceback_entry.record_index_,
-                                         region_duration_metrics,
-                                         num_events);
+                                         region_stop_metrics,
+                                         traceback_entry.region_start_metrics_,
+                                         papi_context_.get_num_events());
 #endif
 
   // Precompute times as far as possible. We just need the calliper stop time
