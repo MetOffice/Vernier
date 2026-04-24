@@ -29,6 +29,8 @@ meto::events_vector meto::events_code;
 /**
  * @brief Returns a debug string showing the current thread and CPU placement.
  * @note  Written to std::cerr (unbuffered) so output is not lost on crash.
+ *        This function has been produced with the assistance of
+ *        Met Office Github Copilot Enterprise
  */
 static std::string papi_debug_str() {
   int logical_cpu = sched_getcpu();
@@ -45,6 +47,8 @@ static std::string papi_debug_str() {
       << " | physical_core=" << physical_core;
   return oss.str();
 }
+
+// This macro has been produced with the assistance of Met Office Github Copilot Enterprise
 #define PAPI_DEBUG_LOG(msg) std::cerr << "[PAPI_DEBUG] " << msg << " | " << papi_debug_str() << "\n"
 #else
 #define PAPI_DEBUG_LOG(msg) do {} while(0)
@@ -52,7 +56,8 @@ static std::string papi_debug_str() {
 
 /**
  * @brief Read the event strings from an env variable
- *
+ * @note  This function has been produced with the assistance of
+ *        Met Office Github Copilot Enterprise
  */
 std::vector<std::string> read_events_str_from_env(const char* env_var) {
   std::vector<std::string> events_str;

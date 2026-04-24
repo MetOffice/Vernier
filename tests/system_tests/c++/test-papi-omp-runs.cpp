@@ -4,6 +4,9 @@
  under which the code may be used.
 \*----------------------------------------------------------------------------*/
 
+// Some of the content of this file has been produced with the assistance of
+// Met Office Github Copilot Enterprise
+
 // System test: verify PAPI_FP_OPS counts are consistent across three
 // OpenMP/profiling patterns.
 //

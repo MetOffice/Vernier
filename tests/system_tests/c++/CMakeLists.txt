@@ -21,7 +21,7 @@ if (BUILD_TESTS)
     set(TESTNAME_PREFIX "SystemTests")
     message(STATUS "Building ${TESTNAME_PREFIX}.${test_name}")
     add_executable(${TESTNAME_PREFIX}_${test_name} ${source_file})
-    target_link_libraries(${TESTNAME_PREFIX}_${test_name} ${CMAKE_PROJECT_NAME} ${PLIBS}) 
+    target_link_libraries(${TESTNAME_PREFIX}_${test_name} ${CMAKE_PROJECT_NAME} ${PLIBS})
     target_include_directories(${TESTNAME_PREFIX}_${test_name} PUBLIC ${CMAKE_BINARY_DIR}/src/c++)
     if (NOT ENABLE_MPI)
       target_compile_definitions(${TESTNAME_PREFIX}_${test_name} PRIVATE USE_VERNIER_MPI_STUB)
@@ -40,6 +40,9 @@ if (BUILD_TESTS)
     add_cxx_system_test(TestVernierMPIHeaders test-vernier-mpi-headers.cpp 2)
     add_cxx_system_test(TestMPIOutputs test-output-files.cpp 2)
   endif()
+
+  # This code has been produced with the assistance of
+  # Met Office Github Copilot Enterprise
 
   if (ENABLE_PAPI)
     function(add_papi_cxx_system_test test_name source_file ranks)

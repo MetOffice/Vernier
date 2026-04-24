@@ -501,6 +501,9 @@ double meto::Vernier::get_child_walltime(size_t const hash,
  * @param[in] event_idx  The index of the PAPI event (0-based).
  *
  * @returns  Total PAPI metric count.
+ *
+ * @note   This function has been produced with the assistance of
+ *         Met Office Github Copilot Enterprise
  */
 long long meto::Vernier::get_total_metrics(size_t const hash,
                                                  int const input_tid,

@@ -469,6 +469,8 @@ unsigned long long int meto::HashTable::get_prof_call_count() const {
  * @param [in] hash       The hash corresponding to the region.
  * @param [in] event_idx  The index of the PAPI event (0-based).
  * @returns  Total PAPI metric count.
+ * @note   This function has been produced with the assistance of
+ *         Met Office Github Copilot Enterprise
  */
 long long meto::HashTable::get_total_metrics(size_t const hash,
                                              int const event_idx) const {

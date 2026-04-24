@@ -50,6 +50,9 @@ add_unit_test(test_recursion test_recursion.cpp)
 # PAPI unit tests (only built when ENABLE_PAPI=ON).
 # ------------------------------------------------------------------------------
 
+# This code has been produced with the assistance of
+# Met Office Github Copilot Enterprise
+
 if (ENABLE_PAPI)
     add_unit_test(test_papi_fp_ops test_papi_fp_ops.cpp)
     target_compile_definitions(test_papi_fp_ops PRIVATE USE_PAPI)
