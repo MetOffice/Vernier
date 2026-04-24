@@ -21,7 +21,11 @@ meto::RegionRecord::RegionRecord(size_t const region_hash,
       self_walltime_(time_duration_t::zero()),
       child_walltime_(time_duration_t::zero()),
       overhead_walltime_(time_duration_t::zero()), call_count_(0),
-      recursion_level_(0) {
+      recursion_level_(0)
+#ifdef USE_PAPI
+      , total_metrics_{}
+#endif
+{
   decorated_region_name_ = region_name_;
   decorated_region_name_ += '@';
   decorated_region_name_ += std::to_string(tid);

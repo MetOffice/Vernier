@@ -19,6 +19,13 @@
 int meto::Vernier::call_depth_ = -1;
 meto::time_point_t meto::Vernier::logged_calliper_start_time_{};
 
+#ifdef USE_PAPI
+meto::PAPIContext meto::Vernier::papi_context_{};
+#endif
+
+// Needed to avoid an issue with RegionRecord and USE_PAPI
+meto::Vernier::~Vernier() = default;
+
 /**
  * @brief Constructor for TracebackEntry struct.
  * @param [in]  record_hash   The hash of the region name.
@@ -27,16 +34,28 @@ meto::time_point_t meto::Vernier::logged_calliper_start_time_{};
  *                                 start calliper.
  * @param [in]  calliper_start_time The clock measurement on entry to the start
  *                                  calliper.
+#ifdef USE_PAPI
+ * @param [in]  region_start_metrics The PAPI metrics measurement on entry to the start
+ *                                  calliper.
+#endif
  *
  */
 
 meto::Vernier::TracebackEntry::TracebackEntry(
     size_t record_hash, meto::record_index_t record_index,
     meto::time_point_t region_start_time,
-    meto::time_point_t calliper_start_time)
+    meto::time_point_t calliper_start_time
+#ifdef USE_PAPI
+    , metrics_vector& region_start_metrics
+#endif
+                                              )
     : record_hash_(record_hash), record_index_(record_index),
       region_start_time_(region_start_time),
-      calliper_start_time_(calliper_start_time) {}
+      calliper_start_time_(calliper_start_time)
+#ifdef USE_PAPI
+      , region_start_metrics_(region_start_metrics)
+#endif
+    {}
 
 /**
  * @brief  Initialise Vernier object.
@@ -70,6 +89,11 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
   // Initialise MPI context
   mpi_context_.init(client_comm_handle, tag);
 
+#ifdef USE_PAPI
+  // Inititialize PAPI
+  papi_init(max_threads_);
+#endif
+
   // Set Vernier initialised.
   initialized_ = true;
 
@@ -91,6 +115,20 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
  */
 
 void meto::Vernier::finalize() {
+
+#ifdef USE_PAPI
+
+  // The finalize of a PAPI context need to be called by the thread
+  // that called the init otherwsie there could be a problem in PAPI.
+  // The following call crate a parallel region for this purpose.
+#pragma omp parallel
+  {
+    papi_context_.finalize();
+  }
+
+  papi_finalize();
+#endif
+
   if (mpi_context_.is_initialized()) {
     mpi_context_.finalize();
   }
@@ -135,6 +173,16 @@ void meto::Vernier::start_part1() {
                         EXIT_FAILURE);
   }
 
+#ifdef USE_PAPI
+  // Initialize PAPI context if not done yet.  This is called here
+  // because each thread need to do it. We do not want VERNIER to
+  // consider the time spent on initilizaing the PAPI context in the
+  // overhead since it is quite expensive but done only once.
+  if(!papi_context_.is_initialized())
+    papi_context_.init();
+
+#endif
+
   // Store the calliper start time, which is used in part2.
   logged_calliper_start_time_ = vernier_gettime();
 }
@@ -165,10 +213,53 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
   // Store the calliper and region start times.
   ++call_depth_;
   if (call_depth_ < PROF_MAX_TRACEBACK_SIZE) {
+#ifdef USE_PAPI
+    metrics_vector region_start_metrics;
+
+    // Read mettrics before getting the start time.  However we need
+    // to check if we are in a parallel region first.
+    int parallel = 0;
+#ifdef _OPENMP
+    parallel = omp_in_parallel();
+#endif
+    if(parallel) {
+      // If we are in a parellel region, then we take the metrics for
+      // only this thread (which could be any thread).
+      region_start_metrics.resize(1);
+      papi_context_.read(region_start_metrics[0]);
+    }
+    else {
+      // We are not inside a parallel region so we are in thread
+      // zero. There is a possibility that this vernier region has
+      // some OMP paralel region inside. We need to take the start
+      // metrics for each possible thread.
+
+      // Set the maximum number of threads.
+      int max_threads = 1;
+#ifdef _OPENMP
+      max_threads = omp_get_max_threads();
+#endif
+      region_start_metrics.resize(static_cast<metrics_vector::size_type>(max_threads));
+#pragma omp parallel
+      {
+        int t = 0;
+#ifdef _OPENMP
+        t = omp_get_thread_num();
+#endif
+        papi_context_.read(region_start_metrics[static_cast<metrics_vector::size_type>(t)]);
+      }
+    }
+
+#endif
+
     auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
     auto region_start_time = vernier_gettime();
     thread_traceback_[tid].at(call_depth_index) = TracebackEntry(
-        hash, record_index, region_start_time, logged_calliper_start_time_);
+        hash, record_index, region_start_time, logged_calliper_start_time_
+#ifdef USE_PAPI
+        , region_start_metrics
+#endif
+                                                                 );
   } else {
     error_handler("EMERGENCY STOP: Traceback array exhausted.", EXIT_FAILURE);
   }
@@ -189,6 +280,44 @@ void meto::Vernier::stop(size_t const hash) {
 
   // Log the region stop time.
   auto region_stop_time = vernier_gettime();
+
+#ifdef USE_PAPI
+  // Log the papi metrics
+  metrics_vector region_stop_metrics;
+
+  // However we need to check if we are in a parallel region first.
+  int parallel = 0;
+#ifdef _OPENMP
+  parallel = omp_in_parallel();
+#endif
+  if(parallel) {
+    // If we are in a parellel region, then we take the metrics for
+    // only this thread (which could be any thread).
+    region_stop_metrics.resize(1);
+    papi_context_.read(region_stop_metrics[0]);
+  }
+  else {
+    // We are not inside a parallel region so we are in thread
+    // zero. There is a possibility that this vernier region has
+    // some OMP paralel region inside. We need to take the start
+    // metrics for each possible thread.
+
+    // Set the maximum number of threads.
+    int max_threads = 1;
+#ifdef _OPENMP
+    max_threads = omp_get_max_threads();
+#endif
+    region_stop_metrics.resize(static_cast<metrics_vector::size_type>(max_threads));
+#pragma omp parallel
+    {
+      int tid = 0;
+#ifdef _OPENMP
+      tid = omp_get_thread_num();
+#endif
+      papi_context_.read(region_stop_metrics[static_cast<metrics_vector::size_type>(tid)]);
+    }
+  }
+#endif
 
   // Determine the thread number
   auto tid = static_cast<hashtable_iterator_t_>(0);
@@ -226,6 +355,12 @@ void meto::Vernier::stop(size_t const hash) {
       traceback_entry.record_index_);
   thread_hashtables_[tid].update(traceback_entry.record_index_,
                                  region_duration);
+#ifdef USE_PAPI
+  thread_hashtables_[tid].update_metrics(traceback_entry.record_index_,
+                                         region_stop_metrics,
+                                         traceback_entry.region_start_metrics_,
+                                         papi_context_.get_num_events());
+#endif
 
   // Precompute times as far as possible. We just need the calliper stop time
   // later.
@@ -356,6 +491,24 @@ double meto::Vernier::get_child_walltime(size_t const hash,
   auto tid = static_cast<hashtable_iterator_t_>(input_tid);
   return thread_hashtables_[tid].get_child_walltime(hash);
 }
+
+#ifdef USE_PAPI
+/**
+ * @brief  Get the total accumulated PAPI metric for a region on a given thread.
+ *
+ * @param[in] hash       The hash corresponding to the region of interest.
+ * @param[in] input_tid  The thread ID.
+ * @param[in] event_idx  The index of the PAPI event (0-based).
+ *
+ * @returns  Total PAPI metric count.
+ */
+long long meto::Vernier::get_total_metrics(size_t const hash,
+                                                 int const input_tid,
+                                                 int const event_idx) const {
+  auto tid = static_cast<hashtable_iterator_t_>(input_tid);
+  return thread_hashtables_[tid].get_total_metrics(hash, event_idx);
+}
+#endif
 
 /**
  * @brief  Get the name of a region corresponding to a given hash.

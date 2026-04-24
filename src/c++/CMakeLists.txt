@@ -13,7 +13,8 @@ include(CMakePackageConfigHelpers)
 
 # Add files source files to library. This is STATIC by default and SHARED when
 # the BUILD_SHARED_LIBS option is turned ON.
-add_library(${CMAKE_PROJECT_NAME}
+
+set(vernier_SOURCES
         vernier.cpp
         hashtable.cpp
         hashvec_handler.cpp
@@ -28,6 +29,12 @@ add_library(${CMAKE_PROJECT_NAME}
         vernier_mpi.cpp
         error_handler.cpp
         )
+
+if (ENABLE_PAPI)
+   list(APPEND vernier_SOURCES vernier_papi.cpp)
+endif()
+
+add_library(${CMAKE_PROJECT_NAME} ${vernier_SOURCES})
 
 target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC
@@ -45,6 +52,15 @@ if (ENABLE_MPI)
 else()
   target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_VERNIER_MPI_STUB)
 endif()
+
+if (ENABLE_PAPI)
+  list(APPEND PLIBS PAPI::PAPI)
+  target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_PAPI)
+  if (PAPI_DEBUG)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE VERNIER_PAPI_DEBUG)
+  endif()
+endif()
+
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${PLIBS})
 

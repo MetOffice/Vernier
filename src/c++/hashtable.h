@@ -87,12 +87,20 @@ public:
   // Constructors
   HashTable() = delete;
   HashTable(int);
+  ~HashTable();
 
   // Prototypes
   size_t compute_hash(std::string_view, int);
   void query_insert(std::string_view const, int, size_t &,
                     record_index_t &) noexcept;
   void update(record_index_t const, time_duration_t const);
+
+#ifdef USE_PAPI
+  void update_metrics(record_index_t const,
+                      metrics_vector&,
+                      metrics_vector&,
+                      int const);
+#endif
 
   // Member functions
   std::vector<size_t> list_keys();
@@ -112,6 +120,10 @@ public:
   std::string get_decorated_region_name(size_t const hash) const;
   unsigned long long int get_call_count(size_t const hash) const;
   unsigned long long int get_prof_call_count() const;
+
+#ifdef USE_PAPI
+  long long get_total_metrics(size_t const hash, int const event_idx) const;
+#endif
 
   void increment_recursion_level(record_index_t const);
   void decrement_recursion_level(record_index_t const);

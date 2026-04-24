@@ -47,6 +47,24 @@ add_unit_test(test_callcount test_callcount.cpp)
 add_unit_test(test_recursion test_recursion.cpp)
 
 # ------------------------------------------------------------------------------
+# PAPI unit tests (only built when ENABLE_PAPI=ON).
+# ------------------------------------------------------------------------------
+
+if (ENABLE_PAPI)
+    add_unit_test(test_papi_fp_ops test_papi_fp_ops.cpp)
+    target_compile_definitions(test_papi_fp_ops PRIVATE USE_PAPI)
+    target_link_libraries(test_papi_fp_ops PAPI::PAPI)
+
+    add_unit_test(test_papi_cyc_ins test_papi_cyc_ins.cpp)
+    target_compile_definitions(test_papi_cyc_ins PRIVATE USE_PAPI)
+    target_link_libraries(test_papi_cyc_ins PAPI::PAPI)
+
+    add_unit_test(test_papi_tot_ins test_papi_tot_ins.cpp)
+    target_compile_definitions(test_papi_tot_ins PRIVATE USE_PAPI)
+    target_link_libraries(test_papi_tot_ins PAPI::PAPI)
+endif ()
+
+# ------------------------------------------------------------------------------
 # Test behaviour when MPI is not initialised.
 # ------------------------------------------------------------------------------
 
@@ -62,7 +80,7 @@ function(add_mpi_not_init_unit_test test_name cpp_file)
     set_project_warnings(${test_name})
     target_include_directories(${test_name} PRIVATE
             ${PROJECT_SOURCE_DIR}/src/c++)
-    gtest_discover_tests(${test_name})
+    gtest_discover_tests(${test_name}  PROPERTIES RUN_SERIAL TRUE)
     if (NOT ENABLE_MPI)
       target_compile_definitions(${test_name} PRIVATE USE_VERNIER_MPI_STUB)
     endif()
