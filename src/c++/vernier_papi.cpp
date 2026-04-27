@@ -25,8 +25,8 @@
 // Contains the codes of the PAPI events that need to be collected.
 meto::events_vector meto::events_code;
 
-// PAPI library should be initilialized only once even if vernier is
-// initilized and finalized multiple times.
+// PAPI library should be initialized only once even if vernier is
+// initialized and finalized multiple times.
 static bool papi_library_initialized_ = false;
 
 #ifdef VERNIER_PAPI_DEBUG
@@ -52,7 +52,7 @@ static std::string papi_debug_str() {
 }
 
 /**
- * @brief Print the debug log one hread at time.
+ * @brief Print the debug log one thread at a time.
  * @note  Written to std::cerr (unbuffered) so output is not lost on crash.
  *        This function has been produced with the assistance of
  *        Met Office Github Copilot Enterprise
@@ -112,10 +112,10 @@ void meto::papi_init(int max_threads) {
                           EXIT_FAILURE);
     }
 
-    // Initilize threads if there are more than one.  We use
+    // Initialize threads if there are more than one.  We use
     // pthread_self instead of omp_get_thread_num because the latter
-    // value can be reused while the former is unique.  Without an
-    // unique value, PAPI get confused.  However, if the code spawn
+    // value can be reused while the former is unique.  Without a
+    // unique value, PAPI gets confused.  However, if the code spawns
     // threads without using OMP, the behaviour is undefined.
     if (max_threads > 1) {
       PAPI_DEBUG_LOG("PAPI_thread_init");
@@ -151,12 +151,12 @@ void meto::papi_init(int max_threads) {
 /**
  * @brief  Finalize PAPI
  *
- * @note once at programm end
+ * @note once at program end
  */
 
 void meto::papi_finalize() {
-  // This need to be cleared in case PAPIContext is initialized and finalized
-  // multiple time on the same run
+  // This needs to be cleared in case PAPIContext is initialized and finalized
+  // multiple times on the same run
   events_code.clear();
 }
 
@@ -172,7 +172,7 @@ meto::PAPIContext::PAPIContext()
 /**
  * @brief Initialise PAPI context and start collecting the metrics.
  *
- * @note This need to be called inside the thread that will compute
+ * @note This needs to be called inside the thread that will compute
  * the metrics.
  */
 
@@ -219,14 +219,14 @@ void meto::PAPIContext::init() {
 /**
  * @brief  Finaliser for PAPI  context.
  *
- * @note Each thread that call init should call finalize.
+ * @note Each thread that calls init should call finalize.
  */
 
 void meto::PAPIContext::finalize() {
 
   if (initialized_ && event_set_ != PAPI_NULL) {
 
-    // Nedd to stop metrics if started values are not used after this
+    // Need to stop metrics if started; values are not used after this,
     // thus we can use them in this call.
     if (started_) {
       PAPI_DEBUG_LOG("PAPI_stop");
@@ -259,7 +259,7 @@ void meto::PAPIContext::finalize() {
  * @brief  Read the metrics.
  * @returns The total values of the metrics collected.
  *
- * @note The metrics are continuesly collected like time passed, they
+ * @note The metrics are continuously collected like time passed, they
  *  are not reset, hence "total". Also only the metrics of the calling
  *  thread are collected.
  */
@@ -268,7 +268,7 @@ void meto::PAPIContext::read(metrics_array &total_values) {
 
   assert(num_events_ <= VERNIER_MAX_PAPI_METRICS);
 
-  // Do nothing if PAPI is not initilized or started.
+  // Do nothing if PAPI is not initialized or started.
   if (!initialized_ || !started_)
     return;
 

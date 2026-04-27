@@ -20,7 +20,7 @@
  *
  */
 
-// Needed to avoid issue between RegionRecord and USE_PAPI.
+// Needed to avoid an issue between RegionRecord and USE_PAPI.
 meto::HashTable::~HashTable() = default;
 
 meto::HashTable::HashTable(int const tid) : tid_(tid) {
@@ -172,18 +172,18 @@ void meto::HashTable::update_metrics(record_index_t const record_index,
 
   // Check if this region has been called recursively
   if (record.recursion_level_ == 0) {
-    // The number of elements in the metrics_vector paint two cases.
+    // The number of elements in the metrics_vector presents two cases.
     //
     // If there is only one element, then the vernier region started
-    // inside a parallel region or there was at maximum one thread. In
-    // this case the metrics of on single thread are added into the
+    // inside a parallel region or there was at most one thread. In
+    // this case the metrics of a single thread are added into the
     // total.
     //
     // If there are more than one elements, then the vernier region
-    // did not started inside a parallel region and it was run by
+    // did not start inside a parallel region and it was run by
     // thread zero. We need to consider the possibility that a
     // parallel region was run inside the vernier region. We need to
-    // sum all the metrics from all the threads to the one of thread
+    // sum all the metrics from all the threads to those of thread
     // zero.
     for (metrics_vector::size_type i = 0; i < stop_metrics.size(); ++i) {
       for (metrics_array::size_type e = 0;

@@ -34,7 +34,7 @@ extern events_vector events_code;
 
 // The type of an array that contains the metrics
 using metrics_array = std::array<long long, VERNIER_MAX_PAPI_METRICS>;
-// The vector that can contains multiple metrics_array.
+// The vector that can contain multiple metrics_array.
 using metrics_vector = std::vector<metrics_array>;
 
 /**
@@ -62,7 +62,7 @@ public:
   void init();
   void finalize();
 
-  // Read the metrics. The metrics are continuesly collected like a
+  // Read the metrics. The metrics are continuously collected like a
   // timer, they are not reset, hence "total".
   void read(metrics_array &total_values);
 };

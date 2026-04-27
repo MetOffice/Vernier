@@ -50,7 +50,7 @@ public:
   unsigned int recursion_level_;
 
 #ifdef USE_PAPI
-  // PAPI metrics total metrics, "self" metrics are not computed and
+  // PAPI total metrics; "self" metrics are not computed and
   // thus recursion metrics are not needed.
   metrics_array total_metrics_;
 #endif
