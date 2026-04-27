@@ -18,6 +18,7 @@
 #ifdef VERNIER_PAPI_DEBUG
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <sched.h>
 #endif
 
@@ -27,8 +28,7 @@ meto::events_vector meto::events_code;
 #ifdef VERNIER_PAPI_DEBUG
 /**
  * @brief Returns a debug string showing the current thread and CPU placement.
- * @note  Written to std::cerr (unbuffered) so output is not lost on crash.
- *        This function has been produced with the assistance of
+ * @note  This function has been produced with the assistance of
  *        Met Office Github Copilot Enterprise
  */
 static std::string papi_debug_str() {
@@ -47,15 +47,28 @@ static std::string papi_debug_str() {
   return oss.str();
 }
 
+/**
+ * @brief Print the debug log one hread at time.
+ * @note  Written to std::cerr (unbuffered) so output is not lost on crash.
+ *        This function has been produced with the assistance of
+ *        Met Office Github Copilot Enterprise
+ */
+
+static void papi_debug_log_impl(const std::string &msg) {
+  static std::mutex log_mutex;
+  std::lock_guard<std::mutex> lock(log_mutex);
+  std::cerr << "[PAPI_DEBUG] " << msg << " | " << papi_debug_str() << "\n";
+}
+
 // This macro has been produced with the assistance of Met Office Github Copilot
 // Enterprise
-#define PAPI_DEBUG_LOG(msg)                                                    \
-  std::cerr << "[PAPI_DEBUG] " << msg << " | " << papi_debug_str() << "\n"
+#define PAPI_DEBUG_LOG(msg) papi_debug_log_impl(msg)
 #else
 #define PAPI_DEBUG_LOG(msg)                                                    \
   do {                                                                         \
   } while (0)
 #endif
+
 
 /**
  * @brief Read the event strings from an env variable
@@ -96,7 +109,8 @@ void meto::papi_init(int max_threads) {
   // Initilize threads if there are more than one.  We use
   // pthread_self instead of omp_get_thread_num because the latter
   // value can be reused while the former is unique.  Without an
-  // unique value, PAPI get confused.
+  // unique value, PAPI get confused.  However, if the code spawn
+  // threads without using OMP, the behaviour is undefined.
   if (max_threads > 1) {
     PAPI_DEBUG_LOG("PAPI_thread_init");
     retval = PAPI_thread_init(pthread_self);
@@ -109,6 +123,11 @@ void meto::papi_init(int max_threads) {
   // Read the events to collect from an environment variable
   // Ex: VERNIER_PAPI_EVENTS1=PAPI_FP_OPS,PAPI_TOT_INS
   auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS1");
+  if (events_str.size() > VERNIER_MAX_PAPI_METRICS ) {
+    meto::error_handler("papi_init. VERNIER_PAPI_EVENTS has too many events: " +
+                        std::to_string(events_str.size()),
+                        EXIT_FAILURE);
+  }
   for (const auto &event_str : events_str) {
     int code;
     PAPI_DEBUG_LOG("PAPI_event_name_to_code(" + event_str + ")");

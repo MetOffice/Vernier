@@ -94,6 +94,13 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
 #ifdef USE_PAPI
   // Inititialize PAPI
   papi_init(max_threads_);
+
+  // Initialize PAPI context for every threads.
+#pragma omp parallel num_threads(max_threads_)
+  {
+    if (!papi_context_.is_initialized())
+      papi_context_.init();
+  }
 #endif
 
   // Set Vernier initialised.
@@ -173,16 +180,6 @@ void meto::Vernier::start_part1() {
     meto::error_handler("Vernier::start_part1. Vernier not initialised.",
                         EXIT_FAILURE);
   }
-
-#ifdef USE_PAPI
-  // Initialize PAPI context if not done yet.  This is called here
-  // because each thread need to do it. We do not want VERNIER to
-  // consider the time spent on initilizaing the PAPI context in the
-  // overhead since it is quite expensive but done only once.
-  if (!papi_context_.is_initialized())
-    papi_context_.init();
-
-#endif
 
   // Store the calliper start time, which is used in part2.
   logged_calliper_start_time_ = vernier_gettime();

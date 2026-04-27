@@ -14,6 +14,10 @@
 #include <gtest/gtest.h>
 #include <papi.h>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 #include "vernier.h"
 #include "vernier_papi.h"
 
@@ -43,6 +47,7 @@ TEST(PAPITest, FPOpsOnlyTest) {
   auto prof = meto::vernier.start("FPRegion");
 
   volatile double acc = 0.0;
+  #pragma omp parallel for reduction(+:acc)
   for (int i = 1; i <= 1000000; ++i) {
     acc += std::sqrt(static_cast<double>(i));
   }
@@ -70,6 +75,10 @@ TEST(PAPITest, FPOpsOnlyTest) {
       << "Expected at most 3 FP ops per iteration (sanity upper bound).";
 
   std::cout << "\n  PAPI_FP_OPS : " << fp_ops << "\n";
+
+#ifdef _OPENMP
+  std::cout << "\n  THREADS     : " << omp_get_max_threads() << "\n";
+#endif
 
   meto::vernier.finalize();
   unsetenv("VERNIER_PAPI_EVENTS1");
