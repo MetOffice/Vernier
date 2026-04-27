@@ -25,7 +25,8 @@
 // Contains the codes of the PAPI events that need to be collected.
 meto::events_vector meto::events_code;
 
-// Check if PAPI library is already initlialized.
+// PAPI library should be initilialized only once even if vernier is
+// initilized and finalized multiple times.
 static bool papi_library_initialized_ = false;
 
 #ifdef VERNIER_PAPI_DEBUG
@@ -190,7 +191,7 @@ void meto::PAPIContext::init() {
   initialized_ = true;
 
   // Add the events to collect metrics and start collecting
-  if (events_code.size() > 0) {
+  if (!events_code.empty()) {
 
     num_events_ = 0;
     for (const auto &code : events_code) {

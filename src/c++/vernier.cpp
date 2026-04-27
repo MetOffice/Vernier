@@ -237,6 +237,8 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
 
       region_start_metrics.resize(
           static_cast<metrics_vector::size_type>(max_threads_));
+
+      // The creation of parallel region will add some overhead
 #pragma omp parallel
       {
         int t = 0;
@@ -302,14 +304,16 @@ void meto::Vernier::stop(size_t const hash) {
 
     region_stop_metrics.resize(
         static_cast<metrics_vector::size_type>(max_threads_));
+
+    // The creation of parallel region will add some overhead
 #pragma omp parallel
     {
-      int tid = 0;
+      int t = 0;
 #ifdef _OPENMP
-      tid = omp_get_thread_num();
+      t = omp_get_thread_num();
 #endif
       papi_context_.read(
-          region_stop_metrics[static_cast<metrics_vector::size_type>(tid)]);
+          region_stop_metrics[static_cast<metrics_vector::size_type>(t)]);
     }
   }
 #endif

@@ -164,8 +164,8 @@ void meto::HashTable::update(record_index_t const record_index,
  */
 
 void meto::HashTable::update_metrics(record_index_t const record_index,
-                                     metrics_vector &stop_metrics,
-                                     metrics_vector &start_metrics,
+                                     const metrics_vector &stop_metrics,
+                                     const metrics_vector &start_metrics,
                                      int const num_events) {
 
   auto &record = hashvec_[record_index];

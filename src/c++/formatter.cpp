@@ -86,7 +86,7 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
      << std::right << "Calls";
 
 #ifdef USE_PAPI
-  if (events_code.size() > 0) {
+  if (!events_code.empty()) {
     for (const auto &code : events_code) {
       os << std::right << std::setw(15)
          << code.second.substr(code.second.size() > 14 ? code.second.size() - 14
@@ -103,8 +103,8 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
      << std::setw(15) << " " << std::setw(10) << " ";
 
 #ifdef USE_PAPI
-  if (events_code.size() > 0) {
-    for (const auto &code : events_code) {
+  if (!events_code.empty()) {
+    for (size_t i = 0; i < events_code.size(); ++i) {
       os << std::setw(15) << " ";
     }
   }
@@ -122,7 +122,7 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
        << std::setw(10) << std::right << record.call_count_;
 
 #ifdef USE_PAPI
-    if (events_code.size() > 0) {
+    if (!events_code.empty()) {
       for (int e = 0; e < static_cast<int>(events_code.size()); e++) {
         os << std::right << std::setw(15)
            << record.total_metrics_[static_cast<metrics_array::size_type>(e)];
