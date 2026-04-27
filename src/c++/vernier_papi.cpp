@@ -73,7 +73,6 @@ static void papi_debug_log_impl(const std::string &msg) {
   } while (0)
 #endif
 
-
 /**
  * @brief Read the event strings from an env variable
  * @note  This function has been produced with the assistance of
@@ -131,9 +130,9 @@ void meto::papi_init(int max_threads) {
   // Read the events to collect from an environment variable
   // Ex: VERNIER_PAPI_EVENTS1=PAPI_FP_OPS,PAPI_TOT_INS
   auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS1");
-  if (events_str.size() > VERNIER_MAX_PAPI_METRICS ) {
+  if (events_str.size() > VERNIER_MAX_PAPI_METRICS) {
     meto::error_handler("papi_init. VERNIER_PAPI_EVENTS has too many events: " +
-                        std::to_string(events_str.size()),
+                            std::to_string(events_str.size()),
                         EXIT_FAILURE);
   }
   for (const auto &event_str : events_str) {

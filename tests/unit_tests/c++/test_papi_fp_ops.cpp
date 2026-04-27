@@ -47,7 +47,7 @@ TEST(PAPITest, FPOpsOnlyTest) {
   auto prof = meto::vernier.start("FPRegion");
 
   volatile double acc = 0.0;
-  #pragma omp parallel for reduction(+:acc)
+#pragma omp parallel for reduction(+ : acc)
   for (int i = 1; i <= 1000000; ++i) {
     acc += std::sqrt(static_cast<double>(i));
   }
