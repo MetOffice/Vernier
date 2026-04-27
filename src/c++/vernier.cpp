@@ -122,8 +122,9 @@ void meto::Vernier::finalize() {
 
   // The finalize of a PAPI context need to be called by the thread
   // that called the init otherwsie there could be a problem in PAPI.
-  // The following call crate a parallel region for this purpose.
-#pragma omp parallel
+  // The following call crate a parallel region (with maximum number
+  // of threads allowed) for this purpose.
+#pragma omp parallel num_threads(max_threads_)
   { papi_context_.finalize(); }
 
   papi_finalize();
@@ -231,15 +232,14 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
       // We are not inside a parallel region so we are in thread
       // zero. There is a possibility that this vernier region has
       // some OMP paralel region inside. We need to take the start
-      // metrics for each possible thread.
+      // metrics for each possible thread. However we do not set
+      // `num_threads` to the maximum number of therads. This to
+      // takes the metrics only of the threads that are part of the
+      // computation, if the code reduced the number of computing
+      // threads.
 
-      // Set the maximum number of threads.
-      int max_threads = 1;
-#ifdef _OPENMP
-      max_threads = omp_get_max_threads();
-#endif
       region_start_metrics.resize(
-          static_cast<metrics_vector::size_type>(max_threads));
+          static_cast<metrics_vector::size_type>(max_threads_));
 #pragma omp parallel
       {
         int t = 0;
@@ -303,13 +303,8 @@ void meto::Vernier::stop(size_t const hash) {
     // some OMP paralel region inside. We need to take the start
     // metrics for each possible thread.
 
-    // Set the maximum number of threads.
-    int max_threads = 1;
-#ifdef _OPENMP
-    max_threads = omp_get_max_threads();
-#endif
     region_stop_metrics.resize(
-        static_cast<metrics_vector::size_type>(max_threads));
+        static_cast<metrics_vector::size_type>(max_threads_));
 #pragma omp parallel
     {
       int tid = 0;
