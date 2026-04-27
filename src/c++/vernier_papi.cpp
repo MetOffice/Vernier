@@ -25,6 +25,9 @@
 // Contains the codes of the PAPI events that need to be collected.
 meto::events_vector meto::events_code;
 
+// Check if PAPI library is already initlialized.
+static bool papi_library_initialized_ = false;
+
 #ifdef VERNIER_PAPI_DEBUG
 /**
  * @brief Returns a debug string showing the current thread and CPU placement.
@@ -99,27 +102,31 @@ static std::vector<std::string> read_events_str_from_env(const char *env_var) {
 
 void meto::papi_init(int max_threads) {
 
-  PAPI_DEBUG_LOG("PAPI_library_init");
-  int retval = PAPI_library_init(PAPI_VER_CURRENT);
-  if (retval != PAPI_VER_CURRENT) {
-    meto::error_handler("papi_init. Version mismatch or init failure.",
-                        EXIT_FAILURE);
-  }
+  if (!papi_library_initialized_) {
 
-  // Initilize threads if there are more than one.  We use
-  // pthread_self instead of omp_get_thread_num because the latter
-  // value can be reused while the former is unique.  Without an
-  // unique value, PAPI get confused.  However, if the code spawn
-  // threads without using OMP, the behaviour is undefined.
-  if (max_threads > 1) {
-    PAPI_DEBUG_LOG("PAPI_thread_init");
-    retval = PAPI_thread_init(pthread_self);
-    if (retval != PAPI_OK) {
-      meto::error_handler("papi_init. Thread initialization failed.",
+    PAPI_DEBUG_LOG("PAPI_library_init");
+    int retval = PAPI_library_init(PAPI_VER_CURRENT);
+    if (retval != PAPI_VER_CURRENT) {
+      meto::error_handler("papi_init. Version mismatch or init failure.",
                           EXIT_FAILURE);
     }
-  }
 
+    // Initilize threads if there are more than one.  We use
+    // pthread_self instead of omp_get_thread_num because the latter
+    // value can be reused while the former is unique.  Without an
+    // unique value, PAPI get confused.  However, if the code spawn
+    // threads without using OMP, the behaviour is undefined.
+    if (max_threads > 1) {
+      PAPI_DEBUG_LOG("PAPI_thread_init");
+      retval = PAPI_thread_init(pthread_self);
+      if (retval != PAPI_OK) {
+        meto::error_handler("papi_init. Thread initialization failed.",
+                            EXIT_FAILURE);
+      }
+    }
+
+    papi_library_initialized_ = true;
+  }
   // Read the events to collect from an environment variable
   // Ex: VERNIER_PAPI_EVENTS1=PAPI_FP_OPS,PAPI_TOT_INS
   auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS1");
@@ -150,9 +157,6 @@ void meto::papi_finalize() {
   // This need to be cleared in case PAPIContext is initialized and finalized
   // multiple time on the same run
   events_code.clear();
-
-  PAPI_DEBUG_LOG("PAPI_shutdown");
-  PAPI_shutdown();
 }
 
 /**
