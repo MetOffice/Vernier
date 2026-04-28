@@ -232,7 +232,8 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
       // Note: We do not set `num_threads` to the maximum possible threads;
       // instead, we only collect metrics for the threads that are actually
       // part of the computation. This ensures that if the code dynamically
-      // reduces the number of computing threads, we only gather relevant metrics.
+      // reduces the number of computing threads, we only gather relevant
+      // metrics.
 
       region_start_metrics.resize(
           static_cast<metrics_vector::size_type>(max_threads_));
