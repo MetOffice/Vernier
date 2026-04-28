@@ -225,14 +225,14 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
       region_start_metrics.resize(1);
       papi_context_.read(region_start_metrics[0]);
     } else {
-      // We are not inside a parallel region so we are in thread
-      // zero. There is a possibility that this vernier region has
-      // some OMP parallel region inside. We need to take the start
-      // metrics for each possible thread. However, we do not set
-      // `num_threads` to the maximum number of threads. This
-      // takes the metrics only for the threads that are part of the
-      // computation, if the code reduced the number of computing
-      // threads.
+      // We are not inside a parallel region, so we are in thread
+      // zero. There is a possibility that this Vernier region contains
+      // an OpenMP parallel region. We need to take the start metrics for
+      // each possible thread that may participate in the parallel region.
+      // Note: We do not set `num_threads` to the maximum possible threads;
+      // instead, we only collect metrics for the threads that are actually
+      // part of the computation. This ensures that if the code dynamically
+      // reduces the number of computing threads, we only gather relevant metrics.
 
       region_start_metrics.resize(
           static_cast<metrics_vector::size_type>(max_threads_));

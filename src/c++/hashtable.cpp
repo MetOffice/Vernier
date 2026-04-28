@@ -179,11 +179,14 @@ void meto::HashTable::update_metrics(record_index_t const record_index,
     // this case the metrics of a single thread are added into the
     // total.
     //
-    // If there is more than one element, then the vernier region
+    // If there is more than one element, then the Vernier region
     // did not start inside a parallel region and was run by
-    // thread zero. We need to consider the possibility that a
-    // parallel region was run inside the vernier region. We need to
-    // sum all the metrics from all threads to those of thread zero.
+    // thread zero. In this case, it is possible that a parallel region
+    // was executed inside the Vernier region. To account for all work
+    // done within the region, we sum the metrics from all threads and
+    // accumulate them into the total for thread zero. This ensures the
+    // total metrics reflect the combined activity of all threads within
+    // the region, regardless of how the parallelism was structured.
     for (metrics_vector::size_type i = 0; i < stop_metrics.size(); ++i) {
       for (metrics_array::size_type e = 0;
            e < static_cast<metrics_array::size_type>(num_events); e++)
