@@ -92,10 +92,10 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
   mpi_context_.init(client_comm_handle, tag);
 
 #ifdef USE_PAPI
-  // Inititialize PAPI
+  // Initialize PAPI
   papi_init(max_threads_);
 
-  // Initialize PAPI context for every threads.
+  // Initialize PAPI context for every thread.
 #pragma omp parallel num_threads(max_threads_)
   {
     if (!papi_context_.is_initialized())
@@ -126,10 +126,9 @@ void meto::Vernier::init(MPI_Comm const client_comm_handle,
 void meto::Vernier::finalize() {
 
 #ifdef USE_PAPI
-
-  // The finalize of a PAPI context need to be called by the thread
-  // that called the init otherwsie there could be a problem in PAPI.
-  // The following call crate a parallel region (with maximum number
+  // The finalize of a PAPI context needs to be called by the thread
+  // that called the init otherwise there could be a problem in PAPI.
+  // The following call creates a parallel region (with maximum number
   // of threads allowed) for this purpose.
 #pragma omp parallel num_threads(max_threads_)
   { papi_context_.finalize(); }
@@ -214,24 +213,24 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
 #ifdef USE_PAPI
     metrics_vector region_start_metrics;
 
-    // Read mettrics before getting the start time.  However we need
+    // Read metrics before getting the start time. However, we need
     // to check if we are in a parallel region first.
     int parallel = 0;
 #ifdef _OPENMP
     parallel = omp_in_parallel();
 #endif
     if (parallel) {
-      // If we are in a parellel region, then we take the metrics for
+      // If we are in a parallel region, then we take the metrics for
       // only this thread (which could be any thread).
       region_start_metrics.resize(1);
       papi_context_.read(region_start_metrics[0]);
     } else {
       // We are not inside a parallel region so we are in thread
       // zero. There is a possibility that this vernier region has
-      // some OMP paralel region inside. We need to take the start
-      // metrics for each possible thread. However we do not set
-      // `num_threads` to the maximum number of therads. This to
-      // takes the metrics only of the threads that are part of the
+      // some OMP parallel region inside. We need to take the start
+      // metrics for each possible thread. However, we do not set
+      // `num_threads` to the maximum number of threads. This
+      // takes the metrics only for the threads that are part of the
       // computation, if the code reduced the number of computing
       // threads.
 
@@ -286,20 +285,20 @@ void meto::Vernier::stop(size_t const hash) {
   // Log the papi metrics
   metrics_vector region_stop_metrics;
 
-  // However we need to check if we are in a parallel region first.
+  // However, we need to check if we are in a parallel region first.
   int parallel = 0;
 #ifdef _OPENMP
   parallel = omp_in_parallel();
 #endif
   if (parallel) {
-    // If we are in a parellel region, then we take the metrics for
+    // If we are in a parallel region, then we take the metrics for
     // only this thread (which could be any thread).
     region_stop_metrics.resize(1);
     papi_context_.read(region_stop_metrics[0]);
   } else {
     // We are not inside a parallel region so we are in thread
     // zero. There is a possibility that this vernier region has
-    // some OMP paralel region inside. We need to take the start
+    // some OMP parallel region inside. We need to take the stop
     // metrics for each possible thread.
 
     region_stop_metrics.resize(
