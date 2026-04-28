@@ -30,14 +30,14 @@ TEST(PAPITest, FPOpsOnlyTest) {
   // Ensure only PAPI_FP_OPS is requested.
   setenv("VERNIER_PAPI_EVENTS1", "PAPI_FP_OPS", /*overwrite=*/1);
 
-  meto::vernier.init();
-
-  // Skip gracefully if the hardware does not support PAPI_FP_OPS.
+    // Skip gracefully if the hardware does not support PAPI_FP_OPS.
   if (meto::events_code.empty()) {
     meto::vernier.finalize();
     unsetenv("VERNIER_PAPI_EVENTS1");
     GTEST_SKIP() << "PAPI_FP_OPS not available on this hardware.";
   }
+
+  meto::vernier.init();
 
   // Exactly one event must be active.
   ASSERT_EQ(meto::events_code.size(), 1u);

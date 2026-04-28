@@ -142,8 +142,6 @@ int main() {
 
   setenv("VERNIER_PAPI_EVENTS1", "PAPI_FP_OPS", /*overwrite=*/1);
 
-  meto::vernier.init();
-
 #ifdef USE_PAPI
   // Skip gracefully if PAPI_FP_OPS is unavailable on this hardware.
   if (meto::events_code.empty()) {
@@ -154,6 +152,8 @@ int main() {
     return EXIT_SUCCESS;
   }
 #endif
+
+  meto::vernier.init();
 
   // -------------------------------------------------------------------------
   // Run 1: vernier region inside the parallel region.
