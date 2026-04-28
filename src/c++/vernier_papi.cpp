@@ -29,6 +29,9 @@ meto::events_vector meto::events_code;
 // initialized and finalized multiple times.
 static bool papi_library_initialized_ = false;
 
+// Thread support must be initialized separately.
+static bool papi_thread_initialized_ = false;
+
 #ifdef VERNIER_PAPI_DEBUG
 /**
  * @brief Returns a debug string showing the current thread and CPU placement.
@@ -165,22 +168,28 @@ void meto::papi_init(int max_threads) {
                           EXIT_FAILURE);
     }
 
-    // Initialize threads if there are more than one.  We use
-    // pthread_self instead of omp_get_thread_num because the latter
-    // value can be reused while the former is unique.  Without a
-    // unique value, PAPI gets confused.  However, if the code spawns
-    // threads without using OMP, the behaviour is undefined.
-    if (max_threads > 1) {
-      PAPI_DEBUG_LOG("PAPI_thread_init");
-      retval = PAPI_thread_init(pthread_self);
-      if (retval != PAPI_OK) {
-        meto::error_handler("papi_init. Thread initialization failed.",
-                            EXIT_FAILURE);
-      }
-    }
-
     papi_library_initialized_ = true;
   }
+
+  // Thread support must be initialized separately from the library guard so
+  // that a prior call to papi_events_probe() (which sets
+  // papi_library_initialized_ without knowing the thread count) does not
+  // prevent PAPI_thread_init from being called here.
+  //
+  // We use pthread_self instead of omp_get_thread_num because the latter
+  // value can be reused while the former is unique.  Without a unique value,
+  // PAPI gets confused.  However, if the code spawns threads without using
+  // OMP, the behaviour is undefined.
+  if (!papi_thread_initialized_ && max_threads > 1) {
+    PAPI_DEBUG_LOG("PAPI_thread_init");
+    int retval = PAPI_thread_init(pthread_self);
+    if (retval != PAPI_OK) {
+      meto::error_handler("papi_init. Thread initialization failed.",
+                          EXIT_FAILURE);
+    }
+    papi_thread_initialized_ = true;
+  }
+
   // Read the events to collect from an environment variable
   // Ex: VERNIER_PAPI_EVENTS1=PAPI_FP_OPS,PAPI_TOT_INS
   auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS1");
@@ -235,6 +244,14 @@ void meto::PAPIContext::init() {
   assert(initialized_ == false);
   assert(started_ == false);
 
+  // Register this thread with PAPI before touching any event set.
+  // PAPI_thread_init() registers the thread-ID function in the calling
+  // (main) thread only; every OMP worker thread must call
+  // PAPI_register_thread() itself before using PAPI.  The call is a
+  // no-op when the thread is already known to PAPI.
+  PAPI_DEBUG_LOG("PAPI_register_thread");
+  PAPI_register_thread();
+
   PAPI_DEBUG_LOG("PAPI_create_eventset");
   if (PAPI_create_eventset(&event_set_) != PAPI_OK) {
     meto::error_handler("PAPIContext::init. Failed to create eventset.",
@@ -277,35 +294,44 @@ void meto::PAPIContext::init() {
 
 void meto::PAPIContext::finalize() {
 
-  if (initialized_ && event_set_ != PAPI_NULL) {
+  if (initialized_) {
 
-    // Need to stop metrics if started; values are not used after this,
-    // thus we can use them in this call.
-    if (started_) {
-      PAPI_DEBUG_LOG("PAPI_stop");
-      long long values[VERNIER_MAX_PAPI_METRICS];
-      if (PAPI_stop(event_set_, values) != PAPI_OK) {
-        meto::error_handler(
-            "PAPIContext::finalize. Failed to stop metrics collection.",
-            EXIT_FAILURE);
+    if (event_set_ != PAPI_NULL) {
+
+      // Need to stop metrics if started; values are not used after this,
+      // thus we can use them in this call.
+      if (started_) {
+        PAPI_DEBUG_LOG("PAPI_stop");
+        long long values[VERNIER_MAX_PAPI_METRICS];
+        if (PAPI_stop(event_set_, values) != PAPI_OK) {
+          meto::error_handler(
+              "PAPIContext::finalize. Failed to stop metrics collection.",
+              EXIT_FAILURE);
+        }
+        started_ = false;
       }
-      started_ = false;
+
+      PAPI_DEBUG_LOG("PAPI_cleanup_eventset");
+      if (PAPI_cleanup_eventset(event_set_) != PAPI_OK) {
+        meto::error_handler("PAPIContext::finalize. Failed to cleanup.",
+                            EXIT_FAILURE);
+      }
+      PAPI_DEBUG_LOG("PAPI_destroy_eventset");
+      if (PAPI_destroy_eventset(&event_set_) != PAPI_OK) {
+        meto::error_handler(
+            "PAPIContext::finalize. Failed to destroy eventset.", EXIT_FAILURE);
+      }
     }
 
-    PAPI_DEBUG_LOG("PAPI_cleanup_eventset");
-    if (PAPI_cleanup_eventset(event_set_) != PAPI_OK) {
-      meto::error_handler("PAPIContext::finalize. Failed to cleanup.",
-                          EXIT_FAILURE);
-    }
-    PAPI_DEBUG_LOG("PAPI_destroy_eventset");
-    if (PAPI_destroy_eventset(&event_set_) != PAPI_OK) {
-      meto::error_handler("PAPIContext::finalize. Failed to destroy eventset.",
-                          EXIT_FAILURE);
-    }
+    event_set_ = PAPI_NULL;
+    initialized_ = false;
+
+    // Deregister this thread from PAPI to release per-thread resources.
+    // Placed inside the initialized_ guard so that it is only called when
+    // PAPI_register_thread() was called in init().
+    PAPI_DEBUG_LOG("PAPI_unregister_thread");
+    PAPI_unregister_thread();
   }
-
-  event_set_ = PAPI_NULL;
-  initialized_ = false;
 }
 
 /**
