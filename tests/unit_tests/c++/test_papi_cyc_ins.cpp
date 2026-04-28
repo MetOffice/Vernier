@@ -29,6 +29,8 @@ TEST(PAPITest, TotCycTotInsTest) {
   // Request both events in order.
   setenv("VERNIER_PAPI_EVENTS1", "PAPI_TOT_CYC,PAPI_TOT_INS", /*overwrite=*/1);
 
+  meto::vernier.init();
+
   // Skip gracefully if neither event could be loaded (e.g. no PMU access).
   if (meto::events_code.empty()) {
     meto::vernier.finalize();
@@ -36,8 +38,6 @@ TEST(PAPITest, TotCycTotInsTest) {
     GTEST_SKIP()
         << "PAPI_TOT_CYC / PAPI_TOT_INS not available on this hardware.";
   }
-
-  meto::vernier.init();
 
   // Exactly two events must be active and in the expected order.
   ASSERT_EQ(meto::events_code.size(), 2u);

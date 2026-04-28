@@ -60,14 +60,14 @@ TEST(PAPITest, TotInsMultiThreadTest) {
 
   setenv("VERNIER_PAPI_EVENTS1", "PAPI_TOT_INS", /*overwrite=*/1);
 
+  meto::vernier.init();
+
   // Skip gracefully if PAPI_TOT_INS is unavailable.
   if (meto::events_code.empty()) {
     meto::vernier.finalize();
     unsetenv("VERNIER_PAPI_EVENTS1");
     GTEST_SKIP() << "PAPI_TOT_INS not available on this hardware.";
   }
-
-  meto::vernier.init();
 
   ASSERT_EQ(meto::events_code.size(), 1u);
   EXPECT_EQ(meto::events_code[0].second, "PAPI_TOT_INS");
