@@ -22,7 +22,10 @@ using ::testing::ExitedWithCode;
 
 // Make sure the code exits when a hash mismatch happens.
 TEST(DeathTest, WrongHashTest) {
-  GTEST_FLAG_SET(death_test_style, "threadsafe");
+
+  // Needed if test is multi-threaded
+  (void)(::testing::GTEST_FLAG(death_test_style) = "threadsafe");
+
   meto::vernier.init();
 
   EXPECT_EXIT(
@@ -71,7 +74,10 @@ TEST(DeathTest, StartBeforeInit) {
 // MPI_COMM_NULL.
 TEST(DeathTest, NullCommunicatorPassed) {
   [[maybe_unused]] int ierr;
-  GTEST_FLAG_SET(death_test_style, "threadsafe");
+
+  // Needed if test is multi-threaded
+  (void)(::testing::GTEST_FLAG(death_test_style) = "threadsafe");
+
   EXPECT_EXIT(
       { meto::vernier.init(MPI_COMM_NULL); }, ExitedWithCode(EXIT_FAILURE),
       "MPIContext::init. MPI initialized, but null communicator passed.");
@@ -92,7 +98,10 @@ TEST(DeathTest, VernierUninitialisedInWrite) {
 // The traceback array is not a growable vector. Check that the code exits
 // when available array elements are exhausted.
 TEST(DeathTest, TooManyTracebackEntries) {
-  GTEST_FLAG_SET(death_test_style, "threadsafe");
+
+  // Needed if test is multi-threaded
+  (void)(::testing::GTEST_FLAG(death_test_style) = "threadsafe");
+
   meto::vernier.init();
 
   EXPECT_EXIT(
