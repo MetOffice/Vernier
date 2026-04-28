@@ -173,7 +173,7 @@ class TestVernierData(unittest.TestCase):
         self.test_data.data["test_calliper"].cumul_time = [30.0, 40.0]
         self.test_data.data["test_calliper"].self_time = [5.0, 15.0]
         self.test_data.data["test_calliper"].total_time = [25.0, 35.0]
-        self.test_data.data["test_calliper"].n_calls = [2]
+        self.test_data.data["test_calliper"].n_calls = [2, 2]
         self.test_data.data["test_calliper"].rank = [0, 1]
         self.test_data.data["test_calliper"].thread = [0, 0]
 
@@ -182,8 +182,8 @@ class TestVernierData(unittest.TestCase):
             self.test_data.write_txt_output(Path(tmp_file.name))
             contents = Path(tmp_file.name).read_text().splitlines()
             # pylint: disable=line-too-long
-            self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", contents[0])
-            self.assertEqual("| test_calliper |           30.0 |         10.0 |           35.0 |             2 |     15.0 |              15.0 |", contents[1])
+            self.assertEqual("|       Routine | Total Min(s) | Total Mean(s) | Total Max(s) | Self Min(s) | Self Mean(s) | Self Max(s) | Max no. calls |   % time | Time per call(s) |", contents[0])
+            self.assertEqual("| test_calliper |         25.0 |          30.0 |         35.0 |         5.0 |         10.0 |        15.0 |             2 |     15.0 |             15.0 |", contents[1])
 
     def test_write_txt_output_terminal(self):
         """
@@ -195,7 +195,7 @@ class TestVernierData(unittest.TestCase):
         self.test_data.data["test_calliper"].cumul_time = [10.0, 12.0]
         self.test_data.data["test_calliper"].self_time = [3.0, 4.0]
         self.test_data.data["test_calliper"].total_time = [15.0, 55.0]
-        self.test_data.data["test_calliper"].n_calls = [2]
+        self.test_data.data["test_calliper"].n_calls = [2, 2]
         self.test_data.data["test_calliper"].rank = [0, 1]
         self.test_data.data["test_calliper"].thread = [0, 0]
 
@@ -205,8 +205,8 @@ class TestVernierData(unittest.TestCase):
         sys.stdout = sys.__stdout__
 
         # pylint: disable=line-too-long
-        self.assertEqual("|       Routine | Total time (s) |     Self (s) | Cumul time (s) | Max no. calls |   % time | Time per call (s) |", write_output.getvalue().splitlines()[0])
-        self.assertEqual("| test_calliper |           35.0 |          3.5 |           11.0 |             2 |     45.0 |              17.5 |", write_output.getvalue().splitlines()[1])
+        self.assertEqual("|       Routine | Total Min(s) | Total Mean(s) | Total Max(s) | Self Min(s) | Self Mean(s) | Self Max(s) | Max no. calls |   % time | Time per call(s) |", write_output.getvalue().splitlines()[0])
+        self.assertEqual("| test_calliper |         15.0 |          35.0 |         55.0 |         3.0 |          3.5 |         4.0 |             2 |     45.0 |             17.5 |", write_output.getvalue().splitlines()[1])
 
     def test_aggregate(self):
         """

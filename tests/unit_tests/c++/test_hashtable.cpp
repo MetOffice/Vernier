@@ -15,6 +15,7 @@
 using ::testing::AllOf;
 using ::testing::An;
 using ::testing::Gt;
+using ::testing::HasSubstr;
 
 int const tid = 0;
 std::string tid_str(std::to_string(tid));
@@ -127,7 +128,7 @@ TEST(HashTableTest, NameLengthTest) {
   meto::vernier.init();
 
   EXPECT_EXIT(meto::vernier.start(label), testing::ExitedWithCode(1),
-              "Internal error: character buffer exhausted.");
+              HasSubstr("Vernier internal error: region name too long"));
 
   meto::vernier.finalize();
 }

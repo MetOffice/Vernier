@@ -7,7 +7,7 @@ name = "Vernier"
 description = "Python post-processing library for Vernier profiling tool"
 license = {file = 'LICENSE'}
 requires-python = '>=3.9'
-dependencies = ['numpy']
+dependencies = []
 version = '0.4.0'
 
 [project.optional-dependencies]
