@@ -95,6 +95,60 @@ static std::vector<std::string> read_events_str_from_env(const char *env_var) {
 }
 
 /**
+ * @brief Probe whether every event in VERNIER_PAPI_EVENTS1 is
+ *        countable on the current hardware. This routine is used for
+ *        unit and system testing.
+ *
+ * @details Initialises the PAPI library (idempotent), then attempts to add
+ *          each requested event to a temporary event set.  The event set is
+ *          always destroyed before the function returns.  No error_handler
+ *          call is made; the function returns false on any failure so that
+ *          callers can issue GTEST_SKIP() before invoking vernier.init().
+ *
+ * @return true  All requested events are available (or no events requested).
+ * @return false PAPI cannot be initialised, or at least one event cannot be
+ *               added to an event set on this hardware.
+ * @note  This function has been produced with the assistance of
+ *        Met Office Github Copilot Enterprise
+ */
+bool meto::papi_events_probe() {
+  // Initialise the PAPI library if it has not been done yet.
+  if (!papi_library_initialized_) {
+    if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT) {
+      return false;
+    }
+    papi_library_initialized_ = true;
+  }
+
+  auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS1");
+  if (events_str.empty()) {
+    return true; // nothing requested — counts as available
+  }
+
+  int es = PAPI_NULL;
+  if (PAPI_create_eventset(&es) != PAPI_OK) {
+    return false;
+  }
+
+  bool all_ok = true;
+  for (const auto &name : events_str) {
+    int code = 0;
+    if (PAPI_event_name_to_code(name.c_str(), &code) != PAPI_OK) {
+      all_ok = false;
+      break;
+    }
+    if (PAPI_add_event(es, code) != PAPI_OK) {
+      all_ok = false;
+      break;
+    }
+  }
+
+  PAPI_cleanup_eventset(es);
+  PAPI_destroy_eventset(&es);
+  return all_ok;
+}
+
+/**
  * @brief  Initialise PAPI
  *
  * @note once before any threads start

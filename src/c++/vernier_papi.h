@@ -28,6 +28,13 @@ namespace meto {
 void papi_init(int);
 void papi_finalize();
 
+// Probe whether every event listed in VERNIER_PAPI_EVENTS1 can be added to a
+// PAPI event set on the current hardware.  Returns true when all events are
+// available, false when any event is missing or cannot be counted.  Never
+// calls error_handler; safe to call before vernier.init().
+// This routine is used for unit and system testing.
+bool papi_events_probe();
+
 // Contains the codes of the PAPI events that need to be collected.
 using events_vector = std::vector<std::pair<int, std::string>>;
 extern events_vector events_code;
