@@ -44,6 +44,10 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h
           vernier_get_wtime.h vernier_mpi.h mpi_context.h error_handler.h)
 
+if (ENABLE_PAPI)
+  list(APPEND PUBLIC_HEADER_FILES vernier_papi.h)
+endif()
+
 # Link library to and external libs (also use project warnings and options).
 set (PLIBS OpenMP::OpenMP_CXX)
 
@@ -55,7 +59,7 @@ endif()
 
 if (ENABLE_PAPI)
   list(APPEND PLIBS PAPI::PAPI)
-  target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_PAPI)
+  target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC USE_PAPI)
   if (PAPI_DEBUG)
     target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE VERNIER_PAPI_DEBUG)
   endif()
