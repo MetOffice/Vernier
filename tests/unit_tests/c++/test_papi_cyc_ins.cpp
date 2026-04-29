@@ -20,20 +20,20 @@
 // Test: PAPI_TOT_CYC and PAPI_TOT_INS are both loaded and return positive
 //       counts after executing a non-trivial region.
 //
-// Event indices (matching the order in VERNIER_PAPI_EVENTS1):
+// Event indices (matching the order in VERNIER_PAPI_EVENTS):
 //   0 -> PAPI_TOT_CYC
 //   1 -> PAPI_TOT_INS
 // ---------------------------------------------------------------------------
 TEST(PAPITest, TotCycTotInsTest) {
 
   // Request both events in order.
-  setenv("VERNIER_PAPI_EVENTS1", "PAPI_TOT_CYC,PAPI_TOT_INS", /*overwrite=*/1);
+  setenv("VERNIER_PAPI_EVENTS", "PAPI_TOT_CYC,PAPI_TOT_INS", /*overwrite=*/1);
 
   // Probe before vernier.init(): if any event is unavailable, vernier.init()
   // would call error_handler → std::exit / MPI_Abort.  Skipping here prevents
   // that hard termination from killing the test binary.
   if (!meto::papi_events_probe()) {
-    unsetenv("VERNIER_PAPI_EVENTS1");
+    unsetenv("VERNIER_PAPI_EVENTS");
     GTEST_SKIP()
         << "PAPI_TOT_CYC / PAPI_TOT_INS not available on this hardware.";
   }
@@ -43,7 +43,7 @@ TEST(PAPITest, TotCycTotInsTest) {
   // Fallback: skip if no events were actually loaded (env var unset path).
   if (meto::events_code.empty()) {
     meto::vernier.finalize();
-    unsetenv("VERNIER_PAPI_EVENTS1");
+    unsetenv("VERNIER_PAPI_EVENTS");
     GTEST_SKIP()
         << "PAPI_TOT_CYC / PAPI_TOT_INS not available on this hardware.";
   }
@@ -85,5 +85,5 @@ TEST(PAPITest, TotCycTotInsTest) {
             << "\n";
 
   meto::vernier.finalize();
-  unsetenv("VERNIER_PAPI_EVENTS1");
+  unsetenv("VERNIER_PAPI_EVENTS");
 }

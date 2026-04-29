@@ -28,13 +28,13 @@
 TEST(PAPITest, FPOpsOnlyTest) {
 
   // Ensure only PAPI_FP_OPS is requested.
-  setenv("VERNIER_PAPI_EVENTS1", "PAPI_FP_OPS", /*overwrite=*/1);
+  setenv("VERNIER_PAPI_EVENTS", "PAPI_FP_OPS", /*overwrite=*/1);
 
   // Probe before vernier.init(): if the event is unavailable, vernier.init()
   // would call error_handler → std::exit / MPI_Abort.  Skipping here prevents
   // that hard termination from killing the test binary.
   if (!meto::papi_events_probe()) {
-    unsetenv("VERNIER_PAPI_EVENTS1");
+    unsetenv("VERNIER_PAPI_EVENTS");
     GTEST_SKIP() << "PAPI_FP_OPS not available on this hardware.";
   }
 
@@ -43,7 +43,7 @@ TEST(PAPITest, FPOpsOnlyTest) {
   // Fallback: skip if no events were actually loaded (env var unset path).
   if (meto::events_code.empty()) {
     meto::vernier.finalize();
-    unsetenv("VERNIER_PAPI_EVENTS1");
+    unsetenv("VERNIER_PAPI_EVENTS");
     GTEST_SKIP() << "PAPI_FP_OPS not available on this hardware.";
   }
 
@@ -89,5 +89,5 @@ TEST(PAPITest, FPOpsOnlyTest) {
 #endif
 
   meto::vernier.finalize();
-  unsetenv("VERNIER_PAPI_EVENTS1");
+  unsetenv("VERNIER_PAPI_EVENTS");
 }

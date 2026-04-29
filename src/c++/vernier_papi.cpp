@@ -102,7 +102,7 @@ static std::vector<std::string> read_events_str_from_env(const char *env_var) {
 }
 
 /**
- * @brief Probe whether every event in VERNIER_PAPI_EVENTS1 is
+ * @brief Probe whether every event in VERNIER_PAPI_EVENTS is
  *        countable on the current hardware. This routine is used for
  *        unit and system testing.
  *
@@ -127,7 +127,7 @@ bool meto::papi_events_probe() {
     papi_library_initialized_ = true;
   }
 
-  auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS1");
+  auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS");
   if (events_str.empty()) {
     return true; // nothing requested — counts as available
   }
@@ -195,8 +195,8 @@ void meto::papi_init(int max_threads) {
   }
 
   // Read the events to collect from an environment variable
-  // Ex: VERNIER_PAPI_EVENTS1=PAPI_FP_OPS,PAPI_TOT_INS
-  auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS1");
+  // Ex: VERNIER_PAPI_EVENTS=PAPI_FP_OPS,PAPI_TOT_INS
+  auto events_str = read_events_str_from_env("VERNIER_PAPI_EVENTS");
   if (events_str.size() > VERNIER_MAX_PAPI_METRICS) {
     meto::error_handler("papi_init. VERNIER_PAPI_EVENTS has too many events: " +
                             std::to_string(events_str.size()),

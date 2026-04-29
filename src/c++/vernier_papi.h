@@ -34,7 +34,7 @@ extern events_vector_t events_code;
 void papi_init(int);
 void papi_finalize();
 
-// Probe whether every event listed in VERNIER_PAPI_EVENTS1 can be added to a
+// Probe whether every event listed in VERNIER_PAPI_EVENTS can be added to a
 // PAPI event set on the current hardware.  Returns true when all events are
 // available, false when any event is missing or cannot be counted.  Never
 // calls error_handler; safe to call before vernier.init().

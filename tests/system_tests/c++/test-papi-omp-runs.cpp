@@ -136,13 +136,13 @@ static bool check_threads_output(std::string const &path) {
 int main() {
   MPI_Init(NULL, NULL);
 
-  setenv("VERNIER_PAPI_EVENTS1", "PAPI_FP_OPS", /*overwrite=*/1);
+  setenv("VERNIER_PAPI_EVENTS", "PAPI_FP_OPS", /*overwrite=*/1);
 
   // Probe before vernier.init(): if PAPI_FP_OPS is unavailable, vernier.init()
   // would call error_handler -> MPI_Abort.  Probing here prevents that hard
   // termination and lets us exit cleanly with a skip message.
   if (!meto::papi_events_probe()) {
-    unsetenv("VERNIER_PAPI_EVENTS1");
+    unsetenv("VERNIER_PAPI_EVENTS");
     std::cout << "PAPI_FP_OPS not available on this hardware – test skipped.\n";
     MPI_Finalize();
     return EXIT_SUCCESS;
@@ -153,7 +153,7 @@ int main() {
   // Fallback: skip if no events were actually loaded (env var unset path).
   if (meto::events_code.empty()) {
     meto::vernier.finalize();
-    unsetenv("VERNIER_PAPI_EVENTS1");
+    unsetenv("VERNIER_PAPI_EVENTS");
     std::cout << "PAPI_FP_OPS not available on this hardware – test skipped.\n";
     MPI_Finalize();
     return EXIT_SUCCESS;
@@ -250,7 +250,7 @@ int main() {
   unsetenv("VERNIER_OUTPUT_FILENAME");
   unsetenv("VERNIER_OUTPUT_MODE");
   unsetenv("VERNIER_OUTPUT_FORMAT");
-  unsetenv("VERNIER_PAPI_EVENTS1");
+  unsetenv("VERNIER_PAPI_EVENTS");
 
   // -------------------------------------------------------------------------
   // Print table and verify bounds.
