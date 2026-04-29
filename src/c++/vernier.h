@@ -61,7 +61,7 @@ private:
     TracebackEntry() = default;
 
     TracebackEntry(size_t, record_index_t, time_point_t, time_point_t,
-                   metrics_vector_t &);
+                   metrics_vector_t &&);
 
     // Data members
     size_t record_hash_;

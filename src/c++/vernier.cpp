@@ -31,8 +31,11 @@ meto::Vernier::~Vernier() = default;
  *                                 start calliper.
  * @param [in]  calliper_start_time The clock measurement on entry to the start
  *                                  calliper.
- * @param [in]  region_start_metrics The PAPI metrics measurement on entry to
- *              the start calliper.
+ * @param [in] region_start_metrics The PAPI metrics measurement on
+ *              entry to the start calliper. The argument should be
+ *              passed using std::move into the object avoiding any
+ *              copy. The argument should not be used after this
+ *              routine call.
  *
  */
 
@@ -40,11 +43,11 @@ meto::Vernier::TracebackEntry::TracebackEntry(
     size_t record_hash, meto::record_index_t record_index,
     meto::time_point_t region_start_time,
     meto::time_point_t calliper_start_time,
-    metrics_vector_t &region_start_metrics)
+    metrics_vector_t &&region_start_metrics)
     : record_hash_(record_hash), record_index_(record_index),
       region_start_time_(region_start_time),
       calliper_start_time_(calliper_start_time),
-      region_start_metrics_(region_start_metrics) {}
+      region_start_metrics_(std::move(region_start_metrics)) {}
 
 /**
  * @brief  Initialise Vernier object.
@@ -244,7 +247,7 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
     auto region_start_time = vernier_gettime();
     thread_traceback_[tid].at(call_depth_index) =
         TracebackEntry(hash, record_index, region_start_time,
-                       logged_calliper_start_time_, region_start_metrics);
+                       logged_calliper_start_time_, std::move(region_start_metrics));
   } else {
     error_handler("EMERGENCY STOP: Traceback array exhausted.", EXIT_FAILURE);
   }
