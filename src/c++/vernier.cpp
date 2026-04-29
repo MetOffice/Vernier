@@ -245,9 +245,9 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
 
     auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
     auto region_start_time = vernier_gettime();
-    thread_traceback_[tid].at(call_depth_index) =
-        TracebackEntry(hash, record_index, region_start_time,
-                       logged_calliper_start_time_, std::move(region_start_metrics));
+    thread_traceback_[tid].at(call_depth_index) = TracebackEntry(
+        hash, record_index, region_start_time, logged_calliper_start_time_,
+        std::move(region_start_metrics));
   } else {
     error_handler("EMERGENCY STOP: Traceback array exhausted.", EXIT_FAILURE);
   }
