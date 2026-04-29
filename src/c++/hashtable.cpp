@@ -94,7 +94,7 @@ size_t meto::HashTable::compute_hash(std::string_view region_name, int tid) {
   // the iterator.
   auto new_chars_size = std::distance(new_chars.begin(), new_chars_iterator);
 
-  // Check that the character string is the length which were expecting.
+  // Check that the character string is the length we were expecting.
   [[maybe_unused]] auto const expected_size =
       static_cast<unsigned int>(region_name.length()) + num_extra_bytes;
   assert(new_chars_size == expected_size);

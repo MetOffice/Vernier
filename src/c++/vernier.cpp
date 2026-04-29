@@ -20,7 +20,7 @@ int meto::Vernier::call_depth_ = -1;
 meto::time_point_t meto::Vernier::logged_calliper_start_time_{};
 meto::PAPIContext meto::Vernier::papi_context_{};
 
-// Needed to avoid an issue with RegionRecord and USE_PAPI
+// Needed to avoid an issue between RegionRecord and USE_PAPI.
 meto::Vernier::~Vernier() = default;
 
 /**
@@ -225,7 +225,7 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
         region_start_metrics.resize(
             static_cast<metrics_vector_t::size_type>(max_threads_));
 
-        // The creation of parallel region will add some overhead
+        // The creation of a parallel region will add some overhead
 #pragma omp parallel
         {
           int t = 0;
@@ -281,15 +281,15 @@ void meto::Vernier::stop(size_t const hash) {
       region_stop_metrics.resize(1);
       papi_context_.read(region_stop_metrics[0]);
     } else {
-      // We are not inside a parallel region so we are in thread
-      // zero. There is a possibility that this vernier region has
+      // We are not inside a parallel region, so we are in thread
+      // zero. There is a possibility that this Vernier region has
       // some OMP parallel region inside. We need to take the stop
       // metrics for each possible thread.
 
       region_stop_metrics.resize(
           static_cast<metrics_vector_t::size_type>(max_threads_));
 
-      // The creation of parallel region will add some overhead
+      // The creation of a parallel region will add some overhead
 #pragma omp parallel
       {
         int t = 0;
