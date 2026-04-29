@@ -85,15 +85,12 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
      << std::setw(15) << std::right << "Overhead (s)" << std::setw(10)
      << std::right << "Calls";
 
-#ifdef USE_PAPI
   if (!events_code.empty()) {
-    for (const auto &code : events_code) {
+    for (std::size_t e = 0; e < events_code.size(); e++) {
       os << std::right << std::setw(15)
-         << code.second.substr(code.second.size() > 14 ? code.second.size() - 14
-                                                       : 0);
+         << events_code[e].second.substr(events_code[e].second.size() > 14 ? events_code[e].second.size() - 14 : 0);
     }
   }
-#endif
 
   os << "\n";
 
@@ -102,13 +99,11 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
   os << std::setw(40) << " " << std::setw(15) << " " << std::setw(15) << " "
      << std::setw(15) << " " << std::setw(10) << " ";
 
-#ifdef USE_PAPI
   if (!events_code.empty()) {
-    for (size_t i = 0; i < events_code.size(); ++i) {
+    for (std::size_t i = 0; i < events_code.size(); ++i) {
       os << std::setw(15) << " ";
     }
   }
-#endif
 
   os << "\n";
   os << std::setfill(' ');
@@ -121,14 +116,12 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
        << std::setw(15) << std::right << record.overhead_walltime_.count()
        << std::setw(10) << std::right << record.call_count_;
 
-#ifdef USE_PAPI
     if (!events_code.empty()) {
-      for (int e = 0; e < static_cast<int>(events_code.size()); e++) {
+      for (std::size_t e = 0; e < events_code.size(); e++) {
         os << std::right << std::setw(15)
-           << record.total_metrics_[static_cast<metrics_array::size_type>(e)];
+           << record.total_metrics_[e];
       }
     }
-#endif
 
     os << "\n";
   }

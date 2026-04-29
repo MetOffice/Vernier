@@ -158,7 +158,6 @@ void meto::HashTable::update(record_index_t const record_index,
   ++record.call_count_;
 }
 
-#ifdef USE_PAPI
 /**
  * @brief  Updates the total PAPI metrics for the specified region.
  * @param [in] record_index  The index in hashvec_ corresponding to the
@@ -169,10 +168,9 @@ void meto::HashTable::update(record_index_t const record_index,
  */
 
 void meto::HashTable::update_metrics(record_index_t const record_index,
-                                     const metrics_vector &stop_metrics,
-                                     const metrics_vector &start_metrics,
+                                     const metrics_vector_t &stop_metrics,
+                                     const metrics_vector_t &start_metrics,
                                      int const num_events) {
-
   auto &record = hashvec_[record_index];
 
   // Check if this region has been called recursively
@@ -192,14 +190,13 @@ void meto::HashTable::update_metrics(record_index_t const record_index,
     // accumulate them into the total for thread zero. This ensures the
     // total metrics reflect the combined activity of all threads within
     // the region, regardless of how the parallelism was structured.
-    for (metrics_vector::size_type i = 0; i < stop_metrics.size(); ++i) {
-      for (metrics_array::size_type e = 0;
-           e < static_cast<metrics_array::size_type>(num_events); e++)
+    for (metrics_vector_t::size_type i = 0; i < stop_metrics.size(); ++i) {
+      for (metrics_array_t::size_type e = 0;
+           e < static_cast<metrics_array_t::size_type>(num_events); e++)
         record.total_metrics_[e] += (stop_metrics[i][e] - start_metrics[i][e]);
     }
   }
 }
-#endif
 
 /**
  * @brief  Increments by 1 the recursion level in a region record.
@@ -471,7 +468,6 @@ unsigned long long int meto::HashTable::get_prof_call_count() const {
   return record.call_count_;
 }
 
-#ifdef USE_PAPI
 /**
  * @brief  Get the total accumulated PAPI metric for a specified region.
  * @param [in] hash       The hash corresponding to the region.
@@ -484,9 +480,9 @@ long long meto::HashTable::get_total_metrics(size_t const hash,
                                              int const event_idx) const {
   auto &record = hash2record(hash);
   return record
-      .total_metrics_[static_cast<metrics_array::size_type>(event_idx)];
+      .total_metrics_[static_cast<metrics_array_t::size_type>(event_idx)];
 }
-#endif
+
 
 /**
  * @brief   Gets a reference to a region record for a given hash.

@@ -28,10 +28,7 @@
 #include "hashtable.h"
 #include "mpi_context.h"
 #include "vernier_mpi.h"
-
-#ifdef USE_PAPI
 #include "vernier_papi.h"
-#endif
 
 #define PROF_MAX_TRACEBACK_SIZE 1000
 
@@ -63,12 +60,8 @@ private:
     // Constructors
     TracebackEntry() = default;
 
-    TracebackEntry(size_t, record_index_t, time_point_t, time_point_t
-#ifdef USE_PAPI
-                   ,
-                   metrics_vector &region_start_metrics
-#endif
-    );
+    TracebackEntry(size_t, record_index_t, time_point_t, time_point_t,
+                   metrics_vector_t &);
 
     // Data members
     size_t record_hash_;
@@ -76,13 +69,11 @@ private:
     time_point_t region_start_time_;
     time_point_t calliper_start_time_;
 
-#ifdef USE_PAPI
     // PAPI metrics. For thread zero, this can be multiple
     // metrics_arrays, one for any possible thread inside the parallel
     // regions of a vernier region. For the other threads, this is a
     // single metrics array.
-    metrics_vector region_start_metrics_;
-#endif
+    metrics_vector_t region_start_metrics_;
   };
 
   // Default initialisation flag.  No explicit constructor, and pointless
@@ -110,11 +101,9 @@ private:
   typedef std::vector<std::array<TracebackEntry, PROF_MAX_TRACEBACK_SIZE>>::
       size_type traceback_index_t;
 
-#ifdef USE_PAPI
   // Aa single PAPI context (eventset) per thread.
   static PAPIContext papi_context_;
 #pragma omp threadprivate(papi_context_)
-#endif
 
   // Private methods
   void start_part1();
@@ -138,10 +127,9 @@ public:
   double get_overhead_walltime(size_t const, int const);
   double get_self_walltime(size_t const hash, int const input_tid);
   double get_child_walltime(size_t const hash, int const input_tid) const;
-#ifdef USE_PAPI
   long long get_total_metrics(size_t const hash, int const input_tid,
                               int const event_idx) const;
-#endif
+
   std::string get_decorated_region_name(size_t const hash,
                                         int const input_tid) const;
   unsigned long long int get_call_count(size_t const hash,

@@ -95,10 +95,8 @@ public:
                     record_index_t &) noexcept;
   void update(record_index_t const, time_duration_t const);
 
-#ifdef USE_PAPI
-  void update_metrics(record_index_t const, const metrics_vector &,
-                      const metrics_vector &, int const);
-#endif
+  void update_metrics(record_index_t const, const metrics_vector_t &,
+                      const metrics_vector_t &, int const);
 
   // Member functions
   std::vector<size_t> list_keys();
@@ -119,9 +117,7 @@ public:
   unsigned long long int get_call_count(size_t const hash) const;
   unsigned long long int get_prof_call_count() const;
 
-#ifdef USE_PAPI
   long long get_total_metrics(size_t const hash, int const event_idx) const;
-#endif
 
   void increment_recursion_level(record_index_t const);
   void decrement_recursion_level(record_index_t const);

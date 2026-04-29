@@ -28,11 +28,8 @@ set(vernier_SOURCES
         mpi_context.cpp
         vernier_mpi.cpp
         error_handler.cpp
+        vernier_papi.cpp
         )
-
-if (ENABLE_PAPI)
-   list(APPEND vernier_SOURCES vernier_papi.cpp)
-endif()
 
 add_library(${CMAKE_PROJECT_NAME} ${vernier_SOURCES})
 
@@ -42,11 +39,8 @@ target_include_directories(${CMAKE_PROJECT_NAME}
         $<INSTALL_INTERFACE:include>)
 
 set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h
-          vernier_get_wtime.h vernier_mpi.h mpi_context.h error_handler.h)
-
-if (ENABLE_PAPI)
-  list(APPEND PUBLIC_HEADER_FILES vernier_papi.h)
-endif()
+          vernier_get_wtime.h vernier_mpi.h mpi_context.h error_handler.h
+          vernier_papi.h)
 
 # Link library to and external libs (also use project warnings and options).
 set (PLIBS OpenMP::OpenMP_CXX)

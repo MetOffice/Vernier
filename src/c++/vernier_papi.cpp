@@ -6,6 +6,13 @@
  */
 
 #include "vernier_papi.h"
+
+// Contains the codes of the PAPI events that need to be collected.
+// This could be a dummy empty object if USE_PAPI is not defined.
+meto::events_vector_t meto::events_code;
+
+#ifdef USE_PAPI
+
 #include "error_handler.h"
 
 #include <cassert>
@@ -21,9 +28,6 @@
 #include <mutex>
 #include <sched.h>
 #endif
-
-// Contains the codes of the PAPI events that need to be collected.
-meto::events_vector meto::events_code;
 
 // PAPI library should be initialized only once even if vernier is
 // initialized and finalized multiple times.
@@ -343,7 +347,7 @@ void meto::PAPIContext::finalize() {
  *  thread are collected.
  */
 
-void meto::PAPIContext::read(metrics_array &total_values) {
+void meto::PAPIContext::read(metrics_array_t &total_values) {
 
   assert(num_events_ <= VERNIER_MAX_PAPI_METRICS);
 
@@ -357,3 +361,5 @@ void meto::PAPIContext::read(metrics_array &total_values) {
                         EXIT_FAILURE);
   }
 }
+
+#endif
