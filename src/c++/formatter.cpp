@@ -88,7 +88,9 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
   if (!events_code.empty()) {
     for (std::size_t e = 0; e < events_code.size(); e++) {
       os << std::right << std::setw(15)
-         << events_code[e].second.substr(events_code[e].second.size() > 14 ? events_code[e].second.size() - 14 : 0);
+         << events_code[e].second.substr(events_code[e].second.size() > 14
+                                             ? events_code[e].second.size() - 14
+                                             : 0);
     }
   }
 
@@ -118,8 +120,7 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 
     if (!events_code.empty()) {
       for (std::size_t e = 0; e < events_code.size(); e++) {
-        os << std::right << std::setw(15)
-           << record.total_metrics_[e];
+        os << std::right << std::setw(15) << record.total_metrics_[e];
       }
     }
 

@@ -483,7 +483,6 @@ long long meto::HashTable::get_total_metrics(size_t const hash,
       .total_metrics_[static_cast<metrics_array_t::size_type>(event_idx)];
 }
 
-
 /**
  * @brief   Gets a reference to a region record for a given hash.
  * @param [in]  hash   The region

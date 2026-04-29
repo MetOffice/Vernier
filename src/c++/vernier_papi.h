@@ -22,7 +22,6 @@
 // too big, the metrics could be multiplexed.
 #define VERNIER_MAX_PAPI_METRICS 5
 
-
 namespace meto {
 
 #ifdef USE_PAPI
@@ -30,7 +29,6 @@ namespace meto {
 // Contains the codes of the PAPI events that need to be collected.
 using events_vector_t = std::vector<std::pair<int, std::string>>;
 extern events_vector_t events_code;
-
 
 // General functions
 void papi_init(int);
@@ -108,7 +106,7 @@ struct PAPIContext {
   constexpr int get_num_events() const { return 0; }
   constexpr void init() {}
   constexpr void finalize() {}
-  constexpr void read([[maybe_unused]] metrics_array_t &total_values) {};
+  constexpr void read([[maybe_unused]] metrics_array_t &total_values){};
 };
 
 #endif

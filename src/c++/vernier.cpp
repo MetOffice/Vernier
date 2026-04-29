@@ -20,7 +20,6 @@ int meto::Vernier::call_depth_ = -1;
 meto::time_point_t meto::Vernier::logged_calliper_start_time_{};
 meto::PAPIContext meto::Vernier::papi_context_{};
 
-
 // Needed to avoid an issue with RegionRecord and USE_PAPI
 meto::Vernier::~Vernier() = default;
 
@@ -39,7 +38,8 @@ meto::Vernier::~Vernier() = default;
 
 meto::Vernier::TracebackEntry::TracebackEntry(
     size_t record_hash, meto::record_index_t record_index,
-    meto::time_point_t region_start_time, meto::time_point_t calliper_start_time,
+    meto::time_point_t region_start_time,
+    meto::time_point_t calliper_start_time,
     metrics_vector_t &region_start_metrics)
     : record_hash_(record_hash), record_index_(record_index),
       region_start_time_(region_start_time),
@@ -118,9 +118,7 @@ void meto::Vernier::finalize() {
   // of threads allowed) for this purpose.
   if (!events_code.empty()) {
 #pragma omp parallel num_threads(max_threads_)
-    {
-      papi_context_.finalize();
-    }
+    { papi_context_.finalize(); }
   }
   papi_finalize();
 
@@ -235,7 +233,8 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
           t = omp_get_thread_num();
 #endif
           papi_context_.read(
-              region_start_metrics[static_cast<metrics_vector_t::size_type>(t)]);
+              region_start_metrics[static_cast<metrics_vector_t::size_type>(
+                  t)]);
         }
       }
 
@@ -243,9 +242,9 @@ size_t meto::Vernier::start_part2(std::string_view const region_name) {
 
     auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
     auto region_start_time = vernier_gettime();
-    thread_traceback_[tid].at(call_depth_index) = TracebackEntry(
-        hash, record_index, region_start_time, logged_calliper_start_time_,
-        region_start_metrics);
+    thread_traceback_[tid].at(call_depth_index) =
+        TracebackEntry(hash, record_index, region_start_time,
+                       logged_calliper_start_time_, region_start_metrics);
   } else {
     error_handler("EMERGENCY STOP: Traceback array exhausted.", EXIT_FAILURE);
   }
@@ -494,8 +493,7 @@ long long meto::Vernier::get_total_metrics(size_t const hash,
   if (!events_code.empty()) {
     auto tid = static_cast<hashtable_iterator_t_>(input_tid);
     return thread_hashtables_[tid].get_total_metrics(hash, event_idx);
-  }
-  else {
+  } else {
     return 0LL;
   }
 }
