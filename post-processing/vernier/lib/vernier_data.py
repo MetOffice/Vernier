@@ -6,12 +6,13 @@
 """
 Module for storing the VernierData and VernierCalliper classes.
 """
+
+from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
 import statistics
 import sys
 from typing import Optional
-from collections import OrderedDict
 
 
 @dataclass(order=True)
@@ -49,7 +50,7 @@ class VernierCalliper():
 
     def __len__(self):
         """
-        Return None if caliper elements differ in length,
+        Return None if calliper elements differ in length,
         otherwise return element lengths.
         """
         result = None
@@ -223,7 +224,8 @@ class VernierData():
 
         return filtered_data
 
-    def write_txt_output(self, txt_path: Optional[Path] = None):
+    def write_txt_output(self, txt_path: Optional[Path] = None,
+                         sort_by = "Routine", sort_reverse = False):
         """
         Writes the Vernier data to a text output in a human-readable table
         format. If an output path is provided, the table is written to that
@@ -232,27 +234,46 @@ class VernierData():
         :param txt_path: The file path that the text output will be written to.
         :type txt_path: :py:class:`pathlib.Path`
 
+        :param str sort_by: The name of the field used to sort the txt output,
+                            default is `Routine`, the name of the calliper.
+
+        :param bool sort_reverse: Whether to reverse the sort defined by sort_by.
+
         """
         txt_table = []
         header_list = []
 
         # From reduce, grab all of the data and separate from the header keys
-        header_pass=True
+        header_pass = True
         for adata in self.data.values():
             reduce_row = []
             reduce_dict = adata.reduce()
-            # Work through each caliper key pair returned by reduce
-            for caliper_key in reduce_dict:
+            # Work through each calliper key pair returned by reduce
+            for calliper_key in reduce_dict:
                 # Append the keys data/value to the row
-                reduce_row.append(reduce_dict[caliper_key])
+                reduce_row.append(reduce_dict[calliper_key])
                 # On the first pass capture the key for later as headers
                 if header_pass:
-                    header_list.append(caliper_key)
+                    header_list.append(calliper_key)
+                else:
+                    if calliper_key not in header_list:
+                        raise ValueError(f'calliper key `{calliper_key}` appears'
+                                         f' in some data but not the first, '
+                                         'inconsistent callipers can lead to '
+                                         'undefined behaviour')
             txt_table.append(reduce_row)
             header_pass=False
 
-        # sort by calliper name
-        txt_table.sort(key=lambda x: x[0])
+        # sort using the provided sort_by and sort_reverse options
+        # default is sort by Routine name, for consistency of output.
+        if not isinstance(sort_reverse, bool):
+            raise TypeError(f'sort_reverse must be a bool, not `{type(sort_reverse)}`')
+        if sort_by not in header_list:
+            raise ValueError(f'sort_by `{sort_by}` not in '
+                             f'list of available headers:\n'
+                             f'{header_list}')
+        sort_n = header_list.index(sort_by)
+        txt_table.sort(key=lambda x: x[sort_n], reverse=sort_reverse)
 
         # Use the header key to add to the top of the output
         txt_table.insert(0, header_list)
@@ -264,7 +285,7 @@ class VernierData():
         for row in txt_table:
             row_output_string=''
             for index, _ in enumerate(row):
-                 # The first column, the caliper name uses the maximum size to align all lines
+                 # The first column, the calliper name uses the maximum size to align all lines
                 if index == 0:
                     row_output_string = row_output_string + (
                         f'| {row[0]:>{max_calliper_len}} ')
@@ -301,24 +322,24 @@ class VernierData():
         :rtype: :py:class:`vernier.VernierCalliper`
         """
         # First get data for calliper key
-        return_caliper = self.data[calliper_key]
+        return_calliper = self.data[calliper_key]
 
         # If rank ID given as argument, filter only data indices where rank data
         # matches the rank ID given as argument
         if rank is not None:
-            rank_indices = return_caliper.get_rank_indices(rank)
+            rank_indices = return_calliper.get_rank_indices(rank)
             if len(rank_indices) == 0:
                 return None
-            return_caliper = return_caliper.filter_by_indices(rank_indices)
+            return_calliper = return_calliper.filter_by_indices(rank_indices)
 
         # Same above but for thread ID
         if thread is not None:
-            thread_indices = return_caliper.get_thread_indices(thread)
+            thread_indices = return_calliper.get_thread_indices(thread)
             if len(thread_indices) == 0:
                 return None
-            return_caliper = return_caliper.filter_by_indices(thread_indices)
+            return_calliper = return_calliper.filter_by_indices(thread_indices)
 
-        return return_caliper
+        return return_calliper
 
     def aggregate(self, vernier_data_list=None, internal_consistency=True):
         """
