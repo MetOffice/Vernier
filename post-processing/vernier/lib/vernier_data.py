@@ -251,8 +251,8 @@ class VernierData():
             txt_table.append(reduce_row)
             header_pass=False
 
-        # sort by self time, descending
-        txt_table = sorted(txt_table, key=lambda x: x[2], reverse=True)
+        # sort by calliper name
+        txt_table.sort(key=lambda x: x[0])
 
         # Use the header key to add to the top of the output
         txt_table.insert(0, header_list)
