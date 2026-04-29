@@ -55,11 +55,7 @@
 
 #include "vernier.h"
 #include "vernier_mpi.h"
-
-#ifdef USE_PAPI
 #include "vernier_papi.h"
-#include <papi.h>
-#endif
 
 static constexpr int WORK_ITERS = 100'000;
 static constexpr long long MIN_OPS_PER_CALL = 1LL * WORK_ITERS;
@@ -142,7 +138,6 @@ int main() {
 
   setenv("VERNIER_PAPI_EVENTS1", "PAPI_FP_OPS", /*overwrite=*/1);
 
-#ifdef USE_PAPI
   // Probe before vernier.init(): if PAPI_FP_OPS is unavailable, vernier.init()
   // would call error_handler -> MPI_Abort.  Probing here prevents that hard
   // termination and lets us exit cleanly with a skip message.
@@ -152,11 +147,9 @@ int main() {
     MPI_Finalize();
     return EXIT_SUCCESS;
   }
-#endif
 
   meto::vernier.init();
 
-#ifdef USE_PAPI
   // Fallback: skip if no events were actually loaded (env var unset path).
   if (meto::events_code.empty()) {
     meto::vernier.finalize();
@@ -165,7 +158,6 @@ int main() {
     MPI_Finalize();
     return EXIT_SUCCESS;
   }
-#endif
 
   // -------------------------------------------------------------------------
   // Run 1: vernier region inside the parallel region.
@@ -233,7 +225,6 @@ int main() {
   // Run2Region is started/stopped on thread 0 only (outside the parallel block)
   // so only thread-0 metrics exist for that region.
   // -------------------------------------------------------------------------
-#ifdef USE_PAPI
   std::vector<long long> run1_ins(static_cast<size_t>(num_threads));
   std::vector<long long> run3_ins(static_cast<size_t>(num_threads));
   for (int t = 0; t < num_threads; ++t) {
@@ -243,7 +234,6 @@ int main() {
         run3_inner_hashes[static_cast<size_t>(t)], t, 0);
   }
   long long const run2_ins = meto::vernier.get_total_metrics(run2_hash, 0, 0);
-#endif
 
   // -------------------------------------------------------------------------
   // Write threads-format output, then finalize.
@@ -265,7 +255,6 @@ int main() {
   // -------------------------------------------------------------------------
   // Print table and verify bounds.
   // -------------------------------------------------------------------------
-#ifdef USE_PAPI
   std::cout << "\n  Run 1 (Run1Region) and Run 3 (InnerRegion) — all threads:\n"
             << "  Thread | Run1Region       | InnerRegion\n"
             << "  -------|------------------|------------------\n";
@@ -304,7 +293,6 @@ int main() {
               << num_threads * MAX_OPS_PER_CALL << "]\n";
     MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
   }
-#endif
 
   // -------------------------------------------------------------------------
   // Check the threads-format output file header.
