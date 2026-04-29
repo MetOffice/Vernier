@@ -106,7 +106,7 @@ struct PAPIContext {
   constexpr int get_num_events() const { return 0; }
   constexpr void init() {}
   constexpr void finalize() {}
-  constexpr void read([[maybe_unused]] metrics_array_t &total_values){};
+  constexpr void read([[maybe_unused]] metrics_array_t &total_values) {};
 };
 
 #endif
