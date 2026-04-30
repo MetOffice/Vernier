@@ -8,10 +8,6 @@
 #include "formatter.h"
 #include "error_handler.h"
 
-#ifdef USE_PAPI
-#include "vernier_papi.h"
-#endif
-
 #include <algorithm>
 #include <iomanip>
 
