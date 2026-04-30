@@ -23,6 +23,7 @@ Requirements for building:
 * CMake 3.13
 * MPICH 3.4.1
 * OpenMP 4.5 (if applicable)
+* PAPI 5.6.0 (optional)
 
 For testing and documenation:
 
@@ -30,12 +31,12 @@ For testing and documenation:
 * pFUnit 4.4.1
 * Doxygen 1.8.5
 * Sphinx 7.2.6
-  
+
   * docutils 0.16 (rendering issues are known to exist in newer versions!)
-  
+
 
 .. note::
-   
+
    Unless stated otherwise versions are a *minimum*. Newer versions
    should be backwards compatible but haven't necessarily been tested.
 
@@ -62,7 +63,7 @@ not supported. After this, CMake can then be used to perform a full build.
 There are a number of options which can be passed to CMake on the command line
 or set using ``ccmake``. The table below highlights some of the flags that can
 be passed to CMake on the command line. Alternatively, ``ccmake ..`` will bring
-up a terminal wherein the user can change build options interactively. 
+up a terminal wherein the user can change build options interactively.
 
 ..  list-table::
     :widths: 20 15 30
@@ -80,7 +81,7 @@ up a terminal wherein the user can change build options interactively.
       - Enable Doxygen source code documentation generation.
     * - ``-DENABLE_SPHINX``
       - **ON** / OFF
-      - Enable Sphinx written documentation generation. 
+      - Enable Sphinx written documentation generation.
     * - ``-DBUILD_TESTS``
       - **ON** / OFF
       - Build unit tests.
@@ -89,11 +90,11 @@ up a terminal wherein the user can change build options interactively.
       - Build Fortran unit tests (requires ``BUILD_TESTS=ON``).
     * - ``-DINCLUDE_GTEST``
       - ON / **OFF**
-      - Fetches and populates GoogleTest within the project build (requires 
+      - Fetches and populates GoogleTest within the project build (requires
         ``BUILD_TESTS=ON``).
     * - ``-DBUILD_SHARED_LIBS``
       - **ON** / OFF
-      - Determines whether the libraries are linked statically (``OFF``) or 
+      - Determines whether the libraries are linked statically (``OFF``) or
         dynamically (``ON``).
     * - ``-DSTRING_LENGTH``
       - *INTEGER*
@@ -101,12 +102,20 @@ up a terminal wherein the user can change build options interactively.
         characters.  If the maximum length is exceeded, Vernier will
         cause the application to exit with an error.
     * - ``-DENABLE_MPI``
-      - ON / **OFF**
+      - **ON** / OFF
       - Build with an external MPI library.  When OFF, Vernier will
         use stub functions to replace the required MPI calls.
+    * - ``-DENABLE_PAPI``
+      - ON / **OFF**
+      - Build with the PAPI library to collect hardware counters .
+        When OFF, Vernier will use stub functions that have minimal to
+        no performance impact.
+    * - ``-DPAPI_DEBUG``
+      - ON / **OFF**
+      - Logs every PAPI call with thread and CPU info (requires ``ENABLE_PAPI=ON``).
 
 The table above pertains to options specific to Vernier. An extensive
-list of CMake internal variables can be found 
+list of CMake internal variables can be found
 `here <https://cmake.org/cmake/help/v3.13/manual/cmake-variables.7.html>`_.
 
 .. _installation:
@@ -148,6 +157,6 @@ Additional targets that can be built from the command line using ``make``.
      in the code. The generated files are put into a ``doxygen`` subdirectory.
 
    ``sphinxdocs``
-     Uses Sphinx to build the written documentation. This target builds the 
-     Doxygen documentation first. The generated files are put into a 
+     Uses Sphinx to build the written documentation. This target builds the
+     Doxygen documentation first. The generated files are put into a
      ``sphinx`` subdirectory.
