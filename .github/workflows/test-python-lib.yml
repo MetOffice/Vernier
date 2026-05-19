@@ -8,9 +8,12 @@ name: Test Python library
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ main,testOutputParsing ]
   pull_request:
     branches: [ main ]
+  workflow_run:
+    workflows: [Build and Test]
+    types: [completed]
 
 jobs:
   test:
@@ -38,3 +41,13 @@ jobs:
     - name: Run CLI tools
       run: |
         summarise-vernier post-processing/vernier/tools/vernier-output-example-collated
+    - name: download vernier-outputs from Build and Test
+      uses: download-artifact@v8
+      with:
+        name: vernier_outputs
+    - name: check downloads
+      run: |
+        ls -l ${{github.workspace}}
+    - name: summarise artifacts
+      run: |
+        find ${{github.workspace}} -name *vernier-output* -exec echo {} \; -exec summarise-vernier {} \;

@@ -38,7 +38,7 @@ jobs:
     name: Compiler ${{ matrix.compiler.cpp }} with MPI ${{matrix.mpi_enabled}}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
 
     - name: Install libomp-devel and mpich
       # Ensure that the OpenMP development libraries are installed.
