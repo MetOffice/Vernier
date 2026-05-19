@@ -42,7 +42,7 @@ jobs:
       run: |
         summarise-vernier post-processing/vernier/tools/vernier-output-example-collated
     - name: download vernier-outputs from Build and Test
-      uses: download-artifact@v8
+      uses: actions/download-artifact@v8
       with:
         name: vernier_outputs
     - name: check downloads
