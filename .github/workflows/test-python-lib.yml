@@ -6,16 +6,15 @@
 name: Test Python library
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ main,testOutputParsing ]
-  pull_request:
-    branches: [ main ]
   workflow_run:
     workflows:
       - Build and Test
     types:
       - completed
+  push:
+    branches: [ main,testOutputParsing ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   test:
