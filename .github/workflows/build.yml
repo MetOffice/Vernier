@@ -90,6 +90,6 @@ jobs:
       run: ctest -VV -C ${{env.BUILD_TYPE}}
     - uses: actions/upload-artifact@v7
       with:
-        name: vernier_outputs
+        name: vernier_outputs-${{ matrix.compiler.cpp }}-MPI_${{matrix.mpi_enabled}}
         path: build/tests/system_tests/c++/*vernier-output*
 

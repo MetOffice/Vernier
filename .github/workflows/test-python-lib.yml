@@ -12,8 +12,10 @@ on:
   pull_request:
     branches: [ main ]
   workflow_run:
-    workflows: [Build and Test]
-    types: [completed]
+    workflows:
+      - Build and Test
+    types:
+      - completed
 
 jobs:
   test:
@@ -44,7 +46,7 @@ jobs:
     - name: download vernier-outputs from Build and Test
       uses: actions/download-artifact@v8
       with:
-        name: vernier_outputs
+        name: vernier_outputs-gcc-13-MPI-ON
     - name: check downloads
       run: |
         ls -l ${{github.workspace}}
