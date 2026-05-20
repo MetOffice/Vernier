@@ -11,10 +11,6 @@ on:
       - Build and Test
     types:
       - completed
-  push:
-    branches: [ main,testOutputParsing ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   test:
