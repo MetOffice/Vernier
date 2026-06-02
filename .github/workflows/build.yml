@@ -101,4 +101,4 @@ jobs:
         python -m pip install .[dev]
     - name: summarise Vernier outputs
       run: |
-        find ${{github.workspace}}/build/tests/system_tests -name *vernier-output* -exec echo {} \; -exec summarise-vernier {} \;
+        find ${{github.workspace}}/build/tests/system_tests -name "*vernier-output*" -exec echo {} \; -exec summarise-vernier {} \;
