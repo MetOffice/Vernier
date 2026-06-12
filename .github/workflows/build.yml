@@ -38,7 +38,7 @@ jobs:
     name: Compiler ${{ matrix.compiler.cpp }} with MPI ${{matrix.mpi_enabled}}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
 
     - name: Install libomp-devel and mpich
       # Ensure that the OpenMP development libraries are installed.
@@ -89,3 +89,16 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ctest -VV -C ${{env.BUILD_TYPE}}
 
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: 3.13
+    - name: Install python library
+      run: |
+        cd post-processing
+        python -m pip install --upgrade pip
+        python -m pip install .
+        python -m pip install .[dev]
+    - name: summarise Vernier outputs
+      run: |
+        find ${{github.workspace}}/build/tests/system_tests -name "*vernier-output*" -exec echo {} \; -exec summarise-vernier {} \;
