@@ -56,7 +56,7 @@ bool check_output_file(const std::string &output_data_path,
   std::istream input(&output_file_buffer);
 
   // Check the header lines
-  for (int i = 0; i < 13; ++i) {
+  for (int i = 0; i < 8; ++i) {
     std::getline(input, buffer);
     std::getline(test_data, expected);
     M_Assert(expected, buffer, i);

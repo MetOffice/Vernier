@@ -34,10 +34,8 @@ void meto::SingleFile::write(hashvec_t hashvec) {
   rank_info(data_buffer, mpi_context_);
   header(header_buffer, formatter_.get_format_string());
 
-  std::cout << header_buffer.str() << std::endl;
   // Format the report on each task and buffer it on each task
   formatter_.execute_format(header_buffer, data_buffer, hashvec);
-  std::cout << header_buffer.str() << std::endl;
 
   std::string filename = output_filename_ + mpi_filename_tail;
 
