@@ -98,21 +98,21 @@ void meto::Formatter::default_output(std::ostream &header, std::ostream &os,
 }
 
 /**
- * @brief  Drhook-style output format, important for using the same post
+ * @brief  Drhook-style output format, important for using the same post-
  *         processing tools
  *
+ * @param header       Header stream to write to
  * @param[in] os       Output stream to write to
  * @param[in] hashvec  Vector containing all the necessary data
  */
 
-void meto::Formatter::drhook(std::ostream &header, std::ostream &os,
-                             const hashvec_t &hashvec) {
+void meto::Formatter::drhook([[maybe_unused]] std::ostream &header,
+                             std::ostream &os, const hashvec_t &hashvec) {
 
   int num_threads = 1;
 #ifdef _OPENMP
   num_threads = omp_get_max_threads();
 #endif
-
   // Preliminary info
   os << "Profiling on " << num_threads << " thread(s).\n";
 
