@@ -6,6 +6,8 @@
 """
 Module for storing the VernierData and VernierCalliper classes.
 """
+
+from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
 import statistics
@@ -46,20 +48,18 @@ class VernierCalliper():
         self.total_time = []
         self.n_calls = []
 
-        return
-
     def __len__(self):
         """
-        Return None if caliper elements differ in length,
+        Return None if calliper elements differ in length,
         otherwise return element lengths.
         """
         result = None
         if (len(self.time_percent) == len(self.cumul_time) ==
-            len(self.self_time) == len(self.total_time) ==  len(self.n_calls)):
+            len(self.self_time) == len(self.total_time) == len(self.n_calls)):
             result = len(self.time_percent)
         return result
 
-    def _get_rank_indices(self, rank: int):
+    def get_rank_indices(self, rank: int):
         """
         Return the indices of the data for a given rank.
 
@@ -83,7 +83,7 @@ class VernierCalliper():
             except ValueError:
                 return rank_indices
 
-    def _get_thread_indices(self, thread: int):
+    def get_thread_indices(self, thread: int):
         """
         Return the indices of the data for a given thread.
 
@@ -107,7 +107,7 @@ class VernierCalliper():
             except ValueError:
                 return thread_indices
 
-    def _filter_by_indices(self, indices: list[int]):
+    def filter_by_indices(self, indices: list[int]):
         """
         Return a new VernierCalliper containing only the entries corresponding
         to the provided indices.
@@ -131,28 +131,39 @@ class VernierCalliper():
 
         return filtered
 
-    def reduce(self) -> list:
+    def reduce(self) -> OrderedDict:
         """Reduces the data for this calliper to a single row of summary data.
 
-        :returns: A list containing the aggregate (mean) for each metric of the
-                  VernierCalliper instance.
-        :rtype: list[str, float, float, float, int, float, float]
+        :returns: A OrderedDict containing the aggregate (mean) for each metric of the
+                  VernierCalliper instance, and the min/max for total time and
+                  self time.
 
         """
-        return [
-            self.name, # calliper name
-            round(statistics.mean(self.total_time), 5), # mean total time across calls
-            round(statistics.mean(self.self_time), 5), # mean self time across calls
-            round(statistics.mean(self.cumul_time), 5), # mean cumulative time across calls
-            self.n_calls[0], # number of calls (should be the same for all entries, so just take the first)
-            round(statistics.mean(self.time_percent), 5), # mean percentage of time across calls
-            round(statistics.mean([t / n for t, n in zip(self.total_time, self.n_calls)]), 5) # mean time per call
-        ]
 
-    @classmethod
-    def labels(self):
-        return ["Routine", "Total time (s)", "Self (s)", "Cumul time (s)",
-                "Max no. calls", "% time", "Time per call (s)"]
+        return OrderedDict([
+            # calliper name
+            ("Routine",self.name),
+            # min total time across calls
+            ("Total Min(s)", round(min(self.total_time), 5)),
+            # mean total time across calls
+            ("Total Mean(s)", round(statistics.mean(self.total_time), 5)),
+            # max total time across calls
+            ("Total Max(s)", round(max(self.total_time), 5)),
+            # min self time across calls
+            ("Self Min(s)", round(min(self.self_time), 5)),
+            # mean self time across calls
+            ("Self Mean(s)", round(statistics.mean(self.self_time), 5)),
+            # max self time across calls
+            ("Self Max(s)", round(max(self.self_time), 5)),
+            # maximum number of calls
+            ("Max no. calls", max(self.n_calls)),
+            # mean percentage of time across calls
+            ("% time", round(statistics.mean(self.time_percent), 5)),
+            # mean time per call
+            ("Time per call(s)", round(statistics.mean([t / n for t, n in
+                                                        zip(self.total_time,
+                                                            self.n_calls)]), 5))
+        ])
 
 
 class VernierData():
@@ -203,7 +214,7 @@ class VernierData():
         filtered_data = VernierData()
 
         # Filter data for a given calliper key
-        for timer in self.data.keys():
+        for timer, _ in self.data.items():
             if any(calliper_key in timer for calliper_key in calliper_keys):
                 filtered_data.data[timer] = self.data[timer]
 
@@ -213,7 +224,8 @@ class VernierData():
 
         return filtered_data
 
-    def write_txt_output(self, txt_path: Optional[Path] = None):
+    def write_txt_output(self, txt_path: Optional[Path] = None,
+                         sort_by = "Routine", sort_reverse = False):
         """
         Writes the Vernier data to a text output in a human-readable table
         format. If an output path is provided, the table is written to that
@@ -222,30 +234,80 @@ class VernierData():
         :param txt_path: The file path that the text output will be written to.
         :type txt_path: :py:class:`pathlib.Path`
 
+        :param str sort_by: The name of the field used to sort the txt output,
+                            default is `Routine`, the name of the calliper.
+
+        :param bool sort_reverse: Whether to reverse the sort defined by sort_by.
+
         """
         txt_table = []
-        for calliper in self.data.keys():
-            txt_table.append(self.data[calliper].reduce())
-        # sort by self time, descending
-        txt_table = sorted(txt_table, key=lambda x: x[2], reverse=True)
+        header_list = []
 
-        txt_table.insert(0, VernierCalliper.labels())
+        # From reduce, grab all of the data and separate from the header keys
+        header_pass = True
+        for adata in self.data.values():
+            reduce_row = []
+            reduce_dict = adata.reduce()
+            # Work through each calliper key pair returned by reduce
+            for calliper_key in reduce_dict:
+                # Append the keys data/value to the row
+                reduce_row.append(reduce_dict[calliper_key])
+                # On the first pass capture the key for later as headers
+                if header_pass:
+                    header_list.append(calliper_key)
+                else:
+                    if calliper_key not in header_list:
+                        raise ValueError(f'calliper key `{calliper_key}` appears'
+                                         f' in some data but not the first, '
+                                         'inconsistent callipers can lead to '
+                                         'undefined behaviour')
+            txt_table.append(reduce_row)
+            header_pass=False
+
+        # sort using the provided sort_by and sort_reverse options
+        # default is sort by Routine name, for consistency of output.
+        if not isinstance(sort_reverse, bool):
+            raise TypeError(f'sort_reverse must be a bool, not `{type(sort_reverse)}`')
+        if sort_by not in header_list:
+            raise ValueError(f'sort_by `{sort_by}` not in '
+                             f'list of available headers:\n'
+                             f'{header_list}')
+        sort_n = header_list.index(sort_by)
+        txt_table.sort(key=lambda x: x[sort_n], reverse=sort_reverse)
+
+        # Use the header key to add to the top of the output
+        txt_table.insert(0, header_list)
 
         max_calliper_len = max([len(line[0]) for line in txt_table])
 
+        row_outputs = []
+        # For each line in the text table, format the string to be written
+        for row in txt_table:
+            row_output_string=''
+            for index, _ in enumerate(row):
+                 # The first column, the calliper name uses the maximum size to align all lines
+                if index == 0:
+                    row_output_string = row_output_string + (
+                        f'| {row[0]:>{max_calliper_len}} ')
+                # Per each other element, align them to the header length,
+                # or where this is too small, 8
+                else:
+                    row_output_string = row_output_string + (
+                        f'| {row[index]:>{max(len(header_list[index]),8)}} ')
+            row_output_string = row_output_string + '|'
+            row_outputs.append(row_output_string)
+
+        output_string = '\n'.join(row_outputs)
+
         # Write to stdout if no path provided, otherwise write to file
         if txt_path is None:
-            out = sys.stdout
+            sys.stdout.write(output_string)
         else:
-            out = open(txt_path, 'w')
+            with open(txt_path, 'w', encoding="utf-8") as file_out:
+                file_out.write(output_string)
 
-        for row in txt_table:
-            out.write('| {:>{}} | {:>14} | {:>12} | {:>14} | {:>13} | {:>8} | {:>17} |\n'.format(row[0], max_calliper_len, *row[1:]))
-
-        if txt_path is not None:
-            out.close()
-
-    def get(self, calliper_key: str, rank: Optional[int] = None, thread: Optional[int] = None) -> Optional[VernierCalliper]:
+    def get(self, calliper_key: str, rank: Optional[int] = None,
+            thread: Optional[int] = None) -> Optional[VernierCalliper]:
         """
         Return a VernierCalliper of the data for this calliper_key,
         or None if it does not exist.
@@ -260,24 +322,24 @@ class VernierData():
         :rtype: :py:class:`vernier.VernierCalliper`
         """
         # First get data for calliper key
-        return_caliper = self.data[calliper_key]
+        return_calliper = self.data[calliper_key]
 
         # If rank ID given as argument, filter only data indices where rank data
         # matches the rank ID given as argument
         if rank is not None:
-            rank_indices = return_caliper._get_rank_indices(rank)
+            rank_indices = return_calliper.get_rank_indices(rank)
             if len(rank_indices) == 0:
                 return None
-            return_caliper = return_caliper._filter_by_indices(rank_indices)
+            return_calliper = return_calliper.filter_by_indices(rank_indices)
 
         # Same above but for thread ID
         if thread is not None:
-            thread_indices = return_caliper._get_thread_indices(thread)
+            thread_indices = return_calliper.get_thread_indices(thread)
             if len(thread_indices) == 0:
                 return None
-            return_caliper = return_caliper._filter_by_indices(thread_indices)
+            return_calliper = return_calliper.filter_by_indices(thread_indices)
 
-        return return_caliper
+        return return_calliper
 
     def aggregate(self, vernier_data_list=None, internal_consistency=True):
         """
@@ -328,7 +390,6 @@ class VernierData():
                 self.data[calliper].thread.extend(vernier_data.data[calliper].thread)
 
 
-
 class VernierDataCollation():
     """
     Class to hold an collation of VernierData instances.
@@ -360,11 +421,11 @@ class VernierDataCollation():
         """
         if label in self.vernier_data:
             raise ValueError(f'The label {label} already exists in this '
-                             f'collation. Please use a different label or '
-                             f'remove the existing entry.')
+                             'collation. Please use a different label or '
+                             'remove the existing entry.')
         if not isinstance(vernier_data, VernierData):
-            raise TypeError(f'The provided vernier_data is not a VernierData '
-                            f'object.')
+            raise TypeError('The provided vernier_data is not a VernierData '
+                            'object.')
         # Check for consistency
         self.internal_consistency(vernier_data)
         # Add the new data
@@ -395,7 +456,7 @@ class VernierDataCollation():
         # notImplemented enforce consistent sizing of members?? needed?
         callipers = []
         # Loop over VernierData objects
-        for _, vdata in self.vernier_data.items():
+        for vdata in self.vernier_data.values():
             # Get a list of the VernierData's callipers, sorted by name
             loop_callipers = sorted(list(vdata.data.keys()))
             # If no callipers checked yet, set these as the truth callipers
@@ -408,17 +469,17 @@ class VernierDataCollation():
                     # Note that this works both ways so all callipers not in the
                     # others list are included.
                     mismatched = set(loop_callipers) ^ set(callipers)
-                    raise ValueError(f'Inconsistent callipers in contents: '
+                    raise ValueError('Inconsistent callipers in contents: '
                                      f'{mismatched} detected as unmatched')
         if new_vernier_data is not None:
             if not isinstance(new_vernier_data, VernierData):
-                raise TypeError(f'The provided vernier_data is not a '
+                raise TypeError('The provided vernier_data is not a '
                                 'VernierData object.')
             check_callipers = sorted(list(new_vernier_data.data.keys()))
             if callipers and check_callipers != callipers:
                 # Extract callipers that were mismatched using Python XOR
                 mismatched = set(check_callipers) ^ set(callipers)
-                raise ValueError(f'Inconsistent callipers in new_vernier_data: '
+                raise ValueError('Inconsistent callipers in new_vernier_data: '
                                  f'{check_callipers} detected as unmatched')
 
     def calliper_list(self):
@@ -432,12 +493,13 @@ class VernierDataCollation():
         result = []
         self.internal_consistency()
 
-        for _, vdata in self.vernier_data.items():
+        for vdata in self.vernier_data.values():
             result = sorted(list(vdata.data.keys()))
             break
         return result
 
-    def get(self, calliper_key: str, rank: Optional[int] = None, thread: Optional[int] = None) -> Optional[VernierCalliper]:
+    def get(self, calliper_key: str, rank: Optional[int] = None,
+            thread: Optional[int] = None) -> Optional[VernierCalliper]:
         """
         Return a VernierCalliper of all the data from all collation members
         for this calliper_key, or None if it does not exist.
@@ -456,7 +518,7 @@ class VernierDataCollation():
             return None
         self.internal_consistency()
         results = VernierCalliper(calliper_key)
-        for _, vdata in self.vernier_data.items():
+        for vdata in self.vernier_data.values():
             data_to_add = vdata.get(calliper_key, rank, thread)
             if data_to_add is None:
                 continue
