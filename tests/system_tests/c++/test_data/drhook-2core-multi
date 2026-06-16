@@ -1,0 +1,16 @@
+####################################################################################################
+#   V E R N I E R                                                                                  #
+#   Output style: Dr HOOK                                                                          #
+#   Format version: 1.0                                                                            #
+####################################################################################################
+
+Task 1 of 2 : MPI rank ID 0
+Profiling on 4 thread(s).
+
+    #  % Time         Cumul         Self        Total     # of calls        Self   Total    Routine@
+                                                                             (Size; Size/sec; Size/call; MinSize; MaxSize)
+        (self)        (sec)        (sec)        (sec)                    ms/call   ms/call
+
+    1  100.000        0.000        0.000        0.000              2       0.014       0.014    __vernier__@0
+    2    7.270        0.000        0.000        0.000              1       0.002       0.010    main@0
+    3    2.475        0.000        0.000        0.000              1       0.001       0.001    even_rank@0
