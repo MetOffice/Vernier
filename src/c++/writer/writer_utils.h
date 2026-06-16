@@ -52,15 +52,12 @@ inline void header(std::ostream &os, const std::string_view style) {
   // Fixed-width line content (98 chars between the '#' borders)
   const int inner_width = 98;
 
-  os << std::setfill('#') << std::setw(100) << ""
-     << "\n"
+  os << std::setfill('#') << std::setw(100) << "" << "\n"
      << "#" << std::setfill(' ') << std::setw(inner_width) << std::left
-     << "   V E R N I E R"
-     << "#\n"
+     << "   V E R N I E R" << "#\n"
      << "#" << std::setw(inner_width) << std::left << style_line << "#\n"
      << "#" << std::setw(inner_width) << std::left << version_line << "#\n"
-     << std::setfill('#') << std::setw(100) << ""
-     << "\n";
+     << std::setfill('#') << std::setw(100) << "" << "\n";
 }
 
 #endif // VERNIER_WRITER_UTILS_H
