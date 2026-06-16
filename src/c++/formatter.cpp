@@ -62,7 +62,7 @@ void meto::Formatter::execute_format(std::ostream &header, std::ostream &os,
  */
 
 void meto::Formatter::default_output(std::ostream &header, std::ostream &os,
-                              const hashvec_t &hashvec) {
+                                     const hashvec_t &hashvec) {
 
   // Write key
   header << "\n";

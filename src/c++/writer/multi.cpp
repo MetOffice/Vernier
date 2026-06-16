@@ -5,9 +5,9 @@
  * -----------------------------------------------------------------------------
  */
 
-#include <sstream>
 #include "multi.h"
 #include "writer_utils.h"
+#include <sstream>
 
 /**
  * @brief  Construct a new Multi writer.

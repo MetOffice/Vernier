@@ -28,7 +28,7 @@ void meto::SingleFile::write(hashvec_t hashvec) {
    * everything through MPI IO.
    */
   std::ostringstream header_buffer; // Formatted header output
-  std::ostringstream data_buffer; // Formatted data output
+  std::ostringstream data_buffer;   // Formatted data output
   std::string mpi_filename_tail = "-collated";
 
   rank_info(data_buffer, mpi_context_);
@@ -92,7 +92,7 @@ void meto::SingleFile::write(hashvec_t hashvec) {
   // Offset each rank's data past the header
   displacement = static_cast<MPI_Offset>(header_length +
                                          mpi_context_.get_rank() * max_length *
-                                         static_cast<int>(sizeof(char)));
+                                             static_cast<int>(sizeof(char)));
   MPI_File_set_view(file_handle, displacement, MPI_CHAR, mpi_buffer, "native",
                     MPI_INFO_NULL);
 
