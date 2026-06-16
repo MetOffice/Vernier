@@ -44,7 +44,7 @@ private:
 
   // Individual formatter functions
   void default_output(std::ostream &header, std::ostream &os,
-               const hashvec_t &hashvec);
+                      const hashvec_t &hashvec);
   void drhook(std::ostream &header, std::ostream &os, const hashvec_t &hashvec);
 
 public:
@@ -55,7 +55,7 @@ public:
   void execute_format(std::ostream &header, std::ostream &os,
                       const hashvec_t &hashvec);
 
-  [[nodiscard]] std::string  get_format_string() const { return format_string_; }
+  [[nodiscard]] std::string get_format_string() const { return format_string_; }
 };
 
 } // namespace meto
