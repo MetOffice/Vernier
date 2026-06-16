@@ -70,9 +70,11 @@ bool check_output_file(const std::string &output_data_path,
  */
 bool create_output(std::string mode, std::string format, int rank,
                    int total_ranks) {
-  std::string path = format + "-" + std::to_string(total_ranks) + "core-vernier-output";
+  std::string path =
+      format + "-" + std::to_string(total_ranks) + "core-vernier-output";
   meto::vernier.init(MPI_COMM_WORLD);
-  std::string test_data_path = "test_data/" + format + "-" + std::to_string(total_ranks) + "core-" + mode;
+  std::string test_data_path = "test_data/" + format + "-" +
+                               std::to_string(total_ranks) + "core-" + mode;
   // Create some data
   auto vnr_handle = meto::vernier.start("main");
 
