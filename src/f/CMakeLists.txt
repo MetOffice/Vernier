@@ -6,7 +6,7 @@
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/modules)
 
 # Testing for building a fortran lib and executable.
-add_library(${CMAKE_PROJECT_NAME}_f SHARED "vernier_mod.F90")
+add_library(${CMAKE_PROJECT_NAME}_f "vernier_mod.F90")
 
 set(PLIBS OpenMP::OpenMP_Fortran)
 if (ENABLE_MPI)

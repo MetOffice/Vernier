@@ -3,6 +3,10 @@
 #  The file LICENCE, distributed with this code, contains details of the terms
 #  under which the code may be used.
 # ------------------------------------------------------------------------------
+"""
+Module for reading the Vernier text formats from files.
+"""
+
 from concurrent import futures
 from enum import Enum, auto
 from pathlib import Path
@@ -52,10 +56,10 @@ class VernierReader():
 
         if "region_name@thread_id" in file_header:
             return VernierFileFormat.THREADS
-        elif any([line.startswith('Profiling on') for line in file_header]):
+        if any([line.startswith('Profiling on') for line in file_header]):
             return VernierFileFormat.DRHOOK
-        else:
-            return VernierFileFormat.INVALID
+        # else
+        return VernierFileFormat.INVALID
 
     def _parse_threadsfile_data(self, file_contents: list[str]) -> VernierData:
         """
@@ -117,7 +121,8 @@ class VernierReader():
                 if calliper_data_section:
                     for key in pc_self_times.keys():
                         calliper = key.split('@')[0]
-                        loaded.data[calliper].time_percent.append((pc_self_times[key]/max_tot_time)*100)
+                        loaded.data[calliper].time_percent.append(
+                            (pc_self_times[key]/max_tot_time)*100)
                 calliper_data_section = False
 
         if not loaded.data:
@@ -227,9 +232,9 @@ class VernierReader():
         if self.path.is_file():
             return self._load_from_file()
 
-        elif self.path.is_dir():
+        if self.path.is_dir():
             return self._load_from_directory()
 
-        else:
-            raise ValueError(f"Provided path '{self.path}' is neither a file "
-                             f"nor a directory.")
+        # else
+        raise ValueError(f"Provided path '{self.path}' is neither a file "
+                         f"nor a directory.")
