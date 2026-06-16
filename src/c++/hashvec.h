@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "vernier_gettime.h"
+#include "vernier_papi.h"
 
 namespace meto {
 
@@ -45,6 +46,10 @@ public:
   time_duration_t overhead_walltime_;
   unsigned long long int call_count_;
   unsigned int recursion_level_;
+
+  // PAPI total metrics; "self" metrics are not computed and
+  // thus recursion metrics are not needed.
+  metrics_array_t total_metrics_;
 };
 
 // Define the hashvec type.

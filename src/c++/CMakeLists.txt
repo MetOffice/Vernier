@@ -13,7 +13,8 @@ include(CMakePackageConfigHelpers)
 
 # Add files source files to library. This is STATIC by default and SHARED when
 # the BUILD_SHARED_LIBS option is turned ON.
-add_library(${CMAKE_PROJECT_NAME}
+
+set(vernier_SOURCES
         vernier.cpp
         hashtable.cpp
         hashvec_handler.cpp
@@ -27,7 +28,10 @@ add_library(${CMAKE_PROJECT_NAME}
         mpi_context.cpp
         vernier_mpi.cpp
         error_handler.cpp
+        vernier_papi.cpp
         )
+
+add_library(${CMAKE_PROJECT_NAME} ${vernier_SOURCES})
 
 target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC
@@ -35,7 +39,8 @@ target_include_directories(${CMAKE_PROJECT_NAME}
         $<INSTALL_INTERFACE:include>)
 
 set(PUBLIC_HEADER_FILES vernier.h hashtable.h hashvec.h vernier_gettime.h
-          vernier_get_wtime.h vernier_mpi.h mpi_context.h error_handler.h)
+          vernier_get_wtime.h vernier_mpi.h mpi_context.h error_handler.h
+          vernier_papi.h)
 
 # Link library to and external libs (also use project warnings and options).
 set (PLIBS OpenMP::OpenMP_CXX)
@@ -45,6 +50,15 @@ if (ENABLE_MPI)
 else()
   target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE USE_VERNIER_MPI_STUB)
 endif()
+
+if (ENABLE_PAPI)
+  list(APPEND PLIBS PAPI::PAPI)
+  target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC USE_PAPI)
+  if (PAPI_DEBUG)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE VERNIER_PAPI_DEBUG)
+  endif()
+endif()
+
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${PLIBS})
 

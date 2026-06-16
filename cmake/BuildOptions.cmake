@@ -20,3 +20,6 @@ option(STRING_LENGTH "Maximum identifer string length" 100)
 
 # Whether to create a vernier.pc pkgc-config file
 option(ENABLE_PKGCONFIG "Enable pkg-config support" ON)
+
+# Enable PAPI debug output (logs every PAPI call with thread and CPU info)
+option(PAPI_DEBUG "Enable PAPI debug output" OFF)

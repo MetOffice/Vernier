@@ -21,6 +21,9 @@
  *
  */
 
+// Needed to avoid an issue between RegionRecord and USE_PAPI.
+meto::HashTable::~HashTable() = default;
+
 meto::HashTable::HashTable(int const tid) : tid_(tid) {
   // Reserve enough places in hashvec_
   hashvec_.reserve(PROF_HASHVEC_RESERVE_SIZE);
@@ -91,7 +94,7 @@ size_t meto::HashTable::compute_hash(std::string_view region_name, int tid) {
   // the iterator.
   auto new_chars_size = std::distance(new_chars.begin(), new_chars_iterator);
 
-  // Check that the character string is the length which were expecting.
+  // Check that the character string is the length we were expecting.
   [[maybe_unused]] auto const expected_size =
       static_cast<unsigned int>(region_name.length()) + num_extra_bytes;
   assert(new_chars_size == expected_size);
@@ -153,6 +156,46 @@ void meto::HashTable::update(record_index_t const record_index,
 
   // Update the number of times this region has been called
   ++record.call_count_;
+}
+
+/**
+ * @brief  Updates the total PAPI metrics for the specified region.
+ * @param [in] record_index  The index in hashvec_ corresponding to the
+ *                           profiled region.
+ * @param [in] stop_metrics  The PAPI metrics at the end of the region.
+ * @param [in] start_metrics The PAPI metrics at the start of the region.
+ * @param [in] num_events    The number of events to update.
+ */
+
+void meto::HashTable::update_metrics(record_index_t const record_index,
+                                     const metrics_vector_t &stop_metrics,
+                                     const metrics_vector_t &start_metrics,
+                                     int const num_events) {
+  auto &record = hashvec_[record_index];
+
+  // Check if this region has been called recursively
+  if (record.recursion_level_ == 0) {
+    // The number of elements in the metrics_vector presents two cases:
+    //
+    // If there is only one element, then the vernier region started
+    // inside a parallel region or there was at most one thread. In
+    // this case the metrics of a single thread are added into the
+    // total.
+    //
+    // If there is more than one element, then the Vernier region
+    // did not start inside a parallel region and was run by
+    // thread zero. In this case, it is possible that a parallel region
+    // was executed inside the Vernier region. To account for all work
+    // done within the region, we sum the metrics from all threads and
+    // accumulate them into the total for thread zero. This ensures the
+    // total metrics reflect the combined activity of all threads within
+    // the region, regardless of how the parallelism was structured.
+    for (metrics_vector_t::size_type i = 0; i < stop_metrics.size(); ++i) {
+      for (metrics_array_t::size_type e = 0;
+           e < static_cast<metrics_array_t::size_type>(num_events); e++)
+        record.total_metrics_[e] += (stop_metrics[i][e] - start_metrics[i][e]);
+    }
+  }
 }
 
 /**
@@ -423,6 +466,21 @@ unsigned long long int meto::HashTable::get_prof_call_count() const {
   auto &record = hash2record(profiler_hash_);
   assert(lookup_table_.count(profiler_hash_) > 0);
   return record.call_count_;
+}
+
+/**
+ * @brief  Get the total accumulated PAPI metric for a specified region.
+ * @param [in] hash       The hash corresponding to the region.
+ * @param [in] event_idx  The index of the PAPI event (0-based).
+ * @returns  Total PAPI metric count.
+ * @note   This function has been produced with the assistance of
+ *         Met Office Github Copilot Enterprise
+ */
+long long meto::HashTable::get_total_metrics(size_t const hash,
+                                             int const event_idx) const {
+  auto &record = hash2record(hash);
+  return record
+      .total_metrics_[static_cast<metrics_array_t::size_type>(event_idx)];
 }
 
 /**

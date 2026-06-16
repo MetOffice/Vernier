@@ -79,14 +79,14 @@ dependencies may look something like:
 
 .. code-block:: cmake
 
-   # Link Vernier libraries 
+   # Link Vernier libraries
    target_link_libraries(foo PUBLIC
            vernier::vernier_f  # Only required for Fortran
            vernier::vernier_c  # Only required for Fortran
            vernier::vernier
            )
 
-   # Include Vernier headers 
+   # Include Vernier headers
    target_include_directories(foo PUBLIC
            /path/to/include
            )
@@ -103,7 +103,7 @@ Environment Variables
      This environment variable determines the format of the outputted tables of
      data. There are currently two options:
 
-     * **drhook**: Mimics the output format of the DrHook profiling tool so 
+     * **drhook**: Mimics the output format of the DrHook profiling tool so
        that the same post-processing techniques can be used.
 
      * **threads**: A custom, strung-together, format where threads have
@@ -117,7 +117,7 @@ Environment Variables
      Determines the output mode to use. Currently supported values are:
 
      * **multi**: Every task writes to its own output file
-       
+
      * **single**: All tasks write to a single global output file
 
      If the environment variable is not set, **multi** mode is used.
@@ -131,6 +131,18 @@ Environment Variables
      name when running in **multi** mode, resulting in a file called
      `vernier-output-0` for the first MPI rank, for example.
 
-     Vernier will append ``-global`` to the name when running in
+     Vernier will append ``-collated`` to the name when running in
      **single** mode and the file will contain formatted entries for
      each task ordered by MPI rank.
+
+
+   ``VERNIER_PAPI_EVENTS``
+
+     A comma-separated list of PAPI events/metrics to collect. A list
+     of available events can be produced by running the `papi_avail`
+     and `papi_native_avail` commands.
+
+     The maximum number of events that can be collected is 5. It might
+     not be possible to collect events from different sources (for
+     example CPU, network, energy). It depends on the underlaying
+     hardware.

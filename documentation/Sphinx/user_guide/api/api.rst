@@ -37,6 +37,9 @@ follows:
        The `comm` parameter is used to specify the MPI communicator for parallel
        execution, the default when unspecified is ``MPI_COMM_WORLD``.
 
+       If ``VERNIER_PAPI_EVENTS`` is set and Vernier was built with PAPI support,
+       PAPI is initialised here across all OpenMP threads.
+
    .. cpp:function:: size_t start(std::string_view const region_name)
 
        Starts a timed region with the given name. Returns a handle (or "hash") for
@@ -73,6 +76,13 @@ follows:
 
        Returns the child time of a region, which is the time spent in child regions
        called by that region including their descendants.
+
+   .. cpp:function:: long long get_total_metrics(size_t const hash, int const thread_id, int const event_idx) const
+
+       Returns the total accumulated value of the PAPI event at index ``event_idx``
+       for the given region and thread. ``event_idx`` is zero-based and corresponds
+       to the position of the event in the ``VERNIER_PAPI_EVENTS`` list.
+       Returns ``0`` if PAPI is not active or the event index is out of range.
 
    .. cpp:function:: std::string get_decorated_region_name(size_t const hash, int const input_tid) const
 
@@ -230,7 +240,7 @@ does not make use of MPI:
 
      // Write
      meto::vernier.write();
-     
+
      // Finalize Vernier
      meto::vernier.finalize();
 
@@ -274,7 +284,7 @@ makes use of MPI:
 
      ! Write
      call vernier_write()
-     
+
      ! Finalize Vernier
      call vernier_finalize()
 

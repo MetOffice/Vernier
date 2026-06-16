@@ -76,23 +76,51 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
 
   // Write headings
   os << "\n";
-  os << std::setw(40) << std::left << "Region " << std::setw(15) << std::right
-     << "Self (s) " << std::setw(15) << std::right << "Total (s) "
-     << std::setw(15) << std::right << "Overhead (s) " << std::setw(10)
-     << std::right << "Calls\n";
+  os << std::setw(40) << std::left << "Region" << std::setw(15) << std::right
+     << "Self (s)" << std::setw(15) << std::right << "Total (s)"
+     << std::setw(15) << std::right << "Overhead (s)" << std::setw(10)
+     << std::right << "Calls";
+
+  if (!events_code.empty()) {
+    for (std::size_t e = 0; e < events_code.size(); e++) {
+      os << std::right << std::setw(15)
+         << events_code[e].second.substr(events_code[e].second.size() > 14
+                                             ? events_code[e].second.size() - 14
+                                             : 0);
+    }
+  }
+
+  os << "\n";
 
   os << std::setfill('-');
-  os << std::setw(40) << "- " << std::setw(15) << "- " << std::setw(15) << "- "
-     << std::setw(15) << "- " << std::setw(10) << "- \n";
+  os << std::left;
+  os << std::setw(40) << " " << std::setw(15) << " " << std::setw(15) << " "
+     << std::setw(15) << " " << std::setw(10) << " ";
+
+  if (!events_code.empty()) {
+    for (std::size_t i = 0; i < events_code.size(); ++i) {
+      os << std::setw(15) << " ";
+    }
+  }
+
+  os << "\n";
   os << std::setfill(' ');
 
   // Data entries
   for (auto const &record : hashvec) {
-    os << std::setw(40) << std::left << record.decorated_region_name_ << " "
-       << std::setw(15) << std::right << record.self_walltime_.count() << " "
-       << std::setw(15) << std::right << record.total_walltime_.count() << " "
+    os << std::setw(40) << std::left << record.decorated_region_name_
+       << std::setw(15) << std::right << record.self_walltime_.count()
+       << std::setw(15) << std::right << record.total_walltime_.count()
        << std::setw(15) << std::right << record.overhead_walltime_.count()
-       << " " << std::setw(10) << std::right << record.call_count_ << "\n";
+       << std::setw(10) << std::right << record.call_count_;
+
+    if (!events_code.empty()) {
+      for (std::size_t e = 0; e < events_code.size(); e++) {
+        os << std::right << std::setw(15) << record.total_metrics_[e];
+      }
+    }
+
+    os << "\n";
   }
 }
 

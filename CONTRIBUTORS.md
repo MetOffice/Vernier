@@ -8,3 +8,4 @@
 | EdHone          | Ed Hone          | Met Office  | 2026-03-20 |
 | MetBenjaminWent | Benjamin Went    | Met Office  | 2026-03-25 |
 | t00sa           | Sam Clarke-Green | Met Office  | 2026-03-26 |
+| mo-mguidolin    | Michele Guidolin | Met Office  | 2026-04-24 |

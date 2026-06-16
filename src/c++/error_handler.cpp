@@ -26,7 +26,8 @@ meto::error_handler::error_handler(const std::string &customError,
 
   std::cerr << customError << "\n";
 
-  if (MPI_Initialized(&flag)) {
+  MPI_Initialized(&flag);
+  if (flag) {
     MPI_Abort(comm, errorCode);
   } else {
     std::exit(errorCode);
