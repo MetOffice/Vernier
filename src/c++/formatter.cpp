@@ -19,20 +19,23 @@
 
 meto::Formatter::Formatter() {
 
-  std::string format = "drhook";
+  // Default formatter
+  std::string format = "default";
 
   char const *env_format = std::getenv("VERNIER_OUTPUT_FORMAT");
   if (env_format) {
     format = env_format;
   }
 
-  if (format == "threads") {
-    format_ = &Formatter::threads;
+  if (format == "default") {
+    format_ = &Formatter::default_output;
+    format_string_ = "Default";
   } else if (format == "drhook") {
     format_ = &Formatter::drhook;
+    format_string_ = "Dr HOOK";
   } else {
     std::string error_msg = "Invalid Vernier output format choice. Expected "
-                            "'threads' or 'drhook'. Currently set to '" +
+                            "'default' or 'drhook'. Currently set to '" +
                             format + "'.";
     error_handler(error_msg, EXIT_FAILURE);
   }
@@ -41,18 +44,14 @@ meto::Formatter::Formatter() {
 /**
  * @brief  Executes the format_ method to write the data.
  *
- * @param[in] os       Output stream that the format method will write to
+ * @param[in] header   Output stream for the format header
+ * @param[in] os       Output stream that the format method will write data to
  * @param[in] hashvec  Vector of data that the format method will operate on
  */
 
-void meto::Formatter::execute_format(std::ostream &os, hashvec_t hashvec,
-                                     MPIContext &mpi_context) {
-  // Add an MPI task identifier to each output file
-  os << "\n"
-     << "Task " << (mpi_context.get_rank() + 1) << " of "
-     << mpi_context.get_size() << " : MPI rank ID " << mpi_context.get_rank()
-     << "\n";
-  (this->*format_)(os, hashvec);
+void meto::Formatter::execute_format(std::ostream &header, std::ostream &os,
+                                     const hashvec_t &hashvec) {
+  (this->*format_)(header, os, hashvec);
 }
 
 /**
@@ -62,37 +61,39 @@ void meto::Formatter::execute_format(std::ostream &os, hashvec_t hashvec,
  * @param[in] hashvec  Vector containing all the necessary data
  */
 
-void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
+void meto::Formatter::default_output(std::ostream &header, std::ostream &os,
+                              const hashvec_t &hashvec) {
 
   // Write key
-  os << "\n";
-  os << "region_name@thread_id\n"
-     << "Self time : Time accrued by region itself. (Exclusive time.)\n"
-     << "Total time: Time including cost of child routines and profiling "
-        "overheads. (Inclusive time.)\n"
-     << "Overhead  : Profiling overhead incurred through direct child routine "
-        "calls only.\n"
-     << "Calls     : Number of times the region is called.\n";
+  header << "\n";
+  header << "region_name@thread_id\n"
+         << "Self time : Time accrued by region itself. (Exclusive time.)\n"
+         << "Total time: Time including cost of child routines and profiling "
+            "overheads. (Inclusive time.)\n"
+         << "Overhead  : Profiling overhead incurred through direct child "
+            "routine calls only.\n"
+         << "Calls     : Number of times the region is called.\n";
 
   // Write headings
   os << "\n";
-  os << std::setw(40) << std::left << "Region " << std::setw(15) << std::right
-     << "Self (s) " << std::setw(15) << std::right << "Total (s) "
-     << std::setw(15) << std::right << "Overhead (s) " << std::setw(10)
+  os << std::setw(45) << std::left << "Region" << std::setw(15) << std::right
+     << "Self (s)" << std::setw(15) << std::right << "Total (s)"
+     << std::setw(15) << std::right << "Overhead (s)" << std::setw(10)
      << std::right << "Calls\n";
 
   os << std::setfill('-');
-  os << std::setw(40) << "- " << std::setw(15) << "- " << std::setw(15) << "- "
-     << std::setw(15) << "- " << std::setw(10) << "- \n";
+  os << std::left;
+  os << std::setw(45) << "" << std::setw(15) << " " << std::setw(15) << " "
+     << std::setw(15) << " " << std::setw(10) << " " << std::endl;
   os << std::setfill(' ');
 
   // Data entries
   for (auto const &record : hashvec) {
-    os << std::setw(40) << std::left << record.decorated_region_name_ << " "
-       << std::setw(15) << std::right << record.self_walltime_.count() << " "
-       << std::setw(15) << std::right << record.total_walltime_.count() << " "
+    os << std::setw(45) << std::left << record.decorated_region_name_
+       << std::setw(15) << std::right << record.self_walltime_.count()
+       << std::setw(15) << std::right << record.total_walltime_.count()
        << std::setw(15) << std::right << record.overhead_walltime_.count()
-       << " " << std::setw(10) << std::right << record.call_count_ << "\n";
+       << std::setw(10) << std::right << record.call_count_ << "\n";
   }
 }
 
@@ -104,7 +105,8 @@ void meto::Formatter::threads(std::ostream &os, hashvec_t hashvec) {
  * @param[in] hashvec  Vector containing all the necessary data
  */
 
-void meto::Formatter::drhook(std::ostream &os, hashvec_t hashvec) {
+void meto::Formatter::drhook(std::ostream &header, std::ostream &os,
+                             const hashvec_t &hashvec) {
 
   int num_threads = 1;
 #ifdef _OPENMP

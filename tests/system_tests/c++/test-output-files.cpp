@@ -12,54 +12,54 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <string>
+
+// Define a simple assertion macro that prints the expected and actual values on
+// failure.
+#define M_Assert(expected, value, file_line)                                   \
+  __M_Assert(expected, value, file_line, __FILE__, __LINE__)
+
+void __M_Assert(const std::string &expected, const std::string &value,
+                const int file_line, const char *file, const int line) {
+  if (expected != value) {
+    std::cerr << "Error: " << file << ":" << line << std::endl
+              << "Assertion failed: source line: " << line
+              << " against KGO file line: " << file_line << std::endl
+              << "Expected: " << expected << std::endl
+              << "Received: " << value << std::endl;
+
+    MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
+  }
+}
 
 /*
  * Check the first few lines of the output file
  */
-bool check_output_file(std::string path, std::string format) {
-  std::filebuf fb;
+bool check_output_file(const std::string &output_data_path,
+                       const std::string &test_data_path) {
+  std::filebuf output_file_buffer;
+  std::filebuf test_file_buffer;
   std::string buffer;
   std::string expected;
 
-  if (!fb.open(path, std::ios::in)) {
-    std::cerr << "failed to open " << path << std::endl;
+  if (!test_file_buffer.open(test_data_path, std::ios::in)) {
+    std::cerr << "failed to open " << test_data_path << std::endl;
     return false;
   }
+  std::istream test_data(&test_file_buffer);
 
-  std::istream input(&fb);
+  if (!output_file_buffer.open(output_data_path, std::ios::in)) {
+    std::cerr << "failed to open " << output_data_path << std::endl;
+    return false;
+  }
+  std::istream input(&output_file_buffer);
 
   // Check the header lines
-  std::getline(input, buffer);
-  if (buffer.compare("") != 0) {
-    std::cerr << "Invalid line: " << buffer << std::endl;
-    return false;
-  }
-
-  std::getline(input, buffer);
-  if (buffer.compare(0, 9, "Task 1 of") != 0) {
-    std::cerr << "Invalid line: " << buffer << std::endl;
-    return false;
-  }
-
-  // Match the next line to the start of an output format
-  if (format.compare("drhook") == 0) {
-    expected = "Profiling on ";
-  } else if (format.compare("threads") == 0) {
-    // Skip extra blank line in threads format
+  for (int i = 0; i < 8; ++i) {
     std::getline(input, buffer);
-    expected = "region_name@thread_id";
-  } else {
-    std::cerr << "unknown format" << std::endl;
-    return false;
-  }
-
-  std::getline(input, buffer);
-  if (buffer.compare(0, expected.length(), expected) != 0) {
-    std::cerr << "Invalid next line" << std::endl;
-    std::cerr << "Got:      " << buffer << std::endl;
-    std::cerr << "Expected: " << expected << std::endl;
-    return false;
+    std::getline(test_data, expected);
+    M_Assert(expected, buffer, i);
   }
 
   return true;
@@ -68,10 +68,11 @@ bool check_output_file(std::string path, std::string format) {
 /*
  * Generate some profiler output and check the contents
  */
-bool create_output(std::string mode, std::string format, int rank) {
-  std::string path = format + "-vernier-output";
+bool create_output(std::string mode, std::string format, int rank,
+                   int total_ranks) {
+  std::string path = format + "-" + std::to_string(total_ranks) + "core-vernier-output";
   meto::vernier.init(MPI_COMM_WORLD);
-
+  std::string test_data_path = "test_data/" + format + "-" + std::to_string(total_ranks) + "core-" + mode;
   // Create some data
   auto vnr_handle = meto::vernier.start("main");
 
@@ -105,7 +106,7 @@ bool create_output(std::string mode, std::string format, int rank) {
     return false;
   }
 
-  if (rank == 0 && !check_output_file(path, format)) {
+  if (rank == 0 && !check_output_file(path, test_data_path)) {
     std::cerr << mode << " file " << format << " test failed" << std::endl;
     return false;
   }
@@ -118,15 +119,17 @@ bool create_output(std::string mode, std::string format, int rank) {
  */
 int main() {
   int rank;
+  int total_ranks;
   std::string modes[] = {"multi", "single"};
-  std::string formats[] = {"drhook", "threads"};
+  std::string formats[] = {"drhook", "default"};
 
   MPI_Init(NULL, NULL);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &total_ranks);
 
   for (auto mode : modes) {
     for (auto format : formats) {
-      if (!create_output(mode, format, rank)) {
+      if (!create_output(mode, format, rank, total_ranks)) {
         MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
       }
     }
