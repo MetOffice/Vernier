@@ -48,7 +48,6 @@ void meto::Multi::write(hashvec_t hashvec) {
 
   // Open file and write buffers
   open_files();
-  os << header_buffer.str() << data_buffer.str();
   os.flush();
   os.close();
 }
