@@ -44,9 +44,9 @@ meto::Formatter::Formatter() {
 /**
  * @brief  Executes the format_ method to write the data.
  *
- * @param[in] header   Output stream for the format header
- * @param[in] os       Output stream that the format method will write data to
- * @param[in] hashvec  Vector of data that the format method will operate on
+ * @param[inout] header   Output stream for the format header
+ * @param[inout] os       Output stream that the format method will write data to
+ * @param[in]    hashvec  Vector of data that the format method will operate on
  */
 
 void meto::Formatter::execute_format(std::ostream &header, std::ostream &os,
@@ -57,8 +57,9 @@ void meto::Formatter::execute_format(std::ostream &header, std::ostream &os,
 /**
  * @brief  Per-thread timing output.
  *
- * @param[in] os       Output stream to write to
- * @param[in] hashvec  Vector containing all the necessary data
+ * @param[inout] header   Output stream for the format header
+ * @param[inout] os       Output stream to write to
+ * @param[in]    hashvec  Vector containing all the necessary data
  */
 
 void meto::Formatter::default_output(std::ostream &header, std::ostream &os,

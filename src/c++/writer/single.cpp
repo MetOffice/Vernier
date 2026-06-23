@@ -61,7 +61,6 @@ void meto::SingleFile::write(hashvec_t hashvec) {
 
   // Broadcast the header length from rank 0 so all ranks know the offset
   int header_length = static_cast<int>(header_buffer.str().length());
-  MPI_Bcast(&header_length, 1, MPI_INT, 0, mpi_context_.get_handle());
 
   // Global maximum string size is required on every task to set up
   // the custom data type
