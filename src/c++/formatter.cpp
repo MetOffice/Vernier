@@ -65,7 +65,7 @@ void meto::Formatter::execute_format(std::ostream &header, std::ostream &os,
 void meto::Formatter::default_output(std::ostream &header, std::ostream &os,
                                      const hashvec_t &hashvec) {
 
-  // Write key
+  // Write header
   header << "\n";
   header << "region_name@thread_id\n"
          << "Self time : Time accrued by region itself. (Exclusive time.)\n"
