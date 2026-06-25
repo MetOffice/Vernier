@@ -37,19 +37,25 @@ namespace meto {
 class Formatter {
 
 private:
+  std::string format_string_;
   // Format method
-  void (Formatter::*format_)(std::ostream &, hashvec_t);
+  void (Formatter::*format_)(std::ostream &header, std::ostream &os,
+                             const hashvec_t &hashvec);
 
   // Individual formatter functions
-  void threads(std::ostream &os, hashvec_t);
-  void drhook(std::ostream &os, hashvec_t);
+  void default_output(std::ostream &header, std::ostream &os,
+                      const hashvec_t &hashvec);
+  void drhook(std::ostream &header, std::ostream &os, const hashvec_t &hashvec);
 
 public:
   // Constructor
   explicit Formatter();
 
   // Execute the format method
-  void execute_format(std::ostream &os, hashvec_t, MPIContext &);
+  void execute_format(std::ostream &header, std::ostream &os,
+                      const hashvec_t &hashvec);
+
+  [[nodiscard]] std::string get_format_string() const { return format_string_; }
 };
 
 } // namespace meto

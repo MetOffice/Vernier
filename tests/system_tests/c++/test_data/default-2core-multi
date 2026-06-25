@@ -1,0 +1,19 @@
+####################################################################################################
+#   V E R N I E R                                                                                  #
+#   Output style: Default                                                                          #
+#   Format version: 1.0                                                                            #
+####################################################################################################
+
+region_name@thread_id
+Self time : Time accrued by region itself. (Exclusive time.)
+Total time: Time including cost of child routines and profiling overheads. (Inclusive time.)
+Overhead  : Profiling overhead incurred through direct child routine calls only.
+Calls     : Number of times the region is called.
+
+Task 1 of 2 : MPI rank ID 0
+
+Region                                              Self (s)      Total (s)   Overhead (s)    Calls
+--------------------------------------------- -------------- -------------- -------------- ---------
+__vernier__@0                                    1.92672e-05    1.92672e-05              0         2
+main@0                                           5.40866e-07    4.28804e-06    3.59723e-06         1
+even_rank@0                                      1.49943e-07    1.49943e-07              0         1

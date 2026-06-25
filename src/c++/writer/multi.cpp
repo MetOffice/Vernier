@@ -6,6 +6,8 @@
  */
 
 #include "multi.h"
+#include "writer_utils.h"
+#include <sstream>
 
 /**
  * @brief  Construct a new Multi writer.
@@ -36,8 +38,17 @@ void meto::Multi::open_files() {
  */
 
 void meto::Multi::write(hashvec_t hashvec) {
+
+  // Write data into buffers
+  std::ostringstream header_buffer;
+  std::ostringstream data_buffer;
+  rank_info(data_buffer, mpi_context_);
+  header(header_buffer, formatter_.get_format_string());
+  formatter_.execute_format(header_buffer, data_buffer, hashvec);
+
+  // Open file and write buffers
   open_files();
-  formatter_.execute_format(os, hashvec, mpi_context_);
+  os << header_buffer.str() << data_buffer.str();
   os.flush();
   os.close();
 }
