@@ -13,6 +13,7 @@ from pathlib import Path
 import os
 from vernier.lib.vernier_data import VernierData
 
+# Should match the format version found in writer_utils.h
 FILE_FORMAT_VERSION = 1.0
 
 class VernierFileFormat(Enum):
@@ -44,9 +45,9 @@ class VernierReader():
     @classmethod
     def _get_file_format(cls, file_header: list[str]) -> VernierFileFormat:
         """
-        Determines file format based on file contents - looks for the presence
-        of characteristic string fragments in a provided section of the file
-        contents.
+        Determines file format based on file header contents - looks for the
+        presence of characteristic string fragments in a provided section of the
+        file contents.
 
         :param file_header: A section of the file contents to be used to
                             detect file format.
@@ -57,6 +58,8 @@ class VernierReader():
 
         file_format = VernierFileFormat.INVALID
         if len(file_header) == 5:
+            # Check the format version of the file is compatible with this
+            # version of the post-processing lib
             if str(FILE_FORMAT_VERSION) in file_header[3]:
                 if "Output style: Default" in file_header[2]:
                     file_format = VernierFileFormat.DEFAULT

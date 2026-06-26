@@ -30,8 +30,8 @@ class TestVernierReader(unittest.TestCase):
     def test_invalid_format_file(self):
         self.assertEqual(VernierReader._get_file_format(["This is a junk file"]), VernierFileFormat.INVALID)
 
-    def test_load_from_file_threads_format(self):
-        test_reader = VernierReader(self.test_data_dir / "vernier-output-threads-collated")
+    def test_load_from_file_default_format(self):
+        test_reader = VernierReader(self.test_data_dir / "vernier-output-default-collated")
         loaded_data = test_reader.load()
         self.assertIn("FULL", loaded_data.data)
         self.assertIn("MAIN_SUB", loaded_data.data)
@@ -88,8 +88,8 @@ class TestVernierReader(unittest.TestCase):
         self.assertCountEqual(loaded_data.data['MAIN_SUB2'].rank, [0, 0, 0, 0, 1, 1, 1, 1])
         self.assertCountEqual(loaded_data.data['MAIN_SUB2'].thread, [1, 0, 2, 3, 2, 3, 1, 0])
 
-    def test_load_from_directory_threads_format(self):
-        test_reader = VernierReader(self.test_data_dir / "vernier-output-threads-format")
+    def test_load_from_directory_default_format(self):
+        test_reader = VernierReader(self.test_data_dir / "vernier-output-default-format")
         loaded_data = test_reader.load()
         self.assertIn("FULL", loaded_data.data)
         self.assertIn("MAIN_SUB", loaded_data.data)
