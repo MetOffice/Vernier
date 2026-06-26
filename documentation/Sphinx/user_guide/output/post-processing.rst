@@ -26,3 +26,7 @@ Scripts
     multiple output files from a parallel run, or a single output file from a
     collated run.
 
+    The result of the summarise script contains the minimum, maximum and mean
+    values for each of the output variables, along with the number of calls
+    and the time and percentage time per call.
+
