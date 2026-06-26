@@ -16,9 +16,9 @@ associated walltimes.
 
 The :ref:`environment variables <env-variables>` section at the end of the
 setting up guide outlines environment variables relevant to Vernier's output.
-To reiterate, the two output format options are **threads** and **drhook**.
+To reiterate, the two output format options are **default** and **drhook**.
 
-**Example "threads" output:**
+**Example "default" output:**
 
 .. code-block:: text
 

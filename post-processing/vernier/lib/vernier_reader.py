@@ -13,13 +13,15 @@ from pathlib import Path
 import os
 from vernier.lib.vernier_data import VernierData
 
+# Should match the format version found in writer_utils.h
+FILE_FORMAT_VERSION = 1.0
 
 class VernierFileFormat(Enum):
     """
     Enums for different Vernier output file formats.
 
     """
-    THREADS = auto()
+    DEFAULT = auto()
     DRHOOK = auto()
     INVALID = auto()
 
@@ -43,9 +45,9 @@ class VernierReader():
     @classmethod
     def _get_file_format(cls, file_header: list[str]) -> VernierFileFormat:
         """
-        Determines file format based on file contents - looks for the presence
-        of characteristic string fragments in a provided section of the file
-        contents.
+        Determines file format based on file header contents - looks for the
+        presence of characteristic string fragments in a provided section of the
+        file contents.
 
         :param file_header: A section of the file contents to be used to
                             detect file format.
@@ -54,16 +56,21 @@ class VernierReader():
         :rtype: VernierFileFormat
         """
 
-        if "region_name@thread_id" in file_header:
-            return VernierFileFormat.THREADS
-        if any([line.startswith('Profiling on') for line in file_header]):
-            return VernierFileFormat.DRHOOK
+        file_format = VernierFileFormat.INVALID
+        if len(file_header) == 5:
+            # Check the format version of the file is compatible with this
+            # version of the post-processing lib
+            if str(FILE_FORMAT_VERSION) in file_header[3]:
+                if "Output style: Default" in file_header[2]:
+                    file_format = VernierFileFormat.DEFAULT
+                if "Output style: Dr HOOK" in file_header[2]:
+                    file_format = VernierFileFormat.DRHOOK
         # else
-        return VernierFileFormat.INVALID
+        return file_format
 
-    def _parse_threadsfile_data(self, file_contents: list[str]) -> VernierData:
+    def _parse_defaultfile_data(self, file_contents: list[str]) -> VernierData:
         """
-        Parses the contents of a Vernier output file in the 'threads' format
+        Parses the contents of a Vernier output file in the 'default' format
         into a VernierData object.
 
         :param file_contents: Contents of the Vernier data file.
@@ -181,13 +188,13 @@ class VernierReader():
 
         contents = self.path.read_text().splitlines()
 
-        header = contents[0:10]
+        header = contents[0:5]
 
         # Match file format and populate data
         # We don't use the match pattern to keep python3.9 compatibility.
         file_format = VernierReader._get_file_format(header)
-        if file_format == VernierFileFormat.THREADS:
-            loaded = self._parse_threadsfile_data(contents)
+        if file_format == VernierFileFormat.DEFAULT:
+            loaded = self._parse_defaultfile_data(contents)
         elif file_format == VernierFileFormat.DRHOOK:
             loaded = self._parse_drhook_data(contents)
         elif file_format == VernierFileFormat.INVALID:
