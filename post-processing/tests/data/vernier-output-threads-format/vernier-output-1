@@ -1,11 +1,16 @@
-
-Task 2 of 2 : MPI rank ID 1
+####################################################################################################
+#   V E R N I E R                                                                                  #
+#   Output style: Default                                                                          #
+#   Format version: 1.0                                                                            #
+####################################################################################################
 
 region_name@thread_id
 Self time : Time accrued by region itself. (Exclusive time.)
 Total time: Time including cost of child routines and profiling overheads. (Inclusive time.)
 Overhead  : Profiling overhead incurred through direct child routine calls only.
 Calls     : Number of times the region is called.
+
+Task 2 of 2 : MPI rank ID 1
 
 Region                                        Self (s)      Total (s)   Overhead (s)     Calls
 --------------------------------------- -------------- -------------- -------------- -------- 
