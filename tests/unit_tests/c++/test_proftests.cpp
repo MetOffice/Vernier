@@ -5,6 +5,7 @@
 \*----------------------------------------------------------------------------*/
 
 #include <chrono>
+#include <filesystem>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <iostream>
@@ -15,6 +16,9 @@
 #include "vernier_mpi.h"
 
 using ::testing::ExitedWithCode;
+
+// Forward declarations
+void check_file_exists_and_remove(std::string const);
 
 //
 //  Tests and death tests related to Vernier class members.
@@ -89,6 +93,16 @@ TEST(DeathTest, VernierUninitialisedInWrite) {
   // clang-format on
 }
 
+// Check that uninitialised MPI is caught in the affinity write functionality.
+TEST(DeathTest, VernierUninitialisedInAffinityWrite) {
+
+  // No init() called yet, so MPI context not initialised.
+  // clang-format off
+  EXPECT_EXIT({ meto::vernier.write_affinity(); }, ExitedWithCode(EXIT_FAILURE),
+              "Vernier::write_affinity. Vernier not initialised.");
+  // clang-format on
+}
+
 // The traceback array is not a growable vector. Check that the code exits
 // when available array elements are exhausted.
 TEST(DeathTest, TooManyTracebackEntries) {
@@ -121,4 +135,50 @@ TEST(DeathTest, InvalidIOModeTest) {
         meto::HashVecHandler object(mpi_context);
       },
       ExitedWithCode(EXIT_FAILURE), "Invalid IO mode choice");
+}
+
+// Check that the Vernier affinity functionality produces files with expected
+// filenames.
+TEST(VernierTest, WriteAffinity) {
+
+  meto::vernier.init(MPI_COMM_WORLD);
+
+  std::string const seedname = "vernier-affinity";
+  std::string const extension = ".txt";
+  std::string fname;
+
+  // Test with default filename
+  meto::vernier.write_affinity();
+  fname = seedname + extension;
+  check_file_exists_and_remove(fname);
+
+  // Test with tag
+  meto::vernier.write_affinity("tag");
+  fname = seedname + "-tag" + extension;
+  check_file_exists_and_remove(fname);
+
+  // Test with comm, no tag
+  meto::vernier.write_affinity_with_comm(MPI_COMM_WORLD);
+  fname = seedname + extension;
+  check_file_exists_and_remove(fname);
+
+  // Test with comm and tag
+  meto::vernier.write_affinity_with_comm(MPI_COMM_WORLD, "commtag");
+  fname = seedname + "-commtag" + ".txt";
+  check_file_exists_and_remove(fname);
+
+  meto::vernier.finalize();
+}
+
+// Helper routine to check whether a file exists, then remove it. Happens on MPI
+// rank 0 only.
+void check_file_exists_and_remove(std::string const fname) {
+
+  int myrank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+
+  if (myrank == 0) {
+    EXPECT_TRUE(std::filesystem::exists(fname));
+    EXPECT_TRUE(std::filesystem::remove(fname));
+  }
 }

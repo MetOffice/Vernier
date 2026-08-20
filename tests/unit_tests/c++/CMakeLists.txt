@@ -45,6 +45,7 @@ add_unit_test(test_hashtable test_hashtable.cpp)
 add_unit_test(test_proftests test_proftests.cpp)
 add_unit_test(test_callcount test_callcount.cpp)
 add_unit_test(test_recursion test_recursion.cpp)
+add_unit_test(test_affinity test_affinity.cpp)
 
 # ------------------------------------------------------------------------------
 # Test behaviour when MPI is not initialised.

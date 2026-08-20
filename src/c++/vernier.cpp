@@ -5,12 +5,14 @@
 \*----------------------------------------------------------------------------*/
 
 #include "vernier.h"
+#include "affinity.h"
 #include "error_handler.h"
 #include "hashvec_handler.h"
 
 #include <cassert>
 #include <chrono>
 #include <iostream>
+#include <sstream>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -292,6 +294,62 @@ void meto::Vernier::write() {
   // Sort hashvec from high to low self walltimes then write
   output_data.sort();
   output_data.write();
+}
+
+/**
+ * @brief  Write affinity map, involving those MPI ranks which
+ *         comprise the communicator with which Vernier was initialised.
+ * @param [in] tag  Optional string to include in the output filename.
+ */
+
+void meto::Vernier::write_affinity(std::string_view const tag) {
+  if (!initialized_) {
+    meto::error_handler("Vernier::write_affinity. Vernier not initialised.",
+                        EXIT_FAILURE);
+  }
+  write_affinity_with_context(mpi_context_, tag);
+}
+
+/**
+ * @brief  Write affinity map, involving those MPI ranks comprising the
+ *         specified MPI communicator.
+ * @param [in] comm_handle MPI communicator over which to report affinitisation.
+ * @param [in] tag  Optional string to include in the output filename.
+ * @warning  All ranks in the communicator provided must call this routine.
+ */
+
+void meto::Vernier::write_affinity_with_comm(MPI_Comm const comm_handle,
+                                             std::string_view const tag) {
+  auto local_mpi_context = meto::MPIContext();
+  local_mpi_context.init(comm_handle);
+  write_affinity_with_context(local_mpi_context, tag);
+  local_mpi_context.finalize();
+}
+
+/**
+ * @brief  Write affinity map, involving those ranks comprising the specified
+ *         Vernier MPI context.
+ * @param [in] mpi_context  The Vernier MPI context.
+ * @param [in] tag  Optional string to include in the output filename.
+ */
+
+void meto::Vernier::write_affinity_with_context(MPIContext const &mpi_context,
+                                                std::string_view const tag) {
+
+  std::string const seedname = "vernier-affinity";
+  std::string const extension = ".txt";
+  std::stringstream ss;
+
+  if (tag != MPI_CONTEXT_NULL_STRING) {
+    ss << seedname << "-" << tag << extension;
+  } else {
+    ss << seedname << extension;
+  }
+
+  std::string filename = ss.str();
+  meto::Affinity affinity;
+
+  affinity.write_map(mpi_context, filename);
 }
 
 /**

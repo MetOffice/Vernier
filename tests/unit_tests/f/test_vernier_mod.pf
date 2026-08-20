@@ -10,6 +10,7 @@ module test_vernier_mod
   !$ use omp_lib
   use mpi
   use pfunit
+  implicit none
 
   integer, parameter :: dp = 8
 
@@ -21,6 +22,9 @@ module test_vernier_mod
     procedure :: teardown
     procedure :: test_vernier_timings
     procedure :: test_vernier_tags
+    procedure :: test_vernier_affinity
+    procedure :: test_vernier_affinity_with_comm
+    procedure :: test_vernier_affinity_default_fname
   end type test_vernier_type
 
 contains
@@ -145,5 +149,133 @@ contains
     call vernier_finalize()
 
   end subroutine test_vernier_tags
+
+  !------------------------------------------------------------------------------
+  ! Test Vernier affinity, using the MPI communicator with which Vernier was
+  ! initialised.
+  !------------------------------------------------------------------------------
+
+  @test(npes=[1,2])
+  subroutine test_vernier_affinity(this)
+    implicit none
+
+    class(test_vernier_type), intent(inout) :: this
+
+    character(len=20) :: tag
+    integer :: comm_size
+    integer :: ierr
+
+    call vernier_init(client_comm_handle = this%getMpiCommunicator())
+
+    ! Generate the filename to write. Vernier does not expose MPI contexts,
+    ! so get the communicator size with direct MPI call.
+    call mpi_comm_size(this%getMpiCommunicator(), comm_size, ierr)
+    write(tag, '(a,i0)') "comm-size", comm_size
+
+    ! Write affinity map.
+    call vernier_write_affinity(tag = trim(tag))
+
+    call check_and_delete_file(this%getMpiCommunicator(), &
+                              "vernier-affinity-"//trim(tag)//".txt")
+
+    call vernier_finalize()
+
+  end subroutine test_vernier_affinity
+
+  !------------------------------------------------------------------------------
+  ! Test Vernier affinity with ranks in the specified MPI communicator.
+  !------------------------------------------------------------------------------
+
+  @test(npes=[1,2])
+  subroutine test_vernier_affinity_with_comm(this)
+    implicit none
+
+    class(test_vernier_type), intent(inout) :: this
+
+    character(len=20) :: tag
+    integer :: comm_size
+    integer :: ierr
+
+    call vernier_init(client_comm_handle = this%getMpiCommunicator())
+
+    ! Generate the filename to write. Vernier does not expose MPI contexts,
+    ! so get the communicator size with direct MPI call.
+    call mpi_comm_size(this%getMpiCommunicator(), comm_size, ierr)
+    write(tag, '(a,i0)') "with-comm-size", comm_size
+
+    ! Write affinity map.
+    call vernier_write_affinity_with_comm(      &
+       comm_handle = this%getMpiCommunicator(), &
+       tag = trim(tag))
+
+    call check_and_delete_file(this%getMpiCommunicator(), &
+                              "vernier-affinity-"//trim(tag)//".txt")
+
+    call vernier_finalize()
+
+  end subroutine test_vernier_affinity_with_comm
+
+  !------------------------------------------------------------------------------
+  ! Test Vernier affinity with no tag (default filename.)
+  ! Run on a single MPI rank only to avoid race conditions between tests with
+  ! different comm sizes.
+  !------------------------------------------------------------------------------
+
+  @test(npes=[1])
+  subroutine test_vernier_affinity_default_fname(this)
+    implicit none
+
+    class(test_vernier_type), intent(inout) :: this
+
+    call vernier_init(client_comm_handle = this%getMpiCommunicator())
+
+    ! Write affinity map.
+    call vernier_write_affinity()
+
+    ! Check file exists with default filename.
+    call check_and_delete_file(this%getMpiCommunicator(), &
+                               "vernier-affinity.txt")
+
+    call vernier_finalize()
+
+  end subroutine test_vernier_affinity_default_fname
+
+  !-------------------------------------------------------------------------------
+  ! Helper routine to check if file exists, then delete if it does. Deleting
+  ! afterwards allows clean re-tests.
+  !-------------------------------------------------------------------------------
+
+  subroutine check_and_delete_file(comm, filename)
+    implicit none
+
+    ! Arguments
+    integer,          intent(in) :: comm
+    character(len=*), intent(in) :: filename
+
+    ! Local parameters
+    integer :: file_unit = 10
+
+    ! Local variables
+    logical :: file_exists
+    integer :: iostat
+    logical :: on_root
+    integer :: my_rank
+    integer :: ierr
+
+    ! Establish whether this is the rank designated as root.
+    call mpi_comm_rank(comm, my_rank, ierr)
+    on_root = (my_rank == 0)
+
+    ! Check and delete on root only.
+    if (on_root) then
+      inquire(file=trim(filename), exist=file_exists)
+      @assertTrue(file_exists)
+
+      ! Remove the test artifact.
+      open(unit=file_unit, iostat=iostat, file=trim(filename), status='old')
+      if (iostat==0) close (unit=file_unit, status='delete')
+    end if
+
+  end subroutine check_and_delete_file
 
 end module test_vernier_mod

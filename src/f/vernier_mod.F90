@@ -31,6 +31,8 @@ module vernier_mod
   public :: vernier_start
   public :: vernier_stop
   public :: vernier_write
+  public :: vernier_write_affinity
+  public :: vernier_write_affinity_with_comm
   public :: vernier_get_total_walltime
   public :: vernier_get_wtime
 
@@ -73,6 +75,19 @@ module vernier_mod
         !No arguments to handle
     end subroutine vernier_write
 
+    subroutine interface_vernier_write_affinity(tag) &
+               bind(C, name='c_vernier_write_affinity')
+      import :: c_char
+      character(kind=c_char, len=1), optional, intent(in) :: tag(*)
+    end subroutine interface_vernier_write_affinity
+
+    subroutine interface_vernier_write_affinity_with_comm(comm_handle, tag) &
+               bind(C, name='c_vernier_write_affinity_with_comm')
+      import :: c_char
+      integer,                                 intent(in) :: comm_handle
+      character(kind=c_char, len=1), optional, intent(in) :: tag(*)
+    end subroutine interface_vernier_write_affinity_with_comm
+
     function vernier_get_total_walltime(hash_in, thread_id) result(walltime) &
              bind(C, name='c_vernier_get_total_walltime')
       import :: vik, vrk
@@ -97,8 +112,7 @@ module vernier_mod
     !> @param [in]  client_comm_handle  Handle for the MPI communicator
     !>                                  over which Vernier will operate.
     !> @param [in] tag The tag to appear in the Vernier output filename.
-    !> @note   Region names need not be null terminated on entry to this
-    !>         routine.
+    !> @note   The tag need not be null terminated on entry to this routine.
     subroutine vernier_init(client_comm_handle, tag)
       implicit none
 
@@ -145,6 +159,64 @@ module vernier_mod
       call interface_vernier_start_part2(hash_out, local_region_name)
 
     end subroutine vernier_start
+
+    !> @brief  Write the affinity map, involving those MPI ranks comprising the
+    !>         communicator with which Vernier was initialised.
+    !> @param [in] tag Optional tag to appear in the Vernier output filename.
+    !> @note   The tag need not be null terminated on entry to this routine.
+    subroutine vernier_write_affinity(tag)
+      implicit none
+
+      !Arguments
+      character(len=*), optional, intent(in) :: tag
+
+      !Local variables
+      character(len=:), allocatable :: local_tag
+
+      ! NB: Dual calls to interface_vernier_write_affinity() ought to be
+      ! unnecessary, since unallocated actual arguments passed to optional dummy
+      ! arguments count as not present in downstream code. We separate the calls
+      ! here (with and without local_tag) to accommodate a compiler bug.
+      if (present(tag)) then
+        allocate(character(len=len_trim(tag)+1) :: local_tag)
+        call append_null_char(tag, local_tag, len_trim(tag))
+        call interface_vernier_write_affinity(local_tag)
+      else
+        call interface_vernier_write_affinity()
+      end if
+
+    end subroutine vernier_write_affinity
+
+    !> @brief  Write the affinity map, involving those MPI ranks comprising the
+    !>         specified communicator.
+    !> @param [in] comm_handle  Includes ranks comprising this MPI communicator
+    !>                          handle.
+    !> @param [in] tag Optional tag to appear in the Vernier output filename.
+    !> @note   The tag need not be null terminated on entry to this routine.
+    !> @warning  All ranks in the communicator provided must call this routine.
+    subroutine vernier_write_affinity_with_comm(comm_handle, tag)
+      implicit none
+
+      !Arguments
+      integer,                    intent(in) :: comm_handle
+      character(len=*), optional, intent(in) :: tag
+
+      !Local variables
+      character(len=:), allocatable :: local_tag
+
+      ! NB: Dual calls to interface_vernier_write_affinity() ought to be
+      ! unnecessary, since unallocated actual arguments passed to optional dummy
+      ! arguments count as not present in downstream code. We separate the calls
+      ! here (with and without local_tag) to accommodate a compiler bug.
+      if (present(tag)) then
+        allocate(character(len=len_trim(tag)+1) :: local_tag)
+        call append_null_char(tag, local_tag, len_trim(tag))
+        call interface_vernier_write_affinity_with_comm(comm_handle, local_tag)
+      else
+        call interface_vernier_write_affinity_with_comm(comm_handle)
+      end if
+
+    end subroutine vernier_write_affinity_with_comm
 
     !> @brief  Adds a null character to the end of a string.
     !> @param [in]  strlen      Length of the unterminated string.

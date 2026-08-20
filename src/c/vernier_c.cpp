@@ -29,6 +29,9 @@ void c_vernier_start_part1();
 void c_vernier_start_part2(long int &, char const *);
 void c_vernier_stop(long int const &);
 void c_vernier_write();
+void c_vernier_write_affinity(const char *const tag);
+void c_vernier_write_affinity_with_comm(
+    const MPI_Fint *const client_comm_handle, const char *const tag);
 double c_vernier_get_total_walltime(long int const &, int const &);
 double c_vernier_get_wtime();
 }
@@ -101,6 +104,44 @@ void c_vernier_stop(long int const &hash_in) {
  */
 
 void c_vernier_write() { meto::vernier.write(); }
+
+/**
+ * @brief Write the affinity map, involving those ranks in the MPI communicator
+ *        with which Vernier was initialised.
+ * @param[in] tag  Optional string to include in the filename.
+ */
+
+void c_vernier_write_affinity(const char *const tag) {
+
+  std::string local_tag = MPI_CONTEXT_NULL_STRING;
+
+  if (tag) {
+    local_tag = static_cast<std::string>(tag);
+  }
+
+  meto::vernier.write_affinity(local_tag);
+}
+
+/**
+ * @brief Write the affinity map, involving those ranks in the specified MPI
+ *        communicator.
+ * @param[in] client_comm_handle  MPI communicator handle.
+ * @param[in] tag  Optional string to include in the filename.
+ * @warning  All ranks in the communicator provided must call this routine.
+ */
+
+void c_vernier_write_affinity_with_comm(
+    const MPI_Fint *const client_comm_handle, const char *const tag) {
+
+  std::string local_tag = MPI_CONTEXT_NULL_STRING;
+
+  if (tag) {
+    local_tag = static_cast<std::string>(tag);
+  }
+
+  MPI_Comm local_handle = MPI_Comm_f2c(*client_comm_handle);
+  meto::vernier.write_affinity_with_comm(local_handle, local_tag);
+}
 
 /**
  * @brief  Get the total wallclock time for the specified region on the
