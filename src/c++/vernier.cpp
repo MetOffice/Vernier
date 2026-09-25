@@ -209,15 +209,30 @@ void meto::Vernier::stop_impl(size_t const hash,
   auto call_depth_index = static_cast<traceback_index_t>(call_depth_);
   auto &traceback_entry = thread_traceback_[tid].at(call_depth_index);
 
-  // Check: which hash is last on the traceback list?
+  // Check whether the received hash matches the last hash on the list.
   size_t last_hash_on_list = traceback_entry.record_hash_;
   if (hash != last_hash_on_list) {
-    std::string error_msg =
-        "EMERGENCY STOP: hashes don't match. Expected calliper: " +
-        thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) +
-        " Received calliper: " +
-        thread_hashtables_[tid].get_decorated_region_name(hash) + "\n";
-    error_handler(error_msg, EXIT_FAILURE);
+
+    // The hash is unexpected. Is it known?
+    record_index_t record_index;
+    if (thread_hashtables_[tid].query(hash, record_index)) {
+
+      // Hash is known but unexpected.
+      std::string error_msg =
+          "EMERGENCY STOP: hashes don't match. Expected calliper: " +
+          thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list) +
+          " Received calliper: " +
+          thread_hashtables_[tid].get_decorated_region_name(hash) + "\n";
+      error_handler(error_msg, EXIT_FAILURE);
+
+    } else {
+
+      // Hash is unknown.
+      std::string error_msg =
+          "EMERGENCY STOP: received unknown hash. Expected calliper: " +
+          thread_hashtables_[tid].get_decorated_region_name(last_hash_on_list);
+      error_handler(error_msg, EXIT_FAILURE);
+    }
   }
 
   // Compute the region time

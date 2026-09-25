@@ -102,6 +102,25 @@ size_t meto::HashTable::compute_hash(std::string_view region_name, int tid) {
 }
 
 /**
+ * @brief  Looks up a hash in the lookup table.
+ * @param [in]  hash          Search for this hash.
+ * @param [out] record_index  Array index of the region record, if found.
+ * @note  Test the returned boolean before relying on the record index.
+ * @returns  Returns true if an entry for the hash already exists, false
+ *           otherwise.
+ *
+ */
+
+bool meto::HashTable::query(size_t const hash,
+                            record_index_t &record_index) noexcept {
+  if (auto search = lookup_table_.find(hash); search != lookup_table_.end()) {
+    record_index = search->second;
+    return true;
+  }
+  return false;
+}
+
+/**
  * @brief  Inserts a new entry into the hashtable.
  * @param [in]  region_name  The name of the region.
  * @param [in]  tid          The thread ID.
@@ -116,13 +135,8 @@ void meto::HashTable::query_insert(std::string_view const region_name, int tid,
   // Compute the hash
   hash = compute_hash(region_name, tid);
 
-  // Does the entry exist already?
-  if (auto search = lookup_table_.find(hash); search != lookup_table_.end()) {
-    record_index = search->second;
-  }
-
-  // If not, create new entry.
-  else {
+  // Does the entry exist already? If not, create new entry.
+  if (!query(hash, record_index)) {
     // Insert this region into the thread's hash table.
     hashvec_.emplace_back(hash, region_name, tid);
     record_index = hashvec_.size() - 1;
