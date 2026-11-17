@@ -42,20 +42,23 @@ private:
   bool initialized_;
   std::string tag_;
 
+  int static constexpr comm_root_ = 0;
+
 public:
   // Constructor
   MPIContext();
 
   // Init and finalize
   bool is_initialized();
-  void init(MPI_Comm, std::string_view tag);
+  void init(MPI_Comm, std::string_view tag = MPI_CONTEXT_NULL_STRING);
   void finalize();
   void reset();
 
   // Getters
-  int get_size();
-  int get_rank();
-  MPI_Comm get_handle();
+  int get_size() const;
+  int get_rank() const;
+  bool on_root() const;
+  MPI_Comm get_handle() const;
 
   std::string get_tag() const;
 };

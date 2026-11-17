@@ -18,6 +18,7 @@
 
 #include <array>
 #include <iterator>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -95,6 +96,7 @@ private:
   // Private methods
   void start_part1();
   size_t start_part2(std::string_view const);
+  void write_affinity_with_context(MPIContext const &, std::string_view);
   void stop_impl(size_t, double *return_region_duration = nullptr);
 
 public:
@@ -110,6 +112,9 @@ public:
   void stop(size_t, double &return_region_duration);
   void stop(size_t, double *return_region_duration);
   void write();
+  void write_affinity(std::string_view const tag = MPI_CONTEXT_NULL_STRING);
+  void write_affinity_with_comm(
+      MPI_Comm const, std::string_view const tag = MPI_CONTEXT_NULL_STRING);
 
   // Getters
   double get_total_walltime(size_t const, int const);
