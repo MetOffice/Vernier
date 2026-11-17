@@ -97,6 +97,7 @@ private:
   void start_part1();
   size_t start_part2(std::string_view const);
   void write_affinity_with_context(MPIContext const &, std::string_view);
+  void stop_impl(size_t, double *return_region_duration = nullptr);
 
 public:
   // Default constructor needed for `inline` global Vernier object.
@@ -107,7 +108,9 @@ public:
             std::string_view tag = MPI_CONTEXT_NULL_STRING);
   void finalize();
   size_t start(std::string_view const);
-  void stop(size_t const);
+  void stop(size_t);
+  void stop(size_t, double &return_region_duration);
+  void stop(size_t, double *return_region_duration);
   void write();
   void write_affinity(std::string_view const tag = MPI_CONTEXT_NULL_STRING);
   void write_affinity_with_comm(

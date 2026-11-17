@@ -35,7 +35,7 @@ contains
 
   subroutine setup(this)
     implicit none
-    
+
     class(test_vernier_type), intent(inout) :: this
 
   end subroutine setup
@@ -46,7 +46,7 @@ contains
 
   subroutine teardown(this)
     implicit none
-    
+
     class(test_vernier_type), intent(inout) :: this
 
   end subroutine teardown
@@ -66,6 +66,9 @@ contains
 
     ! Handle declarations
     integer(kind=vik) :: prof_main
+
+    ! Returned time declaration
+    real(kind=vrk) :: returned_time
 
     ! Error handler
     integer :: ierr
@@ -108,14 +111,14 @@ contains
 
     ! End of profiling; record t2 immediately before.
     t2 = vernier_get_wtime()
-    call vernier_stop(prof_main)
+    call vernier_stop(prof_main, returned_time)
 
     assertions: block
       real(kind=vrk) :: profiler_wallclock_time
 
       actual_time = t2 - t1
       profiler_wallclock_time = vernier_get_total_walltime(prof_main, 0_vik)
-
+      @assertEqual(returned_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
       @assertEqual(actual_time, profiler_wallclock_time, tolerance=1.0e-4_dp)
     end block assertions
 

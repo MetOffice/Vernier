@@ -48,7 +48,8 @@ TEST(SystemTest, TimingTest) {
 
   // End of profiling; record t2 immediately before.
   double t2 = meto::vernier_get_wtime();
-  meto::vernier.stop(prof_main);
+  double returned_time;
+  meto::vernier.stop(prof_main, returned_time);
 
   // Check that the total time measured by the profiler is within some tolerance
   // of the actual time measured by simple t2-t1.  This only tests the top-level
@@ -61,6 +62,8 @@ TEST(SystemTest, TimingTest) {
             << "Actual timing: " << actual_time << "\n";
   std::cout << "\n"
             << "Profiler timing: " << prof_time << "\n\n";
+  std::cout << "Profiler returned timing: " << returned_time << "\n\n";
+  EXPECT_NEAR(returned_time, actual_time, time_tolerance);
   EXPECT_NEAR(prof_time, actual_time, time_tolerance);
 
   meto::vernier.finalize();

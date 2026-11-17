@@ -65,10 +65,11 @@ module vernier_mod
       integer(kind=vik),             intent(out) :: hash_out
     end subroutine interface_vernier_start_part2
 
-    subroutine vernier_stop(hash_in) bind(C, name='c_vernier_stop')
-      import :: vik
+    subroutine vernier_stop(hash_in, region_duration) bind(C, name='c_vernier_stop')
+      import :: vik, vrk
       !> The hash of the region being stopped.
       integer(kind=vik), intent(in) :: hash_in
+      real(kind=vrk), optional, intent(out) :: region_duration
     end subroutine vernier_stop
 
     subroutine vernier_write() bind(C, name='c_vernier_write')
@@ -126,7 +127,7 @@ module vernier_mod
       ! NB: Dual calls to interface_vernier_init() ought to be unnecessary,
       ! since unallocated actual arguments passed to optional dummy arguments
       ! count as not present in downstream code. We separate the calls here
-      ! (with and without local_tag) to accommodate a compiler bug. 
+      ! (with and without local_tag) to accommodate a compiler bug.
       if (present(tag)) then
         allocate(character(len=len_trim(tag)+1) :: local_tag)
         call append_null_char(tag, local_tag, len_trim(tag))

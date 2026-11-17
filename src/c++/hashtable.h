@@ -90,6 +90,7 @@ public:
 
   // Prototypes
   size_t compute_hash(std::string_view, int);
+  bool query(size_t const, record_index_t &) noexcept;
   void query_insert(std::string_view const, int, size_t &,
                     record_index_t &) noexcept;
   void update(record_index_t const, time_duration_t const);

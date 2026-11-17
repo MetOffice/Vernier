@@ -45,9 +45,28 @@ follows:
        Starts a timed region with the given name. Returns a handle (or "hash") for
        the region.
 
-   .. cpp:function:: void stop(size_t const &hash)
+   .. cpp:function:: void stop(size_t hash)
 
-       Stops the timed region associated with the given handle.
+       Stops the timed region associated with the given hash.
+
+       :param hash: The hash value of the region to stop.
+
+   .. cpp:function:: void stop(size_t hash, double &return_region_duration)
+
+       Stops the timed region associated with the given hash. Returns
+       the elapsed time of the region in a variable passed by reference.
+
+       :param hash: The hash value of the region to stop.
+       :param return_region_duration: Reference variable returning calliper time
+
+   .. cpp:function:: void stop(size_t hash, double *return_region_duration)
+
+       Stops the timed region associated with the given hash. Returns
+       the elapsed time of the region in a variable passed as a pointer.
+
+       :param hash: The hash value of the region to stop.
+       :param return_region_duration: Pointer for returning calliper time
+
 
    .. cpp:function:: void write()
 
