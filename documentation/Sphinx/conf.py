@@ -11,7 +11,7 @@ import os
 # -- Project information -----------------------------------------------------
 
 project = 'Vernier'
-copyright = '2023 Met Office. All rights reserved'
+copyright = 'Met Office. All rights reserved'
 author = ''
 
 # -- General configuration ---------------------------------------------------
